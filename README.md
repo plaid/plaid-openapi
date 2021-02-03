@@ -1,4 +1,4 @@
-# plaid-OpenAPI-beta
+# plaid-openapi-beta
 
 More documentation coming 2/15/21.
 
@@ -17,8 +17,10 @@ You can use either `docker-cli` or `npm` to install the generator dependency.
 `OUTPUT_FOLDER="python"`
 
 ```bash
-	docker run --rm -v $(CURRENT_DIR):/local openapitools/openapi-generator-cli:v5.0.0 generate -g python -i local/2020-09-14.yml -o local/$(OUTPUT_FOLDER)/generated-python \
-		-p packageName=plaid \
+docker run --rm -v $(CURRENT_DIR):/local openapitools/openapi-generator-cli:v5.0.0 generate \
+-g python -i local/2020-09-14.yml \
+-o local/$(OUTPUT_FOLDER)/generated-python \
+-p packageName=plaid
 ```
 
 **NPM example:**
@@ -27,6 +29,9 @@ You can use either `docker-cli` or `npm` to install the generator dependency.
 2. Run the `openapi-generator-cli generate` command.
 
 ```bash
-	openapi-generator-cli generate -g python -i ./2020-09-14.yml -o generated-python \
-		-p packageName=plaid \
+openapi-generator-cli generate \
+-g python \
+-i ./2020-09-14.yml \
+-o generated-python \
+-p packageName=plaid
 ```

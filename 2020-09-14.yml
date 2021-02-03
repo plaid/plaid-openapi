@@ -5733,6 +5733,7 @@ components:
             $ref: '#/components/schemas/CountryCode'
         language:
           type: string
+          nullable: true
           description: The `language` specified in the `/link/token/create` call.
         account_filters:
           $ref: '#/components/schemas/AccountFiltersResponse'
@@ -5742,12 +5743,8 @@ components:
           description: The `redirect_uri` specified in the `/link/token/create` call.
         client_name:
           type: string
+          nullable: true
           description: The `client_name` specified in the `/link/token/create` call.
-      required:
-      - initial_products
-      - country_codes
-      - language
-      - account_filters
     LinkTokenCreateResponse:
       type: object
       description: LinkTokenCreateResponse defines the response schema for `/link/token/create`
@@ -10194,7 +10191,6 @@ components:
       allOf:
       - $ref: '#/components/schemas/AccountBase'
       - type: object
-        x-plaid-type: github.plaid.com/plaid/go.git/lib/apischemas.AccountWithOwners
         properties:
           owners:
             type: array
@@ -10208,7 +10204,6 @@ components:
       allOf:
       - $ref: '#/components/schemas/AccountBase'
       - type: object
-        x-plaid-type: github.plaid.com/plaid/go.git/lib/apischemas.GetAssetAccount
         properties:
           days_available:
             type: number
