@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.5.0
+  version: 2020-09-14_1.5.3
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -1225,7 +1225,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ItemGetResponse'
+                $ref: '#/components/schemas/ItemWebhookUpdateResponse'
               examples:
                 example-1:
                   value:
@@ -1505,7 +1505,7 @@ paths:
             schema:
               $ref: '#/components/schemas/LiabilitiesGetRequest'
       description: |-
-        The `/liabilities/get` endpoint returns various details about an Item with loan or credit accounts. Liabilities is supported for US and Canada accounts only. Currently supported account types are account type `credit` with account subtype `credit card` or `paypal`, and account type `loan` with account subtype `student` or `mortgage`. To limit accounts listed in Link to types and subtypes supported by Liabilities, you can use the `account_filter` parameter when [creating a Link token](/docs/api/tokens/#linktokencreate).
+        The `/liabilities/get` endpoint returns various details about an Item with loan or credit accounts. Liabilities data is available primarily for US financial institutions, with some limited coverage of Canadian institutions. Currently supported account types are account type `credit` with account subtype `credit card` or `paypal`, and account type `loan` with account subtype `student` or `mortgage`. To limit accounts listed in Link to types and subtypes supported by Liabilities, you can use the `account_filter` parameter when [creating a Link token](/docs/api/tokens/#linktokencreate).
 
         The types of information returned by Liabilities can include balances and due dates, loan terms, and account details such as original loan amount and guarantor. Data is refreshed approximately once per day; the latest data can be retrieved by calling `/liabilities/get`.
 
@@ -2922,7 +2922,7 @@ paths:
                 example-1:
                   value:
                     link_token: link-production-840204-193734
-                    expiration: 2020-03-27T12:56:34
+                    expiration: "2020-03-27T12:56:34Z"
                     request_id: XQVgFigpGHXkb0b
       description: |-
         The `/link/token/create` endpoint creates a `link_token`, which is required as a parameter when initializing Link. Once Link has been initialized, it returns a `public_token`, which can then be exchanged for an `access_token` via `/item/public_token/exchange` as part of the main Link flow.
@@ -3970,6 +3970,8 @@ components:
         include_optional_metadata:
           type: boolean
           description: When true, return the institution's homepage URL, logo and primary brand color. Learn more
+        account_filter:
+          $ref: '#/components/schemas/InstitutionsSearchAccountFilter'
     InstitutionsSearchResponse:
       type: object
       description: InstitutionsSearchResponse defines the response schema for `/institutions/search`
@@ -4115,10 +4117,12 @@ components:
       - request_id
     SandboxOverridePassword:
       type: string
+      nullable: true
       default: pass_good
       description: Test password to use for the creation of the Sandbox Item. Default value is `pass_good`.
     SandboxOverrideUsername:
       type: string
+      nullable: true
       default: user_good
       description: Test username to use for the creation of the Sandbox Item. Default value is `user_good`.
     SandboxProcessorTokenCreateRequest:
@@ -4418,8 +4422,11 @@ components:
       properties:
         item:
           $ref: '#/components/schemas/Item'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
       required:
       - item
+      - request_id
     ItemAccessTokenInvalidateRequest:
       type: object
       description: ItemAccessTokenInvalidateRequest defines the request schema for `/item/access_token/invalidate`
@@ -4770,8 +4777,6 @@ components:
         access_token:
           $ref: '#/components/schemas/AccessToken'
       required:
-      - client_id
-      - secret
       - access_token
     ItemPublicTokenCreateResponse:
       type: object
@@ -4780,6 +4785,9 @@ components:
         public_token:
           type: string
           description: A `public_token` for the particular Item corresponding to the specified `access_token`
+        expiration:
+          type: string
+          format: date-time
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
@@ -4852,6 +4860,9 @@ components:
           nullable: true
           allOf:
           - $ref: '#/components/schemas/ExternalPaymentSchedule'
+        adjusted_reference:
+          nullable: true
+          type: string
       required:
       - payment_id
       - amount
@@ -5319,7 +5330,7 @@ components:
           description: The `account_id` value obtained from the `onSuccess` callback in Link
         processor:
           type: string
-          description: The processor you are integrating with. Valid values are `"achq"`, `"checkbook"`, `"circle"`, `"drivewealth"`, `"dwolla"`, `"galileo"`, "`interactive_brokers`", `"modern_treasury"`, `"ocrolus"`, `"prime_trust"`, `"velox"`, `"vesta"`, `"vopay"`
+          description: The processor you are integrating with. Valid values are `"achq"`, `"check"`, `"checkbook"`, `"circle"`, `"drivewealth"`, `"dwolla"`, `"galileo"`, "`interactive_brokers`", `"modern_treasury"`, `"ocrolus"`, `"prime_trust"`, `"rize"`, `"sila_money"`, `"unit"`, `"velox"`, `"vesta"`, `"vopay"`, `"wyre"`
       required:
       - access_token
       - account_id
@@ -5419,9 +5430,9 @@ components:
           $ref: '#/components/schemas/APISecret'
         products:
           type: array
-          description: Array of product strings. For Deposit Switch, this should be `["auth", "identity"]`
+          description: Array of product strings
           items:
-            type: string
+            $ref: '#/components/schemas/Products'
           minItems: 1
         user_auth:
           $ref: '#/components/schemas/ItemImportRequestUserAuth'
@@ -5530,13 +5541,15 @@ components:
         country_codes:
           type: array
           description: |-
-            Specify an array of Plaid-supported country codes using the ISO-3166-1 alpha-2 country code standard. Note that if you initialize with a European country code, your users will see the European consent panel during the Link flow. Supported country codes are: `US`, `CA`, `ES`, `FR`, `GB`, `IE`, `NL`. Example value: `['US', 'CA']`. If Link is launched with multiple country codes, only products that you are enabled for in all countries will be used by Link.
+            Specify an array of Plaid-supported country codes using the ISO-3166-1 alpha-2 country code standard. Institutions from all listed countries will be shown.  Supported country codes are: `US`, `CA`, `ES`, `FR`, `GB`, `IE`, `NL`. Example value: `['US', 'CA']`.
+
+            If Link is launched with multiple country codes, only products that you are enabled for in all countries will be used by Link. Note that while all countries are enabled by default in Sandbox and Development, in Production only US and Canada are enabled by default. To gain access to European institutions in the Production environment, [file a product access Support ticket](https://dashboard.plaid.com/support/new/product-and-development/product-troubleshooting/request-product-access) via the Plaid dashboard. If you initialize with a European country code, your users will see the European consent panel during the Link flow.
 
             If using a Link customization, make sure the country codes in the customization match those specified in `country_codes`. If both `country_codes` and a Link customization are used, the value in `country_codes` may override the value in the customization.
 
-            If using the optional Auth features Instant Match, Same-day Micro-deposits, or Automated Micro-deposits, `country_codes` must be set to `['US']`.
+            If using the Auth features Instant Match, Same-day Micro-deposits, or Automated Micro-deposits, `country_codes` must be set to `['US']`.
           items:
-            type: string
+            $ref: '#/components/schemas/CountryCode'
           minItems: 1
         user:
           $ref: '#/components/schemas/LinkTokenCreateRequestUser'
@@ -5549,17 +5562,19 @@ components:
 
             Example: `['auth', 'transactions']`
 
-            `balance` is *not* a valid value, the Balance product does not require explicit initialization and will automatically be initialized when any other product is initialized. Only institutions that support *all* requested products will be shown in Link.
+            `balance` is *not* a valid value, the Balance product does not require explicit initalization and will automatically be initialized when any other product is initialized.
 
-            In Production, you will be billed for each product that you specify when initializing Link. Note that a product cannot be removed from an Item once the Item has been initialized with that product. To stop billing on an Item for subscription-based products, such as Liabilities, Investments, and Transactions, remove the Item via `/item/remove`.
+            Only institutions that support *all* requested products will be shown in Link; to maximize the number of institutions listed, it is recommended to initialize Link with the minimal product set required for your use case. Additional products can be added after Link initialization by calling the relevant endpoints. For details and exceptions, see [Choosing when to initialize products](/docs/link/best-practices/#choosing-when-to-initialize-products).
+
+                    In Production, you will be billed for each product that you specify when initializing Link. Note that a product cannot be removed from an Item once the Item has been initialized with that product. To stop billing on an Item for subscription-based products, such as Liabilities, Investments, and Transactions, remove the Item via `/item/remove`.
           items:
-            type: string
+            $ref: '#/components/schemas/Products'
         webhook:
           type: string
           description: The destination URL to which any webhooks should be sent.
         access_token:
           type: string
-          description: The `access_token` associated with the Item to update, used when updating or modifying an existing `access_token`. Used when launching Link in update mode or (optionally) when initializing Link as part of the Payment Initiation (Europe) flow.
+          description: The `access_token` associated with the Item to update, used when updating or modifying an existing `access_token`. Used when launching Link in update mode, when completing the Same-day (manual) Micro-deposit flow, or (optionally) when initializing Link as part of the Payment Initiation (UK and Europe) flow.
         link_customization_name:
           type: string
           description: The name of the Link customization from the Plaid Dashboard to be applied to Link. If not specified, the `default` customization will be used. When using a Link customization, the language in the customization must match the language selected via the `language` parameter, and the countries in the customization should match the country codes selected via `country_codes`.
@@ -5601,7 +5616,7 @@ components:
           $ref: '#/components/schemas/InvestmentFilter'
     LinkTokenCreateRequestPaymentInitiation:
       type: object
-      description: Specifies options for initializing Link for use with the Payment Initiation (Europe) product. This field is required if `payment_initiation` is included in the `product` array.
+      description: Specifies options for initializing Link for use with the Payment Initiation (Europe) product. This field is required if `payment_initiation` is included in the `products` array.
       properties:
         payment_id:
           type: string
@@ -5610,7 +5625,7 @@ components:
       - payment_id
     LinkTokenCreateRequestDepositSwitch:
       type: object
-      description: Specifies options for initializing Link for use with the Deposit Switch (beta) product. This field is required if `deposit_switch` is included in the `product` array.
+      description: Specifies options for initializing Link for use with the Deposit Switch (beta) product. This field is required if `deposit_switch` is included in the `products` array.
       properties:
         deposit_switch_id:
           type: string
@@ -5754,6 +5769,7 @@ components:
           description: A `link_token`, which can be supplied to Link in order to initialize it and receive a `public_token`, which can be exchanged for an `access_token`.
         expiration:
           type: string
+          format: date-time
           description: The expiration date for the `link_token`, in ISO 8601 format. A `link_token` created to generate a `public_token` that will be exchanged for a new `access_token` expires after 24 hours. A `link_token` created for an existing Item (such as when updating an existing `access_token` by launching Link in update mode) expires after 30 minutes.
         request_id:
           $ref: '#/components/schemas/RequestID'
@@ -5796,8 +5812,8 @@ components:
             Note - This is only relevant for European institutions subject to PSD2 regulations mandating a 90-day consent window. For all other institutions, this field will be null.
           type: string
           nullable: true
-        has_perpetual_otp:
-          type: boolean
+        update_type:
+          type: string
       required:
       - item_id
       - available_products
@@ -6015,7 +6031,7 @@ components:
 
             For `credit`-type accounts, a positive balance indicates the amount owed; a negative amount indicates the lender owing the account holder.
 
-            For `loan`-type accounts, the current balance is the principal remaining on the loan.
+            For `loan`-type accounts, the current balance is the principal remaining on the loan, except in the case of student loan accounts at Sallie Mae (`ins_116944`). For Sallie Mae student loans, the account's balance includes both principal and any outstanding interest.
 
             For `investment`-type accounts, the current balance is the total value of assets as presented by the institution.
 
@@ -7187,7 +7203,7 @@ components:
           description: The date of the last payment. Dates are returned in an ISO 8601 format (YYYY-MM-DD).
           nullable: true
         loan_type_description:
-          description: Type of mortgage (i.e. `conventional`, `fixed`, `variable`).
+          description: Description of the type of loan, for example `conventional`, `fixed`, or `variable`. This field is provided directly from the loan servicer and does not have an enumerated set of possible values.
           type: string
           nullable: true
         loan_term:
@@ -7345,7 +7361,7 @@ components:
     ServicerAddressData:
       title: ServicerAddressData
       type: object
-      description: 'The address of the student loan servicer. '
+      description: The address of the student loan servicer. This is generally the remittance address to which payments should be sent.
       properties:
         city:
           type: string
@@ -7492,8 +7508,12 @@ components:
             A date in ISO 8601 format (YYYY-MM-DD). Standing order payments will begin on the first `interval_execution_day` on or after the `start_date`.
 
             If the first `interval_execution_day` on or after the start date is also the same day that `/payment_initiation/payment/create` was called, the bank *may* make the first payment on that day, but it is not guaranteed to do so.
+        end_date:
+          type: string
+          description: |-
+            A date in ISO 8601 format (YYYY-MM-DD). Standing order payments will end on the last `interval_execution_day` on or before the `end_date`.
 
-            It is not possible to specify an end date for a standing order payment.  To end or modify a standing order payment, the end user should contact their bank.
+            If the only `interval_execution_day` between the start date and the end date (inclusive) is also the same day that `/payment_initiation/payment/create` was called, the bank *may* make a payment on that day, but it is not guaranteed to do so.
       required:
       - interval
       - interval_execution_day
@@ -7511,6 +7531,7 @@ components:
       - transactions
       - credit_details
       - income
+      - deposit_switch
       description: A list of products that an institution can support. All Items must be initialized with at least one product. The Balance product is always available and does not need to be specified during initialization.
       type: string
     ProductStatus:
@@ -9368,10 +9389,10 @@ components:
           description: Outflow of cash from an account
     AccountSubtypes:
       title: AccountSubtypes
-      description: 'An array of account subtypes to display in Link. If not specified, all account subtypes will be shown. For a full list of valid types and subtypes, see the [Account schema](/docs/api/accounts#accounts-schema). '
       type: array
+      description: 'An array of account subtypes to display in Link. If not specified, all account subtypes will be shown. For a full list of valid types and subtypes, see the [Account schema](/docs/api/accounts#accounts-schema). '
       items:
-        type: string
+        $ref: '#/components/schemas/AccountSubtype'
     UserPermissionRevokedWebhook:
       title: UserPermissionRevokedWebhook
       type: object
@@ -9717,6 +9738,7 @@ components:
           $ref: '#/components/schemas/APISecret'
         idempotency_key:
           type: string
+          maxLength: 50
           description: |-
             A random key provided by the client, per unique bank transfer. Maximum of 50 characters.
 
@@ -9746,11 +9768,14 @@ components:
           $ref: '#/components/schemas/BankTransferUser'
         custom_tag:
           type: string
+          nullable: true
+          maxLength: 100
           description: An arbitrary string provided by the client for storage with the bank transfer. Will be returned in all `BankTransfer` objects. May be up to 100 characters.
         metadata:
           $ref: '#/components/schemas/BankTransferMetadata'
         origination_account_id:
           type: string
+          nullable: true
           description: Plaid’s unique identifier for the origination account for this transfer. If you have more than one origination account, this value must be specified.
       required:
       - idempotency_key
@@ -10186,6 +10211,26 @@ components:
           $ref: '#/components/schemas/LoanFilter'
         investment:
           $ref: '#/components/schemas/InvestmentFilter'
+    InstitutionsSearchAccountFilter:
+      title: InstitutionsSearchAccountFilter
+      type: object
+      properties:
+        loan:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountSubtype'
+        depository:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountSubtype'
+        credit:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountSubtype'
+        investment:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountSubtype'
     AccountIdentity:
       title: AccountIdentity
       allOf:
@@ -10235,6 +10280,8 @@ components:
       properties:
         account_subtypes:
           $ref: '#/components/schemas/AccountSubtypes'
+      required:
+      - account_subtypes
     CreditFilter:
       title: CreditFilter
       description: A filter to apply to `credit`-type accounts
@@ -10242,6 +10289,8 @@ components:
       properties:
         account_subtypes:
           $ref: '#/components/schemas/AccountSubtypes'
+      required:
+      - account_subtypes
     LoanFilter:
       title: LoanFilter
       description: A filter to apply to `loan`-type accounts
@@ -10249,6 +10298,8 @@ components:
       properties:
         account_subtypes:
           $ref: '#/components/schemas/AccountSubtypes'
+      required:
+      - account_subtypes
     InvestmentFilter:
       title: InvestmentFilter
       description: A filter to apply to `investment`-type accounts
@@ -10256,6 +10307,8 @@ components:
       properties:
         account_subtypes:
           $ref: '#/components/schemas/AccountSubtypes'
+      required:
+      - account_subtypes
     EmployersSearchRequest:
       title: EmployersSearchRequest
       type: object
@@ -10341,7 +10394,7 @@ components:
     LinkTokenCreateRequestIncomeVerification:
       title: LinkTokenCreateRequestIncomeVerification
       type: object
-      description: Specifies options for initializing Link for use with the Income Verification (beta) product. This field is required if `income_verification` is included in the `product` array.
+      description: Specifies options for initializing Link for use with the Income Verification (beta) product. This field is required if `income_verification` is included in the `products` array.
       properties:
         income_verification_id:
           type: string
