@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.5.3
+  version: 2020-09-14_1.5.4
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -3854,6 +3854,8 @@ components:
           $ref: '#/components/schemas/AccessToken'
         secret:
           $ref: '#/components/schemas/APISecret'
+      required:
+      - access_token
     TransactionsRefreshResponse:
       type: object
       description: TransactionsRefreshResponse defines the response schema for `/transactions/refresh`
@@ -5818,7 +5820,7 @@ components:
       - item_id
       - available_products
       - billed_products
-      - has_perpetual_otp
+      - update_type
     Error:
       description: We use standard HTTP response codes for success and failure notifications, and our errors are further classified by `error_type`. In general, 200 HTTP codes correspond to success, 40X codes are for developer- or user-related failures, and 50X codes are for Plaid-related issues.  Error fields will be `null` if no error has occurred.
       nullable: true
@@ -6322,9 +6324,21 @@ components:
           type: string
           description: The date that the transaction was authorized. Dates are returned in an ISO 8601 format ( `YYYY-MM-DD` ).
           nullable: true
+        authorized_datetime:
+          type: string
+          description: |-
+            Date and time when a transaction was authorized in ISO 8601 format ( `YYYY-MM-DDTHH:mm:ssZ` ).
+            This field is only populated for UK institutions. For institutions in other countries, will be `null`.
+          nullable: true
         date:
           type: string
           description: For pending transactions, the date that the transaction occurred; for posted transactions, the date that the transaction posted. Both dates are returned in an ISO 8601 format ( `YYYY-MM-DD` ).
+        datetime:
+          type: string
+          description: |-
+            Date and time when a transaction was posted in ISO 8601 format ( `YYYY-MM-DDTHH:mm:ssZ` ).
+            This field is only populated for UK institutions. For institutions in other countries, will be `null`.
+          nullable: true
         category_id:
           description: |-
             The ID of the category to which this transaction belongs. See [Categories](https://plaid.com/docs/#category-overview).
