@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.5.3
+  version: 2020-09-14_1.6.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -51,6 +51,7 @@ paths:
                       error: null
                       institution_id: ins_109508
                       item_id: Ed6bjNrDLJfGvZWwnkQlfxwoNz54B5C97ejBr
+                      update_type: background
                       webhook: https://plaid.com/example/hook
                       consent_expiration_time: null
                     status:
@@ -141,6 +142,7 @@ paths:
                       error: null
                       institution_id: ins_117650
                       item_id: DWVAAPWq4RHGlEaNyGKRTAnPLaEmo8Cvq7na6
+                      update_type: background
                       webhook: https://www.genericwebhookurl.com/webhook
                     request_id: m8MDnv9okwxFNBV
         default:
@@ -198,7 +200,9 @@ paths:
                       - Computers and Electronics
                       category_id: "19013000"
                       date: "2017-01-29"
+                      datetime: null
                       authorized_date: "2017-01-27"
+                      authorized_datetime: null
                       location:
                         address: 300 Post St
                         city: San Francisco
@@ -240,6 +244,7 @@ paths:
                       error: null
                       institution_id: ins_3
                       item_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBFL9DrE6
+                      update_type: background
                       webhook: https://www.genericwebhookurl.com/webhook
                     total_transactions: 1
                     request_id: 45QSn
@@ -631,6 +636,7 @@ paths:
                       error: null
                       institution_id: ins_117650
                       item_id: DWVAAPWq4RHGlEaNyGKRTAnPLaEmo8Cvq7na6
+                      update_type: background
                       webhook: https://www.genericwebhookurl.com/webhook
                     request_id: bkVE1BHWMAZ9Rnr
         default:
@@ -871,6 +877,7 @@ paths:
                       error: null
                       institution_id: ins_3
                       item_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBFL9DrE6
+                      update_type: background
                       webhook: https://www.genericwebhookurl.com/webhook
                     request_id: qk5Bxes3gDfv4F2
       description: The `/accounts/balance/get` endpoint returns the real-time balance for each of an Item's accounts. While other endpoints may return a balance object, only `/accounts/balance/get` forces the available and current balance fields to be refreshed rather than cached. This endpoint can be used for existing Items that were added via any of Plaid’s other products. This endpoint can be used as long as Link has been initialized with any other product, `balance` itself is not a product that can be used to initialize Link.
@@ -1022,6 +1029,7 @@ paths:
                       error: null
                       institution_id: ins_3
                       item_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBFL9DrE6
+                      update_type: background
                       webhook: https://www.genericwebhookurl.com/webhook
                     request_id: 3nARps6TOYtbACO
       description: |-
@@ -1242,6 +1250,7 @@ paths:
                       error: null
                       institution_id: ins_117650
                       item_id: DWVAAPWq4RHGlEaNyGKRTAnPLaEmo8Cvq7na6
+                      update_type: background
                       webhook: https://www.genericwebhookurl.com/webhook
                     request_id: vYK11LNTfRoAMbj
       description: The POST `/item/webhook/update` allows you to update the webhook URL associated with an Item. This request triggers a [`WEBHOOK_UPDATE_ACKNOWLEDGED`](/docs/api/webhooks/#item-webhook-url-updated) webhook to the newly specified webhook URL.
@@ -1402,6 +1411,7 @@ paths:
                       error: null
                       institution_id: ins_3
                       item_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBFL9DrE6
+                      update_type: background
                       webhook: https://www.genericwebhookurl.com/webhook
                     liabilities:
                       credit:
@@ -2467,6 +2477,7 @@ paths:
                       error: null
                       institution_id: ins_3
                       item_id: 4z9LPae1nRHWy8pvg9jrsgbRP4ZNQvIdbLq7g
+                      update_type: background
                       webhook: https://www.genericwebhookurl.com/webhook
                     request_id: l68wb8zpS0hqmsJ
                     securities:
@@ -2678,6 +2689,7 @@ paths:
                       error: null
                       institution_id: ins_12
                       item_id: 8Mqq5rqQ7Pcxq9MGDv3JULZ6yzZDLMCwoxGDq
+                      update_type: background
                       webhook: https://www.genericwebhookurl.com/webhook
                     request_id: iv4q3ZlytOOthkv
                     securities:
@@ -3854,6 +3866,8 @@ components:
           $ref: '#/components/schemas/AccessToken'
         secret:
           $ref: '#/components/schemas/APISecret'
+      required:
+      - access_token
     TransactionsRefreshResponse:
       type: object
       description: TransactionsRefreshResponse defines the response schema for `/transactions/refresh`
@@ -5814,11 +5828,20 @@ components:
           nullable: true
         update_type:
           type: string
+          description: |-
+            Indicates whether an Item requires user interaction to be updated, which can be the case for Items with some forms of two-factor authentication.
+
+            `background` - Item can be updated in the background
+
+            `requires_user_authentication` - Item requires user interaction to be updated
+          enum:
+          - background
+          - requires_user_authentication
       required:
       - item_id
       - available_products
       - billed_products
-      - has_perpetual_otp
+      - update_type
     Error:
       description: We use standard HTTP response codes for success and failure notifications, and our errors are further classified by `error_type`. In general, 200 HTTP codes correspond to success, 40X codes are for developer- or user-related failures, and 50X codes are for Plaid-related issues.  Error fields will be `null` if no error has occurred.
       nullable: true
@@ -6322,9 +6345,23 @@ components:
           type: string
           description: The date that the transaction was authorized. Dates are returned in an ISO 8601 format ( `YYYY-MM-DD` ).
           nullable: true
+        authorized_datetime:
+          type: string
+          description: |-
+            Date and time when a transaction was authorized in ISO 8601 format ( `YYYY-MM-DDTHH:mm:ssZ` ).
+
+            This field is only populated for UK institutions. For institutions in other countries, will be `null`.
+          nullable: true
         date:
           type: string
           description: For pending transactions, the date that the transaction occurred; for posted transactions, the date that the transaction posted. Both dates are returned in an ISO 8601 format ( `YYYY-MM-DD` ).
+        datetime:
+          type: string
+          description: |-
+            Date and time when a transaction was posted in ISO 8601 format ( `YYYY-MM-DDTHH:mm:ssZ` ).
+
+            This field is only populated for UK institutions. For institutions in other countries, will be `null`.
+          nullable: true
         category_id:
           description: |-
             The ID of the category to which this transaction belongs. See [Categories](https://plaid.com/docs/#category-overview).
