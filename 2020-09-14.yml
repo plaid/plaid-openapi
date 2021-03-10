@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.5.3
+  version: 2020-09-14_1.8.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -51,6 +51,7 @@ paths:
                       error: null
                       institution_id: ins_109508
                       item_id: Ed6bjNrDLJfGvZWwnkQlfxwoNz54B5C97ejBr
+                      update_type: background
                       webhook: https://plaid.com/example/hook
                       consent_expiration_time: null
                     status:
@@ -141,6 +142,7 @@ paths:
                       error: null
                       institution_id: ins_117650
                       item_id: DWVAAPWq4RHGlEaNyGKRTAnPLaEmo8Cvq7na6
+                      update_type: background
                       webhook: https://www.genericwebhookurl.com/webhook
                     request_id: m8MDnv9okwxFNBV
         default:
@@ -198,7 +200,9 @@ paths:
                       - Computers and Electronics
                       category_id: "19013000"
                       date: "2017-01-29"
+                      datetime: null
                       authorized_date: "2017-01-27"
+                      authorized_datetime: null
                       location:
                         address: 300 Post St
                         city: San Francisco
@@ -240,6 +244,7 @@ paths:
                       error: null
                       institution_id: ins_3
                       item_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBFL9DrE6
+                      update_type: background
                       webhook: https://www.genericwebhookurl.com/webhook
                     total_transactions: 1
                     request_id: 45QSn
@@ -631,6 +636,7 @@ paths:
                       error: null
                       institution_id: ins_117650
                       item_id: DWVAAPWq4RHGlEaNyGKRTAnPLaEmo8Cvq7na6
+                      update_type: background
                       webhook: https://www.genericwebhookurl.com/webhook
                     request_id: bkVE1BHWMAZ9Rnr
         default:
@@ -871,6 +877,7 @@ paths:
                       error: null
                       institution_id: ins_3
                       item_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBFL9DrE6
+                      update_type: background
                       webhook: https://www.genericwebhookurl.com/webhook
                     request_id: qk5Bxes3gDfv4F2
       description: The `/accounts/balance/get` endpoint returns the real-time balance for each of an Item's accounts. While other endpoints may return a balance object, only `/accounts/balance/get` forces the available and current balance fields to be refreshed rather than cached. This endpoint can be used for existing Items that were added via any of Plaid’s other products. This endpoint can be used as long as Link has been initialized with any other product, `balance` itself is not a product that can be used to initialize Link.
@@ -1022,6 +1029,7 @@ paths:
                       error: null
                       institution_id: ins_3
                       item_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBFL9DrE6
+                      update_type: background
                       webhook: https://www.genericwebhookurl.com/webhook
                     request_id: 3nARps6TOYtbACO
       description: |-
@@ -1242,6 +1250,7 @@ paths:
                       error: null
                       institution_id: ins_117650
                       item_id: DWVAAPWq4RHGlEaNyGKRTAnPLaEmo8Cvq7na6
+                      update_type: background
                       webhook: https://www.genericwebhookurl.com/webhook
                     request_id: vYK11LNTfRoAMbj
       description: The POST `/item/webhook/update` allows you to update the webhook URL associated with an Item. This request triggers a [`WEBHOOK_UPDATE_ACKNOWLEDGED`](/docs/api/webhooks/#item-webhook-url-updated) webhook to the newly specified webhook URL.
@@ -1402,6 +1411,7 @@ paths:
                       error: null
                       institution_id: ins_3
                       item_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBFL9DrE6
+                      update_type: background
                       webhook: https://www.genericwebhookurl.com/webhook
                     liabilities:
                       credit:
@@ -1640,6 +1650,8 @@ paths:
         After creating a payment recipient, you can use the `/payment_initiation/payment/create` endpoint to create a payment to that recipient.  Payments can be one-time or standing order (recurring) and can be denominated in either EUR or GBP.  If making domestic GBP-denominated payments, your recipient must have been created with BACS numbers. In general, EUR-denominated payments will be sent via SEPA Credit Transfer and GBP-denominated payments will be sent via the Faster Payments network, but the payment network used will be determined by the institution. Payments sent via Faster Payments will typically arrive immediately, while payments sent via SEPA Credit Transfer will typically arrive in one business day.
 
         Standing orders (recurring payments) must be denominated in GBP and can only be sent to recipients in the UK. Once created, standing order payments will continue indefinitely and cannot be modified or canceled via the API. An end user can cancel or modify a standing order directly on their banking application or website, or by contacting the bank. Standing orders will follow the payment rules of the underlying rails (Faster Payments in UK). Payments can be sent Monday to Friday, excluding bank holidays. If the pre-arranged date falls on a weekend or bank holiday, the payment is made on the next working day. It is not possible to guarantee the exact time the payment will reach the recipient’s account, although at least 90% of standing order payments are sent by 6am.
+
+        In the Development environment, payments must be below 5 GBP / EUR. For details on any payment limits in Production, contact your Plaid Account Manager.
       requestBody:
         required: true
         content:
@@ -2467,6 +2479,7 @@ paths:
                       error: null
                       institution_id: ins_3
                       item_id: 4z9LPae1nRHWy8pvg9jrsgbRP4ZNQvIdbLq7g
+                      update_type: background
                       webhook: https://www.genericwebhookurl.com/webhook
                     request_id: l68wb8zpS0hqmsJ
                     securities:
@@ -2678,6 +2691,7 @@ paths:
                       error: null
                       institution_id: ins_12
                       item_id: 8Mqq5rqQ7Pcxq9MGDv3JULZ6yzZDLMCwoxGDq
+                      update_type: background
                       webhook: https://www.genericwebhookurl.com/webhook
                     request_id: iv4q3ZlytOOthkv
                     securities:
@@ -3687,6 +3701,7 @@ components:
       - access_token
     ItemGetResponse:
       type: object
+      additionalProperties: true
       description: ItemGetResponse defines the response schema for `/item/get` and `/item/webhook/update`
       properties:
         item:
@@ -3727,6 +3742,7 @@ components:
             type: string
     AuthGetResponse:
       type: object
+      additionalProperties: true
       description: AuthGetResponse defines the response schema for `/auth/get`
       properties:
         accounts:
@@ -3747,6 +3763,7 @@ components:
       - request_id
     AuthGetNumbers:
       type: object
+      additionalProperties: true
       description: An object containing identifying numbers used for making electronic transfers to and from the `accounts`. The identifying number type (ACH, EFT, IBAN, or BACS) used will depend on the country of the account. An account may have more than one number type. If a particular identifying number type is not used by any `accounts` for which data has been requested, the array for that type will be empty.
       properties:
         ach:
@@ -3819,6 +3836,7 @@ components:
           minimum: 0
     TransactionsGetResponse:
       type: object
+      additionalProperties: true
       description: TransactionsGetResponse defines the response schema for `/transactions/get`
       properties:
         accounts:
@@ -3854,6 +3872,8 @@ components:
           $ref: '#/components/schemas/AccessToken'
         secret:
           $ref: '#/components/schemas/APISecret'
+      required:
+      - access_token
     TransactionsRefreshResponse:
       type: object
       description: TransactionsRefreshResponse defines the response schema for `/transactions/refresh`
@@ -3915,6 +3935,7 @@ components:
             Note that Plaid does not own any of the logos shared by the API, and that by accessing or using these logos, you agree that you are doing so at your own risk and will, if necessary, obtain all required permissions from the appropriate rights holders and adhere to any applicable usage guidelines. Plaid disclaims all express or implied warranties with respect to the logos.
     InstitutionsGetResponse:
       type: object
+      additionalProperties: true
       description: InstitutionsGetResponse defines the response schema for `/institutions/get`
       properties:
         institutions:
@@ -3974,6 +3995,7 @@ components:
           $ref: '#/components/schemas/InstitutionsSearchAccountFilter'
     InstitutionsSearchResponse:
       type: object
+      additionalProperties: true
       description: InstitutionsSearchResponse defines the response schema for `/institutions/search`
       properties:
         institutions:
@@ -4025,6 +4047,7 @@ components:
           description: If `true`, the response will include status information about the institution. Default value is `false`.
     InstitutionsGetByIdResponse:
       type: object
+      additionalProperties: true
       description: InstitutionsGetByIdResponse defines the response schema for `/institutions/get_by_id`
       properties:
         institution:
@@ -4048,6 +4071,7 @@ components:
       - access_token
     ItemRemoveResponse:
       type: object
+      additionalProperties: true
       description: ItemRemoveResponse defines the response schema for `/item/remove`
       properties:
         request_id:
@@ -4081,6 +4105,7 @@ components:
             type: string
     AccountsGetResponse:
       type: object
+      additionalProperties: true
       description: AccountsGetResponse defines the response schema for `/accounts/get` and `/accounts/balance/get`.
       properties:
         accounts:
@@ -4103,6 +4128,7 @@ components:
       description: CategoriesGetRequest defines the request schema for `/categories/get`
     CategoriesGetResponse:
       type: object
+      additionalProperties: true
       description: CategoriesGetResponse defines the response schema for `/categories/get`
       properties:
         categories:
@@ -4149,6 +4175,7 @@ components:
           $ref: '#/components/schemas/SandboxOverridePassword'
     SandboxProcessorTokenCreateResponse:
       type: object
+      additionalProperties: true
       properties:
         processor_token:
           type: string
@@ -4206,6 +4233,7 @@ components:
           description: The most recent date for which to fetch transaction history. Dates should be formatted as YYYY-MM-DD.
     SandboxPublicTokenCreateResponse:
       type: object
+      additionalProperties: true
       description: SandboxPublicTokenCreateResponse defines the response schema for `/sandbox/public_token/create`
       properties:
         public_token:
@@ -4238,6 +4266,7 @@ components:
       - access_token
     SandboxItemFireWebhookResponse:
       type: object
+      additionalProperties: true
       description: SandboxItemFireWebhookResponse defines the response schema for `/sandbox/item/fire_webhook`
       properties:
         webhook_fired:
@@ -4301,6 +4330,7 @@ components:
             type: string
     IdentityGetResponse:
       type: object
+      additionalProperties: true
       description: IdentityGetResponse defines the response schema for `/identity/get`
       properties:
         accounts:
@@ -4330,6 +4360,7 @@ components:
       - processor_token
     ProcessorAuthGetResponse:
       type: object
+      additionalProperties: true
       description: ProcessorAuthGetResponse defines the response schema for `/processor/auth/get`
       properties:
         request_id:
@@ -4344,6 +4375,7 @@ components:
       - account
     ProcessorNumber:
       type: object
+      additionalProperties: true
       description: An object containing identifying numbers used for making electronic transfers to and from the `account`. The identifying number type (ACH, EFT, IBAN, or BACS) used will depend on the country of the account. An account may have more than one number type. If a particular identifying number type is not used by the `account` for which auth data has been requested, a null value will be returned.
       properties:
         ach:
@@ -4368,6 +4400,7 @@ components:
       - processor_token
     ProcessorIdentityGetResponse:
       type: object
+      additionalProperties: true
       description: ProcessorIdentityGetResponse defines the response schema for `/processor/identity/get`
       properties:
         account:
@@ -4391,6 +4424,7 @@ components:
       - processor_token
     ProcessorBalanceGetResponse:
       type: object
+      additionalProperties: true
       description: ProcessorBalanceGetResponse defines the response schema for `/processor/balance/get`
       properties:
         account:
@@ -4418,6 +4452,7 @@ components:
       - webhook
     ItemWebhookUpdateResponse:
       type: object
+      additionalProperties: true
       description: ItemWebhookUpdateResponse defines the response schema for `/item/webhook/update`
       properties:
         item:
@@ -4441,6 +4476,7 @@ components:
       - access_token
     ItemAccessTokenInvalidateResponse:
       type: object
+      additionalProperties: true
       description: ItemAccessTokenInvalidateResponse defines the response schema for `/item/access_token/invalidate`
       properties:
         new_access_token:
@@ -4465,6 +4501,7 @@ components:
       - key_id
     WebhookVerificationKeyGetResponse:
       type: object
+      additionalProperties: true
       description: WebhookVerificationKeyGetResponse defines the response schema for `/webhook_verification_key/get`
       properties:
         key:
@@ -4476,6 +4513,7 @@ components:
       - request_id
     JWKPublicKey:
       type: object
+      additionalProperties: true
       description: A JSON Web Key (JWK) that can be used in conjunction with [JWT libraries](https://jwt.io/#libraries-io) to verify Plaid webhooks
       properties:
         alg:
@@ -4532,6 +4570,7 @@ components:
             type: string
     LiabilitiesGetResponse:
       type: object
+      additionalProperties: true
       description: LiabilitiesGetResponse defines the response schema for `/liabilities/get`
       properties:
         accounts:
@@ -4572,6 +4611,7 @@ components:
       - name
     PaymentInitiationRecipientCreateResponse:
       type: object
+      additionalProperties: true
       description: PaymentInitiationRecipientCreateResponse defines the response schema for `/payment_initation/recipient/create`
       properties:
         recipient_id:
@@ -4597,6 +4637,7 @@ components:
       - recipient_id
     PaymentInitiationRecipientGetResponse:
       type: object
+      additionalProperties: true
       description: PaymentInitiationRecipientGetResponse defines the response schema for `/payment_initiation/recipient/get`
       properties:
         recipient_id:
@@ -4630,6 +4671,7 @@ components:
           $ref: '#/components/schemas/APISecret'
     PaymentInitiationRecipientListResponse:
       type: object
+      additionalProperties: true
       description: PaymentInitiationRecipientListResponse defines the response schema for `/payment_initiation/recipient/list`
       properties:
         recipients:
@@ -4666,6 +4708,7 @@ components:
       - amount
     PaymentInitiationPaymentCreateResponse:
       type: object
+      additionalProperties: true
       description: PaymentInitiationPaymentCreateResponse defines the response schema for `/payment_initiation/payment/create`
       properties:
         payment_id:
@@ -4697,6 +4740,7 @@ components:
       - access_token
     SandboxItemResetLoginResponse:
       type: object
+      additionalProperties: true
       description: SandboxItemResetLoginResponse defines the response schema for `/sandbox/item/reset_login`
       properties:
         reset_login:
@@ -4732,6 +4776,7 @@ components:
       - verification_status
     SandboxItemSetVerificationStatusResponse:
       type: object
+      additionalProperties: true
       description: SandboxItemSetVerificationStatusResponse defines the response schema for `/sandbox/item/set_verification_status`
       properties:
         request_id:
@@ -4753,6 +4798,7 @@ components:
       - public_token
     ItemPublicTokenExchangeResponse:
       type: object
+      additionalProperties: true
       description: ItemPublicTokenExchangeResponse defines the response schema for `/item/public_token/exchange`
       properties:
         access_token:
@@ -4780,6 +4826,7 @@ components:
       - access_token
     ItemPublicTokenCreateResponse:
       type: object
+      additionalProperties: true
       description: ItemPublicTokenCreateResponse defines the response schema for `/item/public_token/create`
       properties:
         public_token:
@@ -4808,6 +4855,7 @@ components:
       - payment_id
     PaymentInitiationPaymentGetResponse:
       type: object
+      additionalProperties: true
       description: PaymentInitiationPaymentGetResponse defines the response schema for `/payment_initation/payment/get`
       properties:
         payment_id:
@@ -4852,17 +4900,18 @@ components:
         reference:
           type: string
           description: A reference for the payment.
+        adjusted_reference:
+          nullable: true
+          type: string
+          description: The value of the reference sent to the bank after adjustment to pass bank validation rules.
         last_status_update:
           type: string
           description: The date and time of the last time the `status` was updated, in IS0 8601 format
         schedule:
-          $ref: '#/components/schemas/ExternalPaymentSchedule'
+          $ref: '#/components/schemas/ExternalPaymentScheduleGet'
           nullable: true
           allOf:
-          - $ref: '#/components/schemas/ExternalPaymentSchedule'
-        adjusted_reference:
-          nullable: true
-          type: string
+          - $ref: '#/components/schemas/ExternalPaymentScheduleGet'
       required:
       - payment_id
       - amount
@@ -4885,6 +4934,7 @@ components:
       - payment_id
     PaymentInitiationPaymentTokenCreateResponse:
       type: object
+      additionalProperties: true
       description: PaymentInitiationPaymentTokenCreateResponse defines the response schema for `/payment_initiation/payment/token/create`
       properties:
         payment_token:
@@ -4917,6 +4967,7 @@ components:
           description: A string in RFC 3339 format (i.e. "2019-12-06T22:35:49Z"). Only payments created before the cursor will be returned.
     PaymentInitiationPaymentListResponse:
       type: object
+      additionalProperties: true
       description: PaymentInitiationPaymentListResponse defines the response schema for `/payment_initiation/payment/list`
       properties:
         payments:
@@ -4972,6 +5023,7 @@ components:
           $ref: '#/components/schemas/AssetReportUser'
     AssetReportCreateResponse:
       type: object
+      additionalProperties: true
       description: AssetReportCreateResponse defines the response schema for `/asset_report/create`
       properties:
         asset_report_token:
@@ -5017,6 +5069,7 @@ components:
           $ref: '#/components/schemas/AssetReportUser'
     AssetReportRefreshResponse:
       type: object
+      additionalProperties: true
       description: AssetReportRefreshResponse defines the response schema for `/asset_report/refresh`
       properties:
         asset_report_id:
@@ -5043,6 +5096,7 @@ components:
       - asset_report_token
     AssetReportRemoveResponse:
       type: object
+      additionalProperties: true
       description: AssetReportRemoveResponse defines the response schema for `/asset_report/remove`
       properties:
         removed:
@@ -5073,6 +5127,7 @@ components:
       - account_ids_to_exclude
     AssetReportFilterResponse:
       type: object
+      additionalProperties: true
       description: AssetReportFilterResponse defines the response schema for `/asset_report/filter`
       properties:
         asset_report_token:
@@ -5102,6 +5157,7 @@ components:
       - asset_report_token
     AssetReportGetResponse:
       type: object
+      additionalProperties: true
       description: AssetReportGetResponse defines the response schema for `/asset_report/get`
       properties:
         report:
@@ -5150,6 +5206,7 @@ components:
       - auditor_id
     AssetReportAuditCopyCreateResponse:
       type: object
+      additionalProperties: true
       description: AssetReportAuditCopyCreateResponse defines the response schema for `/asset_report/audit_copy/get`
       properties:
         audit_copy_token:
@@ -5175,6 +5232,7 @@ components:
       - audit_copy_token
     AssetReportAuditCopyRemoveResponse:
       type: object
+      additionalProperties: true
       description: AssetReportAuditCopyRemoveResponse defines the response schema for `/asset_report/audit_copy/remove`
       properties:
         removed:
@@ -5210,6 +5268,7 @@ components:
             type: string
     InvestmentsHoldingsGetResponse:
       type: object
+      additionalProperties: true
       description: InvestmentsHoldingsGetResponse defines the response schema for `/investments/holdings/get`
       properties:
         accounts:
@@ -5284,6 +5343,7 @@ components:
           minimum: 0
     InvestmentsTransactionsGetResponse:
       type: object
+      additionalProperties: true
       description: InvestmentsTransactionsGetResponse defines the response schema for `/investments/transactions/get`
       properties:
         item:
@@ -5337,6 +5397,7 @@ components:
       - processor
     ProcessorTokenCreateResponse:
       type: object
+      additionalProperties: true
       description: ProcessorTokenCreateResponse defines the response schema for `/processor/token/create` and `/processor/apex/processor_token/create`
       properties:
         processor_token:
@@ -5365,6 +5426,7 @@ components:
       - account_id
     ProcessorStripeBankAccountTokenCreateResponse:
       type: object
+      additionalProperties: true
       description: ProcessorStripeBankAccountTokenCreateResponse defines the response schema for `/processor/stripe/bank_account/create`
       properties:
         stripe_bank_account_token:
@@ -5410,6 +5472,7 @@ components:
       - target_account_id
     DepositSwitchCreateResponse:
       type: object
+      additionalProperties: true
       description: DepositSwitchCreateResponse defines the response schema for `/deposit_switch/create`
       properties:
         deposit_switch_id:
@@ -5464,6 +5527,7 @@ components:
           description: Authorization token Plaid will use to aggregate this user’s accounts
     ItemImportResponse:
       type: object
+      additionalProperties: true
       description: ItemImportResponse defines the response schema for `/item/import`
       properties:
         access_token:
@@ -5488,6 +5552,7 @@ components:
       - deposit_switch_id
     DepositSwitchTokenCreateResponse:
       type: object
+      additionalProperties: true
       description: DepositSwitchTokenCreateResponse defines the response schema for `/deposit_switch/token/create`
       properties:
         deposit_switch_token:
@@ -5566,7 +5631,7 @@ components:
 
             Only institutions that support *all* requested products will be shown in Link; to maximize the number of institutions listed, it is recommended to initialize Link with the minimal product set required for your use case. Additional products can be added after Link initialization by calling the relevant endpoints. For details and exceptions, see [Choosing when to initialize products](/docs/link/best-practices/#choosing-when-to-initialize-products).
 
-                    In Production, you will be billed for each product that you specify when initializing Link. Note that a product cannot be removed from an Item once the Item has been initialized with that product. To stop billing on an Item for subscription-based products, such as Liabilities, Investments, and Transactions, remove the Item via `/item/remove`.
+            In Production, you will be billed for each product that you specify when initializing Link. Note that a product cannot be removed from an Item once the Item has been initialized with that product. To stop billing on an Item for subscription-based products, such as Liabilities, Investments, and Transactions, remove the Item via `/item/remove`.
           items:
             $ref: '#/components/schemas/Products'
         webhook:
@@ -5605,6 +5670,7 @@ components:
 
         For institutions using OAuth, the filter will not affect the list of institutions or accounts shown by the bank in the OAuth window.
       type: object
+      additionalProperties: true
       properties:
         depository:
           $ref: '#/components/schemas/DepositoryFilter'
@@ -5638,7 +5704,7 @@ components:
       properties:
         client_user_id:
           type: string
-          description: A unique ID representing the end user. Typically this will be a user ID number from your application. Personally identifiable information, such as an email address or phone number, should not be used in the `client_user_id`.
+          description: A unique ID representing the end user. Typically this will be a user ID number from your application. Personally identifiable information, such as an email address or phone number, should not be used in the `client_user_id`. It is currently used as a means of searching logs for the given user in the Plaid Dashboard.
         legal_name:
           type: string
           description: The user's full legal name. This is an optional field used in the [returning user experience](/docs/link/returning-user) to associate Items to the user.
@@ -5684,29 +5750,34 @@ components:
         depository:
           description: A filter to apply to `depository`-type accounts
           type: object
+          additionalProperties: true
           properties:
             account_subtypes:
               $ref: '#/components/schemas/AccountSubtypes'
         credit:
           description: A filter to apply to `credit`-type accounts
           type: object
+          additionalProperties: true
           properties:
             account_subtypes:
               $ref: '#/components/schemas/AccountSubtypes'
         loan:
           description: A filter to apply to `loan`-type accounts
           type: object
+          additionalProperties: true
           properties:
             account_subtypes:
               $ref: '#/components/schemas/AccountSubtypes'
         investment:
           description: A filter to apply to `investment`-type accounts
           type: object
+          additionalProperties: true
           properties:
             account_subtypes:
               $ref: '#/components/schemas/AccountSubtypes'
     LinkTokenGetResponse:
       type: object
+      additionalProperties: true
       description: LinkTokenGetResponse defines the response schema for `/link/token/get`
       properties:
         link_token:
@@ -5730,6 +5801,7 @@ components:
       - request_id
     LinkTokenGetMetadataResponse:
       type: object
+      additionalProperties: true
       description: An object specifying the arguments originally provided to the `/link/token/create` call.
       properties:
         initial_products:
@@ -5762,6 +5834,7 @@ components:
           description: The `client_name` specified in the `/link/token/create` call.
     LinkTokenCreateResponse:
       type: object
+      additionalProperties: true
       description: LinkTokenCreateResponse defines the response schema for `/link/token/create`
       properties:
         link_token:
@@ -5770,7 +5843,7 @@ components:
         expiration:
           type: string
           format: date-time
-          description: The expiration date for the `link_token`, in ISO 8601 format. A `link_token` created to generate a `public_token` that will be exchanged for a new `access_token` expires after 24 hours. A `link_token` created for an existing Item (such as when updating an existing `access_token` by launching Link in update mode) expires after 30 minutes.
+          description: The expiration date for the `link_token`, in ISO 8601 format. A `link_token` created to generate a `public_token` that will be exchanged for a new `access_token` expires after 4 hours. A `link_token` created for an existing Item (such as when updating an existing `access_token` by launching Link in update mode) expires after 30 minutes.
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
@@ -5780,6 +5853,7 @@ components:
     Item:
       description: Metadata about the Item.
       type: object
+      additionalProperties: true
       properties:
         item_id:
           description: The Plaid Item ID. The `item_id` is always unique; linking the same account at the same institution twice will result in two Items with different `item_id` values. Like all Plaid identifiers, the `item_id` is case-sensitive.
@@ -5814,15 +5888,25 @@ components:
           nullable: true
         update_type:
           type: string
+          description: |-
+            Indicates whether an Item requires user interaction to be updated, which can be the case for Items with some forms of two-factor authentication.
+
+            `background` - Item can be updated in the background
+
+            `requires_user_authentication` - Item requires user interaction to be updated
+          enum:
+          - background
+          - requires_user_authentication
       required:
       - item_id
       - available_products
       - billed_products
-      - has_perpetual_otp
+      - update_type
     Error:
       description: We use standard HTTP response codes for success and failure notifications, and our errors are further classified by `error_type`. In general, 200 HTTP codes correspond to success, 40X codes are for developer- or user-related failures, and 50X codes are for Plaid-related issues.  Error fields will be `null` if no error has occurred.
       nullable: true
       type: object
+      additionalProperties: true
       title: Error
       properties:
         error_type:
@@ -5885,9 +5969,11 @@ components:
       allOf:
       - $ref: '#/components/schemas/ItemStatus'
       - type: object
+        additionalProperties: true
     ItemStatus:
       description: An object with information about the status of the Item.
       type: object
+      additionalProperties: true
       nullable: true
       x-examples:
         example-1: {}
@@ -5896,6 +5982,7 @@ components:
         investments:
           description: Information about the last successful and failed investments update for the Item.
           type: object
+          additionalProperties: true
           nullable: true
           properties:
             last_successful_update:
@@ -5909,6 +5996,7 @@ components:
         transactions:
           description: Information about the last successful and failed transactions update for the Item.
           type: object
+          additionalProperties: true
           nullable: true
           properties:
             last_successful_update:
@@ -5922,6 +6010,7 @@ components:
         last_webhook:
           description: Information about the last webhook fired for the Item.
           type: object
+          additionalProperties: true
           nullable: true
           properties:
             sent_at:
@@ -5959,6 +6048,7 @@ components:
     AccountBase:
       title: Account
       type: object
+      additionalProperties: true
       description: A single account at a financial institution.
       properties:
         account_id:
@@ -6007,6 +6097,7 @@ components:
     AccountBalance:
       title: AccountBalance
       type: object
+      additionalProperties: true
       description: A set of fields describing the balance for an account. Balance information may be cached unless the balance object was returned by `/accounts/balance/get`.
       properties:
         available:
@@ -6133,6 +6224,7 @@ components:
     NumbersACH:
       title: NumbersACH
       type: object
+      additionalProperties: true
       description: Identifying information for transferring money to or from a US account via ACH or wire transfer.
       properties:
         account_id:
@@ -6157,9 +6249,11 @@ components:
       allOf:
       - $ref: '#/components/schemas/NumbersACH'
       - type: object
+        additionalProperties: true
     NumbersEFT:
       title: NumbersEFT
       type: object
+      additionalProperties: true
       description: Identifying information for transferring money to or from a Canadian bank account via EFT.
       properties:
         account_id:
@@ -6184,9 +6278,11 @@ components:
       allOf:
       - $ref: '#/components/schemas/NumbersEFT'
       - type: object
+        additionalProperties: true
     NumbersInternational:
       title: NumbersInternational
       type: object
+      additionalProperties: true
       description: Identifying information for transferring money to or from an international bank account via wire transfer.
       properties:
         account_id:
@@ -6207,9 +6303,11 @@ components:
       allOf:
       - $ref: '#/components/schemas/NumbersInternational'
       - type: object
+        additionalProperties: true
     NumbersBACS:
       title: NumbersBACS
       type: object
+      additionalProperties: true
       description: Identifying information for transferring money to or from a UK bank account via BACS.
       properties:
         account_id:
@@ -6230,9 +6328,11 @@ components:
       allOf:
       - $ref: '#/components/schemas/NumbersBACS'
       - type: object
+        additionalProperties: true
     RecipientBACS:
       title: RecipientBACS
       type: object
+      additionalProperties: true
       description: An object containing a BACS account number and sort code. If an IBAN is not provided or if this recipient needs to accept domestic GBP-denominated payments, BACS data is required.
       properties:
         account:
@@ -6246,6 +6346,7 @@ components:
       allOf:
       - $ref: '#/components/schemas/RecipientBACS'
       - type: object
+        additionalProperties: true
         description: The sort code of the account.
     RequestID:
       title: RequestID
@@ -6254,6 +6355,7 @@ components:
     Transaction:
       title: Transaction
       type: object
+      additionalProperties: true
       description: A representation of a transaction
       x-examples: {}
       properties:
@@ -6322,9 +6424,23 @@ components:
           type: string
           description: The date that the transaction was authorized. Dates are returned in an ISO 8601 format ( `YYYY-MM-DD` ).
           nullable: true
+        authorized_datetime:
+          type: string
+          description: |-
+            Date and time when a transaction was authorized in ISO 8601 format ( `YYYY-MM-DDTHH:mm:ssZ` ).
+
+            This field is only populated for UK institutions. For institutions in other countries, will be `null`.
+          nullable: true
         date:
           type: string
           description: For pending transactions, the date that the transaction occurred; for posted transactions, the date that the transaction posted. Both dates are returned in an ISO 8601 format ( `YYYY-MM-DD` ).
+        datetime:
+          type: string
+          description: |-
+            Date and time when a transaction was posted in ISO 8601 format ( `YYYY-MM-DDTHH:mm:ssZ` ).
+
+            This field is only populated for UK institutions. For institutions in other countries, will be `null`.
+          nullable: true
         category_id:
           description: |-
             The ID of the category to which this transaction belongs. See [Categories](https://plaid.com/docs/#category-overview).
@@ -6368,6 +6484,7 @@ components:
     Location:
       title: Transaction Location
       type: object
+      additionalProperties: true
       description: A representation of where a transaction took place
       properties:
         address:
@@ -6405,6 +6522,7 @@ components:
     Institution:
       title: Institution
       type: object
+      additionalProperties: true
       description: Details relating to a specific financial institution
       properties:
         institution_id:
@@ -6455,6 +6573,7 @@ components:
     InstitutionStatus:
       title: InstitutionStatus
       type: object
+      additionalProperties: true
       properties:
         item_logins:
           $ref: '#/components/schemas/ProductStatus'
@@ -6547,6 +6666,7 @@ components:
     PaymentMeta:
       title: payment_meta
       type: object
+      additionalProperties: true
       description: |-
         Transaction information specific to inter-bank transfers. If the transaction was not an inter-bank transfer, all fields will be `null`.
 
@@ -6633,6 +6753,7 @@ components:
     Category:
       title: Category
       type: object
+      additionalProperties: true
       description: Information describing a transaction category
       properties:
         category_id:
@@ -6674,6 +6795,7 @@ components:
       title: TransactionsRemovedWebhook
       description: Fired when transaction(s) for an Item are deleted. The deleted transaction IDs are included in the webhook payload. Plaid will typically check for deleted transaction data several times a day.
       type: object
+      additionalProperties: true
       properties:
         webhook_type:
           type: string
@@ -6706,6 +6828,7 @@ components:
           error: null
     DefaultUpdateWebhook:
       type: object
+      additionalProperties: true
       description: |
         Fired when new transaction data is available for an Item. Plaid will typically check for new transaction data several times a day.
       x-examples:
@@ -6740,6 +6863,7 @@ components:
       title: HistoricalUpdateWebhook
       description: Fired when an Item's historical transaction pull is completed and Plaid has prepared as much historical transaction data as possible for the Item. Once this webhook has been fired, transaction data beyond the most recent 30 days can be fetched for the Item.
       type: object
+      additionalProperties: true
       properties:
         webhook_type:
           type: string
@@ -6770,6 +6894,7 @@ components:
       title: InitialUpdateWebhook
       description: Fired when an Item's initial transaction pull is completed. Once this webhook has been fired, transaction data for the most recent 30 days can be fetched for the Item.
       type: object
+      additionalProperties: true
       x-examples:
         example-1:
           webhook_type: TRANSACTIONS
@@ -6801,6 +6926,7 @@ components:
     PhoneNumber:
       title: PhoneNumber
       type: object
+      additionalProperties: true
       description: A phone number
       properties:
         data:
@@ -6826,6 +6952,7 @@ components:
     Email:
       title: Email
       type: object
+      additionalProperties: true
       properties:
         data:
           type: string
@@ -6848,6 +6975,7 @@ components:
     Address:
       title: Address
       type: object
+      additionalProperties: true
       description: A physical mailing address.
       properties:
         data:
@@ -6863,14 +6991,17 @@ components:
       allOf:
       - $ref: '#/components/schemas/Address'
       - type: object
+        additionalProperties: true
     NullableAddressData:
       nullable: true
       allOf:
       - $ref: '#/components/schemas/AddressData'
       - type: object
+        additionalProperties: true
     AddressData:
       title: AddressData
       type: object
+      additionalProperties: true
       description: Data about the components comprising an address.
       properties:
         city:
@@ -6905,6 +7036,7 @@ components:
     HistoricalBalance:
       title: HistoricalBalance
       type: object
+      additionalProperties: true
       description: An object representing a balance held by an account in the past
       properties:
         date:
@@ -6933,6 +7065,7 @@ components:
     Owner:
       title: Owner
       type: object
+      additionalProperties: true
       description: Data returned from the financial institution about the owner or owners of an account. Only the `names` array must be non-empty.
       properties:
         names:
@@ -6966,6 +7099,7 @@ components:
     OwnerOverride:
       title: OwnerOverride
       type: object
+      additionalProperties: true
       description: Data about the owner or owners of an account. Any fields not specified will be filled in with default Sandbox information.
       properties:
         names:
@@ -6996,6 +7130,7 @@ components:
     LiabilitiesObject:
       title: LiabilitiesObject
       type: object
+      additionalProperties: true
       description: An object containing liability accounts
       properties:
         credit:
@@ -7019,6 +7154,7 @@ components:
     StudentLoan:
       title: StudentLoan
       type: object
+      additionalProperties: true
       description: Contains details about a student loan account
       properties:
         account_id:
@@ -7123,6 +7259,7 @@ components:
     CreditCardLiability:
       title: CreditCardLiability
       type: object
+      additionalProperties: true
       description: An object representing a credit card account.
       properties:
         account_id:
@@ -7167,6 +7304,7 @@ components:
     MortgageLiability:
       title: MortgageLiability
       type: object
+      additionalProperties: true
       description: Contains details about a mortgage account.
       properties:
         account_id:
@@ -7249,6 +7387,7 @@ components:
     MortgageInterestRate:
       title: MortgageInterestRate
       type: object
+      additionalProperties: true
       properties:
         percentage:
           type: number
@@ -7262,6 +7401,7 @@ components:
     MortgagePropertyAddress:
       title: MortgagePropertyAddress
       type: object
+      additionalProperties: true
       properties:
         city:
           type: string
@@ -7287,6 +7427,7 @@ components:
     StudentLoanStatus:
       title: StudentLoanStatus
       type: object
+      additionalProperties: true
       properties:
         end_date:
           type: string
@@ -7320,6 +7461,7 @@ components:
     StudentRepaymentPlan:
       title: StudentRepaymentPlan
       type: object
+      additionalProperties: true
       properties:
         description:
           type: string
@@ -7344,6 +7486,7 @@ components:
     PSLFStatus:
       title: PSLFStatus
       type: object
+      additionalProperties: true
       properties:
         estimated_eligibility_date:
           type: string
@@ -7361,6 +7504,7 @@ components:
     ServicerAddressData:
       title: ServicerAddressData
       type: object
+      additionalProperties: true
       description: The address of the student loan servicer. This is generally the remittance address to which payments should be sent.
       properties:
         city:
@@ -7390,6 +7534,7 @@ components:
     APR:
       title: APR
       type: object
+      additionalProperties: true
       properties:
         apr_percentage:
           type: number
@@ -7418,6 +7563,7 @@ components:
     PaymentInitiationAddress:
       title: PaymentInitiationAddress
       type: object
+      additionalProperties: true
       nullable: true
       description: The optional address of the payment recipient. This object is not currently required to make payments from UK institutions and should not be populated, though may be necessary for future European expansion.
       properties:
@@ -7439,6 +7585,7 @@ components:
     PaymentInitiationRecipient:
       title: PaymentInitiationRecipient
       type: object
+      additionalProperties: true
       description: Information about a payment recipient configured for the Payment Initiation product
       properties:
         recipient_id:
@@ -7456,6 +7603,7 @@ components:
         bacs:
           nullable: true
           type: object
+          additionalProperties: true
           properties:
             account:
               type: string
@@ -7471,6 +7619,7 @@ components:
     Amount:
       title: Amount
       type: object
+      additionalProperties: true
       description: A payment amount.
       properties:
         currency:
@@ -7488,6 +7637,7 @@ components:
     ExternalPaymentSchedule:
       title: ExternalPaymentSchedule
       type: object
+      additionalProperties: true
       nullable: true
       description: The schedule that the payment will be executed on. If a schedule is provided, the payment is automatically set up as a standing order. If no schedule is specified, the payment will be executed only once.
       properties:
@@ -7503,17 +7653,36 @@ components:
             If the payment interval is monthly, `interval_execution_day` should be an integer indicating which day of the month to make the payment on. Integers from 1 to 28 can be used to make a payment on that day of the month. Negative integers from -1 to -5 can be used to make a payment relative to the end of the month. To make a payment on the last day of the month, use -1; to make the payment on the second-to-last day, use -2, and so on.
           type: number
         start_date:
+          format: date
           type: string
           description: |-
             A date in ISO 8601 format (YYYY-MM-DD). Standing order payments will begin on the first `interval_execution_day` on or after the `start_date`.
 
             If the first `interval_execution_day` on or after the start date is also the same day that `/payment_initiation/payment/create` was called, the bank *may* make the first payment on that day, but it is not guaranteed to do so.
         end_date:
+          format: date
           type: string
           description: |-
             A date in ISO 8601 format (YYYY-MM-DD). Standing order payments will end on the last `interval_execution_day` on or before the `end_date`.
 
             If the only `interval_execution_day` between the start date and the end date (inclusive) is also the same day that `/payment_initiation/payment/create` was called, the bank *may* make a payment on that day, but it is not guaranteed to do so.
+      required:
+      - interval
+      - interval_execution_day
+      - start_date
+    ExternalPaymentScheduleGet:
+      title: ExternalPaymentScheduleGet
+      type: object
+      nullable: true
+      description: The schedule that the payment will be executed on. If a schedule is provided, the payment is automatically set up as a standing order. If no schedule is specified, the payment will be executed only once.
+      allOf:
+      - $ref: '#/components/schemas/ExternalPaymentSchedule'
+      properties:
+        adjusted_start_date:
+          format: date
+          nullable: true
+          type: string
+          description: The start date sent to the bank after adjusting for holidays or weekends.  Will be provided in ISO 8601 format (YYYY-MM-DD). If the start date did not require adjustment, this field will be `null`.
       required:
       - interval
       - interval_execution_day
@@ -7537,6 +7706,7 @@ components:
     ProductStatus:
       title: ProductStatus
       type: object
+      additionalProperties: true
       description: A representation of the status health of a request type. Auth requests, Balance requests, Identity requests, Transactions updates, Investments updates, and Item logins each have their own status object.
       properties:
         status:
@@ -7561,6 +7731,7 @@ components:
     ProductStatusBreakdown:
       title: StatusBreakdown
       type: object
+      additionalProperties: true
       description: A detailed breakdown of the institution's performance for a request type. The values for `success`, `error_plaid`, and `error_institution` sum to 1.
       properties:
         success:
@@ -7588,6 +7759,7 @@ components:
     UserCustomPassword:
       title: UserCustomPassword
       type: object
+      additionalProperties: true
       description: Custom test accounts are configured with a JSON configuration object formulated according to the schema below. All fields are optional. Sending an empty object as a configuration will result in an account configured with random balances and transaction history.
       x-examples: {}
       properties:
@@ -7638,6 +7810,7 @@ components:
     MFA:
       title: MFA
       type: object
+      additionalProperties: true
       properties:
         type:
           type: string
@@ -7672,6 +7845,7 @@ components:
     OverrideAccounts:
       title: OverrideAccounts
       type: object
+      additionalProperties: true
       description: Data to use to set values of test accounts. Some values cannot be specified in the schema and will instead will be calculated from other test data in order to achieve more consistent, realistic test data.
       properties:
         type:
@@ -7718,6 +7892,7 @@ components:
     Meta:
       title: Meta
       type: object
+      additionalProperties: true
       description: Allows specifying the metadata of the test account
       properties:
         name:
@@ -7736,6 +7911,7 @@ components:
     Numbers:
       title: Numbers
       type: object
+      additionalProperties: true
       description: Account and bank identifier number data used to configure the test account. All values are optional.
       properties:
         account:
@@ -7774,6 +7950,7 @@ components:
     TransactionOverride:
       title: TransactionOverride
       type: object
+      additionalProperties: true
       description: Data to populate as test transaction data. If not specified, random transactions will be generated instead.
       properties:
         transaction_date:
@@ -7798,6 +7975,7 @@ components:
       - description
     LiabilityOverride:
       type: object
+      additionalProperties: true
       title: ""
       properties:
         type:
@@ -7903,6 +8081,7 @@ components:
     StudentLoanRepaymentModel:
       title: StudentLoanRepaymentModel
       type: object
+      additionalProperties: true
       properties:
         type:
           type: string
@@ -7921,6 +8100,7 @@ components:
     InflowModel:
       title: InflowModel
       type: object
+      additionalProperties: true
       description: The `inflow_model` allows you to model a test account that receives regular income or make regular payments on a loan. Any transactions generated by the `inflow_model` will appear in addition to randomly generated test data or transactions specified by `override_accounts`.
       properties:
         type:
@@ -7956,6 +8136,7 @@ components:
     AutomaticallyVerifiedWebhook:
       title: AutomaticallyVerifiedWebhook
       type: object
+      additionalProperties: true
       description: Fired when an Item is verified via micro-deposits. We recommend communicating to your users when this event is received to notify them that their account is verified and ready for use.
       properties:
         webhook_type:
@@ -7983,6 +8164,7 @@ components:
     JWTHeader:
       title: JWTHeader
       type: object
+      additionalProperties: true
       properties:
         id:
           type: string
@@ -7992,6 +8174,7 @@ components:
     VerificationExpiredWebhook:
       title: VerificationExpiredWebhook
       type: object
+      additionalProperties: true
       description: Fired when an Item was not verified via micro-deposits after ten days since the micro-deposit was made.
       x-examples:
         example-1:
@@ -8019,6 +8202,7 @@ components:
     WebhookUpdateAcknowledgedWebhook:
       title: WebhookUpdateAcknowledgedWebhook
       type: object
+      additionalProperties: true
       description: Fired when an Item's webhook is updated. This will be sent to the newly specified webhook.
       x-examples:
         example-1:
@@ -8049,6 +8233,7 @@ components:
     PendingExpirationWebhook:
       title: PendingExpirationWebhook
       type: object
+      additionalProperties: true
       description: Fired when an Item’s access consent is expiring in 7 days. Some Items have explicit expiration times and we try to relay this when possible to reduce service disruption. This can be resolved by having the user go through Link’s update mode.
       properties:
         webhook_type:
@@ -8076,6 +8261,7 @@ components:
     ItemErrorWebhook:
       title: ItemErrorWebhook
       type: object
+      additionalProperties: true
       description: Fired when an error is encountered with an Item. The error can be resolved by having the user go through Link’s update mode.
       properties:
         webhook_type:
@@ -8107,6 +8293,7 @@ components:
     ItemProductReadyWebhook:
       title: ItemProductReadyWebhook
       type: object
+      additionalProperties: true
       description: Fired once Plaid calculates income from an Item.
       properties:
         webhook_type:
@@ -8132,6 +8319,7 @@ components:
     Recaptcha_RequiredError:
       title: Recaptcha_RequiredError
       type: object
+      additionalProperties: true
       description: The request was flagged by Plaid's fraud system, and requires additional verification to ensure they are not a bot.
       x-examples:
         example-1:
@@ -8176,6 +8364,7 @@ components:
     InvestmentsDefaultUpdateWebhook:
       title: TransactionsUpdateInvestmentsWebhook
       type: object
+      additionalProperties: true
       description: Fired when new or canceled transactions have been detected on an investment account.
       x-examples:
         example-1:
@@ -8211,6 +8400,7 @@ components:
     HoldingsDefaultUpdateWebhook:
       title: HoldingsDefaultUpdateWebhook
       type: object
+      additionalProperties: true
       description: Fired when new or updated holdings have been detected on an investment account. The webhook typically fires once per day, after market close, in response to any newly added holdings or price changes to existing holdings.
       x-examples:
         example-1:
@@ -8246,6 +8436,7 @@ components:
     AssetsProductReadyWebhook:
       title: AssetsProductReadyWebhook
       type: object
+      additionalProperties: true
       description: Fired when the Asset Report has been generated and `/asset_report/get` is ready to be called.  If you attempt to retrieve an Asset Report before this webhook has fired, you’ll receive a response with the HTTP status code 400 and a Plaid error code of `PRODUCT_NOT_READY`.
       properties:
         webhook_type:
@@ -8269,6 +8460,7 @@ components:
     AssetsErrorWebhook:
       title: AssetsErrorWebhook
       type: object
+      additionalProperties: true
       description: Fired when Asset Report generation has failed. The resulting `error` will have an `error_type` of `ASSET_REPORT_ERROR`.
       x-examples:
         example-1:
@@ -8301,6 +8493,7 @@ components:
     Cause:
       title: Cause
       type: object
+      additionalProperties: true
       properties:
         item_id:
           $ref: '#/components/schemas/ItemId'
@@ -8313,6 +8506,7 @@ components:
     Warning:
       title: Warning
       type: object
+      additionalProperties: true
       description: It is possible for an Asset Report to be returned with missing account owner information. In such cases, the Asset Report will contain warning data in the response, indicating why obtaining the owner information failed.
       properties:
         warning_type:
@@ -8341,6 +8535,7 @@ components:
     PaymentAmount:
       title: PaymentAmount
       type: object
+      additionalProperties: true
       properties:
         currency:
           type: string
@@ -8355,6 +8550,7 @@ components:
     AssetReportUser:
       title: AssetReportUser
       type: object
+      additionalProperties: true
       description: The user object allows you to provide additional information about the user to be appended to the Asset Report. All fields are optional. The `first_name`, `last_name`, and `ssn` fields are required if you would like the Report to be eligible for Fannie Mae’s Day 1 Certainty™ program.
       properties:
         client_user_id:
@@ -8403,6 +8599,7 @@ components:
     StandaloneCurrencyCodeList:
       title: StandaloneCurrencyCodeList
       type: object
+      additionalProperties: true
       description: The following currency codes are supported by Plaid.
       properties:
         iso_currency_code:
@@ -8511,6 +8708,7 @@ components:
       title: StandaloneAccountType
       description: The schema below describes the various `types` and corresponding `subtypes` that Plaid recognizes and reports for financial institution accounts.
       type: object
+      additionalProperties: true
       properties:
         depository:
           $ref: '#/components/schemas/DepositoryAccount'
@@ -8819,6 +9017,7 @@ components:
     AssetReport:
       title: AssetReport
       type: object
+      additionalProperties: true
       description: An object representing an Asset Report
       properties:
         asset_report_id:
@@ -8849,6 +9048,7 @@ components:
     AssetReportItem:
       title: AssetReportItem
       type: object
+      additionalProperties: true
       description: A representation of an Item within an Asset Report.
       properties:
         item_id:
@@ -8876,6 +9076,7 @@ components:
     PaymentStatusUpdateWebhook:
       title: PaymentStatusUpdateWebhook
       type: object
+      additionalProperties: true
       description: Fired when the status of a payment has changed.
       x-examples:
         example-1:
@@ -8884,6 +9085,10 @@ components:
           payment_id: payment-id-production-2ba30780-d549-4335-b1fe-c2a938aa39d2
           new_payment_status: PAYMENT_STATUS_INITIATED
           old_payment_status: PAYMENT_STATUS_PROCESSING
+          original_reference: Account Funding 99744
+          adjusted_reference: Account Funding 99
+          original_start_date: "2017-09-14"
+          adjusted_start_date: "2017-09-15"
           timestamp: "2017-09-14T14:42:19.350Z"
           error: null
       properties:
@@ -8954,6 +9159,24 @@ components:
             `PAYMENT_STATUS_BLOCKED`: The payment has been blocked. This is a retryable error.
 
             `PAYMENT_STATUS_UNKNOWN`: The payment status is unknown.
+        original_reference:
+          nullable: true
+          type: string
+          description: The original value of the reference when creating the payment.
+        adjusted_reference:
+          nullable: true
+          type: string
+          description: The value of the reference sent to the bank after adjustment to pass bank validation rules.
+        original_start_date:
+          format: date
+          nullable: true
+          type: string
+          description: The original value of the `start_date` provided during the creation of a standing order. If the payment is not a standing order, this field will be `null`.
+        adjusted_start_date:
+          format: date
+          nullable: true
+          type: string
+          description: The start date sent to the bank after adjusting for holidays or weekends.  Will be provided in ISO 8601 format (YYYY-MM-DD). If the start date did not require adjustment, or if the payment is not a standing order, this field will be `null`.
         timestamp:
           type: string
           description: The timestamp of the update, in ISO 8601 format, e.g. `"2017-09-14T14:42:19.350Z"`
@@ -8969,6 +9192,7 @@ components:
     Holding:
       title: Holding
       type: object
+      additionalProperties: true
       description: A securities holding at an institution.
       properties:
         account_id:
@@ -9014,6 +9238,7 @@ components:
     Security:
       title: Security
       type: object
+      additionalProperties: true
       description: Contains details about a security
       properties:
         security_id:
@@ -9099,6 +9324,7 @@ components:
     InvestmentTransaction:
       title: InvestmentTransaction
       type: object
+      additionalProperties: true
       description: A transaction within an investment account.
       properties:
         investment_transaction_id:
@@ -9222,6 +9448,7 @@ components:
     StandaloneInvestmentTransactionType:
       title: StandaloneInvestmentTransactionType
       type: object
+      additionalProperties: true
       description: Valid values for investment transaction types
       properties:
         buy:
@@ -9252,6 +9479,7 @@ components:
     StandaloneInvestmentTransactionSubtype:
       title: StandaloneInvestmentTransactionSubtype
       type: object
+      additionalProperties: true
       description: Valid subtypes for Investment transaction subtypes. Note that transactions representing inflow of cash will appear as negative amounts, outflow of cash will appear as positive amounts.
       properties:
         account fee:
@@ -9396,6 +9624,7 @@ components:
     UserPermissionRevokedWebhook:
       title: UserPermissionRevokedWebhook
       type: object
+      additionalProperties: true
       description: The `USER_PERMISSION_REVOKED` webhook is fired to when an end user has used the [my.plaid.com portal](https://my.plaid.com) to revoke the permission that they previously granted to access an Item. Once access to an Item has been revoked, it cannot be restored. If the user subsequently returns to your application, a new Item must be created for the user.
       x-examples:
         example-1:
@@ -9440,6 +9669,7 @@ components:
     DepositSwitchGetResponse:
       title: DepositSwitchGetResponse
       type: object
+      additionalProperties: true
       description: DepositSwitchGetResponse defines the response schema for `/deposit_switch/get`
       properties:
         deposit_switch_id:
@@ -9529,6 +9759,7 @@ components:
     BankTransferGetResponse:
       title: BankTransferGetResponse
       type: object
+      additionalProperties: true
       description: BankTransferGetResponse defines the response schema for `/bank_transfer/get`
       properties:
         bank_transfer:
@@ -9545,6 +9776,7 @@ components:
     BankTransfer:
       title: BankTransfer
       type: object
+      additionalProperties: true
       description: Represents a bank transfer within the Bank Transfers API.
       properties:
         id:
@@ -9660,6 +9892,7 @@ components:
     BankTransferUser:
       title: BankTransferUser
       type: object
+      additionalProperties: true
       description: The legal name and other information for the account holder.
       properties:
         legal_name:
@@ -9717,6 +9950,7 @@ components:
     BankTransferFailure:
       title: BankTransferFailure
       type: object
+      additionalProperties: true
       nullable: true
       description: The failure reason if the type of this transfer is `"failed"` or `"reversed"`. Null value otherwise.
       properties:
@@ -9790,6 +10024,7 @@ components:
     BankTransferCreateResponse:
       title: BankTransferCreateResponse
       type: object
+      additionalProperties: true
       description: BankTransferCreateResponse defines the response schema for `/bank_transfer/create`
       properties:
         bank_transfer:
@@ -9838,6 +10073,7 @@ components:
     BankTransferListResponse:
       title: BankTransferListResponse
       type: object
+      additionalProperties: true
       description: BankTransferListResponse defines the response schema for `/bank_transfer/list`
       properties:
         bank_transfers:
@@ -9873,6 +10109,7 @@ components:
     BankTransferCancelResponse:
       title: BankTransferCancelResponse
       type: object
+      additionalProperties: true
       description: BankTransferCancelResponse defines the response schema for `/bank_transfer/cancel`
       properties:
         request_id:
@@ -9970,6 +10207,7 @@ components:
     BankTransferEvent:
       title: BankTransferEvent
       type: object
+      additionalProperties: true
       description: Represents an event in the Bank Transfers API.
       properties:
         event_id:
@@ -10019,6 +10257,7 @@ components:
     BankTransferEventListResponse:
       title: BankTransferEventListResponse
       type: object
+      additionalProperties: true
       description: BankTransferEventListResponse defines the response schema for `/bank_transfer/event/list`
       properties:
         bank_transfer_events:
@@ -10055,6 +10294,7 @@ components:
     BankTransferEventSyncResponse:
       title: BankTransferEventSyncResponse
       type: object
+      additionalProperties: true
       description: BankTransferEventSyncResponse defines the response schema for `/bank_transfer/event/sync`
       properties:
         bank_transfer_events:
@@ -10082,6 +10322,7 @@ components:
     BankTransferBalanceGetResponse:
       title: BankTransferBalanceGetResponse
       type: object
+      additionalProperties: true
       description: BankTransferBalanceGetResponse defines the response schema for `/bank_transfer/balance/get`
       properties:
         balance:
@@ -10094,10 +10335,12 @@ components:
           $ref: '#/components/schemas/RequestID'
       required:
       - balance
+      - origination_account_id
       - request_id
     BankTransferBalance:
       title: BankTransferBalance
       type: object
+      additionalProperties: true
       properties:
         available:
           type: string
@@ -10133,6 +10376,7 @@ components:
     BankTransferMigrateAccountResponse:
       title: BankTransferMigrateAccountResponse
       type: object
+      additionalProperties: true
       description: BankTransferMigrateAccountResponse defines the response schema for `/bank_transfer/migrate_account`
       properties:
         access_token:
@@ -10178,6 +10422,7 @@ components:
     SandboxBankTransferSimulateResponse:
       title: SandboxBankTransferSimulateResponse
       type: object
+      additionalProperties: true
       description: SandboxBankTransferSimulateResponse defines the response schema for `/sandbox/bank_transfer/simulate`
       properties:
         request_id:
@@ -10187,6 +10432,7 @@ components:
     BankTransferReceiverDetails:
       title: BankTransferReceiverDetails
       type: object
+      additionalProperties: true
       nullable: true
       description: The receiver details if the type of this event is `reciever_pending` or `reciever_posted`. Null value otherwise.
       properties:
@@ -10202,6 +10448,7 @@ components:
       description: |
         The `account_filters` specified in the original call to `/link/token/create`.
       type: object
+      additionalProperties: true
       properties:
         depository:
           $ref: '#/components/schemas/DepositoryFilter'
@@ -10214,6 +10461,7 @@ components:
     InstitutionsSearchAccountFilter:
       title: InstitutionsSearchAccountFilter
       type: object
+      additionalProperties: true
       properties:
         loan:
           type: array
@@ -10236,6 +10484,7 @@ components:
       allOf:
       - $ref: '#/components/schemas/AccountBase'
       - type: object
+        additionalProperties: true
         properties:
           owners:
             type: array
@@ -10249,6 +10498,7 @@ components:
       allOf:
       - $ref: '#/components/schemas/AccountBase'
       - type: object
+        additionalProperties: true
         properties:
           days_available:
             type: number
@@ -10277,6 +10527,7 @@ components:
       title: DepositoryFilter
       description: A filter to apply to `depository`-type accounts
       type: object
+      additionalProperties: true
       properties:
         account_subtypes:
           $ref: '#/components/schemas/AccountSubtypes'
@@ -10286,6 +10537,7 @@ components:
       title: CreditFilter
       description: A filter to apply to `credit`-type accounts
       type: object
+      additionalProperties: true
       properties:
         account_subtypes:
           $ref: '#/components/schemas/AccountSubtypes'
@@ -10295,6 +10547,7 @@ components:
       title: LoanFilter
       description: A filter to apply to `loan`-type accounts
       type: object
+      additionalProperties: true
       properties:
         account_subtypes:
           $ref: '#/components/schemas/AccountSubtypes'
@@ -10304,6 +10557,7 @@ components:
       title: InvestmentFilter
       description: A filter to apply to `investment`-type accounts
       type: object
+      additionalProperties: true
       properties:
         account_subtypes:
           $ref: '#/components/schemas/AccountSubtypes'
@@ -10332,6 +10586,7 @@ components:
     EmployersSearchResponse:
       title: EmployersSearchResponse
       type: object
+      additionalProperties: true
       description: EmployersSearchResponse defines the response schema for `/employers/search`.
       properties:
         employers:
@@ -10347,6 +10602,7 @@ components:
     Employer:
       title: Employer
       type: object
+      additionalProperties: true
       description: Data about the employer.
       properties:
         employer_id:
@@ -10381,6 +10637,7 @@ components:
     IncomeVerificationCreateResponse:
       title: IncomeVerificationCreateResponse
       type: object
+      additionalProperties: true
       description: IncomeVerificationCreateResponse defines the response schema for `/income/verification/create`.
       properties:
         income_verification_id:
@@ -10408,6 +10665,7 @@ components:
     IncomeVerificationStatusWebhook:
       title: IncomeVerificationStatusWebhook
       type: object
+      additionalProperties: true
       description: Fired when the status of an income verification instance has changed. It will typically take several minutes for this webhook to fire after the end user has uploaded their documents, and may take up to 15 minutes.
       properties:
         webhook_type:
@@ -10453,6 +10711,7 @@ components:
     IncomeVerificationSummaryGetResponse:
       title: IncomeVerificationSummaryGetResponse
       type: object
+      additionalProperties: true
       description: IncomeVerificationSummaryGetResponse defines the response schema for `/income/verification/summary/get`.
       properties:
         income_summaries:
@@ -10468,6 +10727,7 @@ components:
     IncomeSummary:
       title: IncomeSummary
       type: object
+      additionalProperties: true
       description: The verified fields from a paystub verification. All fields are provided as reported on the paystub.
       properties:
         employer_name:
@@ -10487,6 +10747,7 @@ components:
     TransactionData:
       title: TransactionData
       type: object
+      additionalProperties: true
       nullable: true
       description: Information about the matched direct deposit transaction used to verify a user's payroll information.
       properties:
@@ -10514,6 +10775,7 @@ components:
     IncomeSummaryFieldString:
       title: IncomeSummaryFieldString
       type: object
+      additionalProperties: true
       nullable: true
       properties:
         value:
@@ -10528,15 +10790,18 @@ components:
       allOf:
       - $ref: '#/components/schemas/IncomeSummaryFieldString'
       - type: object
+        additionalProperties: true
         description: The name of the employer, as reported on the paystub.
     EmployeeIncomeSummaryFieldString:
       allOf:
       - $ref: '#/components/schemas/IncomeSummaryFieldString'
       - type: object
+        additionalProperties: true
         description: The name of the employee, as reported on the paystub.
     IncomeSummaryFieldNumber:
       title: IncomeSummaryFieldNumber
       type: object
+      additionalProperties: true
       nullable: true
       properties:
         value:
@@ -10551,20 +10816,24 @@ components:
       allOf:
       - $ref: '#/components/schemas/IncomeSummaryFieldNumber'
       - type: object
+        additionalProperties: true
         description: Year-to-date pre-tax earnings, as reported on the paystub.
     YTDNetIncomeSummaryFieldNumber:
       allOf:
       - $ref: '#/components/schemas/IncomeSummaryFieldNumber'
       - type: object
+        additionalProperties: true
         description: Year-to-date earnings after any tax withholdings, benefit payments or deductions, as reported on the paystub.
     ProjectedIncomeSummaryFieldNumber:
       allOf:
       - $ref: '#/components/schemas/IncomeSummaryFieldNumber'
       - type: object
+        additionalProperties: true
         description: The employee's estimated annual salary, as derived from information reported on the paystub.
     PayFrequency:
       title: PayFrequency
       type: object
+      additionalProperties: true
       nullable: true
       properties:
         value:
@@ -10620,6 +10889,7 @@ components:
     IncomeVerificationPaystubGetResponse:
       title: IncomeVerificationPaystubGetResponse
       type: object
+      additionalProperties: true
       description: IncomeVerificationPaystubGetResponse defines the response schema for `/income/verification/paystub/get`.
       properties:
         paystub:
@@ -10629,6 +10899,7 @@ components:
     Paystub:
       title: Paystub
       type: object
+      additionalProperties: true
       description: An object representing data extracted from the end user's paystub.
       properties:
         paystub_id:
@@ -10660,6 +10931,7 @@ components:
     IncomeBreakdown:
       title: IncomeBreakdown
       type: object
+      additionalProperties: true
       properties:
         type:
           nullable: true
@@ -10680,6 +10952,7 @@ components:
     Employee:
       title: Employee
       type: object
+      additionalProperties: true
       description: Data about the employee.
       properties:
         name:
@@ -10695,6 +10968,7 @@ components:
     PayPeriodDetails:
       title: PayPeriodDetails
       type: object
+      additionalProperties: true
       description: Details about the pay period.
       properties:
         start_date:
@@ -10720,6 +10994,7 @@ components:
     PaystubDeduction:
       title: PaystubDeduction
       type: object
+      additionalProperties: true
       properties:
         type:
           nullable: true
@@ -10736,6 +11011,7 @@ components:
     PaystubYTDDetails:
       title: PaystubYTDDetails
       type: object
+      additionalProperties: true
       properties:
         gross_earnings:
           type: number
@@ -10763,6 +11039,7 @@ components:
     IncomeVerificationDocumentsDownloadResponse:
       title: IncomeVerificationDocumentsDownloadResponse
       type: object
+      additionalProperties: true
       properties:
         id:
           type: string
@@ -10772,6 +11049,7 @@ components:
     IncomeVerificationWebhookStatus:
       title: IncomeVerificationWebhookStatus
       type: object
+      additionalProperties: true
       properties:
         id:
           type: string
@@ -10782,6 +11060,7 @@ components:
       allOf:
       - $ref: '#/components/schemas/Transaction'
       - type: object
+        additionalProperties: true
         properties:
           date_transacted:
             nullable: true
@@ -10795,6 +11074,7 @@ components:
     HealthIncident:
       title: HealthIncident
       type: object
+      additionalProperties: true
       properties:
         start_date:
           nullable: true
@@ -10815,6 +11095,7 @@ components:
     IncidentUpdate:
       title: IncidentUpdate
       type: object
+      additionalProperties: true
       properties:
         description:
           type: string
@@ -10849,6 +11130,7 @@ components:
     DepositSwitchAltCreateResponse:
       title: DepositSwitchAltCreateResponse
       type: object
+      additionalProperties: true
       properties:
         deposit_switch_id:
           type: string
@@ -10862,6 +11144,7 @@ components:
     DepositSwitchTargetAccount:
       title: DepositSwitchTargetAccount
       type: object
+      additionalProperties: true
       properties:
         account_number:
           type: string
@@ -10886,6 +11169,7 @@ components:
     DepositSwitchTargetUser:
       title: DepositSwitchTargetUser
       type: object
+      additionalProperties: true
       properties:
         given_name:
           type: string
@@ -10912,6 +11196,7 @@ components:
     DepositSwitchAddressData:
       title: DepositSwitchAddressData
       type: object
+      additionalProperties: true
       description: The user's address.
       properties:
         city:
