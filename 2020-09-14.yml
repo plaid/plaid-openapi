@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.8.0
+  version: 2020-09-14_1.12.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -260,6 +260,8 @@ paths:
         Transactions are returned in reverse-chronological order, and the sequence of transaction ordering is stable and will not shift.  Transactions are not immutable and can also be removed altogether by the institution; a removed transaction will no longer appear in `/transactions/get`.  For more details, see [Pending and posted transactions](/docs/transactions/transactions-data/#pending-and-posted-transactions).
 
         Due to the potentially large number of transactions associated with an Item, results are paginated. Manipulate the `count` and `offset` parameters in conjunction with the `total_transactions` response body field to fetch all available transactions.
+
+        Data returned by `/transactions/get` will be the data available for the Item as of the most recent successful check for new transactions. Plaid typically checks for new data multiple times a day, but these checks may occur less frequently, such as once a day, depending on the institution. An Item's `status.transactions.last_successful_update` field will show the timestamp of the most recent successful update. To force Plaid to check for new transactions, you can use the `/transactions/refresh` endpoint.
 
         Note that data may not be immediately available to `/transactions/get`. Plaid will begin to prepare transactions data upon Item link, if Link was initialized with `transactions`, or upon the first call to `/transactions/get`, if it wasn't. To be alerted when transaction data is ready to be fetched, listen for the [`INITIAL_UPDATE`](/docs/api/webhooks#transactions-initial_update) and [`HISTORICAL_UPDATE`](/docs/api/webhooks#transactions-historical_update) webhooks. If no transaction history is ready when `/transactions/get` is called, it will return a `PRODUCT_NOT_READY` error.
       requestBody:
@@ -575,7 +577,10 @@ paths:
       externalDocs:
         url: /api/accounts/#accountsget
       operationId: accountsGet
-      description: The `/accounts/get`  endpoint can be used to retrieve information for any linked Item. Note that some information is nullable. Plaid will only return active bank accounts, i.e. accounts that are not closed and are capable of carrying a balance.
+      description: |-
+        The `/accounts/get`  endpoint can be used to retrieve information for any linked Item. Note that some information is nullable. Plaid will only return active bank accounts, i.e. accounts that are not closed and are capable of carrying a balance.
+
+        This endpoint retrieves cached information, rather than extracting fresh information from the institution. As a result, balances returned may not be up-to-date; for realtime balance information, use `/accounts/balance/get` instead.
       responses:
         "200":
           description: success
@@ -3476,7 +3481,7 @@ paths:
                 example-1:
                   value:
                     employers:
-                    - name: Plaid Technologies Inc
+                    - name: Plaid Inc
                       address:
                         city: San Francisco
                         country: US
@@ -3668,10 +3673,43 @@ paths:
       operationId: depositSwitchAltCreate
       description: This endpoint provides an alternative to `/deposit_switch/create` for customers who have not yet fully integrated with Plaid Exchange. Like `/deposit_switch/create`, it created a deposit switch entity that will be persisted throughout the lifecycle of the switch.
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/DepositSwitchAltCreateRequest'
+  /sandbox/bank_transfer/fire_webhook:
+    post:
+      summary: Manually fire a Bank Transfer webhook
+      tags:
+      - plaid
+      externalDocs:
+        url: /api/sandbox/#sandboxbank_transferfire_webhook
+      operationId: sandboxBankTransferFireWebhook
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SandboxBankTransferFireWebhookResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: mdqfuVxeoza6mhu
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      description: Use the `/sandbox/bank_transfer/fire_webhook` endpoint to manually trigger a Bank Transfers webhook in the Sandbox environment.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SandboxBankTransferFireWebhookRequest'
 components:
   securitySchemes:
     clientId:
@@ -3921,7 +3959,7 @@ components:
             $ref: '#/components/schemas/Products'
         routing_numbers:
           type: array
-          description: Specify an array of routing numbers to filter institutions.
+          description: Specify an array of routing numbers to filter institutions. The response will only return institutions that match all of the routing numbers in the array.
           items:
             type: string
         oauth:
@@ -3945,7 +3983,7 @@ components:
             $ref: '#/components/schemas/Institution'
         total:
           type: integer
-          description: The number of institutions returned
+          description: The total number of institutions available via this endpoint
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
@@ -3991,8 +4029,6 @@ components:
         include_optional_metadata:
           type: boolean
           description: When true, return the institution's homepage URL, logo and primary brand color. Learn more
-        account_filter:
-          $ref: '#/components/schemas/InstitutionsSearchAccountFilter'
     InstitutionsSearchResponse:
       type: object
       additionalProperties: true
@@ -5659,6 +5695,10 @@ components:
           $ref: '#/components/schemas/LinkTokenCreateRequestPaymentInitiation'
         deposit_switch:
           $ref: '#/components/schemas/LinkTokenCreateRequestDepositSwitch'
+        income_verification:
+          $ref: '#/components/schemas/LinkTokenCreateRequestIncomeVerification'
+        auth:
+          $ref: '#/components/schemas/LinkTokenCreateRequestAuth'
       required:
       - client_name
       - language
@@ -5698,6 +5738,17 @@ components:
           description: The `deposit_switch_id` provided by the `/deposit_switch/create` endpoint.
       required:
       - deposit_switch_id
+    LinkTokenCreateRequestAuth:
+      type: object
+      description: Specifies options for initializing Link for use with the Auth product. This field is currently only required if using the Flexible Auth product (currently in closed beta).
+      properties:
+        auth_flow:
+          type: string
+          enum:
+          - FLEXIBLE_AUTH
+          description: The optional Auth flow to use. Currently only used to enable Flexible Auth.
+      required:
+      - auth_flow
     LinkTokenCreateRequestUser:
       type: object
       description: An object specifying information about the end user who will be linking their account.
@@ -6050,6 +6101,8 @@ components:
       type: object
       additionalProperties: true
       description: A single account at a financial institution.
+      x-examples:
+        example-1: {}
       properties:
         account_id:
           type: string
@@ -6057,6 +6110,8 @@ components:
             Plaid’s unique identifier for the account. This value will not change unless Plaid can't reconcile the account with the data returned by the financial institution. This may occur, for example, when the name of the account changes. If this happens a new `account_id` will be assigned to the account.
 
             The `account_id` can also change if the `access_token` is deleted and the same credentials that were used to generate that `access_token` are used to generate a new `access_token` on a later date. In that case, the new `account_id` will be different from the old `account_id`.
+
+            If an account with a specific `account_id` disappears instead of changing, the account is likely closed. Closed accounts are not returned by the Plaid API.
 
             Like all Plaid identifiers, the `account_id` is case sensitive.
         balances:
@@ -6092,8 +6147,6 @@ components:
       - name
       - type
       - subtype
-      x-examples:
-        example-1: {}
     AccountBalance:
       title: AccountBalance
       type: object
@@ -6786,11 +6839,11 @@ components:
     APISecret:
       title: APISecret
       type: string
-      description: Your Plaid API `secret`.
+      description: Your Plaid API `secret`. The `secret` is required and may be provided either in the `PLAID-SECRET` header or as part of a request body.
     APIClientID:
       title: ClientID
       type: string
-      description: Your Plaid API `client_id`.
+      description: Your Plaid API `client_id`. The `client_id` is required and may be provided either in the `PLAID-CLIENT-ID` header or as part of a request body.
     TransactionsRemovedWebhook:
       title: TransactionsRemovedWebhook
       description: Fired when transaction(s) for an Item are deleted. The deleted transaction IDs are included in the webhook payload. Plaid will typically check for deleted transaction data several times a day.
@@ -7163,7 +7216,7 @@ components:
           nullable: true
         account_number:
           type: string
-          description: The account number of the loan.
+          description: The account number of the loan. For some institutions, this may be a masked version of the number (e.g., the last 4 digits instead of the entire number).
           nullable: true
         disbursement_dates:
           description: The dates on which loaned funds were disbursed or will be disbursed. These are often in the past. Dates are returned in an ISO 8601 format (YYYY-MM-DD).
@@ -7701,6 +7754,7 @@ components:
       - credit_details
       - income
       - deposit_switch
+      - standing_orders
       description: A list of products that an institution can support. All Items must be initialized with at least one product. The Balance product is always available and does not need to be specified during initialization.
       type: string
     ProductStatus:
@@ -7953,10 +8007,10 @@ components:
       additionalProperties: true
       description: Data to populate as test transaction data. If not specified, random transactions will be generated instead.
       properties:
-        transaction_date:
+        date_transacted:
           type: string
           description: The date of the transaction, in ISO8601 (YYYY-MM-DD) format. Transaction dates in the past or present will result in posted transactions; transaction dates in the future will result in pending transactions. Transactions in Sandbox will move from pending to posted once their transaction date has been reached.
-        posted_date:
+        date_posted:
           type: string
           description: The date the transaction posted, in ISO8601 (YYYY-MM-DD) format
         amount:
@@ -7969,8 +8023,8 @@ components:
           type: string
           description: The ISO-4217 format currency code for the transaction.
       required:
-      - transaction_date
-      - posted_date
+      - date_transacted
+      - date_posted
       - amount
       - description
     LiabilityOverride:
@@ -7979,7 +8033,7 @@ components:
       title: ""
       properties:
         type:
-          description: The type of the liability object, either `credit` or `student`.
+          description: The type of the liability object, either `credit` or `student`. Mortgages are not currently supported in the custom Sandbox.
           type: string
         purchase_apr:
           description: The purchase APR percentage value. For simplicity, this is the only interest rate used to calculate interest charges. Can only be set if `type` is `credit`.
@@ -8032,14 +8086,12 @@ components:
           type: string
           description: Override the `loan_name` field. Can only be set if `type` is `student`.
         loan_status:
-          type: string
-          description: Override the `loan_status` field. Can only be set if `type` is `student`.
+          $ref: '#/components/schemas/StudentLoanStatus'
         payment_reference_number:
           type: string
           description: Override the `payment_reference_number` field. Can only be set if `type` is `student`.
         pslf_status:
-          type: string
-          description: Override the `pslf_status` field. Can only be set if `type` is `student`.
+          $ref: '#/components/schemas/PSLFStatus'
         repayment_plan_description:
           type: string
           description: Override the `repayment_plan.description` field. Can only be set if `type` is `student`.
@@ -8361,6 +8413,25 @@ components:
       - link_user_experience
       - common_causes
       - troubleshooting_steps
+    BankTransfersEventsUpdateWebhook:
+      title: BankTransfersEventsUpdateWebhook
+      type: object
+      additionalProperties: true
+      description: Fired when new bank transfer events are available. Receiving this webhook indicates you should fetch the new events from `/bank_transfer/event/sync`.
+      x-examples:
+        example-1:
+          webhook_type: BANK_TRANSFERS
+          webhook_code: BANK_TRANSFERS_EVENTS_UPDATE
+      properties:
+        webhook_type:
+          type: string
+          description: '`BANK_TRANSFERS`'
+        webhook_code:
+          type: string
+          description: '`BANK_TRANSFERS_EVENTS_UPDATE`'
+      required:
+      - webhook_type
+      - webhook_code
     InvestmentsDefaultUpdateWebhook:
       title: TransactionsUpdateInvestmentsWebhook
       type: object
@@ -9333,6 +9404,8 @@ components:
         cancel_transaction_id:
           type: string
           nullable: true
+          deprecated: true
+          description: A legacy field formerly used internally by Plaid to identify certain canceled transactions.
         account_id:
           type: string
           description: The `account_id` of the account against which this transaction posted.
@@ -11224,3 +11297,26 @@ components:
       - region
       - postal_code
       - country
+    SandboxBankTransferFireWebhookRequest:
+      title: SandboxBankTransferFireWebhookRequest
+      type: object
+      description: SandboxBankTransferFireWebhookRequest defines the request schema for `/sandbox/bank_transfer/fire_webhook`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        webhook:
+          type: string
+          description: The URL to which the webhook should be sent.
+      required:
+      - webhook
+    SandboxBankTransferFireWebhookResponse:
+      title: SandboxBankTransferFireWebhookResponse
+      type: object
+      description: SandboxBankTransferFireWebhookResponse defines the response schema for `/sandbox/bank_transfer/fire_webhook`
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
