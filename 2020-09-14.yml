@@ -8433,6 +8433,41 @@ components:
       - item_id
       - new_holdings
       - updated_holdings
+    LiabilitiesDefaultUpdateWebhook:
+      title: LiabilitiesDefaultUpdateWebhook
+      type: object
+      description: 'Fired when new or updated liabilities have been detected on a liabilities item.'
+      x-examples:
+        example-1:
+          webhook_type: LIABILITIES
+          webhook_code: DEFAULT_UPDATE
+          item_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
+          error: null
+          account_ids_with_new_liabilities:
+            - '52a52b17cf2bc3b430000067'
+            - '5307fe1ec4e5adc356000009'
+          account_ids_with_updated_liabilities:
+            53068f27dedc572a19000029:
+              - 'past_amount_due'
+      properties:
+        webhook_type:
+          type: string
+          description: '`LIABILITIES`'
+        webhook_code:
+          type: string
+          description: '`DEFAULT_UPDATE`'
+        item_id:
+          $ref: '#/components/schemas/ItemId'
+        error:
+          $ref: '#/components/schemas/Error'
+        account_ids_with_new_liabilities:
+          type: array
+          description: An array of `account_id`'s for accounts that contain new liabilities.
+          items:
+            type: string
+        account_ids_with_updated_liabilities:
+          type: object
+          description: An object of `account_id`'s (of accounts that contain updated liabilities) that are mapped to their respective liabilities fields that changed.
     AssetsProductReadyWebhook:
       title: AssetsProductReadyWebhook
       type: object
