@@ -5867,7 +5867,7 @@ components:
           type: string
           nullable: true
         error:
-          $ref: '#/components/schemas/Error'
+          $ref: '#/components/schemas/ErrorBase'
         available_products:
           description: A list of products available for the Item that have not yet been accessed.
           type: array
@@ -5903,11 +5903,25 @@ components:
       - billed_products
       - update_type
     Error:
+      title: Error
+      description: We use standard HTTP response codes for success and failure notifications, and our errors are further classified by `error_type`. In general, 200 HTTP codes correspond to success, 40X codes are for developer- or user-related failures, and 50X codes are for Plaid-related issues.  Error fields will be `null` if no error has occurred.
+      nullable: true
+      allOf:
+        - $ref: '#/components/schemas/ErrorBase'
+        - type: object
+          additionalProperties: true
+          properties:
+            request_id:
+              type: string
+              description: A unique identifying the request, to be used for troubleshooting purposes. This field will be omitted in errors provided by webhooks.
+          required:
+            - request_id
+    ErrorBase:
+      title: ErrorBase
       description: We use standard HTTP response codes for success and failure notifications, and our errors are further classified by `error_type`. In general, 200 HTTP codes correspond to success, 40X codes are for developer- or user-related failures, and 50X codes are for Plaid-related issues.  Error fields will be `null` if no error has occurred.
       nullable: true
       type: object
       additionalProperties: true
-      title: Error
       properties:
         error_type:
           enum:
@@ -5937,9 +5951,6 @@ components:
             This may change over time and is not safe for programmatic use.
           type: string
           nullable: true
-        request_id:
-          type: string
-          description: A unique identifying the request, to be used for troubleshooting purposes. This field will be omitted in errors provided by webhooks.
         causes:
           type: array
           description: |-
@@ -5963,7 +5974,6 @@ components:
       - error_type
       - error_code
       - error_message
-      - request_id
     NullableItemStatus:
       nullable: true
       allOf:
@@ -6804,7 +6814,7 @@ components:
           type: string
           description: '`TRANSACTIONS_REMOVED`'
         error:
-          $ref: '#/components/schemas/Error'
+          $ref: '#/components/schemas/ErrorBase'
         removed_transactions:
           type: array
           description: An array of `transaction_ids` corresponding to the removed transactions
@@ -6846,7 +6856,7 @@ components:
           type: string
           description: '`DEFAULT_UPDATE`'
         error:
-          $ref: '#/components/schemas/Error'
+          $ref: '#/components/schemas/ErrorBase'
         new_transactions:
           type: number
           description: The number of new transactions detected since the last time this webhook was fired.
@@ -6872,7 +6882,7 @@ components:
           type: string
           description: '`HISTORICAL_UPDATE`'
         error:
-          $ref: '#/components/schemas/Error'
+          $ref: '#/components/schemas/ErrorBase'
         new_transactions:
           type: number
           description: The number of new, unfetched transactions available
@@ -8224,7 +8234,7 @@ components:
           type: string
           description: The new webhook URL
         error:
-          $ref: '#/components/schemas/Error'
+          $ref: '#/components/schemas/ErrorBase'
       required:
       - webhook_type
       - webhook_code
@@ -8273,7 +8283,7 @@ components:
         item_id:
           $ref: '#/components/schemas/ItemId'
         error:
-          $ref: '#/components/schemas/Error'
+          $ref: '#/components/schemas/ErrorBase'
       required:
       - webhook_type
       - webhook_code
@@ -8305,7 +8315,7 @@ components:
         item_id:
           $ref: '#/components/schemas/ItemId'
         error:
-          $ref: '#/components/schemas/Error'
+          $ref: '#/components/schemas/ErrorBase'
       required:
       - webhook_type
       - webhook_code
@@ -8384,7 +8394,7 @@ components:
         item_id:
           $ref: '#/components/schemas/ItemId'
         error:
-          $ref: '#/components/schemas/Error'
+          $ref: '#/components/schemas/ErrorBase'
         new_investments_transactions:
           type: number
           description: The number of new transactions reported since the last time this webhook was fired.
@@ -8420,7 +8430,7 @@ components:
         item_id:
           $ref: '#/components/schemas/ItemId'
         error:
-          $ref: '#/components/schemas/Error'
+          $ref: '#/components/schemas/ErrorBase'
         new_holdings:
           type: number
           description: The number of new holdings reported since the last time this webhook was fired.
@@ -8481,7 +8491,7 @@ components:
           type: string
           description: '`ERROR`'
         error:
-          $ref: '#/components/schemas/Error'
+          $ref: '#/components/schemas/ErrorBase'
         asset_report_id:
           type: string
           description: The ID associated with the Asset Report.
@@ -8498,7 +8508,7 @@ components:
         item_id:
           $ref: '#/components/schemas/ItemId'
         error:
-          $ref: '#/components/schemas/Error'
+          $ref: '#/components/schemas/ErrorBase'
       required:
       - item_id
       - error
@@ -9181,7 +9191,7 @@ components:
           type: string
           description: The timestamp of the update, in ISO 8601 format, e.g. `"2017-09-14T14:42:19.350Z"`
         error:
-          $ref: '#/components/schemas/Error'
+          $ref: '#/components/schemas/ErrorBase'
       required:
       - webhook_type
       - webhook_code
@@ -9646,7 +9656,7 @@ components:
         item_id:
           $ref: '#/components/schemas/ItemId'
         error:
-          $ref: '#/components/schemas/Error'
+          $ref: '#/components/schemas/ErrorBase'
       required:
       - webhook_type
       - webhook_code
