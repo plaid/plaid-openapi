@@ -1,6 +1,3 @@
-### 2020-09-14_1.16.0
-- Updated `/payment_initiation/payment/create` with ability to pass in iban or account and sort code. If provided, the end user will be able to send payments only from the specified bank account.
-
 ### 2020-09-14_1.15.1
 - Add clarifying max character line to client_name description.
 

@@ -22,33 +22,6 @@ security:
   secret: []
   plaidVersion: []
 paths:
-  /application/get:
-    post:
-      tags:
-      - plaid
-      summary: Retrieve information about a Plaid application
-      operationId: applicationGet
-      description: Allows financial institutions to retrieve information about Plaid clients for the purpose of building control-tower experiences
-      responses:
-        "200":
-          description: success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApplicationGetResponse'
-        default:
-          description: Error response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ApplicationGetRequest'
-        description: ""
   /item/get:
     post:
       tags:
@@ -6487,13 +6460,6 @@ components:
       - type: object
         additionalProperties: true
         description: The sort code of the account.
-    PaymentInitiationOptionalRestrictionBacs:
-      nullable: true
-      allOf:
-      - $ref: '#/components/schemas/RecipientBACS'
-      - type: object
-        additionalProperties: true
-        description: An optional object used to restrict the accounts used for payments. If provided, the end user will be able to send payments only from the specified bank account.
     RequestID:
       title: RequestID
       type: string
@@ -7819,10 +7785,10 @@ components:
         iban:
           nullable: true
           type: string
-          description: The International Bank Account Number (IBAN) for the payer's account. If provided, the end user will be able to send payments only from the specified bank account.
+          description: The International Bank Account Number (IBAN) for the payer's account.
         bacs:
           nullable: true
-          $ref: '#/components/schemas/PaymentInitiationOptionalRestrictionBacs'
+          $ref: '#/components/schemas/NullableRecipientBACS'
     ExternalPaymentRefundDetails:
       title: ExternalPaymentRefundDetails
       type: object
@@ -11481,60 +11447,3 @@ components:
           $ref: '#/components/schemas/RequestID'
       required:
       - request_id
-    ApplicationID:
-      title: ApplicationID
-      type: string
-      description: This field will map to the application ID that is returned from /item/applications/list, or provided to the institution in an oauth redirect.
-    Application:
-      type: object
-      description: Metadata about the application
-      properties:
-        application_id:
-          $ref: '#/components/schemas/ApplicationID'
-        name:
-          type: string
-          description: The name of the application
-        logo:
-          nullable: true
-          type: string
-          description: A URL that links to the application logo image.
-        application_url:
-          nullable: true
-          type: string
-          description: The URL for the application's website
-        reason_for_access:
-          nullable: true
-          type: string
-          description: A string provided by the connected app stating why they use their respective enabled products.
-      required:
-      - application_id
-      - created_at
-      - name
-      - logo
-      - application_url
-      - reason_for_access
-    ApplicationGetRequest:
-      description: ApplicationGetResponse defines the schema for `/application/get`
-      type: object
-      properties:
-        client_id:
-          $ref: '#/components/schemas/APIClientID'
-        secret:
-          $ref: '#/components/schemas/APISecret'
-        application_id:
-          $ref: '#/components/schemas/ApplicationID'
-      required:
-      - client_id
-      - secret
-      - application_id
-    ApplicationGetResponse:
-      description: The request ID associated with this call.
-      type: object
-      properties:
-        request_id:
-          $ref: '#/components/schemas/RequestID'
-        application:
-          $ref: '#/components/schemas/Application'
-      required:
-      - request_id
-      - application
