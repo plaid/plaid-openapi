@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.15.1
+  version: 2020-09-14_1.16.2
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -416,10 +416,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/InstitutionsGetRequest'
-          application/xml:
-            schema:
-              type: object
-              properties: {}
         description: ""
   /institutions/search:
     post:
@@ -770,6 +766,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -2283,7 +2280,7 @@ paths:
 
         By default, an Asset Report includes transaction descriptions as returned by the bank, as opposed to parsed and categorized by Plaid. You can also receive cleaned and categorized transactions, as well as additional insights like merchant name or location information. We call this an Asset Report with Insights. An Asset Report with Insights provides transaction category, location, and merchant information in addition to the transaction strings provided in a standard Asset Report.
 
-        To retrieve an Asset Report with Insights, call the `/asset_report/get` endpoint with `include_insights` set to `true`. Note that you will need to [contact us](https://dashboard.plaid.com/support) to get access to this feature.
+        To retrieve an Asset Report with Insights, call the `/asset_report/get` endpoint with `include_insights` set to `true`.
       requestBody:
         required: true
         content:
@@ -3521,6 +3518,7 @@ paths:
 
         The data in the employer database is currently limited. As the Verification of Income product progresses through the beta period, more employers are being regularly added. Because the employer database is frequently updated, we recommend that you do not cache or store data from this endpoint for more than a day.
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -3532,7 +3530,7 @@ paths:
       - plaid
       externalDocs:
         url: /income-verification/reference#incomeverificationcreate
-      operationId: post-income-verification-create
+      operationId: incomeVerificationCreate
       responses:
         "200":
           description: OK
@@ -3547,6 +3545,7 @@ paths:
                     request_id: lMjeOeu9X1VUh1F
       description: '`/income/verification/create` begins the income verification process by returning an `income_verification_id`. You can then provide the `income_verification_id` to `/link/token/create` under the `income_verification` parameter in order to create a Link instance that will prompt the user to upload their income documents. Once the documents have been uploaded and parsed, Plaid will fire an `INCOME` webhook.'
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -3597,6 +3596,7 @@ paths:
                     request_id: LhQf0THi8SH1yJm
       description: '`/income/verification/summary/get` returns a verification summary for the income that was verified for an end user. It can be called once the status of the verification has been set to `VERIFICATION_STATUS_PROCESSING_COMPLETE`, as reported by the `INCOME: verification_status` webhook. Attempting to call the endpoint before verification has been completed will result in an error.'
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -3642,6 +3642,7 @@ paths:
                       gross_earnings: 59375
                       net_earnings: null
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -3671,6 +3672,7 @@ paths:
 
         In the future, when Digital Verification is available, the most recent file available for download with the payroll provider will also be available from this endpoint.
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -3991,7 +3993,7 @@ components:
         include_optional_metadata:
           type: boolean
           description: |-
-            When `true`, return the institution's homepage URL, logo and primary brand color.
+            When `true`, return the institution's homepage URL, logo and primary brand color. Note that you may need to contact your Plaid Account Manager to be enabled to use this flag.
 
             Note that Plaid does not own any of the logos shared by the API, and that by accessing or using these logos, you agree that you are doing so at your own risk and will, if necessary, obtain all required permissions from the appropriate rights holders and adhere to any applicable usage guidelines. Plaid disclaims all express or implied warranties with respect to the logos.
         include_payment_initiation_metadata:
@@ -4055,7 +4057,7 @@ components:
           description: Limit results to institutions with or without OAuth login flows. This is primarily relevant to institutions with European country codes
         include_optional_metadata:
           type: boolean
-          description: When true, return the institution's homepage URL, logo and primary brand color.
+          description: When true, return the institution's homepage URL, logo and primary brand color. Note that you may need to contact your Plaid Account Manager to be enabled to use this flag.
         include_payment_initiation_metadata:
           type: boolean
           default: false
@@ -4116,7 +4118,7 @@ components:
           default: false
           type: boolean
           description: |-
-            When `true`, return an institution's logo, brand color, and URL. When available, the bank's logo is returned as a base64 encoded 152x152 PNG, the brand color is in hexadecimal format. The default value is `false`.
+            When `true`, return an institution's logo, brand color, and URL. When available, the bank's logo is returned as a base64 encoded 152x152 PNG, the brand color is in hexadecimal format. The default value is `false`. Note that you may need to contact your Plaid Account Manager to be enabled to use this flag.
 
             Note that Plaid does not own any of the logos shared by the API and that by accessing or using these logos, you agree that you are doing so at your own risk and will, if necessary, obtain all required permissions from the appropriate rights holders and adhere to any applicable usage guidelines. Plaid disclaims all express or implied warranties with respect to the logos.
         include_status:
@@ -4634,6 +4636,15 @@ components:
         expired_at:
           type: integer
           nullable: true
+      required:
+      - alg
+      - crv
+      - kid
+      - kty
+      - use
+      - x
+      - "y"
+      - created_at
     LiabilitiesGetRequest:
       type: object
       description: LiabilitiesGetRequest defines the request schema for `/liabilities/get`
@@ -5264,7 +5275,7 @@ components:
           $ref: '#/components/schemas/AssetReportToken'
         include_insights:
           type: boolean
-          description: '`true` if you would like to retrieve the Asset Report with Insights, `false` otherwise. This field defaults to `false` if omitted. [Contact Plaid Support](https://dashboard.plaid.com/support) to get access to this feature.'
+          description: '`true` if you would like to retrieve the Asset Report with Insights, `false` otherwise. This field defaults to `false` if omitted.'
       required:
       - asset_report_token
     AssetReportGetResponse:
@@ -5765,8 +5776,7 @@ components:
           $ref: '#/components/schemas/LinkTokenAccountFilters'
         institution_id:
           type: string
-          deprecated: true
-          description: Used for certain legacy use cases
+          description: Used for certain Europe-only configurations, as well as certain legacy use cases in other regions.
         payment_initiation:
           $ref: '#/components/schemas/LinkTokenCreateRequestPaymentInitiation'
         deposit_switch:
@@ -6371,10 +6381,13 @@ components:
           description: The Plaid account ID associated with the account numbers
         account:
           type: string
-          description: The ACH account number for the account
+          description: |-
+            The ACH account number for the account.
+
+            Note that when using OAuth with Chase Bank (`ins_56`), Chase will issue "tokenized" routing and account numbers, which are not the user's actual account and routing numbers. These tokenized numbers should work identically to normal account and routing numbers, with the following exceptions: real-time payments are not supported, and same-day ACH transfers using the virtual account number that are initiated within 9 hours of the Item's creation may fail. The digits returned in the mask field will continue to reflect the actual account number, rather than the tokenized account number. If a user revokes their permissions to your app, the tokenized numbers will continue to work for ACH deposits, but not withdrawals.
         routing:
           type: string
-          description: The ACH routing number for the account
+          description: The ACH routing number for the account. If the institution is `ins_56`, this may be a tokenized routing number. For more information, see the description of the `account` field.
         wire_routing:
           type: string
           description: The wire transfer routing number for the account, if available
@@ -7218,7 +7231,7 @@ components:
       properties:
         names:
           description: |-
-            A list of names associated with the account by the financial institution. These should always be the names of individuals, even for business accounts. If the name of a business is reported, please contact Plaid Support.  In the case of a joint account, the names of all account holders will be reported.
+            A list of names associated with the account by the financial institution. These should always be the names of individuals, even for business accounts. If the name of a business is reported, please contact Plaid Support. In the case of a joint account, Plaid will make a best effort to report the names of all account holders.
 
             If an Item contains multiple accounts with different owner names, some institutions will report all names associated with the Item in each account's `names` array.
           type: array
@@ -7815,7 +7828,7 @@ components:
         request_refund_details:
           nullable: true
           type: boolean
-          description: When true Plaid will attempt to request refund details from the payee's financal institution.  Support varies between financial institutions and will not always be available.  If we are able to request refund details the details will be available in the `/payment/get` response.
+          description: When `true`, Plaid will attempt to request refund details from the payee's financial institution.  Support varies between financial institutions and will not always be available.  If refund details could be retrieved, they will be available in the `/payment/get` response.
         iban:
           nullable: true
           type: string
@@ -9509,9 +9522,11 @@ components:
           nullable: true
           description: The security’s trading symbol for publicly traded securities, and otherwise a short identifier if available.
         is_cash_equivalent:
+          nullable: true
           type: boolean
           description: Indicates that a security is a highly liquid asset and can be treated like cash.
         type:
+          nullable: true
           type: string
           description: |-
             The security type of the holding. Valid security types are:
@@ -9552,6 +9567,19 @@ components:
 
             See the [currency code schema](/docs/api/accounts#currency-code-schema) for a full listing of supported `iso_currency_code`s.
       required:
+      - cusip
+      - sedol
+      - isin
+      - institution_security_id
+      - institution_id
+      - proxy_security_id
+      - name
+      - ticker_symbol
+      - is_cash_equivalent
+      - close_price
+      - close_price_as_of
+      - iso_currency_code
+      - unofficial_currency_code
       - security_id
       - type
     InvestmentTransaction:
@@ -10148,6 +10176,7 @@ components:
       additionalProperties:
         type: string
       title: BankTransferMetadata
+      nullable: true
       maxProperties: 50
       description: |
         The Metadata object is a mapping of client-provided string fields to any string value. The following limitations apply:
@@ -11494,7 +11523,7 @@ components:
         name:
           type: string
           description: The name of the application
-        logo:
+        logo_url:
           nullable: true
           type: string
           description: A URL that links to the application logo image.
@@ -11510,7 +11539,7 @@ components:
       - application_id
       - created_at
       - name
-      - logo
+      - logo_url
       - application_url
       - reason_for_access
     ApplicationGetRequest:
