@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.16.2
+  version: 2020-09-14_1.16.4
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -4744,6 +4744,20 @@ components:
       type: object
       additionalProperties: true
       description: PaymentInitiationRecipientGetResponse defines the response schema for `/payment_initiation/recipient/get`
+      allOf:
+      - $ref: '#/components/schemas/PaymentInitiationRecipient'
+      - type: object
+        properties:
+          request_id:
+            $ref: '#/components/schemas/RequestID'
+      required:
+      - recipient_id
+      - name
+      - request_id
+    PaymentInitiationRecipient:
+      type: object
+      additionalProperties: true
+      description: PaymentInitiationRecipient defines a payment initiation recipient
       properties:
         recipient_id:
           type: string
@@ -4759,12 +4773,13 @@ components:
           description: The International Bank Account Number (IBAN) for the recipient.
         bacs:
           $ref: '#/components/schemas/NullableRecipientBACS'
-        request_id:
-          $ref: '#/components/schemas/RequestID'
+        emi_recipient_id:
+          nullable: true
+          type: string
+          description: The EMI (E-Money Institution) account that this recipient is associated with, if any. This EMI account is used as an intermediary account to enable Plaid to reconcile the settlement of funds for Payment Initiation requests.
       required:
       - recipient_id
       - name
-      - request_id
     PaymentInitiationRecipientListRequest:
       type: object
       description: PaymentInitiationRecipientListRequest defines the request schema for `/payment_initiation/recipient/list`
@@ -4782,7 +4797,7 @@ components:
           type: array
           description: An array of payment recipients created for Payment Initiation
           items:
-            $ref: '#/components/schemas/PaymentInitiationRecipientGetResponse'
+            $ref: '#/components/schemas/PaymentInitiationRecipient'
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
@@ -4963,12 +4978,30 @@ components:
       type: object
       additionalProperties: true
       description: PaymentInitiationPaymentGetResponse defines the response schema for `/payment_initation/payment/get`
+      allOf:
+      - $ref: '#/components/schemas/PaymentInitiationPayment'
+      - type: object
+        properties:
+          request_id:
+            $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
+      - payment_id
+      - amount
+      - status
+      - recipient_id
+      - reference
+      - last_status_update
+      - bacs
+      - iban
+    PaymentInitiationPayment:
+      type: object
+      additionalProperties: true
+      description: PaymentInitiationPayment defines a payment initiation payment
       properties:
         payment_id:
           type: string
           description: The ID of the payment. Like all Plaid identifiers, the `payment_id` is case sensitive.
-        request_id:
-          $ref: '#/components/schemas/RequestID'
         amount:
           $ref: '#/components/schemas/PaymentAmount'
         status:
@@ -5095,7 +5128,7 @@ components:
           type: array
           description: An array of payments that have been created, associated with the given `client_id`.
           items:
-            $ref: '#/components/schemas/PaymentInitiationPaymentGetResponse'
+            $ref: '#/components/schemas/PaymentInitiationPayment'
         next_cursor:
           nullable: true
           format: date-time
@@ -5455,7 +5488,7 @@ components:
         count:
           type: integer
           default: 100
-          minimum: 0
+          minimum: 1
           maximum: 500
           description: |
             The number of transactions to fetch.
@@ -7801,6 +7834,7 @@ components:
 
             If the first `interval_execution_day` on or after the start date is also the same day that `/payment_initiation/payment/create` was called, the bank *may* make the first payment on that day, but it is not guaranteed to do so.
         end_date:
+          nullable: true
           format: date
           type: string
           description: |-
