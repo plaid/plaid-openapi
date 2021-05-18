@@ -1,3 +1,10 @@
+### 2020-09-14_1.16.4
+- Removes erroneous `request_id` that was incorrectly shown to be returned in items from `/payment_initiation/payment/list` and `/payment_initiation/recipient/list`.
+- Fix for `ExternalPaymentSchedule` to make `end_date` optional. 
+
+### 2020-09-14_1.16.3
+- Updated `/investments/transactions/get` count minimum to be 1 instead of 0
+
 ### 2020-09-14_1.16.2
 - Fixes for required parameters for `JWKPublicKey` and `Security`.
 - Fix for `BankTransferMetadata` to be nullable.
