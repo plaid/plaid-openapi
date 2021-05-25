@@ -1,3 +1,10 @@
+### 2020-09-14_1.16.6
+- Added `ItemApplicationScopesUpdateRequest` and `ItemApplicationScopesUpdateResponse` schema
+
+### 2020-09-14_1.16.5
+- Added `emi_account_id` field to `PaymentInitiationPayment` model for `/payment_initiation/payment/get` and `/payment_initiation/payment/list` response
+- Added `emi_recipient_id` field to `PaymentInitiationRecipient` model for `/payment_initiation/recipient/get` and `/payment_initiation/recipient/list` response
+
 ### 2020-09-14_1.16.4
 - Removes erroneous `request_id` that was incorrectly shown to be returned in items from `/payment_initiation/payment/list` and `/payment_initiation/recipient/list`.
 - Fix for `ExternalPaymentSchedule` to make `end_date` optional. 
