@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.16.4
+  version: 2020-09-14_1.16.6
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -22,6 +22,32 @@ security:
   secret: []
   plaidVersion: []
 paths:
+  /item/application/scopes/update:
+    post:
+      tags:
+      - plaid
+      summary: Update the scopes of access for a particular application
+      operationId: itemApplicationScopesUpdate
+      description: Enable consumers to update product access on selected accounts for an application.
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemApplicationScopesUpdateResponse'
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemApplicationScopesUpdateRequest'
   /application/get:
     post:
       tags:
@@ -2829,7 +2855,7 @@ paths:
                     stripe_bank_account_token: btok_5oEetfLzPklE1fwJZ7SG
                     request_id: xrQNYZ7Zoh6R7gV
       operationId: processorStripeBankAccountTokenCreate
-      description: Used to create a token suitable for sending to Stripe to enable Plaid-Stripe integrations.
+      description: Used to create a token suitable for sending to Stripe to enable Plaid-Stripe integrations. For a detailed guide on integrating Stripe, see [Add Stripe to your app](https://plaid.com/docs/auth/partnerships/stripe/).
       requestBody:
         required: true
         content:
@@ -4776,7 +4802,7 @@ components:
         emi_recipient_id:
           nullable: true
           type: string
-          description: The EMI (E-Money Institution) account that this recipient is associated with, if any. This EMI account is used as an intermediary account to enable Plaid to reconcile the settlement of funds for Payment Initiation requests.
+          description: The EMI (E-Money Institution) recipient that this recipient is associated with, if any. This EMI recipient is used as an intermediary account to enable Plaid to reconcile the settlement of funds for Payment Initiation requests.
       required:
       - recipient_id
       - name
@@ -5061,6 +5087,10 @@ components:
         iban:
           type: string
           nullable: true
+        emi_account_id:
+          nullable: true
+          type: string
+          description: The EMI (E-Money Institution) account that this payment is associated with, if any. This EMI account is used as an intermediary account to enable Plaid to reconcile the settlement of funds for Payment Initiation requests.
       required:
       - payment_id
       - amount
@@ -5801,7 +5831,7 @@ components:
           description: The name of the Link customization from the Plaid Dashboard to be applied to Link. If not specified, the `default` customization will be used. When using a Link customization, the language in the customization must match the language selected via the `language` parameter, and the countries in the customization should match the country codes selected via `country_codes`.
         redirect_uri:
           type: string
-          description: A URI indicating the destination where a user should be forwarded after completing the Link flow; used to support OAuth authentication flows when launching Link in the browser or via a webview. The `redirect_uri` should not contain any query parameters. If `android_package_name` is specified, this field should be left blank. Any redirect URI specified here must also be added under the "Allowed redirect URIs" configuration on the [developer dashboard](https://dashboard.plaid.com/team/api). In non-Sandbox (Production and Development) environments, the `redirect_uri` must begin with https.
+          description: A URI indicating the destination where a user should be forwarded after completing the Link flow; used to support OAuth authentication flows when launching Link in the browser or via a webview. The `redirect_uri` should not contain any query parameters. When used in Production or Development, must be an https URI. To specify any subdomain, use `*` as a wildcard character, e.g. `https://*.example.com/oauth.html`. If `android_package_name` is specified, this field should be left blank.  Note that any redirect URI must also be added to the Allowed redirect URIs list in the [developer dashboard](https://dashboard.plaid.com/team/api).
         android_package_name:
           type: string
           description: 'The name of your app''s Android package. Required if using the `link_token` to initialize Link on Android. When creating a `link_token` for initializing Link on other platforms, this field must be left blank. Any package name specified here must also be added to the Allowed Android package names setting on the [developer dashboard](https://dashboard.plaid.com/team/api). '
@@ -9670,7 +9700,7 @@ components:
             `buy`: Buying an investment
             `sell`: Selling an investment
             `cancel`: A cancellation of a pending transaction
-             `cash`: Activity that modifies a cash position
+            `cash`: Activity that modifies a cash position
             `fee`: A fee on the account
             `transfer`: Activity which modifies a position, but not through buy/sell activity e.g. options exercise, portfolio transfer
         subtype:
@@ -11601,3 +11631,83 @@ components:
       required:
       - request_id
       - application
+    ProductAccess:
+      description: Allow or disallow product access across all accounts. If unset, defaults to all products allowed.
+      type: object
+      additionalProperties: true
+      properties:
+        statements:
+          description: Allow access to statements. If unset, defaults to `true`.
+          type: boolean
+          nullable: true
+          default: true
+        identity:
+          description: Allow access to the Identity product (name, email, phone, address). If unset, defaults to `true`.
+          type: boolean
+          nullable: true
+          default: true
+        auth:
+          description: Allow access to account number details. If unset, defaults to `true`.
+          type: boolean
+          nullable: true
+          default: true
+        transactions:
+          description: Allow access to transaction details. If unset, defaults to `true`.
+          type: boolean
+          nullable: true
+          default: true
+    AccountAccess:
+      description: Allow or disallow product access by account. Unlisted (e.g. missing) accounts will be considered `new_accounts`.
+      type: object
+      properties:
+        unique_id:
+          description: The unique account identifier for this account. This value must match that returned by the data access API for this account.
+          type: string
+        authorized:
+          description: Allow the application to see this account (and associated details, including balance) in the list of accounts. If unset, defaults to `true`.
+          type: boolean
+          nullable: true
+          default: true
+      required:
+      - unique_id
+    Scopes:
+      description: The scopes object
+      type: object
+      properties:
+        product_access:
+          $ref: '#/components/schemas/ProductAccess'
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountAccess'
+        new_accounts:
+          description: Allow access to newly opened accounts as they are opened. If unset, defaults to `true`.
+          type: boolean
+          nullable: true
+          default: true
+    ItemApplicationScopesUpdateRequest:
+      description: ItemApplicationScopesUpdateRequest defines the request schema for `/item/application/scopes/update`
+      type: object
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+        application_id:
+          $ref: '#/components/schemas/ApplicationID'
+        scopes:
+          $ref: '#/components/schemas/Scopes'
+      required:
+      - application_id
+      - access_token
+      - scopes
+    ItemApplicationScopesUpdateResponse:
+      description: ItemApplicationScopesUpdateResponse defines the response schema for `/item/application/scopes/update`
+      type: object
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
