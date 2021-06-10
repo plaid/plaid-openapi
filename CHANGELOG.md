@@ -1,3 +1,24 @@
+### 2020-09-14_1.18.1
+- Fixed file to reflect that `category_id` and `next_payment_due_date` are nullable
+- Removed spurious `paystub_id` field
+- Added missing `SCHEDULED` value to `IncidentUpdate.status` enum
+- Various description fixes
+
+### 2020-09-14_1.18.0
+
+- Added `/item/application/scopes/update` endpoint
+- Fixed incorrect enum values for `update_type`
+- Fixed file to reflect that `current` balance field is nullable.
+- Description and textual fixes
+- Fix invalid format errors
+- Add new investment subtypes
+
+### 2021-09-14_1.17.0
+- Small description fix for `/income/verification/create` and `/employers/search`
+- Fixed  `ytd_net_income` value in `IncomeVerificationSummaryGetResponse` example
+- Fixed references to `paystub` to be plural `paystubs` for `/income/verification/paystubs/get` route and schemas
+- Added `PaystubEmployer` schema referenced in the `Paystub` object
+
 ### 2020-09-14_1.16.6
 - Added `ItemApplicationScopesUpdateRequest` and `ItemApplicationScopesUpdateResponse` schema
 
