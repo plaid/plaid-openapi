@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.16.6
+  version: 2020-09-14_1.18.1
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -22,6 +22,32 @@ security:
   secret: []
   plaidVersion: []
 paths:
+  /item/application/list:
+    post:
+      tags:
+      - plaid
+      summary: List a user’s connected applications
+      operationId: itemApplicationList
+      description: List a user’s connected applications
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemApplicationListResponse'
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemApplicationListRequest'
   /item/application/scopes/update:
     post:
       tags:
@@ -308,15 +334,15 @@ paths:
                 $ref: '#/components/schemas/Error'
           description: Error response
       description: |-
-        The `/transactions/get` endpoint allows developers to receive user-authorized transaction data for credit, depository, and some loan-type accounts (the list of loan-type accounts supported is the same as for Liabilities; for details, see the `/liabilities/get` endpoint). For transaction history from investments accounts, use the [Investments endpoint](/docs/api/products#investments) instead. Transaction data is standardized across financial institutions, and in many cases transactions are linked to a clean name, entity type, location, and category. Similarly, account data is standardized and returned with a clean name, number, balance, and other meta information where available.
+        The `/transactions/get` endpoint allows developers to receive user-authorized transaction data for credit, depository, and some loan-type accounts (only those with account subtype `student`; coverage may be limited). For transaction history from investments accounts, use the [Investments endpoint](https://plaid.com/docs/api/products#investments) instead. Transaction data is standardized across financial institutions, and in many cases transactions are linked to a clean name, entity type, location, and category. Similarly, account data is standardized and returned with a clean name, number, balance, and other meta information where available.
 
-        Transactions are returned in reverse-chronological order, and the sequence of transaction ordering is stable and will not shift.  Transactions are not immutable and can also be removed altogether by the institution; a removed transaction will no longer appear in `/transactions/get`.  For more details, see [Pending and posted transactions](/docs/transactions/transactions-data/#pending-and-posted-transactions).
+        Transactions are returned in reverse-chronological order, and the sequence of transaction ordering is stable and will not shift.  Transactions are not immutable and can also be removed altogether by the institution; a removed transaction will no longer appear in `/transactions/get`.  For more details, see [Pending and posted transactions](https://plaid.com/docs/transactions/transactions-data/#pending-and-posted-transactions).
 
         Due to the potentially large number of transactions associated with an Item, results are paginated. Manipulate the `count` and `offset` parameters in conjunction with the `total_transactions` response body field to fetch all available transactions.
 
         Data returned by `/transactions/get` will be the data available for the Item as of the most recent successful check for new transactions. Plaid typically checks for new data multiple times a day, but these checks may occur less frequently, such as once a day, depending on the institution. An Item's `status.transactions.last_successful_update` field will show the timestamp of the most recent successful update. To force Plaid to check for new transactions, you can use the `/transactions/refresh` endpoint.
 
-        Note that data may not be immediately available to `/transactions/get`. Plaid will begin to prepare transactions data upon Item link, if Link was initialized with `transactions`, or upon the first call to `/transactions/get`, if it wasn't. To be alerted when transaction data is ready to be fetched, listen for the [`INITIAL_UPDATE`](/docs/api/webhooks#transactions-initial_update) and [`HISTORICAL_UPDATE`](/docs/api/webhooks#transactions-historical_update) webhooks. If no transaction history is ready when `/transactions/get` is called, it will return a `PRODUCT_NOT_READY` error.
+        Note that data may not be immediately available to `/transactions/get`. Plaid will begin to prepare transactions data upon Item link, if Link was initialized with `transactions`, or upon the first call to `/transactions/get`, if it wasn't. To be alerted when transaction data is ready to be fetched, listen for the [`INITIAL_UPDATE`](https://plaid.com/docs/api/webhooks#transactions-initial_update) and [`HISTORICAL_UPDATE`](https://plaid.com/docs/api/webhooks#transactions-historical_update) webhooks. If no transaction history is ready when `/transactions/get` is called, it will return a `PRODUCT_NOT_READY` error.
       requestBody:
         required: true
         content:
@@ -350,7 +376,7 @@ paths:
                 $ref: '#/components/schemas/Error'
           description: Error response
       description: |-
-        `/transactions/refresh` is an optional endpoint for users of the Transactions product. It initiates an on-demand extraction to fetch the newest transactions for an Item. This on-demand extraction takes place in addition to the periodic extractions that automatically occur multiple times a day for any Transactions-enabled Item. If changes to transactions are discovered after calling `/transactions/refresh`, Plaid will fire a webhook: [`TRANSACTIONS_REMOVED`](/docs/api/webhooks#deleted-transactions-detected) will be fired if any removed transactions are detected, and [`DEFAULT_UPDATE`](/docs/api/webhooks#transactions-default_update) will be fired if any new transactions are detected. New transactions can be fetched by calling `/transactions/get`.
+        `/transactions/refresh` is an optional endpoint for users of the Transactions product. It initiates an on-demand extraction to fetch the newest transactions for an Item. This on-demand extraction takes place in addition to the periodic extractions that automatically occur multiple times a day for any Transactions-enabled Item. If changes to transactions are discovered after calling `/transactions/refresh`, Plaid will fire a webhook: [`TRANSACTIONS_REMOVED`](https://plaid.com/docs/api/webhooks#deleted-transactions-detected) will be fired if any removed transactions are detected, and [`DEFAULT_UPDATE`](https://plaid.com/docs/api/webhooks#transactions-default_update) will be fired if any new transactions are detected. New transactions can be fetched by calling `/transactions/get`.
 
         Access to `/transactions/refresh` in Production is specific to certain pricing plans. If you cannot access `/transactions/refresh` in Production, [contact Sales](https://www.plaid.com/contact) for assistance.
       requestBody:
@@ -772,7 +798,7 @@ paths:
       externalDocs:
         url: /api/sandbox/#sandboxprocessor_tokencreate
       operationId: sandboxProcessorTokenCreate
-      description: Use the `/sandbox/processor_token/create` endpoint to create a valid `processor_token` for an arbitrary institution ID and test credentials. The created `processor_token` corresponds to a new Sandbox Item. You can then use this `processor_token` with the `/processor/` API endpoints in Sandbox. You can also use `/sandbox/processor_token/create` with the [`user_custom` test username](/docs/sandbox/user-custom) to generate a test account with custom data.
+      description: Use the `/sandbox/processor_token/create` endpoint to create a valid `processor_token` for an arbitrary institution ID and test credentials. The created `processor_token` corresponds to a new Sandbox Item. You can then use this `processor_token` with the `/processor/` API endpoints in Sandbox. You can also use `/sandbox/processor_token/create` with the [`user_custom` test username](https://plaid.com/docs/sandbox/user-custom) to generate a test account with custom data.
       responses:
         "200":
           description: OK
@@ -805,7 +831,7 @@ paths:
       externalDocs:
         url: /api/sandbox/#sandboxpublic_tokencreate
       operationId: sandboxPublicTokenCreate
-      description: Use the `/sandbox/public_token/create`  endpoint to create a valid `public_token`  for an arbitrary institution ID, initial products, and test credentials. The created `public_token` maps to a new Sandbox Item. You can then call `/item/public_token/exchange` to exchange the `public_token` for an `access_token` and perform all API actions. `/sandbox/public_token/create` can also be used with the [`user_custom` test username](/docs/sandbox/user-custom) to generate a test account with custom data.
+      description: Use the `/sandbox/public_token/create`  endpoint to create a valid `public_token`  for an arbitrary institution ID, initial products, and test credentials. The created `public_token` maps to a new Sandbox Item. You can then call `/item/public_token/exchange` to exchange the `public_token` for an `access_token` and perform all API actions. `/sandbox/public_token/create` can also be used with the [`user_custom` test username](https://plaid.com/docs/sandbox/user-custom) to generate a test account with custom data.
       responses:
         "200":
           description: success
@@ -1310,7 +1336,7 @@ paths:
                       update_type: background
                       webhook: https://www.genericwebhookurl.com/webhook
                     request_id: vYK11LNTfRoAMbj
-      description: The POST `/item/webhook/update` allows you to update the webhook URL associated with an Item. This request triggers a [`WEBHOOK_UPDATE_ACKNOWLEDGED`](/docs/api/webhooks/#item-webhook-url-updated) webhook to the newly specified webhook URL.
+      description: The POST `/item/webhook/update` allows you to update the webhook URL associated with an Item. This request triggers a [`WEBHOOK_UPDATE_ACKNOWLEDGED`](https://plaid.com/docs/api/webhooks/#item-webhook-url-updated) webhook to the newly specified webhook URL.
       requestBody:
         required: true
         content:
@@ -1353,7 +1379,7 @@ paths:
       - plaid
       summary: Get webhook verification key
       externalDocs:
-        url: /api/webhook-verification/#webhook_verification_keyget
+        url: /api/webhooks/webhook-verification/#webhook_verification_keyget
       operationId: webhookVerificationKeyGet
       responses:
         "200":
@@ -1570,7 +1596,7 @@ paths:
             schema:
               $ref: '#/components/schemas/LiabilitiesGetRequest'
       description: |-
-        The `/liabilities/get` endpoint returns various details about an Item with loan or credit accounts. Liabilities data is available primarily for US financial institutions, with some limited coverage of Canadian institutions. Currently supported account types are account type `credit` with account subtype `credit card` or `paypal`, and account type `loan` with account subtype `student` or `mortgage`. To limit accounts listed in Link to types and subtypes supported by Liabilities, you can use the `account_filter` parameter when [creating a Link token](/docs/api/tokens/#linktokencreate).
+        The `/liabilities/get` endpoint returns various details about an Item with loan or credit accounts. Liabilities data is available primarily for US financial institutions, with some limited coverage of Canadian institutions. Currently supported account types are account type `credit` with account subtype `credit card` or `paypal`, and account type `loan` with account subtype `student` or `mortgage`. To limit accounts listed in Link to types and subtypes supported by Liabilities, you can use the `account_filter` parameter when [creating a Link token](https://plaid.com/docs/api/tokens/#linktokencreate).
 
         The types of information returned by Liabilities can include balances and due dates, loan terms, and account details such as original loan amount and guarantor. Data is refreshed approximately once per day; the latest data can be retrieved by calling `/liabilities/get`.
 
@@ -1702,7 +1728,7 @@ paths:
       description: |-
         After creating a payment recipient, you can use the `/payment_initiation/payment/create` endpoint to create a payment to that recipient.  Payments can be one-time or standing order (recurring) and can be denominated in either EUR or GBP.  If making domestic GBP-denominated payments, your recipient must have been created with BACS numbers. In general, EUR-denominated payments will be sent via SEPA Credit Transfer and GBP-denominated payments will be sent via the Faster Payments network, but the payment network used will be determined by the institution. Payments sent via Faster Payments will typically arrive immediately, while payments sent via SEPA Credit Transfer will typically arrive in one business day.
 
-        Standing orders (recurring payments) must be denominated in GBP and can only be sent to recipients in the UK. Once created, standing order payments will continue indefinitely and cannot be modified or canceled via the API. An end user can cancel or modify a standing order directly on their banking application or website, or by contacting the bank. Standing orders will follow the payment rules of the underlying rails (Faster Payments in UK). Payments can be sent Monday to Friday, excluding bank holidays. If the pre-arranged date falls on a weekend or bank holiday, the payment is made on the next working day. It is not possible to guarantee the exact time the payment will reach the recipient’s account, although at least 90% of standing order payments are sent by 6am.
+        Standing orders (recurring payments) must be denominated in GBP and can only be sent to recipients in the UK. Once created, standing order payments cannot be modified or canceled via the API. An end user can cancel or modify a standing order directly on their banking application or website, or by contacting the bank. Standing orders will follow the payment rules of the underlying rails (Faster Payments in UK). Payments can be sent Monday to Friday, excluding bank holidays. If the pre-arranged date falls on a weekend or bank holiday, the payment is made on the next working day. It is not possible to guarantee the exact time the payment will reach the recipient’s account, although at least 90% of standing order payments are sent by 6am.
 
         In the Development environment, payments must be below 5 GBP / EUR. For details on any payment limits in Production, contact your Plaid Account Manager.
       requestBody:
@@ -1765,7 +1791,7 @@ paths:
                     reset_login: true
                     request_id: m8MDnv9okwxFNBV
       description: |-
-        `/sandbox/item/reset_login/` forces an Item into an `ITEM_LOGIN_REQUIRED` state in order to simulate an Item whose login is no longer valid. This makes it easy to test Link's [update mode](/docs/link/update-mode) flow in the Sandbox environment.  After calling `/sandbox/item/reset_login`, You can then use Plaid Link update mode to restore the Item to a good state. An `ITEM_LOGIN_REQUIRED` webhook will also be fired after a call to this endpoint, if one is associated with the Item.
+        `/sandbox/item/reset_login/` forces an Item into an `ITEM_LOGIN_REQUIRED` state in order to simulate an Item whose login is no longer valid. This makes it easy to test Link's [update mode](https://plaid.com/docs/link/update-mode) flow in the Sandbox environment.  After calling `/sandbox/item/reset_login`, You can then use Plaid Link update mode to restore the Item to a good state. An `ITEM_LOGIN_REQUIRED` webhook will also be fired after a call to this endpoint, if one is associated with the Item.
 
 
         In the Sandbox, Items will transition to an `ITEM_LOGIN_REQUIRED` error state automatically after 30 days, even if this endpoint is not called.
@@ -1799,7 +1825,7 @@ paths:
 
         Note that not all Plaid developer accounts are enabled for micro-deposit based verification by default. Your account must be enabled for this feature in order to test it in Sandbox. To enable this features or check your status, contact your account manager or [submit a product access Support ticket](https://dashboard.plaid.com/support/new/product-and-development/product-troubleshooting/request-product-access).
 
-        For more information on testing Automated Micro-deposits in Sandbox, see [Auth full coverage testing](/docs/auth/coverage/testing#).
+        For more information on testing Automated Micro-deposits in Sandbox, see [Auth full coverage testing](https://plaid.com/docs/auth/coverage/testing#).
       requestBody:
         required: true
         content:
@@ -1858,13 +1884,13 @@ paths:
                     public_token: public-sandbox-b0e2c4ee-a763-4df5-bfe9-46a46bce993d
                     request_id: Aim3b
       description: |-
-        Note: As of July 2020, the `/item/public_token/create` endpoint is deprecated. Instead, use `/link/token/create` with an `access_token` to create a Link token for use with [update mode](/docs/link/update-mode).
+        Note: As of July 2020, the `/item/public_token/create` endpoint is deprecated. Instead, use `/link/token/create` with an `access_token` to create a Link token for use with [update mode](https://plaid.com/docs/link/update-mode).
 
         If you need your user to take action to restore or resolve an error associated with an Item, generate a public token with the `/item/public_token/create` endpoint and then initialize Link with that `public_token`.
 
-        A `public_token` is one-time use and expires after 30 minutes. You use a `public_token` to initialize Link in [update mode](/docs/link/update-mode) for a particular Item. You can generate a `public_token` for an Item even if you did not use Link to create the Item originally.
+        A `public_token` is one-time use and expires after 30 minutes. You use a `public_token` to initialize Link in [update mode](https://plaid.com/docs/link/update-mode) for a particular Item. You can generate a `public_token` for an Item even if you did not use Link to create the Item originally.
 
-        The `/item/public_token/create` endpoint is **not** used to create your initial `public_token`. If you have not already received an `access_token` for a specific Item, use Link to obtain your `public_token` instead. See the [Quickstart](/docs/quickstart) for more information.
+        The `/item/public_token/create` endpoint is **not** used to create your initial `public_token`. If you have not already received an `access_token` for a specific Item, use Link to obtain your `public_token` instead. See the [Quickstart](https://plaid.com/docs/quickstart) for more information.
       requestBody:
         required: true
         content:
@@ -1899,6 +1925,8 @@ paths:
                     last_status_update: "2019-11-06T21:10:52Z"
                     payment_expiration_time: "2019-11-06T21:25:52Z"
                     recipient_id: recipient-id-sandbox-9b6b4679-914b-445b-9450-efbdb80296f6
+                    bacs: null
+                    iban: null
                     request_id: aEAQmewMzlVa1k6
       description: The `/payment_initiation/payment/get` endpoint can be used to check the status of a payment, as well as to receive basic information such as recipient and payment amount. In the case of standing orders, the `/payment_initiation/payment/get` endpoint will provide information about the status of the overall standing order itself; the API cannot be used to retrieve payment status for individual payments within a standing order.
       requestBody:
@@ -1935,6 +1963,8 @@ paths:
                       status: PAYMENT_STATUS_INPUT_NEEDED
                       last_status_update: "2019-11-06T21:10:52Z"
                       recipient_id: recipient-id-sandbox-9b6b4679-914b-445b-9450-efbdb80296f6
+                      bacs: null
+                      iban: null
                     next_cursor: "2020-01-01T00:00:00Z"
                     request_id: aEAQmewMzlVa1k6
       requestBody:
@@ -1968,7 +1998,7 @@ paths:
       description: |-
         The `/asset_report/create` endpoint initiates the process of creating an Asset Report, which can then be retrieved by passing the `asset_report_token` return value to the `/asset_report/get` or `/asset_report/pdf/get` endpoints.
 
-        The Asset Report takes some time to be created and is not available immediately after calling `/asset_report/create`. When the Asset Report is ready to be retrieved using `/asset_report/get` or `/asset_report/pdf/get`, Plaid will fire a `PRODUCT_READY` webhook. For full details of the webhook schema, see [Asset Report webhooks](/docs/api/webhooks/#Assets-webhooks).
+        The Asset Report takes some time to be created and is not available immediately after calling `/asset_report/create`. When the Asset Report is ready to be retrieved using `/asset_report/get` or `/asset_report/pdf/get`, Plaid will fire a `PRODUCT_READY` webhook. For full details of the webhook schema, see [Asset Report webhooks](https://plaid.com/docs/api/webhooks/#Assets-webhooks).
 
         The `/asset_report/create` endpoint creates an Asset Report at a moment in time. Asset Reports are immutable. To get an updated Asset Report, use the `/asset_report/refresh` endpoint.
       requestBody:
@@ -2068,7 +2098,7 @@ paths:
 
         Because Asset Reports are immutable, calling `/asset_report/filter` does not alter the original Asset Report in any way; rather, `/asset_report/filter` creates a new Asset Report with a new token and id. Asset Reports created via `/asset_report/filter` do not contain new Asset data, and are not billed.
 
-        Plaid will fire a [`PRODUCT_READY`](/docs/api/webhooks) webhook once generation of the filtered Asset Report has completed.
+        Plaid will fire a [`PRODUCT_READY`](https://plaid.com/docs/api/webhooks) webhook once generation of the filtered Asset Report has completed.
       requestBody:
         required: true
         content:
@@ -2302,7 +2332,7 @@ paths:
                     warnings: []
       operationId: assetReportGet
       description: |-
-        The `/asset_report/get` endpoint retrieves the Asset Report in JSON format. Before calling `/asset_report/get`, you must first create the Asset Report using `/asset_report/create` (or filter an Asset Report using `/asset_report/filter`) and then wait for the [`PRODUCT_READY`](/docs/api/webhooks) webhook to fire, indicating that the Report is ready to be retrieved.
+        The `/asset_report/get` endpoint retrieves the Asset Report in JSON format. Before calling `/asset_report/get`, you must first create the Asset Report using `/asset_report/create` (or filter an Asset Report using `/asset_report/filter`) and then wait for the [`PRODUCT_READY`](https://plaid.com/docs/api/webhooks) webhook to fire, indicating that the Report is ready to be retrieved.
 
         By default, an Asset Report includes transaction descriptions as returned by the bank, as opposed to parsed and categorized by Plaid. You can also receive cleaned and categorized transactions, as well as additional insights like merchant name or location information. We call this an Asset Report with Insights. An Asset Report with Insights provides transaction category, location, and merchant information in addition to the transaction strings provided in a standard Asset Report.
 
@@ -2330,7 +2360,7 @@ paths:
                 $ref: '#/components/schemas/AssetReportPDFGetResponse'
       operationId: assetReportPdfGet
       description: |-
-        The `/asset_report/pdf/get` endpoint retrieves the Asset Report in PDF format. Before calling `/asset_report/pdf/get`, you must first create the Asset Report using `/asset_report/create` (or filter an Asset Report using `/asset_report/filter`) and then wait for the [`PRODUCT_READY`](/docs/api/webhooks) webhook to fire, indicating that the Report is ready to be retrieved.
+        The `/asset_report/pdf/get` endpoint retrieves the Asset Report in PDF format. Before calling `/asset_report/pdf/get`, you must first create the Asset Report using `/asset_report/create` (or filter an Asset Report using `/asset_report/filter`) and then wait for the [`PRODUCT_READY`](https://plaid.com/docs/api/webhooks) webhook to fire, indicating that the Report is ready to be retrieved.
 
         The response to `/asset_report/pdf/get` is the PDF binary data. The `request_id`  is returned in the `Plaid-Request-ID` header.
 
@@ -3542,7 +3572,7 @@ paths:
       description: |-
         `/employers/search` allows you the ability to search Plaid’s database of known employers, for use with Deposit Switch. You can use this endpoint to look up a user's employer in order to confirm that they are supported. Users with non-supported employers can then be routed out of the Deposit Switch flow.
 
-        The data in the employer database is currently limited. As the Verification of Income product progresses through the beta period, more employers are being regularly added. Because the employer database is frequently updated, we recommend that you do not cache or store data from this endpoint for more than a day.
+        The data in the employer database is currently limited. As the Deposit Switch and Income products progress through their respective beta periods, more employers are being regularly added. Because the employer database is frequently updated, we recommend that you do not cache or store data from this endpoint for more than a day.
       requestBody:
         required: true
         content:
@@ -3569,7 +3599,7 @@ paths:
                   value:
                     income_verification_id: f2a826d7-25cf-483b-a124-c40beb64b732
                     request_id: lMjeOeu9X1VUh1F
-      description: '`/income/verification/create` begins the income verification process by returning an `income_verification_id`. You can then provide the `income_verification_id` to `/link/token/create` under the `income_verification` parameter in order to create a Link instance that will prompt the user to upload their income documents. Once the documents have been uploaded and parsed, Plaid will fire an `INCOME` webhook.'
+      description: '`/income/verification/create` begins the income verification process by returning an `income_verification_id`. You can then provide the `income_verification_id` to `/link/token/create` under the `income_verification` parameter in order to create a Link instance that will prompt the user to go through the income verification flow. Plaid will fire an `INCOME` webhook once the user completes the Payroll Income flow, or when the uploaded documents in the Document Income flow have finished processing. '
       requestBody:
         required: true
         content:
@@ -3617,7 +3647,7 @@ paths:
                         value: 59375
                         verification_status: UNVERIFIED
                       ytd_net_income:
-                        value: 66205.35714285713
+                        value: 66205.35
                         verification_status: UNVERIFIED
                     request_id: LhQf0THi8SH1yJm
       description: '`/income/verification/summary/get` returns a verification summary for the income that was verified for an end user. It can be called once the status of the verification has been set to `VERIFICATION_STATUS_PROCESSING_COMPLETE`, as reported by the `INCOME: verification_status` webhook. Attempting to call the endpoint before verification has been completed will result in an error.'
@@ -3627,54 +3657,55 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/IncomeVerificationSummaryGetRequest'
-  /income/verification/paystub/get:
+  /income/verification/paystubs/get:
     post:
-      summary: Retrieve information from the paystub used for income verification
+      summary: Retrieve information from the paystubs used for income verification
       tags:
       - plaid
       externalDocs:
-        url: /income-verification/reference#incomeverificationpaystubget
-      operationId: incomeVerificationPaystubGet
+        url: /income-verification/reference#incomeverificationpaystubsget
+      operationId: incomeVerificationPaystubsGet
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IncomeVerificationPaystubGetResponse'
+                $ref: '#/components/schemas/IncomeVerificationPaystubsGetResponse'
               examples:
                 example-1:
                   value:
-                    account_id: null
-                    employee:
-                      address:
-                        city: SAN FRANCISCO
-                        country: US
-                        postal_code: "94133"
-                        region: CA
-                        street: 2140 TAYLOR ST
-                      name: ANNA CHARLESTON
-                    employer:
-                      name: PLAID INC
-                    income_breakdown: []
-                    pay_period_details:
-                      check_amount: 1490.21
-                      end_date: "2020-12-15"
-                      gross_earnings: 4500
-                      pay_day: "2020-12-15"
-                      start_date: "2020-12-01"
-                    request_id: snygYZ9fR3vXuam
-                    ytd_earnings:
-                      gross_earnings: 59375
-                      net_earnings: null
+                    request_id: 2pxQ59buGdsHRef
+                    paystubs:
+                    - account_id: null
+                      employee:
+                        address:
+                          city: SAN FRANCISCO
+                          country: US
+                          postal_code: "94133"
+                          region: CA
+                          street: 2140 TAYLOR ST
+                        name: ANNA CHARLESTON
+                      employer:
+                        name: PLAID INC
+                      income_breakdown: []
+                      pay_period_details:
+                        check_amount: 1490.21
+                        end_date: "2020-12-15"
+                        gross_earnings: 4500
+                        pay_day: "2020-12-15"
+                        start_date: "2020-12-01"
+                      ytd_earnings:
+                        gross_earnings: 59375
+                        net_earnings: null
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/IncomeVerificationPaystubGetRequest'
+              $ref: '#/components/schemas/IncomeVerificationPaystubsGetRequest'
         description: ""
-      description: '`/income/verification/paystub/get` returns the information collected from the paystub that was used to verify an end user''s income. It can be called once the status of the verification has been set to `VERIFICATION_STATUS_PROCESSING_COMPLETE`, as reported by the `INCOME: verification_status` webhook. Attempting to call the endpoint before verification has been completed will result in an error.'
+      description: '`/income/verification/paystubs/get` returns the information collected from the paystubs that were used to verify an end user''s income. It can be called once the status of the verification has been set to `VERIFICATION_STATUS_PROCESSING_COMPLETE`, as reported by the `INCOME: verification_status` webhook. Attempting to call the endpoint before verification has been completed will result in an error.'
   /income/verification/documents/download:
     post:
       summary: Download the original documents used for income verification
@@ -3696,7 +3727,7 @@ paths:
 
         The response to `/income/verification/documents/download` is a ZIP file in binary data. The `request_id`  is returned in the `Plaid-Request-ID` header.
 
-        In the future, when Digital Verification is available, the most recent file available for download with the payroll provider will also be available from this endpoint.
+        For Payroll Income, the most recent file available for download with the payroll provider will also be available from this endpoint.
       requestBody:
         required: true
         content:
@@ -4734,7 +4765,6 @@ components:
           type: string
           description: The International Bank Account Number (IBAN) for the recipient. If BACS data is not provided, an IBAN is required.
         bacs:
-          nullable: true
           $ref: '#/components/schemas/NullableRecipientBACS'
         address:
           $ref: '#/components/schemas/PaymentInitiationAddress'
@@ -5075,18 +5105,14 @@ components:
           description: The date and time of the last time the `status` was updated, in IS0 8601 format
         schedule:
           $ref: '#/components/schemas/ExternalPaymentScheduleGet'
-          nullable: true
-          allOf:
-          - $ref: '#/components/schemas/ExternalPaymentScheduleGet'
         refund_details:
           $ref: '#/components/schemas/ExternalPaymentRefundDetails'
-          nullable: true
         bacs:
           $ref: '#/components/schemas/NullableRecipientBACS'
-          nullable: true
         iban:
           type: string
           nullable: true
+          description: The International Bank Account Number (IBAN) for the recipient.
         emi_account_id:
           nullable: true
           type: string
@@ -5815,7 +5841,7 @@ components:
 
             `balance` is *not* a valid value, the Balance product does not require explicit initalization and will automatically be initialized when any other product is initialized.
 
-            Only institutions that support *all* requested products will be shown in Link; to maximize the number of institutions listed, it is recommended to initialize Link with the minimal product set required for your use case. Additional products can be added after Link initialization by calling the relevant endpoints. For details and exceptions, see [Choosing when to initialize products](/docs/link/best-practices/#choosing-when-to-initialize-products).
+            Only institutions that support *all* requested products will be shown in Link; to maximize the number of institutions listed, it is recommended to initialize Link with the minimal product set required for your use case. Additional products can be added after Link initialization by calling the relevant endpoints. For details and exceptions, see [Choosing when to initialize products](https://plaid.com/docs/link/best-practices/#choosing-when-to-initialize-products).
 
             In Production, you will be billed for each product that you specify when initializing Link. Note that a product cannot be removed from an Item once the Item has been initialized with that product. To stop billing on an Item for subscription-based products, such as Liabilities, Investments, and Transactions, remove the Item via `/item/remove`.
           items:
@@ -5855,9 +5881,9 @@ components:
       - user
     LinkTokenAccountFilters:
       description: |
-        By default, Link will only display account types that are compatible with all products supplied in the `products` parameter of `/link/token/create`. You can further limit the accounts shown in Link by using `account_filters` to specify the account subtypes to be shown in Link. Only the specified subtypes will be shown. This filtering applies to both the Account Select view (if enabled) and the Institution Select view. Institutions that do not support the selected subtypes will be omitted from Link. To indicate that all subtypes should be shown, use the value `"all"`. If the `account_filters` filter is used, any account type for which a filter is not specified will be entirely omitted from Link. For a full list of valid types and subtypes, see the [Account schema](/docs/api/accounts#accounts-schema).
+        By default, Link will only display account types that are compatible with all products supplied in the `products` parameter of `/link/token/create`. You can further limit the accounts shown in Link by using `account_filters` to specify the account subtypes to be shown in Link. Only the specified subtypes will be shown. This filtering applies to both the Account Select view (if enabled) and the Institution Select view. Institutions that do not support the selected subtypes will be omitted from Link. To indicate that all subtypes should be shown, use the value `"all"`. If the `account_filters` filter is used, any account type for which a filter is not specified will be entirely omitted from Link. For a full list of valid types and subtypes, see the [Account schema](https://plaid.com/docs/api/accounts#accounts-schema).
 
-        For institutions using OAuth, the filter will not affect the list of institutions or accounts shown by the bank in the OAuth window.
+        For institutions using OAuth, the filter will not affect the list of accounts shown by the bank in the OAuth window.
       type: object
       additionalProperties: true
       properties:
@@ -5907,25 +5933,25 @@ components:
           description: A unique ID representing the end user. Typically this will be a user ID number from your application. Personally identifiable information, such as an email address or phone number, should not be used in the `client_user_id`. It is currently used as a means of searching logs for the given user in the Plaid Dashboard.
         legal_name:
           type: string
-          description: The user's full legal name. This is an optional field used in the [returning user experience](/docs/link/returning-user) to associate Items to the user.
+          description: The user's full legal name. This is an optional field used in the [returning user experience](https://plaid.com/docs/link/returning-user) to associate Items to the user.
         phone_number:
           type: string
-          description: The user's phone number in [E.164](https://en.wikipedia.org/wiki/E.164) format. This field is optional, but required to enable the [returning user experience](/docs/link/returning-user).
+          description: The user's phone number in [E.164](https://en.wikipedia.org/wiki/E.164) format. This field is optional, but required to enable the [returning user experience](https://plaid.com/docs/link/returning-user).
         phone_number_verified_time:
           type: string
           description: |
-            The date and time the phone number was verified in ISO 8601 format (`YYYY-MM-DDThh:mm:ssZ`). This field is optional, but required to enable any [returning user experience](/docs/link/returning-user).
+            The date and time the phone number was verified in ISO 8601 format (`YYYY-MM-DDThh:mm:ssZ`). This field is optional, but required to enable any [returning user experience](https://plaid.com/docs/link/returning-user).
 
              Only pass a verification time for a phone number that you have verified. If you have performed verification but don’t have the time, you may supply a signal value of the start of the UNIX epoch.
 
              Example: `2020-01-01T00:00:00Z`
         email_address:
           type: string
-          description: The user's email address. This field is optional, but required to enable the [pre-authenticated returning user flow](/docs/link/returning-user/#enabling-the-returning-user-experience).
+          description: The user's email address. This field is optional, but required to enable the [pre-authenticated returning user flow](https://plaid.com/docs/link/returning-user/#enabling-the-returning-user-experience).
         email_address_verified_time:
           type: string
           description: |-
-            The date and time the email address was verified in ISO 8601 format (`YYYY-MM-DDThh:mm:ssZ`). This is an optional field used in the [returning user experience](/docs/link/returning-user).
+            The date and time the email address was verified in ISO 8601 format (`YYYY-MM-DDThh:mm:ssZ`). This is an optional field used in the [returning user experience](https://plaid.com/docs/link/returning-user).
 
              Only pass a verification time for an email address that you have verified. If you have performed verification but don’t have the time, you may supply a signal value of the start of the UNIX epoch.
 
@@ -5943,7 +5969,7 @@ components:
       description: |
         By default, Link will only display account types that are compatible with all products supplied in the `products` parameter of `/link/token/create`. You can further limit the accounts shown in Link by using `account_filters` to specify the account subtypes to be shown in Link. Only the specified subtypes will be shown. This filtering applies to both the Account Select view (if enabled) and the Institution Select view. Institutions that do not support the selected subtypes will be omitted from Link. To indicate that all subtypes should be shown, use the value `"all"`. If the `account_filters` filter is used, any account type for which a filter is not specified will be entirely omitted from Link.
 
-        For a full list of valid types and subtypes, see the [Account schema](/docs/api/accounts#accounts-schema).
+        For a full list of valid types and subtypes, see the [Account schema](https://plaid.com/docs/api/accounts#accounts-schema).
 
         For institutions using OAuth, the filter will not affect the list of institutions or accounts shown by the bank in the OAuth window.
       type: object
@@ -6094,10 +6120,10 @@ components:
 
             `background` - Item can be updated in the background
 
-            `requires_user_authentication` - Item requires user interaction to be updated
+            `user_present_required` - Item requires user interaction to be updated
           enum:
           - background
-          - requires_user_authentication
+          - user_present_required
       required:
       - item_id
       - available_products
@@ -6246,7 +6272,7 @@ components:
 
         `other:` Non-specified account type
 
-        See the [Account type schema](/docs/api/accounts#account-type-schema) for a full listing of account types and corresponding subtypes.
+        See the [Account type schema](https://plaid.com/docs/api/accounts#account-type-schema) for a full listing of account types and corresponding subtypes.
     AccountBase:
       title: Account
       type: object
@@ -6321,6 +6347,7 @@ components:
           nullable: true
         current:
           type: number
+          nullable: true
           description: |-
             The total amount of funds in or owed by the account.
 
@@ -6330,7 +6357,7 @@ components:
 
             For `investment`-type accounts, the current balance is the total value of assets as presented by the institution.
 
-            Note that balance information may be cached unless the value was returned by `/accounts/balance/get`, and current balance information is typically not updated intra-day. If you require realtime balance information, use the `available` balance as provided by `/accounts/balance/get`.
+            Note that balance information may be cached unless the value was returned by `/accounts/balance/get`; if the Item is enabled for Transactions, the balance will be at least as recent as the most recent Transaction update. If you require realtime balance information, use the `available` balance as provided by `/accounts/balance/get`.
         limit:
           type: number
           description: |-
@@ -6349,7 +6376,7 @@ components:
           description: |-
             The unofficial currency code associated with the balance. Always null if `iso_currency_code` is non-null. Unofficial currency codes are used for currencies that do not have official ISO currency codes, such as cryptocurrencies and the currencies of certain countries.
 
-            See the [currency code schema](/docs/api/accounts#currency-code-schema) for a full listing of supported `unofficial_currency_code`s.
+            See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `unofficial_currency_code`s.
           nullable: true
         last_updated_datetime:
           type: string
@@ -6358,13 +6385,11 @@ components:
 
             This is currently only provided when the `min_last_updated_datetime` is passed when calling `/accounts/balance/get` for `ins_128026` (Capital One).
           nullable: true
-      required:
-      - current
     AccountSubtype:
       type: string
       nullable: true
       title: AccountSubtype
-      description: See the [Account type schema](/docs/api/accounts/#account-type-schema) for a full listing of account types and corresponding subtypes.
+      description: See the [Account type schema](https://plaid.com/docs/api/accounts/#account-type-schema) for a full listing of account types and corresponding subtypes.
       enum:
       - 401a
       - 401k
@@ -6380,11 +6405,14 @@ components:
       - isa
       - ira
       - lif
+      - life insurance
       - lira
       - lrif
       - lrsp
       - non-taxable brokerage account
       - other
+      - other insurance
+      - other annuity
       - prif
       - rdsp
       - resp
@@ -6447,7 +6475,7 @@ components:
           description: |-
             The ACH account number for the account.
 
-            Note that when using OAuth with Chase Bank (`ins_56`), Chase will issue "tokenized" routing and account numbers, which are not the user's actual account and routing numbers. These tokenized numbers should work identically to normal account and routing numbers, with the following exceptions: real-time payments are not supported, and same-day ACH transfers using the virtual account number that are initiated within 9 hours of the Item's creation may fail. The digits returned in the mask field will continue to reflect the actual account number, rather than the tokenized account number. If a user revokes their permissions to your app, the tokenized numbers will continue to work for ACH deposits, but not withdrawals.
+            Note that when using OAuth with Chase Bank (`ins_56`), Chase will issue "tokenized" routing and account numbers, which are not the user's actual account and routing numbers. These tokenized numbers should work identically to normal account and routing numbers. The digits returned in the mask field will continue to reflect the actual account number, rather than the tokenized account number. If a user revokes their permissions to your app, the tokenized numbers will continue to work for ACH deposits, but not withdrawals.
         routing:
           type: string
           description: The ACH routing number for the account. If the institution is `ins_56`, this may be a tokenized routing number. For more information, see the description of the `account` field.
@@ -6557,17 +6585,19 @@ components:
           type: string
           description: The 6-character sort code of the account.
     NullableRecipientBACS:
-      nullable: true
       allOf:
       - $ref: '#/components/schemas/RecipientBACS'
       - type: object
+        nullable: true
         additionalProperties: true
         description: The sort code of the account.
+      nullable: true
     PaymentInitiationOptionalRestrictionBacs:
       nullable: true
       allOf:
       - $ref: '#/components/schemas/RecipientBACS'
       - type: object
+        nullable: true
         additionalProperties: true
         description: An optional object used to restrict the accounts used for payments. If provided, the end user will be able to send payments only from the specified bank account.
     RequestID:
@@ -6669,6 +6699,7 @@ components:
 
             If the `transactions` object was returned by an Assets endpoint such as `/asset_report/get/` or `/asset_report/pdf/get`, this field will only appear in an Asset Report with Insights.
           type: string
+          nullable: true
         category:
           type: array
           description: |-
@@ -6683,7 +6714,7 @@ components:
           description: |-
             The unofficial currency code associated with the transaction. Always `null` if `iso_currency_code` is non-`null`. Unofficial currency codes are used for currencies that do not have official ISO currency codes, such as cryptocurrencies and the currencies of certain countries.
 
-            See the [currency code schema](/docs/api/accounts#currency-code-schema) for a full listing of supported `iso_currency_code`s.
+            See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `iso_currency_code`s.
           nullable: true
         iso_currency_code:
           type: string
@@ -7281,7 +7312,7 @@ components:
           description: |-
             The unofficial currency code associated with the balance. Always `null` if `iso_currency_code` is non-`null`.
 
-            See the [currency code schema](/docs/api/accounts#currency-code-schema) for a full listing of supported `iso_currency_code`s.
+            See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `iso_currency_code`s.
           nullable: true
       required:
       - date
@@ -7509,6 +7540,7 @@ components:
           type: number
         next_payment_due_date:
           type: string
+          nullable: true
           description: The due date for the next payment. The due date is `null` if a payment is not expected. Dates are returned in an ISO 8601 format (YYYY-MM-DD).
       required:
       - aprs
@@ -7892,14 +7924,17 @@ components:
         request_refund_details:
           nullable: true
           type: boolean
-          description: When `true`, Plaid will attempt to request refund details from the payee's financial institution.  Support varies between financial institutions and will not always be available.  If refund details could be retrieved, they will be available in the `/payment/get` response.
+          description: When `true`, Plaid will attempt to request refund details from the payee's financial institution.  Support varies between financial institutions and will not always be available.  If refund details could be retrieved, they will be available in the `/payment_initiation/payment/get` response.
         iban:
           nullable: true
           type: string
           description: The International Bank Account Number (IBAN) for the payer's account. If provided, the end user will be able to send payments only from the specified bank account.
         bacs:
-          nullable: true
           $ref: '#/components/schemas/PaymentInitiationOptionalRestrictionBacs'
+        emi_account_id:
+          nullable: true
+          type: string
+          description: The EMI (E-Money Institution) account that this payment is associated with, if any. This EMI account is used as an intermediary account to enable Plaid to reconcile the settlement of funds for Payment Initiation requests.
     ExternalPaymentRefundDetails:
       title: ExternalPaymentRefundDetails
       type: object
@@ -7913,7 +7948,6 @@ components:
           type: string
           description: The International Bank Account Number (IBAN) for the account.
         bacs:
-          nullable: true
           $ref: '#/components/schemas/NullableRecipientBACS'
     ExternalPaymentScheduleGet:
       title: ExternalPaymentScheduleGet
@@ -8703,10 +8737,10 @@ components:
           item_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
           error: null
           account_ids_with_new_liabilities:
-          - 52a52b17cf2bc3b430000067
-          - 5307fe1ec4e5adc356000009
+          - XMBvvyMGQ1UoLbKByoMqH3nXMj84ALSdE5B58
+          - BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
           account_ids_with_updated_liabilities:
-            53068f27dedc572a19000029:
+            XMBvvyMGQ1UoLbKByoMqH3nXMj84ALSdE5B58:
             - past_amount_due
       properties:
         webhook_type:
@@ -8733,7 +8767,7 @@ components:
           description: |
             An object with keys of `account_id`'s that are mapped to their respective liabilities fields that changed.
 
-            Example: `{ "53068f27dedc572a19000029": ["past_amount_due"] }`
+            Example: `{ "XMBvvyMGQ1UoLbKByoMqH3nXMj84ALSdE5B58": ["past_amount_due"] }`
     AssetsProductReadyWebhook:
       title: AssetsProductReadyWebhook
       type: object
@@ -9537,7 +9571,7 @@ components:
           description: |
             The unofficial currency code associated with the holding. Always `null` if `iso_currency_code` is non-`null`. Unofficial currency codes are used for currencies that do not have official ISO currency codes, such as cryptocurrencies and the currencies of certain countries.
 
-            See the [currency code schema](/docs/api/accounts#currency-code-schema) for a full listing of supported `iso_currency_code`s.
+            See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `iso_currency_code`s.
       required:
       - account_id
       - security_id
@@ -9629,7 +9663,7 @@ components:
           description: |-
             The unofficial currency code associated with the security. Always `null` if `iso_currency_code` is non-`null`. Unofficial currency codes are used for currencies that do not have official ISO currency codes, such as cryptocurrencies and the currencies of certain countries.
 
-            See the [currency code schema](/docs/api/accounts#currency-code-schema) for a full listing of supported `iso_currency_code`s.
+            See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `iso_currency_code`s.
       required:
       - cusip
       - sedol
@@ -9705,7 +9739,7 @@ components:
             `transfer`: Activity which modifies a position, but not through buy/sell activity e.g. options exercise, portfolio transfer
         subtype:
           type: string
-          description: For descriptions of possible transaction subtypes, see [Investment transaction subtypes schema](/docs/api/accounts/#investment-transaction-subtypes-schema).
+          description: For descriptions of possible transaction subtypes, see [Investment transaction subtypes schema](https://plaid.com/docs/api/accounts/#investment-transaction-subtypes-schema).
           enum:
           - account fee
           - assignment
@@ -9761,7 +9795,7 @@ components:
           description: |-
             The unofficial currency code associated with the holding. Always `null` if `iso_currency_code` is non-`null`. Unofficial currency codes are used for currencies that do not have official ISO currency codes, such as cryptocurrencies and the currencies of certain countries.
 
-            See the [currency code schema](/docs/api/accounts#currency-code-schema) for a full listing of supported `iso_currency_code`s.
+            See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `iso_currency_code`s.
       required:
       - investment_transaction_id
       - account_id
@@ -9945,7 +9979,7 @@ components:
     AccountSubtypes:
       title: AccountSubtypes
       type: array
-      description: 'An array of account subtypes to display in Link. If not specified, all account subtypes will be shown. For a full list of valid types and subtypes, see the [Account schema](/docs/api/accounts#accounts-schema). '
+      description: 'An array of account subtypes to display in Link. If not specified, all account subtypes will be shown. For a full list of valid types and subtypes, see the [Account schema](https://plaid.com/docs/api/accounts#accounts-schema). '
       items:
         $ref: '#/components/schemas/AccountSubtype'
     UserPermissionRevokedWebhook:
@@ -10205,7 +10239,7 @@ components:
 
         `"pbr"` - Cross Border Entry
 
-        `"pop`" - Point-of-Purchase Entry
+        `"pop"` - Point-of-Purchase Entry
 
         `"pos"` - Point-of-Sale Entry
 
@@ -10224,7 +10258,7 @@ components:
       properties:
         legal_name:
           type: string
-          description: The account holder’s full legal name.
+          description: The account holder’s full legal name. If the transfer description is `ccd`, this should be the business name of the account holder.
         email_address:
           type: string
           description: The account holder’s email.
@@ -10284,7 +10318,7 @@ components:
         ach_return_code:
           type: string
           nullable: true
-          description: The ACH return code, e.g. `R01`.  A return code will be provided if and only if the transfer status is `reversed`. For a full listing of ACH return codes, see [Bank Transfers errors](/docs/errors/bank-transfers/#ach-return-codes).
+          description: The ACH return code, e.g. `R01`.  A return code will be provided if and only if the transfer status is `reversed`. For a full listing of ACH return codes, see [Bank Transfers errors](https://plaid.com/docs/errors/bank-transfers/#ach-return-codes).
         description:
           type: string
           description: A human-readable description of the reason for the failure or reversal.
@@ -11199,10 +11233,10 @@ components:
       - NEEDS_INFO
       - UNABLE_TO_VERIFY
       - UNKNOWN
-    IncomeVerificationPaystubGetRequest:
-      title: IncomeVerificationPaystubGetRequest
+    IncomeVerificationPaystubsGetRequest:
+      title: IncomeVerificationPaystubsGetRequest
       type: object
-      description: IncomeVerificationPaystubGetRequest defines the request schema for `/income/verification/paystub/get`.
+      description: IncomeVerificationPaystubsGetRequest defines the request schema for `/income/verification/paystubs/get`.
       properties:
         client_id:
           $ref: '#/components/schemas/APIClientID'
@@ -11213,14 +11247,16 @@ components:
           description: The ID of the verification for which to get paystub information.
       required:
       - income_verification_id
-    IncomeVerificationPaystubGetResponse:
-      title: IncomeVerificationPaystubGetResponse
+    IncomeVerificationPaystubsGetResponse:
+      title: IncomeVerificationPaystubsGetResponse
       type: object
       additionalProperties: true
-      description: IncomeVerificationPaystubGetResponse defines the response schema for `/income/verification/paystub/get`.
+      description: IncomeVerificationPaystubsGetResponse defines the response schema for `/income/verification/paystubs/get`.
       properties:
-        paystub:
-          $ref: '#/components/schemas/Paystub'
+        paystubs:
+          type: array
+          items:
+            $ref: '#/components/schemas/Paystub'
         request_id:
           $ref: '#/components/schemas/RequestID'
     Paystub:
@@ -11229,15 +11265,12 @@ components:
       additionalProperties: true
       description: An object representing data extracted from the end user's paystub.
       properties:
-        paystub_id:
-          type: string
-          description: The unique identifier for this paystub.
         account_id:
           type: string
           nullable: true
           description: The account identifier for the account associated with this paystub.
         employer:
-          $ref: '#/components/schemas/Employer'
+          $ref: '#/components/schemas/PaystubEmployer'
         employee:
           $ref: '#/components/schemas/Employee'
         pay_period_details:
@@ -11245,11 +11278,9 @@ components:
         income_breakdown:
           $ref: '#/components/schemas/IncomeBreakdown'
         ytd_earnings:
-          $ref: '#/components/schemas/PaystubYTDDetails'
           allOf:
           - $ref: '#/components/schemas/PaystubYTDDetails'
       required:
-      - paystub_id
       - employer
       - employee
       - pay_period_details
@@ -11288,10 +11319,15 @@ components:
           nullable: true
         address:
           $ref: '#/components/schemas/NullableAddressData'
-        ssn_masked:
+    PaystubEmployer:
+      title: Employer
+      type: object
+      additionalProperties: true
+      properties:
+        name:
           nullable: true
           type: string
-          description: 'The SSN of the employee, with all but the last 4 digits masked out. For example: "XXX-XX-1111".'
+          description: The name of the employer on the paystub.
     PayPeriodDetails:
       title: PayPeriodDetails
       type: object
@@ -11433,6 +11469,7 @@ components:
           enum:
           - INVESTIGATING
           - IDENTIFIED
+          - SCHEDULED
           - RESOLVED
           - UNKNOWN
         updated_date:
@@ -11632,7 +11669,7 @@ components:
       - request_id
       - application
     ProductAccess:
-      description: Allow or disallow product access across all accounts. If unset, defaults to all products allowed.
+      description: The product access being requested. Used to or disallow product access across all accounts. If unset, defaults to all products allowed.
       type: object
       additionalProperties: true
       properties:
@@ -11670,6 +11707,12 @@ components:
           default: true
       required:
       - unique_id
+    NullableScopes:
+      nullable: true
+      allOf:
+      - $ref: '#/components/schemas/Scopes'
+      - type: object
+        additionalProperties: true
     Scopes:
       description: The scopes object
       type: object
@@ -11685,6 +11728,22 @@ components:
           type: boolean
           nullable: true
           default: true
+    RequestedScopes:
+      type: object
+      description: Scope of required and optional account features or content from a ConnectedApplication.
+      properties:
+        required_product_access:
+          $ref: '#/components/schemas/ProductAccess'
+        optional_product_access:
+          $ref: '#/components/schemas/ProductAccess'
+        account_filters:
+          $ref: '#/components/schemas/AccountFilter'
+        account_selection_cardinality:
+          $ref: '#/components/schemas/AccountSelectionCardinality'
+      required:
+      - required_product_access
+      - optional_product_access
+      - account_selection_cardinality
     ItemApplicationScopesUpdateRequest:
       description: ItemApplicationScopesUpdateRequest defines the request schema for `/item/application/scopes/update`
       type: object
@@ -11711,3 +11770,95 @@ components:
           $ref: '#/components/schemas/RequestID'
       required:
       - request_id
+    ItemApplicationListRequest:
+      description: Request to list connected applications for a user.
+      type: object
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+      required:
+      - access_token
+    ItemApplicationListResponse:
+      description: Describes the connected application for a particular end user.
+      type: object
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+        applications:
+          type: array
+          description: A list of connected applications.
+          items:
+            $ref: '#/components/schemas/ConnectedApplication'
+      required:
+      - applications
+    ConnectedApplication:
+      description: Describes the connected application for a particular end user.
+      type: object
+      properties:
+        application_id:
+          $ref: '#/components/schemas/ApplicationID'
+        name:
+          type: string
+          description: The name of the application.
+        created_at:
+          type: string
+          description: The date this application was linked in ISO8601 (YYYY-MM-DD) format in UTC.
+        logo:
+          nullable: true
+          type: string
+          description: A URL that links to the application logo image.
+        application_url:
+          nullable: true
+          type: string
+          description: The URL for the application's website.
+        reason_for_access:
+          nullable: true
+          type: string
+          description: A string provided by the connected app stating why they use their respective enabled products.
+        product_data_types:
+          type: array
+          description: (Deprecated) A list of enums representing the data collected and products enabled for this connected application.
+          items:
+            type: string
+            enum:
+            - ACCOUNT_BALANCE
+            - ACCOUNT_USER_INFO
+            - ACCOUNT_TRANSACTIONS
+        scopes:
+          $ref: '#/components/schemas/NullableScopes'
+        requested_scopes:
+          $ref: '#/components/schemas/RequestedScopes'
+      required:
+      - application_id
+      - name
+      - created_at
+      - product_data_types
+    AccountSelectionCardinality:
+      type: string
+      description: The application requires that accounts be limited to a specific cardinality. `MULTI_SELECT` indicates that the user should be allowed to pick multiple accounts. `SINGLE_SELECT` indicates that the user should be allowed to pick only a single account. `ALL` indicates that the user must share all of their accounts and should not be given the opportunity to de-select
+      enum:
+      - SINGLE_SELECT
+      - MULTI_SELECT
+      - ALL
+    AccountFilter:
+      type: object
+      description: Enumerates the account subtypes that the application wishes for the user to be able to select from. For more details refer to Plaid documentation on account filters.
+      properties:
+        depository:
+          $ref: '#/components/schemas/AccountFilterSubtypes'
+        credit:
+          $ref: '#/components/schemas/AccountFilterSubtypes'
+        loan:
+          $ref: '#/components/schemas/AccountFilterSubtypes'
+        investment:
+          $ref: '#/components/schemas/AccountFilterSubtypes'
+    AccountFilterSubtypes:
+      type: array
+      description: A list of account subtypes to be filtered.
+      items:
+        type: string
+        description: List of account subtypes.
