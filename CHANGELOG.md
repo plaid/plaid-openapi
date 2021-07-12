@@ -1,3 +1,35 @@
+### 2020-09-14_1.19.5
+- Added `required` to many fields where it was missing
+- Removed `nullable: true` annotation incorrectly applied to some fields
+- Added ``nullable: true` annotation incorrectly missing from some fields
+- Fixed invalid example for `/processor/balance/get`
+- Fixed incorrect formatting for certain `allOf` structures
+- Added enum values for some strings that were not treated as enums
+- Added missing `created_at` field to `Application`
+- Added missing `null` enum to some nullable enums
+- Added missing beta `include_original_description` and `original_description` fields to `Transaction`
+- Various small description fixes
+- Updated external docs URLs for Income endpoints
+
+### 2021-09-14_1.19.4
+- Fixed description for `close_price` field returned in `/investments/holdings/get` response
+
+### 2020-09-14_1.19.3
+- Updated the `/institutions/get/` description to explain filtering behavior
+
+### 2020-09-14_1.19.2
+- Added `error` field to `/income/verification/summary/get` response body
+
+### 2020-09-14_1.19.1
+- Fix links to income (beta) docs
+- add income webhook example
+
+### 2020-09-14_1.19.0
+- Added `/sandbox/income/fire_webhook` endpoint
+
+### 2020-09-14_1.18.2
+- Added Lithic and SVB to the list of supported processors for `/processor/token/create` endpoint
+
 ### 2020-09-14_1.18.1
 - Fixed file to reflect that `category_id` and `next_payment_due_date` are nullable
 - Removed spurious `paystub_id` field
@@ -28,7 +60,7 @@
 
 ### 2020-09-14_1.16.4
 - Removes erroneous `request_id` that was incorrectly shown to be returned in items from `/payment_initiation/payment/list` and `/payment_initiation/recipient/list`.
-- Fix for `ExternalPaymentSchedule` to make `end_date` optional. 
+- Fix for `ExternalPaymentSchedule` to make `end_date` optional.
 
 ### 2020-09-14_1.16.3
 - Updated `/investments/transactions/get` count minimum to be 1 instead of 0

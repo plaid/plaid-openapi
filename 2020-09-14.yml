@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.18.1
+  version: 2020-09-14_1.19.5
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -460,6 +460,8 @@ paths:
           description: Error response
       description: |-
         Returns a JSON response containing details on all financial institutions currently supported by Plaid. Because Plaid supports thousands of institutions, results are paginated.
+
+        If there is no overlap between an institution’s enabled products and a client’s enabled products, then the institution will be filtered out from the response. As a result, the number of institutions returned may not match the count specified in the call.
 
         This data changes frequently. If you store it locally on your system, be sure to update it regularly.
       requestBody:
@@ -1283,6 +1285,8 @@ paths:
                         available: 100
                         current: 110
                         limit: null
+                        iso_currency_code: USD
+                        unofficial_currency_code: null
                       mask: "0000"
                       name: Plaid Checking
                       official_name: Plaid Gold Checking
@@ -1596,7 +1600,7 @@ paths:
             schema:
               $ref: '#/components/schemas/LiabilitiesGetRequest'
       description: |-
-        The `/liabilities/get` endpoint returns various details about an Item with loan or credit accounts. Liabilities data is available primarily for US financial institutions, with some limited coverage of Canadian institutions. Currently supported account types are account type `credit` with account subtype `credit card` or `paypal`, and account type `loan` with account subtype `student` or `mortgage`. To limit accounts listed in Link to types and subtypes supported by Liabilities, you can use the `account_filter` parameter when [creating a Link token](https://plaid.com/docs/api/tokens/#linktokencreate).
+        The `/liabilities/get` endpoint returns various details about an Item with loan or credit accounts. Liabilities data is available primarily for US financial institutions, with some limited coverage of Canadian institutions. Currently supported account types are account type `credit` with account subtype `credit card` or `paypal`, and account type `loan` with account subtype `student` or `mortgage`. To limit accounts listed in Link to types and subtypes supported by Liabilities, you can use the `account_filters` parameter when [creating a Link token](https://plaid.com/docs/api/tokens/#linktokencreate).
 
         The types of information returned by Liabilities can include balances and due dates, loan terms, and account details such as original loan amount and guarantor. Data is refreshed approximately once per day; the latest data can be retrieved by calling `/liabilities/get`.
 
@@ -3545,7 +3549,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/employers#employerssearch
+        url: /api/employers/#employerssearch
       operationId: employersSearch
       summary: Search employer database
       responses:
@@ -3585,7 +3589,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /income-verification/reference#incomeverificationcreate
+        url: /api/products/#incomeverificationcreate
       operationId: incomeVerificationCreate
       responses:
         "200":
@@ -3612,7 +3616,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /income-verification/reference#incomeverificationsummaryget
+        url: /api/products/#incomeverificationsummaryget
       operationId: incomeVerificationSummaryGet
       responses:
         "200":
@@ -3663,7 +3667,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /income-verification/reference#incomeverificationpaystubsget
+        url: /api/products/#incomeverificationpaystubsget
       operationId: incomeVerificationPaystubsGet
       responses:
         "200":
@@ -3712,7 +3716,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /income-verification/reference#incomeverificationdocumentsdownload
+        url: /api/products/#incomeverificationdocumentsdownload
       operationId: incomeVerificationDocumentsDownload
       responses:
         "200":
@@ -3737,7 +3741,7 @@ paths:
     parameters: []
   /deposit_switch/alt/create:
     post:
-      summary: Create a deposit switch when not using Plaid Exchange.'
+      summary: Create a deposit switch when not using Plaid Exchange.
       tags:
       - plaid
       externalDocs:
@@ -3794,6 +3798,38 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SandboxBankTransferFireWebhookRequest'
+  /sandbox/income/fire_webhook:
+    post:
+      summary: Manually fire an Income webhook
+      tags:
+      - plaid
+      externalDocs:
+        url: /api/sandbox/#sandboxincomefire_webhook
+      operationId: sandboxIncomeFireWebhook
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SandboxIncomeFireWebhookResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: mdqfuVxeoza6mhu
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      description: Use the `/sandbox/income/fire_webhook` endpoint to manually trigger an Income webhook in the Sandbox environment.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SandboxIncomeFireWebhookRequest'
 components:
   securitySchemes:
     clientId:
@@ -3906,6 +3942,11 @@ components:
           description: An array of BACS numbers identifying accounts.
           items:
             $ref: '#/components/schemas/NumbersBACS'
+      required:
+      - ach
+      - eft
+      - international
+      - bacs
     TransactionsGetRequest:
       type: object
       description: TransactionsGetRequest defines the request schema for `/transactions/get`
@@ -3954,6 +3995,11 @@ components:
           default: 0
           description: The number of transactions to skip. The default value is 0.
           minimum: 0
+        include_original_description:
+          type: boolean
+          default: false
+          description: Include the transactions' original descriptions. This feature is in closed beta and only available to beta program participants. For more details, contact your Plaid Account Manager.
+          nullable: true
     TransactionsGetResponse:
       type: object
       additionalProperties: true
@@ -4089,10 +4135,10 @@ components:
           description: The search query. Institutions with names matching the query are returned
         products:
           type: array
-          description: Filter the Institutions based on whether they support all products listed in products. Provide `null` to get institutions regardless of supported products
+          description: Filter the Institutions based on whether they support all products listed in `products`. Provide `null` to get institutions regardless of supported products. Note that when `auth` is specified as a product, if you are enabled for Instant Match or Automated Micro-deposits, institutions that support those products will be returned even if `auth` is not present in their product array.
+          minItems: 1
           items:
             $ref: '#/components/schemas/Products'
-          minItems: 1
         country_codes:
           type: array
           description: |
@@ -4364,7 +4410,7 @@ components:
           $ref: '#/components/schemas/SandboxPublicTokenCreateRequestOptionsTransactions'
     SandboxPublicTokenCreateRequestOptionsTransactions:
       type: object
-      description: SandboxPublicTokenCreateRequestOptionsTransactions is an optional set of corresponding to transactions options.
+      description: SandboxPublicTokenCreateRequestOptionsTransactions is an optional set of parameters corresponding to transactions options.
       properties:
         start_date:
           type: string
@@ -4372,6 +4418,7 @@ components:
         end_date:
           type: string
           description: The most recent date for which to fetch transaction history. Dates should be formatted as YYYY-MM-DD.
+      title: ""
     SandboxPublicTokenCreateResponse:
       type: object
       additionalProperties: true
@@ -4695,13 +4742,14 @@ components:
           nullable: true
       required:
       - alg
-      - crv
       - kid
       - kty
-      - use
+      - crv
       - x
       - "y"
+      - use
       - created_at
+      - expired_at
     LiabilitiesGetRequest:
       type: object
       description: LiabilitiesGetRequest defines the request schema for `/liabilities/get`
@@ -4761,9 +4809,9 @@ components:
           type: string
           description: The name of the recipient
         iban:
-          nullable: true
           type: string
           description: The International Bank Account Number (IBAN) for the recipient. If BACS data is not provided, an IBAN is required.
+          nullable: true
         bacs:
           $ref: '#/components/schemas/NullableRecipientBACS'
         address:
@@ -4797,7 +4845,6 @@ components:
       required:
       - recipient_id
     PaymentInitiationRecipientGetResponse:
-      type: object
       additionalProperties: true
       description: PaymentInitiationRecipientGetResponse defines the response schema for `/payment_initiation/recipient/get`
       allOf:
@@ -4810,6 +4857,8 @@ components:
       - recipient_id
       - name
       - request_id
+      - iban
+      - bacs
     PaymentInitiationRecipient:
       type: object
       additionalProperties: true
@@ -4824,18 +4873,21 @@ components:
         address:
           $ref: '#/components/schemas/PaymentInitiationAddress'
         iban:
-          nullable: true
           type: string
           description: The International Bank Account Number (IBAN) for the recipient.
+          nullable: true
         bacs:
           $ref: '#/components/schemas/NullableRecipientBACS'
         emi_recipient_id:
-          nullable: true
           type: string
           description: The EMI (E-Money Institution) recipient that this recipient is associated with, if any. This EMI recipient is used as an intermediary account to enable Plaid to reconcile the settlement of funds for Payment Initiation requests.
+          nullable: true
       required:
       - recipient_id
       - name
+      - iban
+      - bacs
+      title: ""
     PaymentInitiationRecipientListRequest:
       type: object
       description: PaymentInitiationRecipientListRequest defines the request schema for `/payment_initiation/recipient/list`
@@ -4876,7 +4928,7 @@ components:
         amount:
           $ref: '#/components/schemas/PaymentAmount'
         schedule:
-          $ref: '#/components/schemas/ExternalPaymentSchedule'
+          $ref: '#/components/schemas/ExternalPaymentScheduleRequest'
         options:
           $ref: '#/components/schemas/ExternalPaymentOptions'
       required:
@@ -5031,7 +5083,6 @@ components:
       required:
       - payment_id
     PaymentInitiationPaymentGetResponse:
-      type: object
       additionalProperties: true
       description: PaymentInitiationPaymentGetResponse defines the response schema for `/payment_initation/payment/get`
       allOf:
@@ -5096,9 +5147,9 @@ components:
           type: string
           description: A reference for the payment.
         adjusted_reference:
-          nullable: true
           type: string
           description: The value of the reference sent to the bank after adjustment to pass bank validation rules.
+          nullable: true
         last_status_update:
           format: date-time
           type: string
@@ -5108,15 +5159,15 @@ components:
         refund_details:
           $ref: '#/components/schemas/ExternalPaymentRefundDetails'
         bacs:
-          $ref: '#/components/schemas/NullableRecipientBACS'
+          $ref: '#/components/schemas/NullableSenderBACS'
         iban:
           type: string
+          description: The International Bank Account Number (IBAN) for the sender, if specified in the `/payment_initiation/payment/create` call.
           nullable: true
-          description: The International Bank Account Number (IBAN) for the recipient.
         emi_account_id:
-          nullable: true
           type: string
           description: The EMI (E-Money Institution) account that this payment is associated with, if any. This EMI account is used as an intermediary account to enable Plaid to reconcile the settlement of funds for Payment Initiation requests.
+          nullable: true
       required:
       - payment_id
       - amount
@@ -5124,6 +5175,7 @@ components:
       - recipient_id
       - reference
       - last_status_update
+      - schedule
       - bacs
       - iban
     PaymentInitiationPaymentTokenCreateRequest:
@@ -5166,15 +5218,14 @@ components:
         secret:
           $ref: '#/components/schemas/APISecret'
         count:
-          nullable: true
           type: integer
-          maximum: 200
           default: 10
           description: The maximum number of payments to return. If `count` is not specified, a maximum of 10 payments will be returned, beginning with the most recent payment before the cursor (if specified).
-        cursor:
           nullable: true
+        cursor:
           type: string
           description: A string in RFC 3339 format (i.e. "2019-12-06T22:35:49Z"). Only payments created before the cursor will be returned.
+          nullable: true
     PaymentInitiationPaymentListResponse:
       type: object
       additionalProperties: true
@@ -5602,7 +5653,7 @@ components:
           description: The `account_id` value obtained from the `onSuccess` callback in Link
         processor:
           type: string
-          description: The processor you are integrating with. Valid values are `"achq"`, `"check"`, `"checkbook"`, `"circle"`, `"drivewealth"`, `"dwolla"`, `"galileo"`, "`interactive_brokers`", `"modern_treasury"`, `"ocrolus"`, `"prime_trust"`, `"rize"`, `"sila_money"`, `"unit"`, `"vesta"`, `"vopay"`, `"wyre"`
+          description: The processor you are integrating with. Valid values are `"achq"`, `"check"`, `"checkbook"`, `"circle"`, `"drivewealth"`, `"dwolla"`, `"galileo"`, "`interactive_brokers`", `"lithic"`, `"modern_treasury"`, `"ocrolus"`, `"prime_trust"`, `"rize"`, `"sila_money"`, `"svb_api"`, `"unit"`, `"vesta"`, `"vopay"`, `"wyre"`
       required:
       - access_token
       - account_id
@@ -5835,13 +5886,15 @@ components:
           description: |-
             List of Plaid product(s) you wish to use. If launching Link in update mode, should be omitted; required otherwise. Valid products are:
 
-            `transactions`, `auth`, `identity`, `assets`, `investments`, `liabilities`, `payment_initiation`, `deposit_switch`
+            `transactions`, `auth`, `identity`, `assets`, `investments`, `liabilities`, `payment_initiation`, `deposit_switch`, `income_verification`
 
             Example: `['auth', 'transactions']`
 
             `balance` is *not* a valid value, the Balance product does not require explicit initalization and will automatically be initialized when any other product is initialized.
 
             Only institutions that support *all* requested products will be shown in Link; to maximize the number of institutions listed, it is recommended to initialize Link with the minimal product set required for your use case. Additional products can be added after Link initialization by calling the relevant endpoints. For details and exceptions, see [Choosing when to initialize products](https://plaid.com/docs/link/best-practices/#choosing-when-to-initialize-products).
+
+            Note that, unless you have opted to disable Instant Match support, institutions that support Instant Match will also be shown in Link if `auth` is specified as a product, even though these institutions do not contain `auth` in their product array.
 
             In Production, you will be billed for each product that you specify when initializing Link. Note that a product cannot be removed from an Item once the Item has been initialized with that product. To stop billing on an Item for subscription-based products, such as Liabilities, Investments, and Transactions, remove the Item via `/item/remove`.
           items:
@@ -5881,7 +5934,7 @@ components:
       - user
     LinkTokenAccountFilters:
       description: |
-        By default, Link will only display account types that are compatible with all products supplied in the `products` parameter of `/link/token/create`. You can further limit the accounts shown in Link by using `account_filters` to specify the account subtypes to be shown in Link. Only the specified subtypes will be shown. This filtering applies to both the Account Select view (if enabled) and the Institution Select view. Institutions that do not support the selected subtypes will be omitted from Link. To indicate that all subtypes should be shown, use the value `"all"`. If the `account_filters` filter is used, any account type for which a filter is not specified will be entirely omitted from Link. For a full list of valid types and subtypes, see the [Account schema](https://plaid.com/docs/api/accounts#accounts-schema).
+        By default, Link will provide limited account filtering: it will only display Institutions that are compatible with all products supplied in the `products` parameter of `/link/token/create`, and, if `auth` is specified in the `products` array, will also filter out accounts other than `checking` and `savings` accounts on the Select Account pane. You can further limit the accounts shown in Link by using `account_filters` to specify the account subtypes to be shown in Link. Only the specified subtypes will be shown. This filtering applies to both the Account Select view (if enabled) and the Institution Select view. Institutions that do not support the selected subtypes will be omitted from Link. To indicate that all subtypes should be shown, use the value `"all"`. If the `account_filters` filter is used, any account type for which a filter is not specified will be entirely omitted from Link. For a full list of valid types and subtypes, see the [Account schema](https://plaid.com/docs/api/accounts#accounts-schema).
 
         For institutions using OAuth, the filter will not affect the list of accounts shown by the bank in the OAuth window.
       type: object
@@ -6025,6 +6078,10 @@ components:
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
+      - link_token
+      - created_at
+      - expiration
+      - metadata
       - request_id
     LinkTokenGetMetadataResponse:
       type: object
@@ -6053,12 +6110,19 @@ components:
           $ref: '#/components/schemas/AccountFiltersResponse'
         redirect_uri:
           type: string
-          nullable: true
           description: The `redirect_uri` specified in the `/link/token/create` call.
+          nullable: true
         client_name:
           type: string
           nullable: true
           description: The `client_name` specified in the `/link/token/create` call.
+      required:
+      - initial_products
+      - webhook
+      - country_codes
+      - language
+      - redirect_uri
+      - client_name
     LinkTokenCreateResponse:
       type: object
       additionalProperties: true
@@ -6126,15 +6190,18 @@ components:
           - user_present_required
       required:
       - item_id
+      - webhook
+      - error
       - available_products
       - billed_products
+      - consent_expiration_time
       - update_type
     Error:
       description: We use standard HTTP response codes for success and failure notifications, and our errors are further classified by `error_type`. In general, 200 HTTP codes correspond to success, 40X codes are for developer- or user-related failures, and 50X codes are for Plaid-related issues.  Error fields will be `null` if no error has occurred.
-      nullable: true
       type: object
       additionalProperties: true
       title: Error
+      nullable: true
       properties:
         error_type:
           enum:
@@ -6167,7 +6234,7 @@ components:
           nullable: true
         request_id:
           type: string
-          description: A unique identifying the request, to be used for troubleshooting purposes. This field will be omitted in errors provided by webhooks.
+          description: A unique ID identifying the request, to be used for troubleshooting purposes. This field will be omitted in errors provided by webhooks.
         causes:
           type: array
           description: |-
@@ -6177,21 +6244,19 @@ components:
           items: {}
         status:
           type: number
-          nullable: true
           description: The HTTP status code associated with the error. This will only be returned in the response body when the error information is provided via a webhook.
+          nullable: true
         documentation_url:
           type: string
-          nullable: true
           description: The URL of a Plaid documentation page with more information about the error
         suggested_action:
-          nullable: true
           type: string
           description: Suggested steps for resolving the error
       required:
       - error_type
       - error_code
       - error_message
-      - request_id
+      - display_message
     NullableItemStatus:
       nullable: true
       allOf:
@@ -6273,6 +6338,27 @@ components:
         `other:` Non-specified account type
 
         See the [Account type schema](https://plaid.com/docs/api/accounts#account-type-schema) for a full listing of account types and corresponding subtypes.
+    OverrideAccountType:
+      type: string
+      title: OverrideAccountType
+      enum:
+      - investment
+      - credit
+      - depository
+      - loan
+      - other
+      description: |-
+        `investment:` Investment account
+
+        `credit:` Credit card
+
+        `depository:` Depository account
+
+        `loan:` Loan account
+
+        `other:` Non-specified account type
+
+        See the [Account type schema](https://plaid.com/docs/api/accounts#account-type-schema) for a full listing of account types and corresponding subtypes.
     AccountBase:
       title: Account
       type: object
@@ -6302,8 +6388,8 @@ components:
           description: The name of the account, either assigned by the user or by the financial institution itself
         official_name:
           type: string
-          nullable: true
           description: The official name of the account as given by the financial institution
+          nullable: true
         type:
           $ref: '#/components/schemas/AccountType'
         subtype:
@@ -6317,11 +6403,12 @@ components:
           - verification_expired
           - verification_failed
           description: "The current verification status of an Auth Item initiated through Automated or Manual micro-deposits.  Returned for Auth Items only.\n\n`pending_automatic_verification`: The Item is pending automatic verification\n\n`pending_manual_verification`: The Item is pending manual micro-deposit verification. Items remain in this state until the user successfully verifies the two amounts.\n\n`automatically_verified`: The Item has successfully been automatically verified\t\n\n`manually_verified`: The Item has successfully been manually verified\n\n`verification_expired`: Plaid was unable to automatically verify the deposit within 7 calendar days and will no longer attempt to validate the Item. Users may retry by submitting their information again through Link.\n\n`verification_failed`: The Item failed manual micro-deposit verification because the user exhausted all 3 verification attempts. Users may retry by submitting their information again through Link.\t\n\t"
-          nullable: true
       required:
       - account_id
       - balances
+      - mask
       - name
+      - official_name
       - type
       - subtype
     AccountBalance:
@@ -6347,7 +6434,6 @@ components:
           nullable: true
         current:
           type: number
-          nullable: true
           description: |-
             The total amount of funds in or owed by the account.
 
@@ -6358,6 +6444,7 @@ components:
             For `investment`-type accounts, the current balance is the total value of assets as presented by the institution.
 
             Note that balance information may be cached unless the value was returned by `/accounts/balance/get`; if the Item is enabled for Transactions, the balance will be at least as recent as the most recent Transaction update. If you require realtime balance information, use the `available` balance as provided by `/accounts/balance/get`.
+          nullable: true
         limit:
           type: number
           description: |-
@@ -6385,6 +6472,12 @@ components:
 
             This is currently only provided when the `min_last_updated_datetime` is passed when calling `/accounts/balance/get` for `ins_128026` (Capital One).
           nullable: true
+      required:
+      - available
+      - current
+      - limit
+      - iso_currency_code
+      - unofficial_currency_code
     AccountSubtype:
       type: string
       nullable: true
@@ -6399,6 +6492,7 @@ components:
       - brokerage
       - cash isa
       - education savings account
+      - ebt
       - gic
       - health reimbursement arrangement
       - hsa
@@ -6487,6 +6581,7 @@ components:
       - account_id
       - account
       - routing
+      - wire_routing
     NullableNumbersACH:
       nullable: true
       allOf:
@@ -6576,6 +6671,7 @@ components:
       title: RecipientBACS
       type: object
       additionalProperties: true
+      nullable: true
       description: An object containing a BACS account number and sort code. If an IBAN is not provided or if this recipient needs to accept domestic GBP-denominated payments, BACS data is required.
       properties:
         account:
@@ -6585,19 +6681,24 @@ components:
           type: string
           description: The 6-character sort code of the account.
     NullableRecipientBACS:
+      nullable: true
       allOf:
       - $ref: '#/components/schemas/RecipientBACS'
       - type: object
-        nullable: true
         additionalProperties: true
-        description: The sort code of the account.
+        description: The account number and sort code of the recipient's account.
+    NullableSenderBACS:
       nullable: true
+      allOf:
+      - $ref: '#/components/schemas/RecipientBACS'
+      - type: object
+        additionalProperties: true
+        description: The account number and sort code of the sender's account, if specified in the `/payment_initiation/payment/create` call.
     PaymentInitiationOptionalRestrictionBacs:
       nullable: true
       allOf:
       - $ref: '#/components/schemas/RecipientBACS'
       - type: object
-        nullable: true
         additionalProperties: true
         description: An optional object used to restrict the accounts used for payments. If provided, the end user will be able to send payments only from the specified bank account.
     RequestID:
@@ -6668,8 +6769,8 @@ components:
             If the `transactions` object was returned by a Transactions endpoint such as `/transactions/get`, this field will always appear. If the `transactions` object was returned by an Assets endpoint such as `/asset_report/get/` or `/asset_report/pdf/get`, this field will only appear in an Asset Report with Insights.
         merchant_name:
           type: string
-          nullable: true
           description: The merchant name, as extracted by Plaid from the `name` field.
+          nullable: true
         location:
           $ref: '#/components/schemas/Location'
         authorized_date:
@@ -6728,12 +6829,31 @@ components:
           description: The ID of the account in which this transaction occurred.
         transaction_code:
           $ref: '#/components/schemas/TransactionCode'
+        original_description:
+          type: string
+          description: The string returned by the financial institution to describe the transaction. For transactions returned by `/transactions/get`, this field is in beta and will be omitted unless the client is both enrolled in the closed beta program and has set `options.include_original_description` to `true`.
+          nullable: true
       required:
       - transaction_id
+      - account_owner
+      - pending_transaction_id
       - pending
+      - payment_channel
+      - payment_meta
+      - name
+      - merchant_name
+      - location
+      - authorized_date
+      - authorized_datetime
       - date
+      - datetime
+      - category_id
+      - category
+      - unofficial_currency_code
+      - iso_currency_code
       - amount
       - account_id
+      - transaction_code
     Location:
       title: Transaction Location
       type: object
@@ -6772,6 +6892,15 @@ components:
           type: string
           description: The merchant defined store number where the transaction occurred.
           nullable: true
+      required:
+      - address
+      - city
+      - region
+      - postal_code
+      - country
+      - lat
+      - lon
+      - store_number
     Institution:
       title: Institution
       type: object
@@ -6786,7 +6915,7 @@ components:
           description: The official name of the institution
         products:
           type: array
-          description: A list of the Plaid products supported by the institution
+          description: A list of the Plaid products supported by the institution. Note that only institutions that support Instant Auth will return `auth` in the product array; institutions that do not list `auth` may still support other Auth methods such as Instant Match or Automated Micro-deposit Verification. For more details, see [Full Auth coverage](https://plaid.com/docs/auth/coverage/).
           items:
             $ref: '#/components/schemas/Products'
         country_codes:
@@ -6824,6 +6953,7 @@ components:
       - name
       - products
       - country_codes
+      - routing_numbers
       - oauth
     InstitutionStatus:
       title: InstitutionStatus
@@ -6937,28 +7067,37 @@ components:
           nullable: true
         payee:
           type: string
-          nullable: true
           description: For transfers, the party that is receiving the transaction.
+          nullable: true
         by_order_of:
           type: string
-          nullable: true
           description: The party initiating a wire transfer. Will be `null` if the transaction is not a wire transfer.
+          nullable: true
         payer:
           type: string
-          nullable: true
           description: For transfers, the party that is paying the transaction.
+          nullable: true
         payment_method:
           type: string
-          nullable: true
           description: The type of transfer, e.g. 'ACH'
+          nullable: true
         payment_processor:
           type: string
-          nullable: true
           description: The name of the payment processor
+          nullable: true
         reason:
           type: string
-          nullable: true
           description: The payer-supplied description of the transfer.
+          nullable: true
+      required:
+      - reference_number
+      - ppd_id
+      - payee
+      - by_order_of
+      - payer
+      - payment_method
+      - payment_processor
+      - reason
     TransactionCode:
       type: string
       title: transaction_code
@@ -7032,9 +7171,8 @@ components:
       description: The access token associated with the Item data is being requested for.
     NullableAccessToken:
       nullable: true
-      allOf:
-      - $ref: '#/components/schemas/AccessToken'
-      - type: string
+      type: string
+      description: The access token associated with the Item data is being requested for.
     BankTransferAccessToken:
       description: The Plaid `access_token` for the account that will be debited or credited.
       type: string
@@ -7190,7 +7328,6 @@ components:
         primary:
           type: boolean
           description: When `true`, identifies the phone number as the primary number on an account.
-          nullable: true
         type:
           type: string
           enum:
@@ -7201,9 +7338,10 @@ components:
           - mobile1
           - other
           description: The type of phone number.
-          nullable: true
       required:
       - data
+      - primary
+      - type
     Email:
       title: Email
       type: object
@@ -7238,7 +7376,6 @@ components:
         primary:
           type: boolean
           description: When `true`, identifies the address as the primary address on an account.
-          nullable: true
       required:
       - data
     NullableAddress:
@@ -7280,9 +7417,12 @@ components:
         country:
           type: string
           description: The ISO 3166-1 alpha-2 country code
+          nullable: true
       required:
       - city
+      - region
       - street
+      - postal_code
       - country
     ProcessorToken:
       title: ProcessorToken
@@ -7317,6 +7457,8 @@ components:
       required:
       - date
       - current
+      - iso_currency_code
+      - unofficial_currency_code
     Owner:
       title: Owner
       type: object
@@ -7390,22 +7532,26 @@ components:
       properties:
         credit:
           type: array
+          description: The credit accounts returned.
           nullable: true
-          description: The credit accounts returned. If no credit accounts are returned, `credit` will not be present in the schema.
           items:
             $ref: '#/components/schemas/CreditCardLiability'
         mortgage:
-          nullable: true
-          description: The mortgage accounts returned. If no mortgage accounts are returned, `mortgage` will not be present in the schema.
+          description: The mortgage accounts returned.
           type: array
+          nullable: true
           items:
             $ref: '#/components/schemas/MortgageLiability'
         student:
-          nullable: true
-          description: The student loan accounts returned. If no student loan accounts are returned, `student` will not be present in the schema.
+          description: The student loan accounts returned.
           type: array
+          nullable: true
           items:
             $ref: '#/components/schemas/StudentLoan'
+      required:
+      - credit
+      - mortgage
+      - student
     StudentLoan:
       title: StudentLoan
       type: object
@@ -7506,7 +7652,30 @@ components:
           type: number
           nullable: true
       required:
+      - account_id
+      - account_number
+      - disbursement_dates
+      - expected_payoff_date
+      - guarantor
       - interest_rate_percentage
+      - is_overdue
+      - last_payment_amount
+      - last_payment_date
+      - last_statement_issue_date
+      - loan_name
+      - loan_status
+      - minimum_payment_amount
+      - next_payment_due_date
+      - origination_date
+      - origination_principal_amount
+      - outstanding_interest_amount
+      - payment_reference_number
+      - pslf_status
+      - repayment_plan
+      - sequence_number
+      - servicer_address
+      - ytd_interest_paid
+      - ytd_principal_paid
     CreditCardLiability:
       title: CreditCardLiability
       type: object
@@ -7540,10 +7709,12 @@ components:
           type: number
         next_payment_due_date:
           type: string
-          nullable: true
           description: The due date for the next payment. The due date is `null` if a payment is not expected. Dates are returned in an ISO 8601 format (YYYY-MM-DD).
+          nullable: true
       required:
+      - account_id
       - aprs
+      - is_overdue
       - last_payment_amount
       - last_payment_date
       - last_statement_issue_date
@@ -7558,7 +7729,6 @@ components:
         account_id:
           type: string
           description: The ID of the account that this liability belongs to.
-          nullable: true
         account_number:
           type: string
           description: The account number of the loan.
@@ -7631,11 +7801,31 @@ components:
           description: The YTD principal paid.
           nullable: true
       required:
+      - account_id
       - account_number
+      - current_late_fee
+      - escrow_balance
+      - has_pmi
+      - has_prepayment_penalty
+      - interest_rate
+      - last_payment_amount
+      - last_payment_date
+      - loan_type_description
+      - loan_term
+      - maturity_date
+      - next_monthly_payment
+      - next_payment_due_date
+      - origination_date
+      - origination_principal_amount
+      - past_due_amount
+      - property_address
+      - ytd_interest_paid
+      - ytd_principal_paid
     MortgageInterestRate:
       title: MortgageInterestRate
       type: object
       additionalProperties: true
+      description: Object containing metadata about the interest rate for the mortgage.
       properties:
         percentage:
           type: number
@@ -7645,11 +7835,14 @@ components:
           type: string
           description: The type of interest charged (fixed or variable).
           nullable: true
-      description: Object containing metadata about the interest rate for the mortgage.
+      required:
+      - percentage
+      - type
     MortgagePropertyAddress:
       title: MortgagePropertyAddress
       type: object
       additionalProperties: true
+      description: Object containing fields describing property address.
       properties:
         city:
           type: string
@@ -7671,11 +7864,17 @@ components:
           type: string
           description: The full street address (example "564 Main Street, Apt 15").
           nullable: true
-      description: Object containing fields describing property address.
+      required:
+      - city
+      - country
+      - postal_code
+      - region
+      - street
     StudentLoanStatus:
       title: StudentLoanStatus
       type: object
       additionalProperties: true
+      description: An object representing the status of the student loan
       properties:
         end_date:
           type: string
@@ -7705,18 +7904,22 @@ components:
           - transferred
           description: The status type of the student loan
           nullable: true
-      description: An object representing the status of the student loan
+      required:
+      - end_date
+      - type
     StudentRepaymentPlan:
       title: StudentRepaymentPlan
       type: object
       additionalProperties: true
+      description: An object representing the repayment plan for the student loan
       properties:
         description:
           type: string
-          description: The description of the repayment plan as provided by the servicer.
           nullable: true
+          description: The description of the repayment plan as provided by the servicer.
         type:
           type: string
+          nullable: true
           enum:
           - extended graduated
           - extended standard
@@ -7728,13 +7931,16 @@ components:
           - pay as you earn
           - revised pay as you earn
           - standard
+          - null
           description: The type of the repayment plan.
-          nullable: true
-      description: An object representing the repayment plan for the student loan
+      required:
+      - description
+      - type
     PSLFStatus:
       title: PSLFStatus
       type: object
       additionalProperties: true
+      description: 'Information about the student''s eligibility in the Public Service Loan Forgiveness program. This is only returned if the institution is Fedloan (`ins_116527`). '
       properties:
         estimated_eligibility_date:
           type: string
@@ -7748,7 +7954,10 @@ components:
           type: number
           description: The number of qualifying payments remaining.
           nullable: true
-      description: 'Information about the student''s eligibility in the Public Service Loan Forgiveness program. This is only returned if the institution is Fedloan (`ins_116527`). '
+      required:
+      - estimated_eligibility_date
+      - payments_made
+      - payments_remaining
     ServicerAddressData:
       title: ServicerAddressData
       type: object
@@ -7779,10 +7988,17 @@ components:
           type: string
           description: The ISO 3166-1 alpha-2 country code
           nullable: true
+      required:
+      - city
+      - region
+      - street
+      - postal_code
+      - country
     APR:
       title: APR
       type: object
       additionalProperties: true
+      description: Information about the APR on the account.
       properties:
         apr_percentage:
           type: number
@@ -7798,22 +8014,23 @@ components:
           description: The type of balance to which the APR applies.
         balance_subject_to_apr:
           type: number
-          nullable: true
           description: Amount of money that is subjected to the APR if a balance was carried beyond payment due date. How it is calculated can vary by card issuer. It is often calculated as an average daily balance.
+          nullable: true
         interest_charge_amount:
           type: number
-          nullable: true
           description: Amount of money charged due to interest from last statement.
+          nullable: true
       required:
       - apr_percentage
       - apr_type
-      description: Information about the APR on the account.
+      - balance_subject_to_apr
+      - interest_charge_amount
     PaymentInitiationMetadata:
       title: PaymentInitiationMetadata
       type: object
       additionalProperties: true
-      nullable: true
       description: Metadata that captures what specific payment configurations an institution supports when making Payment Initiation requests.
+      nullable: true
       properties:
         supports_international_payments:
           type: boolean
@@ -7831,12 +8048,17 @@ components:
           description: Indicates whether the institution supports returning refund details when initiating a payment.
         standing_order_metadata:
           $ref: '#/components/schemas/PaymentInitiationStandingOrderMetadata'
+      required:
+      - supports_international_payments
+      - maximum_payment_amount
+      - supports_refund_details
+      - standing_order_metadata
     PaymentInitiationStandingOrderMetadata:
       title: PaymentInitiationStandingOrderMetadata
       type: object
       additionalProperties: true
-      nullable: true
       description: Metadata specifically related to valid Payment Initiation standing order configurations for the institution.
+      nullable: true
       properties:
         supports_standing_order_end_date:
           type: boolean
@@ -7849,19 +8071,23 @@ components:
           description: A list of the valid standing order intervals supported by the institution.
           items:
             $ref: '#/components/schemas/PaymentScheduleInterval'
+      required:
+      - supports_standing_order_end_date
+      - supports_standing_order_negative_execution_days
+      - valid_standing_order_intervals
     PaymentInitiationAddress:
       title: PaymentInitiationAddress
       type: object
       additionalProperties: true
-      nullable: true
       description: The optional address of the payment recipient. This object is not currently required to make payments from UK institutions and should not be populated, though may be necessary for future European expansion.
+      nullable: true
       properties:
         street:
           description: An array of length 1-2 representing the street address where the recipient is located. Maximum of 70 characters.
           type: array
+          minItems: 1
           items:
             type: string
-          minItems: 1
         city:
           type: string
           description: The city where the recipient is located. Maximum of 35 characters.
@@ -7871,12 +8097,17 @@ components:
         country:
           type: string
           description: The ISO 3166-1 alpha-2 country code where the recipient is located.
-    ExternalPaymentSchedule:
-      title: ExternalPaymentSchedule
+      required:
+      - street
+      - city
+      - postal_code
+      - country
+    ExternalPaymentScheduleBase:
+      title: ExternalPaymentScheduleBase
       type: object
       additionalProperties: true
-      nullable: true
       description: The schedule that the payment will be executed on. If a schedule is provided, the payment is automatically set up as a standing order. If no schedule is specified, the payment will be executed only once.
+      nullable: true
       properties:
         interval:
           $ref: '#/components/schemas/PaymentScheduleInterval'
@@ -7896,17 +8127,28 @@ components:
 
             If the first `interval_execution_day` on or after the start date is also the same day that `/payment_initiation/payment/create` was called, the bank *may* make the first payment on that day, but it is not guaranteed to do so.
         end_date:
-          nullable: true
           format: date
           type: string
           description: |-
             A date in ISO 8601 format (YYYY-MM-DD). Standing order payments will end on the last `interval_execution_day` on or before the `end_date`.
-
             If the only `interval_execution_day` between the start date and the end date (inclusive) is also the same day that `/payment_initiation/payment/create` was called, the bank *may* make a payment on that day, but it is not guaranteed to do so.
+          nullable: true
+        adjusted_start_date:
+          format: date
+          type: string
+          description: The start date sent to the bank after adjusting for holidays or weekends.  Will be provided in ISO 8601 format (YYYY-MM-DD). If the start date did not require adjustment, this field will be `null`.
+          nullable: true
+    ExternalPaymentScheduleRequest:
+      title: ExternalPaymentScheduleRequest
+      additionalProperties: true
+      description: The schedule that the payment will be executed on. If a schedule is provided, the payment is automatically set up as a standing order. If no schedule is specified, the payment will be executed only once.
+      allOf:
+      - $ref: '#/components/schemas/ExternalPaymentScheduleBase'
+      - type: object
       required:
+      - start_date
       - interval
       - interval_execution_day
-      - start_date
     PaymentScheduleInterval:
       type: string
       title: PaymentScheduleInterval
@@ -7922,18 +8164,18 @@ components:
       nullable: true
       properties:
         request_refund_details:
-          nullable: true
           type: boolean
+          nullable: true
           description: When `true`, Plaid will attempt to request refund details from the payee's financial institution.  Support varies between financial institutions and will not always be available.  If refund details could be retrieved, they will be available in the `/payment_initiation/payment/get` response.
         iban:
-          nullable: true
           type: string
+          nullable: true
           description: The International Bank Account Number (IBAN) for the payer's account. If provided, the end user will be able to send payments only from the specified bank account.
         bacs:
           $ref: '#/components/schemas/PaymentInitiationOptionalRestrictionBacs'
         emi_account_id:
-          nullable: true
           type: string
+          nullable: true
           description: The EMI (E-Money Institution) account that this payment is associated with, if any. This EMI account is used as an intermediary account to enable Plaid to reconcile the settlement of funds for Payment Initiation requests.
     ExternalPaymentRefundDetails:
       title: ExternalPaymentRefundDetails
@@ -7944,25 +8186,25 @@ components:
           type: string
           description: The name of the account holder.
         iban:
-          nullable: true
           type: string
           description: The International Bank Account Number (IBAN) for the account.
+          nullable: true
         bacs:
           $ref: '#/components/schemas/NullableRecipientBACS'
+      required:
+      - name
+      - iban
+      - bacs
     ExternalPaymentScheduleGet:
       title: ExternalPaymentScheduleGet
-      type: object
       nullable: true
       description: The schedule that the payment will be executed on. If a schedule is provided, the payment is automatically set up as a standing order. If no schedule is specified, the payment will be executed only once.
       allOf:
-      - $ref: '#/components/schemas/ExternalPaymentSchedule'
-      properties:
-        adjusted_start_date:
-          format: date
-          nullable: true
-          type: string
-          description: The start date sent to the bank after adjusting for holidays or weekends.  Will be provided in ISO 8601 format (YYYY-MM-DD). If the start date did not require adjustment, this field will be `null`.
+      - $ref: '#/components/schemas/ExternalPaymentScheduleBase'
+      - type: object
       required:
+      - adjusted_start_date
+      - end_date
       - interval
       - interval_execution_day
       - start_date
@@ -7978,7 +8220,7 @@ components:
       - payment_initiation
       - transactions
       - credit_details
-      - income
+      - income_verification
       - deposit_switch
       - standing_orders
       description: A list of products that an institution can support. All Items must be initialized with at least one product. The Balance product is always available and does not need to be specified during initialization.
@@ -8031,7 +8273,6 @@ components:
           - DELAYED
           - STOPPED
           description: The `refresh_interval` may be `DELAYED` or `STOPPED` even when the success rate is high. This value is only returned for Transactions status breakdowns.
-          nullable: true
       required:
       - success
       - error_plaid
@@ -8129,7 +8370,7 @@ components:
       description: Data to use to set values of test accounts. Some values cannot be specified in the schema and will instead will be calculated from other test data in order to achieve more consistent, realistic test data.
       properties:
         type:
-          $ref: '#/components/schemas/AccountType'
+          $ref: '#/components/schemas/OverrideAccountType'
         subtype:
           $ref: '#/components/schemas/AccountSubtype'
         starting_balance:
@@ -8218,15 +8459,6 @@ components:
         bacs_sort_code:
           type: string
           description: BACS sort code
-      required:
-      - account
-      - ach_routing
-      - ach_wire_routing
-      - eft_institution
-      - eft_branch
-      - international_bic
-      - international_iban
-      - bacs_sort_code
     TransactionOverride:
       title: TransactionOverride
       type: object
@@ -8768,6 +9000,13 @@ components:
             An object with keys of `account_id`'s that are mapped to their respective liabilities fields that changed.
 
             Example: `{ "XMBvvyMGQ1UoLbKByoMqH3nXMj84ALSdE5B58": ["past_amount_due"] }`
+      required:
+      - webhook_type
+      - webhook_code
+      - item_id
+      - error
+      - account_ids_with_new_liabilities
+      - account_ids_with_updated_liabilities
     AssetsProductReadyWebhook:
       title: AssetsProductReadyWebhook
       type: object
@@ -8917,7 +9156,7 @@ components:
         phone_number:
           type: string
           nullable: true
-          description: 'The user''s phone number, in E.164 format: +{countrycode}{number}. For example: "+14151234567"'
+          description: 'The user''s phone number, in E.164 format: +{countrycode}{number}. For example: "+14151234567". Phone numbers provided in other formats will be parsed on a best-effort basis.'
         email:
           type: string
           nullable: true
@@ -9231,6 +9470,9 @@ components:
           type: string
           description: |
             Life Income Fund (LIF) retirement account (Canada)
+        life insurance:
+          type: string
+          description: Life insurance account
         lira:
           type: string
           description: Locked-in Retirement Account (LIRA) (Canada)
@@ -9243,9 +9485,18 @@ components:
         mutual fund:
           type: string
           description: Mutual fund account
-        "non-taxable brokerage account\t":
+        non-taxable brokerage account:
           type: string
           description: A non-taxable brokerage account that is not covered by a more specific subtype
+        other:
+          type: string
+          description: An account whose type could not be determined
+        other annuity:
+          type: string
+          description: An annuity account not covered by other subtypes
+        other insurance:
+          type: string
+          description: An insurance account not covered by other subtypes
         pension:
           type: string
           description: Standard pension account
@@ -9330,11 +9581,15 @@ components:
       - isa
       - keogh
       - lif
+      - life insurance
       - lira
       - lrif
       - lrsp
       - mutual fund
-      - "non-taxable brokerage account\t"
+      - non-taxable brokerage account
+      - other
+      - other annuity
+      - other insurance
       - pension
       - prif
       - profit sharing plan
@@ -9502,23 +9757,23 @@ components:
 
             `PAYMENT_STATUS_UNKNOWN`: The payment status is unknown.
         original_reference:
-          nullable: true
           type: string
           description: The original value of the reference when creating the payment.
-        adjusted_reference:
           nullable: true
+        adjusted_reference:
           type: string
           description: The value of the reference sent to the bank after adjustment to pass bank validation rules.
+          nullable: true
         original_start_date:
           format: date
-          nullable: true
           type: string
           description: The original value of the `start_date` provided during the creation of a standing order. If the payment is not a standing order, this field will be `null`.
+          nullable: true
         adjusted_start_date:
           format: date
-          nullable: true
           type: string
           description: The start date sent to the bank after adjusting for holidays or weekends.  Will be provided in ISO 8601 format (YYYY-MM-DD). If the start date did not require adjustment, or if the payment is not a standing order, this field will be `null`.
+          nullable: true
         timestamp:
           type: string
           description: The timestamp of the update, in ISO 8601 format, e.g. `"2017-09-14T14:42:19.350Z"`
@@ -9530,6 +9785,9 @@ components:
       - payment_id
       - new_payment_status
       - old_payment_status
+      - original_reference
+      - original_start_date
+      - adjusted_start_date
       - timestamp
     Holding:
       title: Holding
@@ -9548,36 +9806,40 @@ components:
           description: The last price given by the institution for this security.
         institution_price_as_of:
           type: string
-          nullable: true
           format: date
           description: The date at which `institution_price` was current.
+          nullable: true
         institution_value:
           type: number
           description: The value of the holding, as reported by the institution.
         cost_basis:
           type: number
-          nullable: true
           description: The cost basis of the holding.
+          nullable: true
         quantity:
-          description: The total quantity of the asset held, as reported by the financial institution.
+          description: The total quantity of the asset held, as reported by the financial institution. If the security is an option, `quantity` will reflect the total number of options (typically the number of contracts multiplied by 100), not the number of contracts.
           type: number
         iso_currency_code:
           type: string
-          nullable: true
           description: The ISO-4217 currency code of the holding. Always `null` if `unofficial_currency_code` is non-`null`.
+          nullable: true
         unofficial_currency_code:
           type: string
-          nullable: true
           description: |
             The unofficial currency code associated with the holding. Always `null` if `iso_currency_code` is non-`null`. Unofficial currency codes are used for currencies that do not have official ISO currency codes, such as cryptocurrencies and the currencies of certain countries.
 
             See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `iso_currency_code`s.
+          nullable: true
       required:
       - account_id
       - security_id
       - institution_price
+      - institution_price_as_of
       - institution_value
+      - cost_basis
       - quantity
+      - iso_currency_code
+      - unofficial_currency_code
     Security:
       title: Security
       type: object
@@ -9647,7 +9909,7 @@ components:
         close_price:
           type: number
           nullable: true
-          description: Price of the security at the close of the previous trading session. `null` for non-public securities.
+          description: Price of the security at the close of the previous trading session. `null` for non-public securities. If the security is a foreign currency or a cryptocurrency this field will be updated daily and will be priced in USD.
         close_price_as_of:
           type: string
           nullable: true
@@ -9691,16 +9953,16 @@ components:
           description: The ID of the Investment transaction, unique across all Plaid transactions. Like all Plaid identifiers, the `investment_transaction_id` is case sensitive.
         cancel_transaction_id:
           type: string
-          nullable: true
           deprecated: true
           description: A legacy field formerly used internally by Plaid to identify certain canceled transactions.
+          nullable: true
         account_id:
           type: string
           description: The `account_id` of the account against which this transaction posted.
         security_id:
           type: string
-          nullable: true
           description: The `security_id` to which this transaction is related.
+          nullable: true
         date:
           type: string
           description: The ISO-8601 posting date for the transaction, or transacted date for pending transactions.
@@ -9709,7 +9971,7 @@ components:
           description: The institution’s description of the transaction.
         quantity:
           type: number
-          description: The number of units of the security involved in this transactions
+          description: The number of units of the security involved in this transaction.
         amount:
           description: The complete value of the transaction. Positive values when cash is debited, e.g. purchases of stock; negative values when cash is credited, e.g. sales of stock. Treatment remains the same for cash-only movements unassociated with securities.
           type: number
@@ -9718,8 +9980,8 @@ components:
           type: number
         fees:
           type: number
-          nullable: true
           description: The combined value of all fees applied to this transaction
+          nullable: true
         type:
           type: string
           enum:
@@ -9787,25 +10049,29 @@ components:
           - withdrawal
         iso_currency_code:
           type: string
-          nullable: true
           description: The ISO-4217 currency code of the transaction. Always `null` if `unofficial_currency_code` is non-`null`.
+          nullable: true
         unofficial_currency_code:
           type: string
-          nullable: true
           description: |-
             The unofficial currency code associated with the holding. Always `null` if `iso_currency_code` is non-`null`. Unofficial currency codes are used for currencies that do not have official ISO currency codes, such as cryptocurrencies and the currencies of certain countries.
 
             See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `iso_currency_code`s.
+          nullable: true
       required:
       - investment_transaction_id
       - account_id
+      - security_id
       - date
       - name
       - quantity
       - amount
       - price
+      - fees
       - type
       - subtype
+      - iso_currency_code
+      - unofficial_currency_code
     StandaloneInvestmentTransactionType:
       title: StandaloneInvestmentTransactionType
       type: object
@@ -10196,6 +10462,8 @@ components:
       - status
       - network
       - cancellable
+      - failure_reason
+      - custom_tag
       - metadata
       - origination_account_id
       - direction
@@ -10265,8 +10533,8 @@ components:
           nullable: true
         routing_number:
           type: string
-          readOnly: true
           description: The account holder's routing number. This field is only used for response data. Do not provide this field when making requests.
+          readOnly: true
       required:
       - legal_name
     BankTransferMetadata:
@@ -10363,8 +10631,8 @@ components:
           $ref: '#/components/schemas/BankTransferUser'
         custom_tag:
           type: string
-          nullable: true
           maxLength: 100
+          nullable: true
           description: An arbitrary string provided by the client for storage with the bank transfer. Will be returned in all `BankTransfer` objects. May be up to 100 characters.
         metadata:
           $ref: '#/components/schemas/BankTransferMetadata'
@@ -10407,13 +10675,13 @@ components:
         start_date:
           type: string
           format: date-time
-          description: The start datetime of bank transfers to list. This should be in RFC 3339 format (i.e. `2019-12-06T22:35:49Z`)
           nullable: true
+          description: The start datetime of bank transfers to list. This should be in RFC 3339 format (i.e. `2019-12-06T22:35:49Z`)
         end_date:
           type: string
           format: date-time
-          description: The end datetime of bank transfers to list. This should be in RFC 3339 format (i.e. `2019-12-06T22:35:49Z`)
           nullable: true
+          description: The end datetime of bank transfers to list. This should be in RFC 3339 format (i.e. `2019-12-06T22:35:49Z`)
         count:
           type: integer
           minimum: 1
@@ -10427,8 +10695,8 @@ components:
           description: The number of bank transfers to skip before returning results.
         origination_account_id:
           type: string
-          description: Filter bank transfers to only those originated through the specified origination account.
           nullable: true
+          description: Filter bank transfers to only those originated through the specified origination account.
         direction:
           $ref: '#/components/schemas/BankTransferDirection'
     BankTransferListResponse:
@@ -10448,12 +10716,13 @@ components:
       - request_id
     BankTransferDirection:
       type: string
+      nullable: true
       title: BankTransferDirection
       description: 'Indicates the direction of the transfer: `outbound` for API-initiated transfers, or `inbound` for payments received by the FBO account.'
-      nullable: true
       enum:
       - outbound
       - inbound
+      - null
     BankTransferCancelRequest:
       title: BankTransferCancelRequest
       type: object
@@ -10507,12 +10776,13 @@ components:
           nullable: true
         bank_transfer_type:
           type: string
+          nullable: true
           title: BankTransferType
           description: The type of bank transfer. This will be either `debit` or `credit`.  A `debit` indicates a transfer of money into your origination account; a `credit` indicates a transfer of money out of your origination account.
-          nullable: true
           enum:
           - debit
           - credit
+          - null
         event_types:
           type: array
           description: Filter events by event type.
@@ -10521,14 +10791,14 @@ components:
         count:
           type: integer
           description: The maximum number of bank transfer events to return. If the number of events matching the above parameters is greater than `count`, the most recent events will be returned.
-          minimum: 1
-          maximum: 25
           default: 25
+          maximum: 25
+          minimum: 1
           nullable: true
         offset:
           type: integer
-          minimum: 0
           default: 0
+          minimum: 0
           description: The offset into the list of bank transfer events. When `count`=25 and `offset`=0, the first 25 events will be returned. When `count`=25 and `offset`=25, the next 25 bank transfer events will be returned.
           nullable: true
         origination_account_id:
@@ -10538,12 +10808,20 @@ components:
         direction:
           type: string
           title: BankTransferDirection
-          description: 'Indicates the direction of the transfer: `outbound` for API-initiated transfers, or `inbound` for payments received by the FBO account.'
+          description: |-
+            Indicates the direction of the transfer: `outbound`: for API-initiated transfers
+            `inbound`: for payments received by the FBO account.
+          enum:
+          - inbound
+          - outbound
+          - null
           nullable: true
     BankTransferEventType:
       type: string
       title: BankTransferEventType
       description: |-
+        The type of event that this bank transfer represents.
+
         `pending`: A new transfer was created; it is in the pending state.
 
         `cancelled`: The transfer was cancelled by the client.
@@ -10609,6 +10887,7 @@ components:
       - event_type
       - account_id
       - bank_transfer_id
+      - origination_account_id
       - bank_transfer_type
       - bank_transfer_amount
       - bank_transfer_iso_currency_code
@@ -10794,16 +11073,19 @@ components:
       title: BankTransferReceiverDetails
       type: object
       additionalProperties: true
-      nullable: true
       description: The receiver details if the type of this event is `reciever_pending` or `reciever_posted`. Null value otherwise.
+      nullable: true
       properties:
         available_balance:
           type: string
-          nullable: true
           description: The sign of the available balance for the receiver bank account associated with the receiver event at the time the matching transaction was found. Can be `positive`, `negative`, or null if the balance was not available at the time.
           enum:
           - positive
           - negative
+          - null
+          nullable: true
+      required:
+      - available_balance
     AccountFiltersResponse:
       title: AccountFiltersResponse
       description: |
@@ -10864,10 +11146,8 @@ components:
           days_available:
             type: number
             description: The duration of transaction history available for this Item, typically defined as the time since the date of the earliest transaction in that account. Only returned by Assets endpoints.
-            nullable: true
           transactions:
             type: array
-            nullable: true
             description: Transaction history associated with the account. Only returned by Assets endpoints. Transaction history returned by endpoints such as `/transactions/get` or `/investments/transactions/get` will be returned in the top-level `transactions` field instead.
             items:
               $ref: '#/components/schemas/AssetReportTransaction'
@@ -10878,12 +11158,14 @@ components:
               $ref: '#/components/schemas/Owner'
           historical_balances:
             type: array
-            nullable: true
             description: Calculated data about the historical balances on the account. Only returned by Assets endpoints.
             items:
               $ref: '#/components/schemas/HistoricalBalance'
         required:
+        - days_available
+        - transactions
         - owners
+        - historical_balances
     DepositoryFilter:
       title: DepositoryFilter
       description: A filter to apply to `depository`-type accounts
@@ -10976,11 +11258,12 @@ components:
           $ref: '#/components/schemas/NullableAddressData'
         confidence_score:
           type: number
-          nullable: true
           description: A number from 0 to 1 indicating Plaid's level of confidence in the pairing between the employer and the institution (not yet implemented).
       required:
       - employer_id
       - name
+      - address
+      - confidence_score
     IncomeVerificationCreateRequest:
       title: IncomeVerificationCreateRequest
       type: object
@@ -11012,14 +11295,13 @@ components:
     LinkTokenCreateRequestIncomeVerification:
       title: LinkTokenCreateRequestIncomeVerification
       type: object
-      description: Specifies options for initializing Link for use with the Income Verification (beta) product. This field is required if `income_verification` is included in the `products` array.
+      description: Specifies options for initializing Link for use with the Income (beta) product. This field is required if `income_verification` is included in the `products` array.
       properties:
         income_verification_id:
           type: string
           description: The `income_verification_id` of the verification instance, as provided by `/income/verification/create`.
         asset_report_id:
           type: string
-          nullable: true
           description: The `asset_report_id` of an asset report associated with the user, as provided by `/asset_report/create`. Providing an `asset_report_id` is optional and can be used to verify the user through a streamlined flow. If provided, the bank linking flow will be skipped.
       required:
       - income_verification_id
@@ -11027,7 +11309,13 @@ components:
       title: IncomeVerificationStatusWebhook
       type: object
       additionalProperties: true
-      description: Fired when the status of an income verification instance has changed. It will typically take several minutes for this webhook to fire after the end user has uploaded their documents, and may take up to 15 minutes.
+      description: Fired when the status of an income verification instance has changed. It will typically take several minutes for this webhook to fire after the end user has uploaded their documents in the Document Income flow.
+      x-examples:
+        example-1:
+          webhook_type: INCOME
+          webhook_code: income_verification
+          income_verification_id: f6f5132f-853b-421c-8c41-d24f93ebc39f
+          verification_status: VERIFICATION_STATUS_PROCESSING_COMPLETE
       properties:
         webhook_type:
           type: string
@@ -11080,6 +11368,8 @@ components:
           description: A list of income summaries.
           items:
             $ref: '#/components/schemas/IncomeSummary'
+        error:
+          $ref: '#/components/schemas/Error'
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
@@ -11105,6 +11395,14 @@ components:
           $ref: '#/components/schemas/ProjectedIncomeSummaryFieldNumber'
         verified_transaction:
           $ref: '#/components/schemas/TransactionData'
+      required:
+      - employer_name
+      - employee_name
+      - ytd_gross_income
+      - ytd_net_income
+      - pay_frequency
+      - projected_wage
+      - verified_transaction
     TransactionData:
       title: TransactionData
       type: object
@@ -11259,6 +11557,9 @@ components:
             $ref: '#/components/schemas/Paystub'
         request_id:
           $ref: '#/components/schemas/RequestID'
+      required:
+      - paystubs
+      - request_id
     Paystub:
       title: Paystub
       type: object
@@ -11292,21 +11593,35 @@ components:
       additionalProperties: true
       properties:
         type:
-          nullable: true
           type: string
-          description: The type of income. Possible values include `"regular"`, `"overtime"`, and `"bonus"`.
-        rate:
+          description: |-
+            The type of income. Possible values include:
+              `"regular"`: regular income
+              `"overtime"`: overtime income
+               `"bonus"`: bonus income
+          enum:
+          - bonus
+          - overtime
+          - regular
+          - null
           nullable: true
+        rate:
           type: number
           description: The hourly rate at which the income is paid.
-        hours:
           nullable: true
+        hours:
           type: number
           description: The number of hours logged for this income for this pay period.
+          nullable: true
         total:
           type: number
-          nullable: true
           description: The total pay for this pay period.
+          nullable: true
+      required:
+      - type
+      - rate
+      - hours
+      - total
     Employee:
       title: Employee
       type: object
@@ -11319,15 +11634,20 @@ components:
           nullable: true
         address:
           $ref: '#/components/schemas/NullableAddressData'
+      required:
+      - name
+      - address
     PaystubEmployer:
       title: Employer
       type: object
       additionalProperties: true
       properties:
         name:
-          nullable: true
           type: string
           description: The name of the employer on the paystub.
+          nullable: true
+      required:
+      - name
     PayPeriodDetails:
       title: PayPeriodDetails
       type: object
@@ -11335,42 +11655,52 @@ components:
       description: Details about the pay period.
       properties:
         start_date:
-          nullable: true
           type: string
           description: 'The pay period start date, in ISO 8601 format: "yyyy-mm-dd".'
-        end_date:
           nullable: true
+        end_date:
           type: string
           description: 'The pay period end date, in ISO 8601 format: "yyyy-mm-dd".'
+          nullable: true
         pay_day:
           type: string
           description: The date on which the paystub was issued, in ISO 8601 format ("yyyy-mm-dd").
           nullable: true
         gross_earnings:
-          nullable: true
           type: number
           description: Total earnings before tax.
-        check_amount:
           nullable: true
+        check_amount:
           type: number
           description: The net amount of the paycheck.
+          nullable: true
+      required:
+      - start_date
+      - end_date
+      - pay_day
+      - gross_earnings
+      - check_amount
     PaystubDeduction:
       title: PaystubDeduction
       type: object
       additionalProperties: true
       properties:
         type:
-          nullable: true
           type: string
           description: 'The description of the deduction, as provided on the paystub. For example: `"401(k)"`, `"FICA MED TAX"`.'
-        is_pretax:
           nullable: true
+        is_pretax:
           type: boolean
           description: '`true` if the deduction is pre-tax; `false` otherwise.'
-        total:
           nullable: true
+        total:
           type: number
           description: The amount of the deduction.
+          nullable: true
+      required:
+      - type
+      - is_pretax
+      - total
     PaystubYTDDetails:
       title: PaystubYTDDetails
       type: object
@@ -11385,6 +11715,7 @@ components:
       required:
       - gross_earnings
       - net_earnings
+      description: The amount of income earned year to date, as based on paystub data.
     IncomeVerificationDocumentsDownloadRequest:
       title: IncomeVerificationDocumentsDownloadRequest
       type: object
@@ -11426,12 +11757,9 @@ components:
         additionalProperties: true
         properties:
           date_transacted:
+            type: string
             nullable: true
-            type: string
             description: The date on which the transaction took place, in IS0 8601 format.
-          original_description:
-            type: string
-            description: The string returned by the financial institution to describe the transaction
         required:
         - original_description
     HealthIncident:
@@ -11440,11 +11768,9 @@ components:
       additionalProperties: true
       properties:
         start_date:
-          nullable: true
           type: string
           description: The start date of the incident, in ISO 8601 format, e.g. `"2020-10-30T15:26:48Z"`.
         end_date:
-          nullable: true
           type: string
           description: The end date of the incident, in ISO 8601 format, e.g. `"2020-10-30T15:26:48Z"`.
         title:
@@ -11455,6 +11781,10 @@ components:
           description: Updates on the health incident.
           items:
             $ref: '#/components/schemas/IncidentUpdate'
+      required:
+      - start_date
+      - title
+      - incident_updates
     IncidentUpdate:
       title: IncidentUpdate
       type: object
@@ -11624,6 +11954,9 @@ components:
         name:
           type: string
           description: The name of the application
+        created_at:
+          type: string
+          description: The date this application was linked in ISO8601 (YYYY-MM-DD) format in UTC.
         logo_url:
           nullable: true
           type: string
@@ -11803,10 +12136,7 @@ components:
           $ref: '#/components/schemas/ApplicationID'
         name:
           type: string
-          description: The name of the application.
-        created_at:
-          type: string
-          description: The date this application was linked in ISO8601 (YYYY-MM-DD) format in UTC.
+          description: The name of the application
         logo:
           nullable: true
           type: string
@@ -11814,11 +12144,14 @@ components:
         application_url:
           nullable: true
           type: string
-          description: The URL for the application's website.
+          description: The URL for the application's website
         reason_for_access:
           nullable: true
           type: string
           description: A string provided by the connected app stating why they use their respective enabled products.
+        created_at:
+          type: string
+          description: The date this application was linked in ISO8601 (YYYY-MM-DD) format in UTC.
         product_data_types:
           type: array
           description: (Deprecated) A list of enums representing the data collected and products enabled for this connected application.
@@ -11836,10 +12169,13 @@ components:
       - application_id
       - name
       - created_at
+      - logo
+      - application_url
+      - reason_for_access
       - product_data_types
     AccountSelectionCardinality:
       type: string
-      description: The application requires that accounts be limited to a specific cardinality. `MULTI_SELECT` indicates that the user should be allowed to pick multiple accounts. `SINGLE_SELECT` indicates that the user should be allowed to pick only a single account. `ALL` indicates that the user must share all of their accounts and should not be given the opportunity to de-select
+      description: "The application requires that accounts be limited to a specific cardinality. \n`MULTI_SELECT`: indicates that the user should be allowed to pick multiple accounts.\n`SINGLE_SELECT`: indicates that the user should be allowed to pick only a single account. \n`ALL`: indicates that the user must share all of their accounts and should not be given the opportunity to de-select"
       enum:
       - SINGLE_SELECT
       - MULTI_SELECT
@@ -11862,3 +12198,43 @@ components:
       items:
         type: string
         description: List of account subtypes.
+    SandboxIncomeFireWebhookRequest:
+      title: SandboxIncomeFireWebhookRequest
+      type: object
+      description: SandboxIncomeFireWebhookRequest defines the request schema for `/sandbox/income/fire_webhook`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        income_verification_id:
+          type: string
+          description: The ID of the verification.
+        webhook:
+          type: string
+          description: The URL to which the webhook should be sent.
+        verification_status:
+          type: string
+          enum:
+          - VERIFICATION_STATUS_PROCESSING_COMPLETE
+          - VERIFICATION_STATUS_DOCUMENT_REJECTED
+          - VERIFICATION_STATUS_PROCESSING_FAILED
+          description: |-
+            `VERIFICATION_STATUS_PROCESSING_COMPLETE`: The income verification status processing has completed.
+
+            `VERIFICATION_STATUS_DOCUMENT_REJECTED`: The documentation uploaded by the end user was recognized as a supported file format, but not recognized as a valid paystub.
+
+            `VERIFICATION_STATUS_PROCESSING_FAILED`: A failure occurred when attempting to process the verification documentation.
+      required:
+      - income_verification_id
+      - webhook
+      - verification_status
+    SandboxIncomeFireWebhookResponse:
+      title: SandboxIncomeFireWebhookResponse
+      type: object
+      description: SandboxIncomeFireWebhookResponse defines the response schema for `/sandbox/income/fire_webhook`
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
