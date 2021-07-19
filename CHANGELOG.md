@@ -1,3 +1,21 @@
+### 2020-09-14_1.19.8
+- Added `options` field to request body for `deposit_switch/create` and `deposit_switch/alt/create` endpoints
+- Added webhook documentation for `deposit_switch/`
+- Added a new state to the list of possible values for the `state` field in the response body, and updated descriptions of all states
+
+### 2020-09-14_1.19.7
+- Added `ItemApplicationListUserAuth` component
+- Added `user_auth` as a private field in `/item/application/list` request
+- Changed `/item/application/list` request `access_token` field from `AccessToken` to `NullableAccessToken` to support `user_auth` flow (`/item/application/list` can be queried using `user_auth` instead of an access token for certain clients)
+
+### 2020-09-14_1.19.6
+- Added the following response fields to the `/deposit_switch/get` docs:
+    + `switch_method`
+    + `employer_name`
+    + `employer_id`
+    + `institution_name`
+    + `institution_id`
+
 ### 2020-09-14_1.19.5
 - Added `required` to many fields where it was missing
 - Removed `nullable: true` annotation incorrectly applied to some fields
@@ -11,7 +29,7 @@
 - Various small description fixes
 - Updated external docs URLs for Income endpoints
 
-### 2021-09-14_1.19.4
+### 2020-09-14_1.19.4
 - Fixed description for `close_price` field returned in `/investments/holdings/get` response
 
 ### 2020-09-14_1.19.3
@@ -45,7 +63,7 @@
 - Fix invalid format errors
 - Add new investment subtypes
 
-### 2021-09-14_1.17.0
+### 2020-09-14_1.17.0
 - Small description fix for `/income/verification/create` and `/employers/search`
 - Fixed  `ytd_net_income` value in `IncomeVerificationSummaryGetResponse` example
 - Fixed references to `paystub` to be plural `paystubs` for `/income/verification/paystubs/get` route and schemas
