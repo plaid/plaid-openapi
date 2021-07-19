@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.19.5
+  version: 2020-09-14_1.19.6
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -3125,12 +3125,17 @@ paths:
                     target_account_id: bX5hEMdRAkq1QikR3BLjDyMfMkVpqLmEm1VR7
                     deposit_switch_id: LjDyMfMkVpqLmEm1VR7bQikR3BX5hEMdRAkq1
                     state: completed
+                    switch_method: instant
                     date_created: "2019-11-01"
                     date_completed: "2019-11-01"
                     account_has_multiple_allocations: true
                     is_allocated_remainder: false
                     percent_allocated: 50
                     amount_allocated: null
+                    employer_name: COMPANY INC
+                    employer_id: pqLmEm1VR7bQi11231
+                    institution_name: Bank of America
+                    institution_id: ins_1
                     request_id: lMjeOeu9X1VUh1F
       operationId: depositSwitchGet
       description: This endpoint returns information related to how the user has configured their payroll allocation and the state of the switch. You can use this information to build logic related to the user's direct deposit allocation preferences.
@@ -10301,11 +10306,11 @@ components:
       properties:
         deposit_switch_id:
           type: string
-          description: The ID of the deposit switch
+          description: The ID of the deposit switch.
         target_account_id:
           type: string
           nullable: true
-          description: The ID of the bank account the direct deposit was switched to
+          description: The ID of the bank account the direct deposit was switched to.
         target_item_id:
           type: string
           nullable: true
@@ -10317,6 +10322,18 @@ components:
           - completed
           - error
           description: The state of the deposit switch.
+        switch_method:
+          type: string
+          enum:
+          - instant
+          - mail
+          - pdf
+          description: |-
+            The method used to conduct the deposit switch.
+
+            - `instant` – User instantly switched their direct deposit to a new or existing bank account by connecting their payroll or employer account.
+            - `mail` – User requested that Plaid contact their employer by mail to make the direct deposit switch.
+            - `pdf` – User generated a PDF or email to be sent to their employer with the information necessary to make the deposit switch.
         account_has_multiple_allocations:
           nullable: true
           type: boolean
@@ -10333,6 +10350,22 @@ components:
           type: number
           nullable: true
           description: The dollar amount of direct deposit allocated to the target account. Always `null` if the target account is not allocated an amount or if the deposit switch has not been completed.
+        employer_name:
+          type: string
+          nullable: true
+          description: The name of the employer selected by the user. If the user did not select an employer, the value returned is `null`.
+        employer_id:
+          type: string
+          nullable: true
+          description: The ID of the employer selected by the user. If the user did not select an employer, the value returned is `null`.
+        institution_name:
+          type: string
+          nullable: true
+          description: The name of the institution selected by the user. If the user did not select an institution, the value returned is `null`.
+        institution_id:
+          type: string
+          nullable: true
+          description: The ID of the institution selected by the user. If the user did not select an institution, the value returned is `null`.
         date_created:
           description: ISO8601 date the deposit switch was created.
           type: string
