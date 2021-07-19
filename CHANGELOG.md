@@ -1,3 +1,11 @@
+### 2020-09-14_1.19.10
+- Added `income` back to the list of possible products as it's in sandbox return values.
+- Made `switch_method` nullable as the sandbox deposit/switch response has it nulled.
+
+### 2021-07-1_1.19.9
+- Added `CountryCode` to the request fields of `deposit_switch/create` and `deposit_switch/alt/create`
+- Added `TransactionAccessTokens` to `DepositSwitchCreateOptions`
+
 ### 2020-09-14_1.19.8
 - Added `options` field to request body for `deposit_switch/create` and `deposit_switch/alt/create` endpoints
 - Added webhook documentation for `deposit_switch/`
