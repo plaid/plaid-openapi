@@ -1,3 +1,13 @@
+### 2020-09-14_1.19.8
+- Added `options` field to request body for `deposit_switch/create` and `deposit_switch/alt/create` endpoints
+- Added webhook documentation for `deposit_switch/`
+- Added a new state to the list of possible values for the `state` field in the response body, and updated descriptions of all states
+
+### 2020-09-14_1.19.7
+- Added `ItemApplicationListUserAuth` component
+- Added `user_auth` as a private field in `/item/application/list` request
+- Changed `/item/application/list` request `access_token` field from `AccessToken` to `NullableAccessToken` to support `user_auth` flow (`/item/application/list` can be queried using `user_auth` instead of an access token for certain clients)
+
 ### 2020-09-14_1.19.6
 - Added the following response fields to the `/deposit_switch/get` docs:
     + `switch_method`

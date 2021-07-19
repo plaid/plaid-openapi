@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.19.6
+  version: 2020-09-14_1.19.8
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -3746,7 +3746,7 @@ paths:
     parameters: []
   /deposit_switch/alt/create:
     post:
-      summary: Create a deposit switch when not using Plaid Exchange.
+      summary: Create a deposit switch without using Plaid Exchange
       tags:
       - plaid
       externalDocs:
@@ -5735,9 +5735,22 @@ components:
         target_account_id:
           type: string
           description: Plaid Account ID that specifies the target bank account. This account will become the recipient for a user's direct deposit.
+        options:
+          $ref: '#/components/schemas/DepositSwitchCreateRequestOptions'
       required:
       - target_access_token
       - target_account_id
+    DepositSwitchCreateRequestOptions:
+      type: object
+      title: DepositSwitchCreateRequestOptions
+      description: Options to configure the `/deposit_switch/create` request. If provided, cannot be `null`.
+      x-private-visibility: false
+      properties:
+        webhook:
+          type: string
+          description: |
+            The URL registered to receive webhooks when the status of a deposit switch request has changed.
+          nullable: true
     DepositSwitchCreateResponse:
       type: object
       additionalProperties: true
@@ -10319,9 +10332,20 @@ components:
           type: string
           enum:
           - initialized
+          - processing
           - completed
           - error
-          description: The state of the deposit switch.
+          description: |2-
+
+            The state, or status, of the deposit switch.
+
+            - `initialized` – The deposit switch has been initialized with the user entering the information required to submit the deposit switch request.
+
+            - `processing` – The deposit switch request has been submitted and is being processed.
+
+            - `completed` – The user's employer has fulfilled the deposit switch request.
+
+            - `error` – There was an error processing the deposit switch request.
         switch_method:
           type: string
           enum:
@@ -10329,7 +10353,7 @@ components:
           - mail
           - pdf
           description: |-
-            The method used to conduct the deposit switch.
+            The method used to make the deposit switch.
 
             - `instant` – User instantly switched their direct deposit to a new or existing bank account by connecting their payroll or employer account.
             - `mail` – User requested that Plaid contact their employer by mail to make the direct deposit switch.
@@ -10389,6 +10413,41 @@ components:
       - date_created
       - date_completed
       - request_id
+    DepositSwitchStateUpdateWebhook:
+      title: DepositSwitchStateUpdateWebhook
+      type: object
+      description: Fired when the status of a deposit switch request has changed.
+      x-examples:
+        example-1:
+          webhook_type: DEPOSIT_SWITCH
+          webhook_code: SWITCH_STATE_UPDATE
+          state: completed
+          deposit_switch_id: f6f5132f-853b-421c-8c41-d24f93ebc39f
+      properties:
+        webhook_type:
+          type: string
+          description: '`"DEPOSIT_SWITCH"`'
+        webhook_code:
+          type: string
+          description: '`"SWITCH_STATE_UPDATE"`'
+        state:
+          type: string
+          description: |2-
+
+            The state, or status, of the deposit switch.
+
+            `initialized`: The deposit switch has been initialized with the user entering the information required to submit the deposit switch request.
+
+            `processing`: The deposit switch request has been submitted and is being processed.
+
+            `completed`: The user's employer has fulfilled and completed the deposit switch request.
+
+            `error`: There was an error processing the deposit switch request.
+
+            For more information, see the [Deposit Switch API reference](/docs/api/products#deposit_switchget).
+        deposit_switch_id:
+          type: string
+          description: The ID of the deposit switch.
     AssetReportAuditCopyGetRequest:
       title: AssetReportAuditCopyGetRequest
       type: object
@@ -11851,6 +11910,8 @@ components:
           $ref: '#/components/schemas/DepositSwitchTargetAccount'
         target_user:
           $ref: '#/components/schemas/DepositSwitchTargetUser'
+        options:
+          $ref: '#/components/schemas/DepositSwitchCreateRequestOptions'
       required:
       - target_account
       - target_user
@@ -12145,9 +12206,7 @@ components:
         secret:
           $ref: '#/components/schemas/APISecret'
         access_token:
-          $ref: '#/components/schemas/AccessToken'
-      required:
-      - access_token
+          $ref: '#/components/schemas/NullableAccessToken'
     ItemApplicationListResponse:
       description: Describes the connected application for a particular end user.
       type: object
@@ -12271,3 +12330,15 @@ components:
           $ref: '#/components/schemas/RequestID'
       required:
       - request_id
+    ItemApplicationListUserAuth:
+      type: object
+      description: User authentication parameters, for clients making a request without an `access_token`. This is only allowed for select clients and will not be supported in the future. Most clients should call /item/import to obtain an access token before making a request.
+      properties:
+        user_id:
+          nullable: true
+          type: string
+          description: Account username.
+        fi_username_hash:
+          nullable: true
+          type: string
+          description: Account username hashed by FI.
