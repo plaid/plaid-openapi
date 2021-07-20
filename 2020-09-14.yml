@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.19.8
+  version: 2020-09-14_1.19.10
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -4101,7 +4101,7 @@ components:
         include_optional_metadata:
           type: boolean
           description: |-
-            When `true`, return the institution's homepage URL, logo and primary brand color. Note that you may need to contact your Plaid Account Manager to be enabled to use this flag.
+            When `true`, return the institution's homepage URL, logo and primary brand color.
 
             Note that Plaid does not own any of the logos shared by the API, and that by accessing or using these logos, you agree that you are doing so at your own risk and will, if necessary, obtain all required permissions from the appropriate rights holders and adhere to any applicable usage guidelines. Plaid disclaims all express or implied warranties with respect to the logos.
         include_payment_initiation_metadata:
@@ -4165,7 +4165,7 @@ components:
           description: Limit results to institutions with or without OAuth login flows. This is primarily relevant to institutions with European country codes
         include_optional_metadata:
           type: boolean
-          description: When true, return the institution's homepage URL, logo and primary brand color. Note that you may need to contact your Plaid Account Manager to be enabled to use this flag.
+          description: When true, return the institution's homepage URL, logo and primary brand color.
         include_payment_initiation_metadata:
           type: boolean
           default: false
@@ -4226,7 +4226,7 @@ components:
           default: false
           type: boolean
           description: |-
-            When `true`, return an institution's logo, brand color, and URL. When available, the bank's logo is returned as a base64 encoded 152x152 PNG, the brand color is in hexadecimal format. The default value is `false`. Note that you may need to contact your Plaid Account Manager to be enabled to use this flag.
+            When `true`, return an institution's logo, brand color, and URL. When available, the bank's logo is returned as a base64 encoded 152x152 PNG, the brand color is in hexadecimal format. The default value is `false`.
 
             Note that Plaid does not own any of the logos shared by the API and that by accessing or using these logos, you agree that you are doing so at your own risk and will, if necessary, obtain all required permissions from the appropriate rights holders and adhere to any applicable usage guidelines. Plaid disclaims all express or implied warranties with respect to the logos.
         include_status:
@@ -5735,6 +5735,14 @@ components:
         target_account_id:
           type: string
           description: Plaid Account ID that specifies the target bank account. This account will become the recipient for a user's direct deposit.
+        country_code:
+          type: string
+          title: CountryCode
+          enum:
+          - US
+          - CA
+          description: ISO-3166-1 alpha-2 country code standard.
+          nullable: true
         options:
           $ref: '#/components/schemas/DepositSwitchCreateRequestOptions'
       required:
@@ -5751,6 +5759,13 @@ components:
           description: |
             The URL registered to receive webhooks when the status of a deposit switch request has changed.
           nullable: true
+        transaction_item_access_tokens:
+          type: array
+          description: An array of access tokens corresponding to transaction items to use when attempting to match the user to their Payroll Provider. These tokens must be created by the same client id as the one creating the switch, and have access to the transactions product.
+          items:
+            $ref: '#/components/schemas/AccessToken'
+          minItems: 1
+          maxItems: 99
     DepositSwitchCreateResponse:
       type: object
       additionalProperties: true
@@ -5934,6 +5949,8 @@ components:
           description: 'The name of your app''s Android package. Required if using the `link_token` to initialize Link on Android. When creating a `link_token` for initializing Link on other platforms, this field must be left blank. Any package name specified here must also be added to the Allowed Android package names setting on the [developer dashboard](https://dashboard.plaid.com/team/api). '
         account_filters:
           $ref: '#/components/schemas/LinkTokenAccountFilters'
+        eu_config:
+          $ref: '#/components/schemas/LinkTokenEUConfig'
         institution_id:
           type: string
           description: Used for certain Europe-only configurations, as well as certain legacy use cases in other regions.
@@ -5966,6 +5983,13 @@ components:
           $ref: '#/components/schemas/LoanFilter'
         investment:
           $ref: '#/components/schemas/InvestmentFilter'
+    LinkTokenEUConfig:
+      description: Configuration parameters for EU flows
+      type: object
+      properties:
+        headless:
+          type: boolean
+          description: If `true`, open Link without an initial UI. Defaults to `false`.
     LinkTokenCreateRequestPaymentInitiation:
       type: object
       description: Specifies options for initializing Link for use with the Payment Initiation (Europe) product. This field is required if `payment_initiation` is included in the `products` array.
@@ -8238,6 +8262,7 @@ components:
       - payment_initiation
       - transactions
       - credit_details
+      - income
       - income_verification
       - deposit_switch
       - standing_orders
@@ -10347,6 +10372,7 @@ components:
 
             - `error` – There was an error processing the deposit switch request.
         switch_method:
+          nullable: true
           type: string
           enum:
           - instant
@@ -11912,6 +11938,14 @@ components:
           $ref: '#/components/schemas/DepositSwitchTargetUser'
         options:
           $ref: '#/components/schemas/DepositSwitchCreateRequestOptions'
+        country_code:
+          type: string
+          title: CountryCode
+          enum:
+          - US
+          - CA
+          description: ISO-3166-1 alpha-2 country code standard.
+          nullable: true
       required:
       - target_account
       - target_user
