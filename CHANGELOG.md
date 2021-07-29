@@ -1,3 +1,12 @@
+### 2020-09-14_1.19.12
+- Added `alpaca`, `astra` and `moov` processors.
+- Changed naming for some nullable parameters from `NullableParam` to `ParamNullable`.
+- Added `/processor/bank_transfer/create` endpoint.
+
+### 2020-09-14_1.19.11
+- Added `logo_url` as a required value of `ConnectedApplications`
+- Made `logo` a deprecated value of `ConnectedApplications` soon to be removed in future versions
+
 ### 2020-09-14_1.19.10
 - Added `income` back to the list of possible products as it's in sandbox return values.
 - Made `switch_method` nullable as the sandbox deposit/switch response has it nulled.

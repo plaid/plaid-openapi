@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.19.10
+  version: 2020-09-14_1.19.12
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -1184,6 +1184,61 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ProcessorAuthGetRequest'
+  /processor/bank_transfer/create:
+    post:
+      tags:
+      - plaid
+      summary: Create a bank transfer as a processor
+      externalDocs:
+        url: /api/processors/#bank_transfercreate
+      operationId: processorBankTransferCreate
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessorBankTransferCreateResponse'
+              examples:
+                example-1:
+                  value:
+                    bank_transfer:
+                      account_id: 6qL6lWoQkAfNE3mB8Kk5tAnvpX81qefrvvl7B
+                      ach_class: ppd
+                      amount: "12.34"
+                      cancellable: true
+                      created: "2020-08-06T17:27:15Z"
+                      custom_tag: my tag
+                      description: Testing2
+                      direction: outbound
+                      failure_reason: null
+                      id: 460cbe92-2dcc-8eae-5ad6-b37d0ec90fd9
+                      iso_currency_code: USD
+                      metadata:
+                        key1: value1
+                        key2: value2
+                      network: ach
+                      origination_account_id: 11111111-1111-1111-1111-111111111111
+                      status: pending
+                      type: credit
+                      user:
+                        email_address: plaid@plaid.com
+                        legal_name: John Smith
+                        routing_number: "111111111"
+                    request_id: saKrIBuEB9qJZno
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      description: Use the `/processor/bank_transfer/create` endpoint to initiate a new bank transfer as a processor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcessorBankTransferCreateRequest'
   /processor/identity/get:
     post:
       tags:
@@ -3870,7 +3925,7 @@ components:
         item:
           $ref: '#/components/schemas/Item'
         status:
-          $ref: '#/components/schemas/NullableItemStatus'
+          $ref: '#/components/schemas/ItemStatusNullable'
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
@@ -4003,7 +4058,7 @@ components:
         include_original_description:
           type: boolean
           default: false
-          description: Include the transactions' original descriptions. This feature is in closed beta and only available to beta program participants. For more details, contact your Plaid Account Manager.
+          description: Include the raw unparsed transaction description from the financial institution. This field is disabled by default. If you need this information in addition to the parsed data provided, contact your Plaid Account Manager.
           nullable: true
     TransactionsGetResponse:
       type: object
@@ -4576,19 +4631,88 @@ components:
       - request_id
       - numbers
       - account
+    ProcessorBankTransferCreateRequest:
+      title: ProcessorBankTransferCreateRequest
+      type: object
+      description: ProcessorBankTransferCreateRequest defines the request schema for `/processor/bank_transfer/create`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        idempotency_key:
+          type: string
+          maxLength: 50
+          description: |-
+            A random key provided by the client, per unique bank transfer. Maximum of 50 characters.
+
+            The API supports idempotency for safely retrying requests without accidentally performing the same operation twice. For example, if a request to create a bank transfer fails due to a network connection error, you can retry the request with the same idempotency key to guarantee that only a single bank transfer is created.
+        processor_token:
+          $ref: '#/components/schemas/ProcessorToken'
+        type:
+          $ref: '#/components/schemas/BankTransferType'
+        network:
+          $ref: '#/components/schemas/BankTransferNetwork'
+        amount:
+          type: string
+          description: The transfer amount (decimal string with two digits of precision e.g. "10.00").
+        iso_currency_code:
+          type: string
+          description: The currency of the transfer amount – should be set to "USD".
+        description:
+          type: string
+          description: The transfer description. Maximum of 10 characters.
+          maxLength: 10
+        ach_class:
+          $ref: '#/components/schemas/ACHClass'
+        user:
+          $ref: '#/components/schemas/BankTransferUser'
+        custom_tag:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: An arbitrary string provided by the client for storage with the bank transfer. Will be returned in all `BankTransfer` objects. May be up to 100 characters.
+        metadata:
+          $ref: '#/components/schemas/BankTransferMetadata'
+        origination_account_id:
+          type: string
+          nullable: true
+          description: Plaid’s unique identifier for the origination account for this transfer. If you have more than one origination account, this value must be specified.
+      required:
+      - idempotency_key
+      - processor_token
+      - type
+      - network
+      - amount
+      - iso_currency_code
+      - description
+      - user
+    ProcessorBankTransferCreateResponse:
+      title: ProcessorBankTransferCreateResponse
+      type: object
+      additionalProperties: true
+      description: ProcessorBankTransferCreateResponse defines the response schema for `/processor/bank_transfer/create`
+      properties:
+        bank_transfer:
+          $ref: '#/components/schemas/BankTransfer'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - bank_transfer
+      - request_id
     ProcessorNumber:
       type: object
       additionalProperties: true
       description: An object containing identifying numbers used for making electronic transfers to and from the `account`. The identifying number type (ACH, EFT, IBAN, or BACS) used will depend on the country of the account. An account may have more than one number type. If a particular identifying number type is not used by the `account` for which auth data has been requested, a null value will be returned.
       properties:
         ach:
-          $ref: '#/components/schemas/NullableNumbersACH'
+          $ref: '#/components/schemas/NumbersACHNullable'
         eft:
-          $ref: '#/components/schemas/NullableNumbersEFT'
+          $ref: '#/components/schemas/NumbersEFTNullable'
         international:
-          $ref: '#/components/schemas/NullableNumbersInternational'
+          $ref: '#/components/schemas/NumbersInternationalNullable'
         bacs:
-          $ref: '#/components/schemas/NullableNumbersBACS'
+          $ref: '#/components/schemas/NumbersBACSNullable'
     ProcessorIdentityGetRequest:
       type: object
       description: ProcessorIdentityGetRequest defines the request schema for `/processor/identity/get`
@@ -4818,7 +4942,7 @@ components:
           description: The International Bank Account Number (IBAN) for the recipient. If BACS data is not provided, an IBAN is required.
           nullable: true
         bacs:
-          $ref: '#/components/schemas/NullableRecipientBACS'
+          $ref: '#/components/schemas/RecipientBACSNullable'
         address:
           $ref: '#/components/schemas/PaymentInitiationAddress'
       required:
@@ -4882,7 +5006,7 @@ components:
           description: The International Bank Account Number (IBAN) for the recipient.
           nullable: true
         bacs:
-          $ref: '#/components/schemas/NullableRecipientBACS'
+          $ref: '#/components/schemas/RecipientBACSNullable'
         emi_recipient_id:
           type: string
           description: The EMI (E-Money Institution) recipient that this recipient is associated with, if any. This EMI recipient is used as an intermediary account to enable Plaid to reconcile the settlement of funds for Payment Initiation requests.
@@ -5164,7 +5288,7 @@ components:
         refund_details:
           $ref: '#/components/schemas/ExternalPaymentRefundDetails'
         bacs:
-          $ref: '#/components/schemas/NullableSenderBACS'
+          $ref: '#/components/schemas/SenderBACSNullable'
         iban:
           type: string
           description: The International Bank Account Number (IBAN) for the sender, if specified in the `/payment_initiation/payment/create` call.
@@ -5658,7 +5782,7 @@ components:
           description: The `account_id` value obtained from the `onSuccess` callback in Link
         processor:
           type: string
-          description: The processor you are integrating with. Valid values are `"achq"`, `"check"`, `"checkbook"`, `"circle"`, `"drivewealth"`, `"dwolla"`, `"galileo"`, "`interactive_brokers`", `"lithic"`, `"modern_treasury"`, `"ocrolus"`, `"prime_trust"`, `"rize"`, `"sila_money"`, `"svb_api"`, `"unit"`, `"vesta"`, `"vopay"`, `"wyre"`
+          description: The processor you are integrating with. Valid values are `"achq"`, `"alpaca"`, `"astra"`, `"check"`, `"checkbook"`, `"circle"`, `"drivewealth"`, `"dwolla"`, `"galileo"`, "`interactive_brokers`", `"lithic"`, `"modern_treasury"`, `"moov"`, `"ocrolus"`, `"prime_trust"`, `"rize"`, `"sila_money"`, `"svb_api"`, `"unit"`, `"vesta"`, `"vopay"`, `"wyre"`
       required:
       - access_token
       - account_id
@@ -6299,12 +6423,54 @@ components:
       - error_code
       - error_message
       - display_message
-    NullableItemStatus:
+    ItemStatusNullable:
       nullable: true
       allOf:
       - $ref: '#/components/schemas/ItemStatus'
       - type: object
         additionalProperties: true
+    ItemStatusTransactions:
+      description: Information about the last successful and failed transactions update for the Item.
+      type: object
+      additionalProperties: true
+      nullable: true
+      properties:
+        last_successful_update:
+          description: ISO 8601 timestamp of the last successful transactions update for the Item. The status will update each time Plaid successfully connects with the institution, regardless of whether any new data is available in the update.
+          type: string
+          nullable: true
+        last_failed_update:
+          description: ISO 8601 timestamp of the last failed transactions update for the Item. The status will update each time Plaid fails an attempt to connect with the institution, regardless of whether any new data is available in the update.
+          type: string
+          nullable: true
+    ItemStatusInvestments:
+      description: Information about the last successful and failed investments update for the Item.
+      type: object
+      additionalProperties: true
+      nullable: true
+      properties:
+        last_successful_update:
+          description: ISO 8601 timestamp of the last successful investments update for the Item. The status will update each time Plaid successfully connects with the institution, regardless of whether any new data is available in the update.
+          type: string
+          nullable: true
+        last_failed_update:
+          description: ISO 8601 timestamp of the last failed investments update for the Item. The status will update each time Plaid fails an attempt to connect with the institution, regardless of whether any new data is available in the update.
+          type: string
+          nullable: true
+    ItemStatusLastWebhook:
+      description: Information about the last webhook fired for the Item.
+      type: object
+      additionalProperties: true
+      nullable: true
+      properties:
+        sent_at:
+          description: ISO 8601 timestamp of when the webhook was fired.
+          type: string
+          nullable: true
+        code_sent:
+          description: The last webhook code sent.
+          type: string
+          nullable: true
     ItemStatus:
       description: An object with information about the status of the Item.
       type: object
@@ -6315,47 +6481,11 @@ components:
       title: ItemStatus
       properties:
         investments:
-          description: Information about the last successful and failed investments update for the Item.
-          type: object
-          additionalProperties: true
-          nullable: true
-          properties:
-            last_successful_update:
-              description: ISO 8601 timestamp of the last successful investments update for the Item. The status will update each time Plaid successfully connects with the institution, regardless of whether any new data is available in the update.
-              type: string
-              nullable: true
-            last_failed_update:
-              description: ISO 8601 timestamp of the last failed investments update for the Item. The status will update each time Plaid fails an attempt to connect with the institution, regardless of whether any new data is available in the update.
-              type: string
-              nullable: true
+          $ref: '#/components/schemas/ItemStatusInvestments'
         transactions:
-          description: Information about the last successful and failed transactions update for the Item.
-          type: object
-          additionalProperties: true
-          nullable: true
-          properties:
-            last_successful_update:
-              description: ISO 8601 timestamp of the last successful transactions update for the Item. The status will update each time Plaid successfully connects with the institution, regardless of whether any new data is available in the update.
-              type: string
-              nullable: true
-            last_failed_update:
-              description: ISO 8601 timestamp of the last failed transactions update for the Item. The status will update each time Plaid fails an attempt to connect with the institution, regardless of whether any new data is available in the update.
-              type: string
-              nullable: true
+          $ref: '#/components/schemas/ItemStatusTransactions'
         last_webhook:
-          description: Information about the last webhook fired for the Item.
-          type: object
-          additionalProperties: true
-          nullable: true
-          properties:
-            sent_at:
-              description: ISO 8601 timestamp of when the webhook was fired.
-              type: string
-              nullable: true
-            code_sent:
-              description: The last webhook code sent.
-              type: string
-              nullable: true
+          $ref: '#/components/schemas/ItemStatusLastWebhook'
     AccountType:
       type: string
       title: AccountType
@@ -6624,7 +6754,7 @@ components:
       - account
       - routing
       - wire_routing
-    NullableNumbersACH:
+    NumbersACHNullable:
       nullable: true
       allOf:
       - $ref: '#/components/schemas/NumbersACH'
@@ -6653,7 +6783,7 @@ components:
       - account
       - institution
       - branch
-    NullableNumbersEFT:
+    NumbersEFTNullable:
       nullable: true
       allOf:
       - $ref: '#/components/schemas/NumbersEFT'
@@ -6678,7 +6808,7 @@ components:
       - account_id
       - iban
       - bic
-    NullableNumbersInternational:
+    NumbersInternationalNullable:
       nullable: true
       allOf:
       - $ref: '#/components/schemas/NumbersInternational'
@@ -6703,7 +6833,7 @@ components:
       - account_id
       - account
       - sort_code
-    NullableNumbersBACS:
+    NumbersBACSNullable:
       nullable: true
       allOf:
       - $ref: '#/components/schemas/NumbersBACS'
@@ -6722,14 +6852,14 @@ components:
         sort_code:
           type: string
           description: The 6-character sort code of the account.
-    NullableRecipientBACS:
+    RecipientBACSNullable:
       nullable: true
       allOf:
       - $ref: '#/components/schemas/RecipientBACS'
       - type: object
         additionalProperties: true
         description: The account number and sort code of the recipient's account.
-    NullableSenderBACS:
+    SenderBACSNullable:
       nullable: true
       allOf:
       - $ref: '#/components/schemas/RecipientBACS'
@@ -6747,8 +6877,8 @@ components:
       title: RequestID
       type: string
       description: A unique identifier for the request, which can be used for troubleshooting. This identifier, like all Plaid identifiers, is case sensitive.
-    Transaction:
-      title: Transaction
+    TransactionBase:
+      title: TransactionBase
       type: object
       additionalProperties: true
       description: A representation of a transaction
@@ -6772,69 +6902,9 @@ components:
 
             `unresolved:` transactions that do not fit into the other three types.
           deprecated: true
-        transaction_id:
-          type: string
-          description: The unique ID of the transaction. Like all Plaid identifiers, the `transaction_id` is case sensitive.
-        account_owner:
-          type: string
-          description: The name of the account owner. This field is not typically populated and only relevant when dealing with sub-accounts.
-          nullable: true
         pending_transaction_id:
           type: string
           description: The ID of a posted transaction's associated pending transaction, where applicable.
-          nullable: true
-        pending:
-          type: boolean
-          description: When `true`, identifies the transaction as pending or unsettled. Pending transaction details (name, type, amount, category ID) may change before they are settled.
-        payment_channel:
-          type: string
-          enum:
-          - online
-          - in store
-          - other
-          description: |
-            The channel used to make a payment.
-            `online:` transactions that took place online.
-
-            `in store:` transactions that were made at a physical location.
-
-            `other:` transactions that relate to banks, e.g. fees or deposits.
-
-            This field replaces the `transaction_type` field.
-        payment_meta:
-          $ref: '#/components/schemas/PaymentMeta'
-        name:
-          type: string
-          description: |-
-            The merchant name or transaction description.
-
-            If the `transactions` object was returned by a Transactions endpoint such as `/transactions/get`, this field will always appear. If the `transactions` object was returned by an Assets endpoint such as `/asset_report/get/` or `/asset_report/pdf/get`, this field will only appear in an Asset Report with Insights.
-        merchant_name:
-          type: string
-          description: The merchant name, as extracted by Plaid from the `name` field.
-          nullable: true
-        location:
-          $ref: '#/components/schemas/Location'
-        authorized_date:
-          type: string
-          description: The date that the transaction was authorized. Dates are returned in an ISO 8601 format ( `YYYY-MM-DD` ).
-          nullable: true
-        authorized_datetime:
-          type: string
-          description: |-
-            Date and time when a transaction was authorized in ISO 8601 format ( `YYYY-MM-DDTHH:mm:ssZ` ).
-
-            This field is only populated for UK institutions. For institutions in other countries, will be `null`.
-          nullable: true
-        date:
-          type: string
-          description: For pending transactions, the date that the transaction occurred; for posted transactions, the date that the transaction posted. Both dates are returned in an ISO 8601 format ( `YYYY-MM-DD` ).
-        datetime:
-          type: string
-          description: |-
-            Date and time when a transaction was posted in ISO 8601 format ( `YYYY-MM-DDTHH:mm:ssZ` ).
-
-            This field is only populated for UK institutions. For institutions in other countries, will be `null`.
           nullable: true
         category_id:
           description: |-
@@ -6852,6 +6922,34 @@ components:
           nullable: true
           items:
             type: string
+        location:
+          $ref: '#/components/schemas/Location'
+        payment_meta:
+          $ref: '#/components/schemas/PaymentMeta'
+        account_owner:
+          type: string
+          description: The name of the account owner. This field is not typically populated and only relevant when dealing with sub-accounts.
+          nullable: true
+        name:
+          type: string
+          description: |-
+            The merchant name or transaction description.
+
+            If the `transactions` object was returned by a Transactions endpoint such as `/transactions/get`, this field will always appear. If the `transactions` object was returned by an Assets endpoint such as `/asset_report/get/` or `/asset_report/pdf/get`, this field will only appear in an Asset Report with Insights.
+        original_description:
+          type: string
+          description: The string returned by the financial institution to describe the transaction. For transactions returned by `/transactions/get`, this field is in beta and will be omitted unless the client is both enrolled in the closed beta program and has set `options.include_original_description` to `true`.
+          nullable: true
+        account_id:
+          type: string
+          description: The ID of the account in which this transaction occurred.
+        amount:
+          type: number
+          description: The settled value of the transaction, denominated in the account's currency, as stated in `iso_currency_code` or `unofficial_currency_code`. Positive values when money moves out of the account; negative values when money moves in. For example, debit card purchases are positive; credit card payments, direct deposits, and refunds are negative.
+        iso_currency_code:
+          type: string
+          description: The ISO-4217 currency code of the transaction. Always `null` if `unofficial_currency_code` is non-null.
+          nullable: true
         unofficial_currency_code:
           type: string
           description: |-
@@ -6859,43 +6957,85 @@ components:
 
             See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `iso_currency_code`s.
           nullable: true
-        iso_currency_code:
+        date:
           type: string
-          description: The ISO-4217 currency code of the transaction. Always `null` if `unofficial_currency_code` is non-null.
-          nullable: true
-        amount:
-          type: number
-          description: The settled value of the transaction, denominated in the account's currency, as stated in `iso_currency_code` or `unofficial_currency_code`. Positive values when money moves out of the account; negative values when money moves in. For example, debit card purchases are positive; credit card payments, direct deposits, and refunds are negative.
-        account_id:
+          description: For pending transactions, the date that the transaction occurred; for posted transactions, the date that the transaction posted. Both dates are returned in an ISO 8601 format ( `YYYY-MM-DD` ).
+        pending:
+          type: boolean
+          description: When `true`, identifies the transaction as pending or unsettled. Pending transaction details (name, type, amount, category ID) may change before they are settled.
+        transaction_id:
           type: string
-          description: The ID of the account in which this transaction occurred.
-        transaction_code:
-          $ref: '#/components/schemas/TransactionCode'
-        original_description:
-          type: string
-          description: The string returned by the financial institution to describe the transaction. For transactions returned by `/transactions/get`, this field is in beta and will be omitted unless the client is both enrolled in the closed beta program and has set `options.include_original_description` to `true`.
-          nullable: true
+          description: The unique ID of the transaction. Like all Plaid identifiers, the `transaction_id` is case sensitive.
       required:
       - transaction_id
-      - account_owner
-      - pending_transaction_id
       - pending
-      - payment_channel
-      - payment_meta
-      - name
-      - merchant_name
-      - location
-      - authorized_date
-      - authorized_datetime
       - date
-      - datetime
-      - category_id
-      - category
       - unofficial_currency_code
       - iso_currency_code
       - amount
       - account_id
-      - transaction_code
+    Transaction:
+      title: Transaction
+      description: A representation of a transaction
+      x-examples: {}
+      allOf:
+      - $ref: '#/components/schemas/TransactionBase'
+      - type: object
+        additionalProperties: true
+        properties:
+          payment_channel:
+            type: string
+            enum:
+            - online
+            - in store
+            - other
+            description: |
+              The channel used to make a payment.
+              `online:` transactions that took place online.
+
+              `in store:` transactions that were made at a physical location.
+
+              `other:` transactions that relate to banks, e.g. fees or deposits.
+
+              This field replaces the `transaction_type` field.
+          merchant_name:
+            type: string
+            description: The merchant name, as extracted by Plaid from the `name` field.
+            nullable: true
+          authorized_date:
+            type: string
+            description: The date that the transaction was authorized. Dates are returned in an ISO 8601 format ( `YYYY-MM-DD` ).
+            nullable: true
+          authorized_datetime:
+            type: string
+            description: |-
+              Date and time when a transaction was authorized in ISO 8601 format ( `YYYY-MM-DDTHH:mm:ssZ` ).
+
+              This field is only populated for UK institutions. For institutions in other countries, will be `null`.
+            nullable: true
+          datetime:
+            type: string
+            description: |-
+              Date and time when a transaction was posted in ISO 8601 format ( `YYYY-MM-DDTHH:mm:ssZ` ).
+
+              This field is only populated for UK institutions. For institutions in other countries, will be `null`.
+            nullable: true
+          transaction_code:
+            $ref: '#/components/schemas/TransactionCode'
+        required:
+        - account_owner
+        - pending_transaction_id
+        - payment_channel
+        - payment_meta
+        - name
+        - merchant_name
+        - location
+        - authorized_date
+        - authorized_datetime
+        - datetime
+        - category_id
+        - category
+        - transaction_code
     Location:
       title: Transaction Location
       type: object
@@ -7211,7 +7351,7 @@ components:
       title: AccessToken
       type: string
       description: The access token associated with the Item data is being requested for.
-    NullableAccessToken:
+    AccessTokenNullable:
       nullable: true
       type: string
       description: The access token associated with the Item data is being requested for.
@@ -7420,13 +7560,13 @@ components:
           description: When `true`, identifies the address as the primary address on an account.
       required:
       - data
-    NullableAddress:
+    AddressNullable:
       nullable: true
       allOf:
       - $ref: '#/components/schemas/Address'
       - type: object
         additionalProperties: true
-    NullableAddressData:
+    AddressDataNullable:
       nullable: true
       allOf:
       - $ref: '#/components/schemas/AddressData'
@@ -8232,7 +8372,7 @@ components:
           description: The International Bank Account Number (IBAN) for the account.
           nullable: true
         bacs:
-          $ref: '#/components/schemas/NullableRecipientBACS'
+          $ref: '#/components/schemas/RecipientBACSNullable'
       required:
       - name
       - iban
@@ -10378,6 +10518,7 @@ components:
           - instant
           - mail
           - pdf
+          - null
           description: |-
             The method used to make the deposit switch.
 
@@ -11373,7 +11514,7 @@ components:
           type: string
           description: The name of the employer
         address:
-          $ref: '#/components/schemas/NullableAddressData'
+          $ref: '#/components/schemas/AddressDataNullable'
         confidence_score:
           type: number
           description: A number from 0 to 1 indicating Plaid's level of confidence in the pairing between the employer and the institution (not yet implemented).
@@ -11751,7 +11892,7 @@ components:
           description: The name of the employee.
           nullable: true
         address:
-          $ref: '#/components/schemas/NullableAddressData'
+          $ref: '#/components/schemas/AddressDataNullable'
       required:
       - name
       - address
@@ -11870,7 +12011,7 @@ components:
     AssetReportTransaction:
       title: AssetReportTransaction
       allOf:
-      - $ref: '#/components/schemas/Transaction'
+      - $ref: '#/components/schemas/TransactionBase'
       - type: object
         additionalProperties: true
         properties:
@@ -12168,7 +12309,7 @@ components:
           default: true
       required:
       - unique_id
-    NullableScopes:
+    ScopesNullable:
       nullable: true
       allOf:
       - $ref: '#/components/schemas/Scopes'
@@ -12240,7 +12381,7 @@ components:
         secret:
           $ref: '#/components/schemas/APISecret'
         access_token:
-          $ref: '#/components/schemas/NullableAccessToken'
+          $ref: '#/components/schemas/AccessTokenNullable'
     ItemApplicationListResponse:
       description: Describes the connected application for a particular end user.
       type: object
@@ -12266,6 +12407,11 @@ components:
         logo:
           nullable: true
           type: string
+          description: A URL that links to the application logo image (will be deprecated in the future, please use logo_url).
+          deprecated: true
+        logo_url:
+          nullable: true
+          type: string
           description: A URL that links to the application logo image.
         application_url:
           nullable: true
@@ -12288,7 +12434,7 @@ components:
             - ACCOUNT_USER_INFO
             - ACCOUNT_TRANSACTIONS
         scopes:
-          $ref: '#/components/schemas/NullableScopes'
+          $ref: '#/components/schemas/ScopesNullable'
         requested_scopes:
           $ref: '#/components/schemas/RequestedScopes'
       required:
@@ -12296,12 +12442,17 @@ components:
       - name
       - created_at
       - logo
+      - logo_url
       - application_url
       - reason_for_access
       - product_data_types
     AccountSelectionCardinality:
       type: string
-      description: "The application requires that accounts be limited to a specific cardinality. \n`MULTI_SELECT`: indicates that the user should be allowed to pick multiple accounts.\n`SINGLE_SELECT`: indicates that the user should be allowed to pick only a single account. \n`ALL`: indicates that the user must share all of their accounts and should not be given the opportunity to de-select"
+      description: |-
+        The application requires that accounts be limited to a specific cardinality.
+        `MULTI_SELECT`: indicates that the user should be allowed to pick multiple accounts.
+        `SINGLE_SELECT`: indicates that the user should be allowed to pick only a single account.
+        `ALL`: indicates that the user must share all of their accounts and should not be given the opportunity to de-select
       enum:
       - SINGLE_SELECT
       - MULTI_SELECT
