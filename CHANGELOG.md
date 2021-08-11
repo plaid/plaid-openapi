@@ -1,3 +1,22 @@
+### 2020-09-14_1.20.6
+- Added `format:` labels to all date and date-time strings
+- Fix missing title attributes
+- Converted some strings to enums
+### 2020-09-14_1.20.5
+- Updated `Select Account` to `Account Select`
+### 2020-09-14_1.20.4
+- Update Signal risk tier definitions
+### 2020-09-14_1.20.3
+- Bug fixes to signal endpoints
+### 2020-09-14_1.20.1
+- Added `/sandbox/oauth/select_accounts` endpoint.
+### 2021-07-27_1.20.0
+- Added `liabilities_updates`, `liabilities`, and `investments` to institution schema
+### 2020-09-14_1.20.0
+- Added `/signal/evaluate` endpoint
+- Added `/signal/decision/report` endpoint
+- Added `/signal/return/report` endpoint
+- Added `/income/verification/refresh` endpoint.
 ### 2020-09-14_1.19.12
 - Added `alpaca`, `astra` and `moov` processors.
 - Changed naming for some nullable parameters from `NullableParam` to `ParamNullable`.

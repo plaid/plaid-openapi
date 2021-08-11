@@ -1,6 +1,6 @@
-# plaid-OpenAPI-beta
+# plaid-OpenAPI
 
-Plaid uses the `OpenAPI 3.0.0` specification to schematize our [docs](https://plaid.com/docs) and to generate our supported client libraries (in beta). This provides for a consistent typing experience across our external interfaces. Below we have listed some examples and issues we have found when iterating on the specification.
+Plaid uses the `OpenAPI 3.0.0` specification to schematize our [docs](https://plaid.com/docs) and to generate our supported client libraries. This provides for a consistent typing experience across our external interfaces. Below we have listed some examples and issues we have found when iterating on the specification.
 
 ## Using the OpenAPI generator
 
@@ -8,13 +8,15 @@ You can find examples on the official [OpenApiGenerator docs](https://github.com
 
 ### Generating Plaid supported client libraries
 
+The following are approximate commands that we use to generate our 5 client libraries:
+
 #### plaid-node
 
 ```bash
 openapi-generator-cli generate -g typescript-axios  \
 -i 2020-09-14.yml \
 -o build/generated-node \
--p npmName=plaid,supportsES6=true,npmVersion='9.0.0-beta.10',modelPropertyNaming=original \
+-p npmName=plaid,supportsES6=true,modelPropertyNaming=original \
 -t local/templates/typescript-axios
 ```
 
@@ -24,7 +26,7 @@ openapi-generator-cli generate -g typescript-axios  \
 openapi-generator-cli generate -g python \
 -i 2020-09-14.yml \
 -o build/generated-python \
--p packageName=plaid,packageVersion=8.0.0b6 \
+-p packageName=plaid \
 --global-property apiTests=false,modelTests=false \
 -t templates/python
 ```
@@ -37,7 +39,7 @@ openapi-generator-cli generate -g ruby  \
 -o build/generated-ruby \
 --global-property=apiTests=false,modelTests=false  \
 --library=faraday \
--p gemName=plaid,gemRequiredRubyVersion=">= 2.7.1",gemVersion=14.0.0.beta1 \
+-p gemName=plaid,gemRequiredRubyVersion=">= 2.7.1" \
 -t local/templates/ruby
 
 ```
@@ -50,12 +52,22 @@ openapi-generator-cli generate -g java \
 -o build/generated-java \
 --library=retrofit2 \
 --global-property apiDocs=false,modelDocs=false,apiTests=false,modelTests=false \
--p artifactId=plaid,apiPackage=com.plaid.client.request,modelPackage=com.plaid.client.model,artifactVersion=9.0.0-beta-1,dateLibrary=java8 \
+-p artifactId=plaid,apiPackage=com.plaid.client.request,modelPackage=com.plaid.client.model,dateLibrary=java8 \
 -t templates/java \
 --type-mappings=BigDecimal=Double
 ```
 
-All template edits can be found on their corresponding `plaid-language` beta release branches in the `/templates` folder.
+#### plaid-go
+```bash
+openapi-generator-cli -g go \
+-i 2020-09-14.yml \
+-o build/plaid-go \
+--global-property=apiTests=false,modelTests=false,apiDocs=false,modelDocs=false \
+-t templates/go \
+-p packageName=plaid,enumClassPrefix=true,
+```
+
+All template edits can be found on their corresponding in the `/templates` folder for the associated library.
 
 ### Known issues with openapi-generator
 
