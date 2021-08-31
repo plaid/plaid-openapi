@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.26.1
+  version: 2020-09-14_1.28.2
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -1715,6 +1715,37 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PaymentInitiationRecipientCreateRequest'
+  /payment_initiation/payment/reverse:
+    post:
+      tags:
+      - plaid
+      summary: Reverse an existing payment
+      externalDocs:
+        url: /api/products/#payment_initiationpaymentreverse
+      operationId: paymentInitiationPaymentReverse
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentInitiationPaymentReverseResponse'
+              examples:
+                example-1:
+                  value:
+                    refund_id: refund-id-sandbox-c5f8cd31-6cae-4cad-9b0d-f7c10be9cc4b
+                    request_id: HtlKzBX0fMeF7mU
+                    status: INITIATED
+      description: |
+        Reverse a previously initiated payment.
+
+        A payment can only be reversed once and will be refunded to the original sender's account.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentInitiationPaymentReverseRequest'
   /payment_initiation/recipient/get:
     post:
       tags:
@@ -4304,7 +4335,7 @@ paths:
                       status: DOCUMENT_STATUS_PROCESSING_COMPLETE
                       doc_id: 2jkflanbd
                     paystubs:
-                      deductions:
+                    - deductions:
                         subtotals: []
                         totals: []
                       doc_id: 2jkflanbd
@@ -4980,6 +5011,10 @@ components:
             When `true`, return the institution's homepage URL, logo and primary brand color.
 
             Note that Plaid does not own any of the logos shared by the API, and that by accessing or using these logos, you agree that you are doing so at your own risk and will, if necessary, obtain all required permissions from the appropriate rights holders and adhere to any applicable usage guidelines. Plaid disclaims all express or implied warranties with respect to the logos.
+        include_auth_metadata:
+          type: boolean
+          default: false
+          description: When `true`, returns metadata related to the Auth product indicating which auth methods are supported.
         include_payment_initiation_metadata:
           type: boolean
           default: false
@@ -5042,6 +5077,10 @@ components:
         include_optional_metadata:
           type: boolean
           description: When true, return the institution's homepage URL, logo and primary brand color.
+        include_auth_metadata:
+          type: boolean
+          default: false
+          description: When `true`, returns metadata related to the Auth product indicating which auth methods are supported.
         include_payment_initiation_metadata:
           type: boolean
           default: false
@@ -5109,6 +5148,10 @@ components:
           type: boolean
           default: false
           description: If `true`, the response will include status information about the institution. Default value is `false`.
+        include_auth_metadata:
+          type: boolean
+          default: false
+          description: When `true`, returns metadata related to the Auth product indicating which auth methods are supported.
         include_payment_initiation_metadata:
           type: boolean
           default: false
@@ -5793,6 +5836,37 @@ components:
       required:
       - recipient_id
       - request_id
+    PaymentInitiationPaymentReverseResponse:
+      type: object
+      additionalProperties: true
+      description: PaymentInitiationPaymentReverseResponse defines the response schema for `/payment_initation/payment/reverse`
+      properties:
+        refund_id:
+          type: string
+          description: A unique ID identifying the refund
+        status:
+          type: string
+          enum:
+          - PROCESSING
+          - EXECUTED
+          - INITIATED
+          - FAILED
+          description: |-
+            The status of the refund.
+
+            `PROCESSING`: The refund is currently being processed. The refund will automatically exit this state when processing is complete.
+
+            `INITIATED`: The refund has been successfully initiated.
+
+            `EXECUTED`: Indicates that the refund has been successfully executed.
+
+            `FAILED`: The refund has failed to be executed. This error is retryable once the root cause is resolved.
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - refund_id
+      - request_id
+      - status
     PaymentInitiationRecipientGetRequest:
       type: object
       description: PaymentInitiationRecipientGetRequest defines the request schema for `/payment_initiation/recipient/get`
@@ -5897,6 +5971,20 @@ components:
       - recipient_id
       - reference
       - amount
+    PaymentInitiationPaymentReverseRequest:
+      type: object
+      description: PaymentInitiationPaymentReverseRequest defines the request schema for `/payment_initiation/payment/reverse`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        payment_id:
+          type: string
+          description: The ID of the payment to reverse
+          minLength: 1
+      required:
+      - payment_id
     PaymentInitiationPaymentCreateResponse:
       type: object
       additionalProperties: true
@@ -6639,7 +6727,7 @@ components:
           - prime_trust
           - rize
           - sila_money
-          - sbv_api
+          - svb_api
           - treasury_prime
           - unit
           - vesta
@@ -7044,7 +7132,7 @@ components:
           description: To be provided in the format "ddd-dd-dddd". This field is optional and will support not-yet-implemented functionality for new products.
         date_of_birth:
           type: string
-          format: date-time
+          format: date
           description: To be provided in the format "yyyy-mm-dd". This field is optional and will support not-yet-implemented functionality for new products.
       required:
       - client_user_id
@@ -7475,6 +7563,8 @@ components:
             Note that not all institutions calculate the `available`  balance. In the event that `available` balance is unavailable, Plaid will return an `available` balance value of `null`.
 
             Available balance may be cached and is not guaranteed to be up-to-date in realtime unless the value was returned by `/accounts/balance/get`.
+
+            If `current` is `null` this field is guaranteed not to be `null`.
           nullable: true
         current:
           type: number
@@ -7488,6 +7578,8 @@ components:
             For `investment`-type accounts, the current balance is the total value of assets as presented by the institution.
 
             Note that balance information may be cached unless the value was returned by `/accounts/balance/get`; if the Item is enabled for Transactions, the balance will be at least as recent as the most recent Transaction update. If you require realtime balance information, use the `available` balance as provided by `/accounts/balance/get`.
+
+            When returned by `/accounts/balance/get`, this field may be `null`. When this happens, `available` is guaranteed not to be `null`.
           nullable: true
         limit:
           type: number
@@ -8017,6 +8109,8 @@ components:
           $ref: '#/components/schemas/InstitutionStatus'
         payment_initiation_metadata:
           $ref: '#/components/schemas/PaymentInitiationMetadata'
+        auth_metadata:
+          $ref: '#/components/schemas/AuthMetadata'
       required:
       - institution_id
       - name
@@ -9141,6 +9235,37 @@ components:
       - apr_type
       - balance_subject_to_apr
       - interest_charge_amount
+    AuthMetadata:
+      title: AuthMetadata
+      type: object
+      additionalProperties: true
+      description: Metadata that captures information about the Auth features of an institution.
+      nullable: true
+      properties:
+        supported_methods:
+          $ref: '#/components/schemas/AuthSupportedMethods'
+      required:
+      - supported_methods
+    AuthSupportedMethods:
+      title: AuthSupportedMethods
+      type: object
+      additionalProperties: true
+      description: Metadata specifically related to which auth methods an institution supports.
+      nullable: true
+      properties:
+        instant_auth:
+          type: boolean
+          description: Indicates if instant auth is supported.
+        instant_match:
+          type: boolean
+          description: Indicates if instant match is supported.
+        automated_micro_deposits:
+          type: boolean
+          description: Indicates if automated microdeposits are supported.
+      required:
+      - instant_auth
+      - instant_match
+      - automated_micro_deposits
     PaymentInitiationMetadata:
       title: PaymentInitiationMetadata
       type: object

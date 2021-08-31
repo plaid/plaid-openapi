@@ -1,3 +1,20 @@
+### 2020-09-14_1.28.2
+- Fix misspelled enum for `svb_api`
+- Fix incorrect format string for `date_of_birth` from `date-time` to `date`
+
+### 2020-09-14_1.28.1
+- Updated `balance` fields availability description for `/accounts/balance/get`
+
+### 2020-09-14_1.28.0
+- Add `/payment_initiation/payment/reverse` endpoint
+
+### 2020-09-14_1.27.0
+- Added `include_auth_metadata` field to `InstitutionsGetRequestOptions`, `InstitutionsSearchRequestOptions`, `InstitutionsGetByIdRequestOptions`.
+- Added `auth_metadata` field to `Institution` object, which is included in `InstitutionsGetResponse`, `InstitutionsSearchResponse`, `InstitutionsGetByIdResponse`.
+
+### 2020-09-14_1.26.2
+- Updates documentation for `income/verification/paystubs/get`.
+
 ### 2020-09-14_1.26.1
 - Fix bug with request generation for `/income/verification/paystub/get`
 
