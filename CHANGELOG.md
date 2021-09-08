@@ -1,3 +1,62 @@
+### 2020-09-14_1.31.1
+- Add additional enum for `canonical_description`
+
+### 2020-09-14_1.31.0
+- Add `/income/verification/precheck` endpoint
+
+### 2020-09-14_1.30.3
+- Update enum strings for `canonical_description`
+
+### 2020-09-14_1.30.2
+- Added `initiated_refunds` field to `/payment_initiation/payment/get` and `/payment_initiation/payment/list`
+
+### 2020-09-14_1.30.1
+- Add response for `income/verification/paystub/get`
+
+### 2020-09-14_1.30.0
+- Add /bank_transfer/sweep/list endpoint
+
+### 2020-09-14_1.29.1
+- Added description for 'SignalEvaluateRequest'
+- Added description for 'SignalEvaluateResponse'
+- Added description for 'SignalScores'
+- Added description for 'SignalDecisionReportRequest'
+- Added description for 'SignalDecisionReportResponse'
+- Added description for 'SignalReturnReportRequest'
+- Added description for 'SignalReturnReportResponse'
+
+### 2020-09-14_1.29.0
+- Added `include_personal_finance_category_beta` as an optional field to the `TransactionsGetRequestOptions` component
+- Added `personal_finance_category` as a nullable field to the `Transaction` component 
+
+### 2020-09-14_1.28.4
+- Remove iso_currency_code from `/transfer/authorization/create` response
+
+### 2020-09-14_1.28.3
+- Remove direction for `/transfer` endpoints
+- Remove receiver_details and receiver_* event types for `/transfer` endpoints
+- Remove iso_currency_code from `/transfer` endpoints
+- Remove custom_tag from `/transfer` endpoints
+- Remove description for authorization object
+- Make ach_class required for `/transfer/create`
+
+### 2020-09-14_1.28.2
+- Fix misspelled enum for `svb_api`
+- Fix incorrect format string for `date_of_birth` from `date-time` to `date`
+
+### 2020-09-14_1.28.1
+- Updated `balance` fields availability description for `/accounts/balance/get`
+
+### 2020-09-14_1.28.0
+- Add `/payment_initiation/payment/reverse` endpoint
+
+### 2020-09-14_1.27.0
+- Added `include_auth_metadata` field to `InstitutionsGetRequestOptions`, `InstitutionsSearchRequestOptions`, `InstitutionsGetByIdRequestOptions`.
+- Added `auth_metadata` field to `Institution` object, which is included in `InstitutionsGetResponse`, `InstitutionsSearchResponse`, `InstitutionsGetByIdResponse`.
+
+### 2020-09-14_1.26.2
+- Updates documentation for `income/verification/paystubs/get`.
+
 ### 2020-09-14_1.26.1
 - Fix bug with request generation for `/income/verification/paystub/get`
 
