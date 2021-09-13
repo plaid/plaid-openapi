@@ -1,3 +1,15 @@
+### 2020-09-14_1.31.5
+- Update Link token shown in example response for `/link/token/create`
+
+### 2020-09-14_1.31.4
+- Add `transfer` to products list
+
+### 2020-09-14_1.31.3
+- Update description for `/transfer/authorization/create` in sandbox
+
+### 2020-09-14_1.31.2
+- Made more fields on `/income/verification/precheck` optional
+
 ### 2020-09-14_1.31.1
 - Add additional enum for `canonical_description`
 

@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.31.1
+  version: 2020-09-14_1.31.5
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -3133,7 +3133,7 @@ paths:
               examples:
                 example-1:
                   value:
-                    link_token: link-production-840204-193734
+                    link_token: link-sandbox-af1a0311-da53-4636-b754-dd15cc058176
                     expiration: "2020-03-27T12:56:34Z"
                     request_id: XQVgFigpGHXkb0b
       description: |-
@@ -3427,11 +3427,11 @@ paths:
 
         In Plaid's sandbox environment the decisions will be returned as follows:
 
-          - To approve a transfer, create an Item in Link with the username `user_good` and password `pass_good`
+          - To approve a transfer, make an authorization request with an `amount` less than the available balance in the account.
 
-          - To decline a transfer with the rationale code `NSF`, create an Item in Link with the username `declined_nsf_good` and password `pass_good`
+          - To decline a transfer with the rationale code `NSF`, the available balance on the account must be less than the authorization `amount`. See [Create Sandbox test data](https://plaid.com/docs/sandbox/user-custom/) for details on how to customize data in Sandbox.
 
-          - To decline a transfer with the rationale code `RISK`, create an Item in Link with the username `declined_risk_good` and password `pass_good`
+          - To decline a transfer with the rationale code `RISK`, the available balance on the account must be exactly $0. See [Create Sandbox test data](https://plaid.com/docs/sandbox/user-custom/) for details on how to customize data in Sandbox.
 
           - To permit a transfer with the rationale code `MANUALLY_VERIFIED_ITEM`, create an Item in Link through the [Same Day Micro-deposits flow](https://plaid.com/docs/auth/coverage/testing/#testing-same-day-micro-deposits).
 
@@ -7091,7 +7091,7 @@ components:
           description: |-
             List of Plaid product(s) you wish to use. If launching Link in update mode, should be omitted; required otherwise. Valid products are:
 
-            `transactions`, `auth`, `identity`, `assets`, `investments`, `liabilities`, `payment_initiation`, `deposit_switch`, `income_verification`
+            `transactions`, `auth`, `identity`, `assets`, `investments`, `liabilities`, `payment_initiation`, `deposit_switch`, `income_verification`, `transfer`
 
             `balance` is *not* a valid value, the Balance product does not require explicit initalization and will automatically be initialized when any other product is initialized.
 
@@ -9600,6 +9600,7 @@ components:
       - income_verification
       - deposit_switch
       - standing_orders
+      - transfer
       description: A list of products that an institution can support. All Items must be initialized with at least one product. The Balance product is always available and does not need to be specified during initialization.
       type: string
     ProductStatus:
@@ -13840,9 +13841,11 @@ components:
       properties:
         name:
           type: string
+          nullable: true
           description: The employer's name
         tax_id:
           type: string
+          nullable: true
           description: The employer's tax id
     IncomeVerificationPrecheckMilitaryInfo:
       title: IncomeVerificationPrecheckMilitaryInfo
@@ -13881,7 +13884,7 @@ components:
           nullable: true
           description: The user's email address
         home_address:
-          $ref: '#/components/schemas/AddressDataNullable'
+          $ref: '#/components/schemas/SignalAddressData'
     IncomeVerificationPrecheckResponse:
       title: IncomeVerificationPrecheckResponse
       type: object
