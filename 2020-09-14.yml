@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.31.5
+  version: 2020-09-14_1.33.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -7132,6 +7132,8 @@ components:
           $ref: '#/components/schemas/LinkTokenCreateRequestIncomeVerification'
         auth:
           $ref: '#/components/schemas/LinkTokenCreateRequestAuth'
+        update:
+          $ref: '#/components/schemas/LinkTokenCreateRequestUpdate'
       required:
       - client_name
       - language
@@ -7233,6 +7235,14 @@ components:
           description: To be provided in the format "yyyy-mm-dd". This field is optional and will support not-yet-implemented functionality for new products.
       required:
       - client_user_id
+    LinkTokenCreateRequestUpdate:
+      type: object
+      description: Specifies options for initializing Link for [update mode](https://plaid.com/docs/link/update-mode).
+      properties:
+        account_selection_enabled:
+          type: boolean
+          description: If `true`, enables [update mode with Account Select](https://plaid.com/docs/link/update-mode/#using-update-mode-to-request-new-accounts).
+          default: false
     LinkTokenCreateRequestAccountSubtypes:
       description: |
         By default, Link will only display account types that are compatible with all products supplied in the `products` parameter of `/link/token/create`. You can further limit the accounts shown in Link by using `account_filters` to specify the account subtypes to be shown in Link. Only the specified subtypes will be shown. This filtering applies to both the Account Select view (if enabled) and the Institution Select view. Institutions that do not support the selected subtypes will be omitted from Link. To indicate that all subtypes should be shown, use the value `"all"`. If the `account_filters` filter is used, any account type for which a filter is not specified will be entirely omitted from Link.
@@ -7574,6 +7584,7 @@ components:
       - credit
       - depository
       - loan
+      - payroll
       - other
       description: |-
         `investment:` Investment account
@@ -7583,6 +7594,8 @@ components:
         `depository:` Depository account
 
         `loan:` Loan account
+
+        `payroll:` Payroll acccount
 
         `other:` Non-specified account type
 
@@ -7789,6 +7802,7 @@ components:
       - rewards
       - safe deposit
       - sarsep
+      - payroll
       - null
     NumbersACH:
       title: NumbersACH
@@ -8572,7 +8586,7 @@ components:
       - item_id
     HistoricalUpdateWebhook:
       title: HistoricalUpdateWebhook
-      description: Fired when an Item's historical transaction pull is completed and Plaid has prepared as much historical transaction data as possible for the Item. Once this webhook has been fired, transaction data beyond the most recent 30 days can be fetched for the Item.
+      description: Fired when an Item's historical transaction pull is completed and Plaid has prepared as much historical transaction data as possible for the Item. Once this webhook has been fired, transaction data beyond the most recent 30 days can be fetched for the Item. If [Account Select v2](https://plaid.com/docs/link/customization/#account-select) is enabled, this webhook will also be fired if account selections for the Item are updated, with `num_transactions` set to the number of net new transactions pulled after the account selection update.
       type: object
       additionalProperties: true
       properties:
@@ -8603,7 +8617,7 @@ components:
           new_transactions: 231
     InitialUpdateWebhook:
       title: InitialUpdateWebhook
-      description: Fired when an Item's initial transaction pull is completed. Once this webhook has been fired, transaction data for the most recent 30 days can be fetched for the Item.
+      description: Fired when an Item's initial transaction pull is completed. Once this webhook has been fired, transaction data for the most recent 30 days can be fetched for the Item. If [Account Select v2](https://plaid.com/docs/link/customization/#account-select) is enabled, this webhook will also be fired if account selections for the Item are updated, with `num_transactions` set to the number of net new transactions pulled after the account selection update.
       type: object
       additionalProperties: true
       x-examples:
@@ -9782,6 +9796,8 @@ components:
           $ref: '#/components/schemas/LiabilityOverride'
         inflow_model:
           $ref: '#/components/schemas/InflowModel'
+        income:
+          $ref: '#/components/schemas/IncomeOverride'
       required:
       - type
       - subtype
@@ -10116,6 +10132,64 @@ components:
       - payment_day_of_month
       - transaction_name
       - statement_day_of_month
+    IncomeOverride:
+      title: IncomeOverride
+      type: object
+      description: Specify payroll data on the account.
+      properties:
+        paystubs:
+          type: array
+          description: A list of paystubs associated with the account.
+          items:
+            $ref: '#/components/schemas/PaystubOverride'
+    PaystubOverride:
+      title: PaystubOverride
+      type: object
+      description: An object representing data from a paystub.
+      properties:
+        employer:
+          type: object
+          description: The employer on the paystub.
+          properties:
+            name:
+              type: string
+              description: The name of the employer.
+        employee:
+          type: object
+          description: The employee on the paystub.
+          properties:
+            name:
+              type: string
+              description: The name of the employee.
+            address:
+              type: object
+              description: The address of the employee.
+              properties:
+                city:
+                  type: string
+                  description: The full city name.
+                region:
+                  type: string
+                  description: |-
+                    The region or state
+                    Example: `"NC"`
+                street:
+                  type: string
+                  description: |-
+                    The full street address
+                    Example: `"564 Main Street, APT 15"`
+                postal_code:
+                  type: string
+                  description: 5 digit postal code.
+                country:
+                  type: string
+                  description: The country of the address.
+        income_breakdown:
+          type: array
+          items:
+            $ref: '#/components/schemas/IncomeBreakdown'
+        pay_period_details:
+          $ref: '#/components/schemas/PayPeriodDetails'
     ItemId:
       title: ItemId
       type: string
@@ -14527,7 +14601,7 @@ components:
             The type of income. Possible values include:
               `"regular"`: regular income
               `"overtime"`: overtime income
-               `"bonus"`: bonus income
+              `"bonus"`: bonus income
           enum:
           - bonus
           - overtime
@@ -15877,3 +15951,24 @@ components:
       title: SandboxOauthSelectAccountsResponse
       type: object
       description: Defines the response schema for `/sandbox/oauth/select_accounts`
+    NewAccountsAvailableWebhook:
+      title: NewAccountsAvailableWebhook
+      type: object
+      description: Fired when Plaid detects a new account for Items created or updated with [Account Select v2](https://plaid.com/docs/link/customization/#account-select). Upon receiving this webhook, you can prompt your users to share new accounts with you through [Account Select v2 update mode](https://plaid.com/docs/link/update-mode/#using-update-mode-to-request-new-accounts).
+      x-examples:
+        example-1:
+          webhook_type: ITEM
+          webhook_code: NEW_ACCOUNTS_AVAILABLE
+          item_id: gAXlMgVEw5uEGoQnnXZ6tn9E7Mn3LBc4PJVKZ
+          error: null
+      properties:
+        webhook_type:
+          type: string
+          description: '`ITEM`'
+        webhook_code:
+          type: string
+          description: '`NEW_ACCOUNTS_AVAILABLE`'
+        item_id:
+          $ref: '#/components/schemas/ItemId'
+        error:
+          $ref: '#/components/schemas/Error'
