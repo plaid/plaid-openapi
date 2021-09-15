@@ -1,3 +1,11 @@
+### 2020-09-14_1.33.0
+- Add `update.account_selection_enabled` parameter to `/link/token/create` for Account Select v2
+- Update descriptions for `TRANSACTIONS: INITIAL_UPDATE` AND `TRANSACTIONS: HISTORICAL_UPDATE` for Account Select v2
+- Add `ITEMS: NEW_ACCOUNTS_AVAILABLE` webhook
+
+### 2020-09-14_1.32.0
+- Add Sandbox custom password schema for income verification
+
 ### 2020-09-14_1.31.5
 - Update Link token shown in example response for `/link/token/create`
 
