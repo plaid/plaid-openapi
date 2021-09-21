@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.33.0
+  version: 2020-09-14_1.34.1
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -388,6 +388,37 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/TransactionsRefreshRequest'
+  /transactions/recurring/get:
+    post:
+      tags:
+      - plaid
+      summary: Get streams of recurring transactions
+      operationId: transactionsRecurringGet
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionsRecurringGetResponse'
+              examples: {}
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error response
+      description: |-
+        The `/transactions/recurring/get` endpoint identifies and returns groups of transactions that occur on a regular basis for the inputted Item and accounts.
+
+        The product is currently in beta. To request access, contact transactions-feedback@plaid.com.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionsRecurringGetRequest'
+            examples: {}
   /institutions/get:
     post:
       tags:
@@ -5016,6 +5047,45 @@ components:
           $ref: '#/components/schemas/RequestID'
       required:
       - request_id
+    TransactionsRecurringGetRequest:
+      type: object
+      description: TransactionsRecurringGetRequest defines the request schema for `/transactions/recurring/get`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        account_ids:
+          type: array
+          description: |-
+            A list of `account_ids` to retrieve for the Item
+
+            Note: An error will be returned if a provided `account_id` is not associated with the Item.
+          items:
+            type: string
+    TransactionsRecurringGetResponse:
+      type: object
+      additionalProperties: true
+      description: TransactionsRecurringGetResponse defines the response schema for `/transactions/recurring/get`
+      properties:
+        inflow_streams:
+          type: array
+          description: An array of depository transaction streams.
+          items:
+            $ref: '#/components/schemas/TransactionStream'
+        outflow_streams:
+          type: array
+          description: An array of expense transaction streams.
+          items:
+            $ref: '#/components/schemas/TransactionStream'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - inflow_strems
+      - outflow_streams
+      - request_id
     InstitutionsGetRequest:
       type: object
       description: InstitutionsGetRequest defines the request schema for `/institutions/get`
@@ -8179,6 +8249,92 @@ components:
       - lat
       - lon
       - store_number
+    TransactionStream:
+      title: TransactionStream
+      type: object
+      description: A grouping of related transactions
+      x-examples: {}
+      additionalProperties: true
+      properties:
+        account_id:
+          type: string
+          description: The ID of the account to which the stream belongs
+        stream_id:
+          type: string
+          description: A unique id for the stream
+        category_id:
+          description: The ID of the category to which this transaction belongs. See [Categories](https://plaid.com/docs/#category-overview).
+          type: string
+        category:
+          type: array
+          description: A hierarchical array of the categories to which this transaction belongs. See [Categories](https://plaid.com/docs/#category-overview).
+          items:
+            type: string
+        description:
+          type: string
+          description: A description of the transaction stream.
+        first_date:
+          type: string
+          description: The posted date of the earliest transaction in the stream.
+          format: date
+        last_date:
+          type: string
+          description: The posted date of the latest transaction in the stream.
+          format: date
+        frequency:
+          $ref: '#/components/schemas/RecurringTransactionFrequency'
+        transaction_ids:
+          type: array
+          description: An array of Plaid transaction IDs belonging to the stream, sorted by posted date.
+          items:
+            type: string
+        average_amount:
+          $ref: '#/components/schemas/TransactionStreamAmount'
+        is_active:
+          type: boolean
+          description: indicates whether the transaction stream is still live.
+      required:
+      - account_id
+      - stream_id
+      - category
+      - category_id
+      - description
+      - first_date
+      - last_date
+      - frequency
+      - transaction_ids
+      - average_amount
+      - is_active
+    TransactionStreamAmount:
+      type: object
+      title: TransactionStreamAmount
+      description: Object with data pertaining to an amount on the transaction stream.
+      additionalProperties: true
+      properties:
+        amount:
+          type: number
+          description: represents the numerical value of an amount.
+        iso_currency_code:
+          type: string
+          description: |-
+            The ISO-4217 currency code of the amount. Always `null` if `unofficial_currency_code` is non-`null`.
+
+            See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `iso_currency_code`s.
+          nullable: true
+        unofficial_currency_code:
+          type: string
+          description: The unofficial currency code of the amount. Always `null` if `iso_currency_code` is non-`null`. Unofficial currency codes are used for currencies that do not have official ISO currency codes, such as cryptocurrencies and the currencies of certain countries.
+          nullable: true
+    RecurringTransactionFrequency:
+      type: string
+      description: describes the frequency of the transaction stream.
+      title: RecurringTransactionFrequency
+      enum:
+      - UNKNOWN
+      - WEEKLY
+      - BIWEEKLY
+      - SEMI_MONTHLY
+      - MONTHLY
     Institution:
       title: Institution
       type: object
@@ -10989,7 +11145,7 @@ components:
         401k:
           type: string
           description: Standard 401(k) retirement account (US)
-        403b:
+        403B:
           type: string
           description: 403(b) retirement savings account for non-profits and schools (US)
         457b:
@@ -11128,7 +11284,7 @@ components:
       - "529"
       - 401a
       - 401k
-      - 403b
+      - 403B
       - 457b
       - brokerage
       - cash isa

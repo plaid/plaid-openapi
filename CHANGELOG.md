@@ -1,3 +1,9 @@
+### 2020-09-14_1.34.1
+- Change "403b" to "403B" in the `InvestmentAccountSubtype` schema
+
+### 2020-09-14_1.34.0
+- Add `/transactions/recurring/get` route to the API
+
 ### 2020-09-14_1.33.0
 - Add `update.account_selection_enabled` parameter to `/link/token/create` for Account Select v2
 - Update descriptions for `TRANSACTIONS: INITIAL_UPDATE` AND `TRANSACTIONS: HISTORICAL_UPDATE` for Account Select v2
