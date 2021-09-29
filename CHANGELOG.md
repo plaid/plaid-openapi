@@ -1,3 +1,16 @@
+### 2020-09-14_1.36.1
+- Fixed a bug for `SignalEvaluateRequest` and removed `additionalProperties: true` for it.
+
+### 2020-09-14_1.36.0
+- Add missing `last_statement_balance` liabilities field to OpenAPI file.
+
+### 2020-09-14_1.35.0
+- Add support for `BSV` currency
+
+### 2020-09-14_1.34.2
+- Set the maximum `days_requested` to be 731 in the `AssetReportCreateRequest` and `AssetReportRefreshRequest` schemas
+- Set the `client_report_id` and `webhook` fields to be nullable in the `AssetReportCreateRequest` and `AssetReportRefreshRequest` schemas
+
 ### 2020-09-14_1.34.1
 - Change "403b" to "403B" in the `InvestmentAccountSubtype` schema
 

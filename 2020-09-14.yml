@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.34.1
+  version: 2020-09-14_1.36.1
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -1635,6 +1635,7 @@ paths:
                         last_payment_amount: 168.25
                         last_payment_date: "2019-05-22"
                         last_statement_issue_date: "2019-05-28"
+                        last_statement_balance: 1708.77
                         minimum_payment_amount: 20
                         next_payment_due_date: "2020-05-28"
                       mortgage:
@@ -6488,7 +6489,7 @@ components:
           maxItems: 99
         days_requested:
           type: integer
-          maximum: 730
+          maximum: 731
           minimum: 0
           description: The maximum integer number of days of history to include in the Asset Report. If using Fannie Mae Day 1 Certainty, `days_requested` must be at least 61 for new originations or at least 31 for refinancings.
         options:
@@ -6502,10 +6503,12 @@ components:
       properties:
         client_report_id:
           type: string
+          nullable: true
           description: Client-generated identifier, which can be used by lenders to track loan applications.
         webhook:
           type: string
           description: URL to which Plaid will send Assets webhooks, for example when the requested Asset Report is ready.
+          nullable: true
         user:
           $ref: '#/components/schemas/AssetReportUser'
     AssetReportCreateResponse:
@@ -6536,7 +6539,7 @@ components:
         days_requested:
           type: integer
           minimum: 0
-          maximum: 730
+          maximum: 731
           description: The maximum number of days of history to include in the Asset Report. Must be an integer. If not specified, the value from the original call to `/asset_report/create` will be used.
         options:
           $ref: '#/components/schemas/AssetReportRefreshRequestOptions'
@@ -6548,10 +6551,12 @@ components:
       properties:
         client_report_id:
           type: string
+          nullable: true
           description: Client-generated identifier, which can be used by lenders to track loan applications.
         webhook:
           type: string
           description: URL to which Plaid will send Assets webhooks, for example when the requested Asset Report is ready.
+          nullable: true
         user:
           $ref: '#/components/schemas/AssetReportUser'
     AssetReportRefreshResponse:
@@ -9201,6 +9206,9 @@ components:
           type: string
           format: date
           description: The date of the last statement. Dates are returned in an [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (YYYY-MM-DD).
+        last_statement_balance:
+          description: The total amount owed as of the last statement issued
+          type: number
         minimum_payment_amount:
           description: The minimum payment due for the next billing cycle.
           type: number
@@ -9216,6 +9224,7 @@ components:
       - last_payment_amount
       - last_payment_date
       - last_statement_issue_date
+      - last_statement_balance
       - minimum_payment_amount
       - next_payment_due_date
     MortgageLiability:
@@ -10926,6 +10935,9 @@ components:
         BTG:
           type: string
           description: Bitcoin Gold
+        BSV:
+          type: string
+          description: Bitcoin Satoshi Vision
         CNH:
           type: string
           description: Chinese Yuan (offshore)
@@ -11327,6 +11339,7 @@ components:
       - trust
       - ugma
       - utma
+      - variable annuity
     AssetReport:
       title: AssetReport
       type: object
@@ -15702,7 +15715,6 @@ components:
       title: SignalEvaluateRequest
       description: SignalEvaluateRequest defines the request schema for `/signal/evaluate`
       type: object
-      additionalProperties: true
       properties:
         client_id:
           $ref: '#/components/schemas/APIClientID'
