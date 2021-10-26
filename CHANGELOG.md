@@ -1,8 +1,70 @@
+### 2020-09-14_1.40.3
+- Fixing enum naming for verification object in `income/verification/paystubs/get`
+
+### 2020-09-14_1.40.2
+- Fixes typos and updates descriptions
+
+### 2020-09-14_1.40.1
+- Adds `user_present` as an optional field of `/signal/evaluate`.
+- Adds `days_funds_on_hold` as an optional field of `/signal/decision/report`.
+
+### 2020-09-14_1.40.0
+- Updating response body for `income/verification/paystubs/get` to return verification status for each paystub
+
+### 2020-09-14_1.39.1
+- Adds `item_id` to `/sandbox/income/fire_webhook` request
+
+### 2020-09-14_1.39.0
+- Adds `access_tokens` to `/income/verification/create` and `/link/token/create` for income verification.
+
+### 2020-09-14_1.38.0
+- Updates the response body for `/income/verification/paystubs/get` to incorporate new fields that will begin to be populated, and marks old fields as deprecated which will be phased out
+- Adds documentation for `/income/verification/taxforms/get`
+- Adds documentation for `/employment/verification/get`
+
+### 2020-09-14_1.37.7
+- Adds request requirements for `/transactions/recurring/get`
+
+### 2020-09-14_1.37.6
+- Adds `inflow_streams` to required field of `/transactions/recurring/get`.
+ 
+### 2020-09-14_1.37.5
+- Make default behavior of `include_insights` in `/asset_report/get` request explicit.
+
+### 2020-09-14_1.37.4
+- Adds `url` to `employer` field of  `/income/verification/precheck`.
+
+### 2020-09-14_1.37.3
+- Adds `address` to `employer` field of `/income/verification/precheck`. Marks `income_verification_id` deprecated in `/link/token/create`
+
+### 2020-09-14_1.37.2
+- Adds `precheck_id` to `/income/verification/create` and `/link/token/create` for income verification.
+
+### 2020-09-14_1.37.1
+- Adds `document_type` to `/income/verification/paystubs/get` and `/income/verification/taxforms/get`
+
+### 2020-09-14_1.37.0
+- Adding `employment/verification/get` route to the API
+
+### 2020-09-14_1.36.5
+- Adds ability to fetch individual documents from `/income/verification/documents/download`
+
+### 2020-09-14_1.36.4
+- Add additionalProperties to `SignalDecisionReportResponse`
+- Add additionalProperties to `SignalReturnReportResponse`
+- Make the `CoreAttributes` field of the `SignalEvaluateResponse` optional
+
+### 2020-09-14_1.36.3
+- Make the `days_requested` field for `AssetReportRefreshRequest` nullable.
+
+### 2020-09-14_1.36.2
+- Update examples
+
 ### 2020-09-14_1.36.1
 - Fixed a bug for `SignalEvaluateRequest` and removed `additionalProperties: true` for it.
 
 ### 2020-09-14_1.36.0
-- Add missing `last_statement_balance` liabilities field to OpenAPI file.
+- Add missing `last_statement_balance` liabilities field to OpenAPI file 
 
 ### 2020-09-14_1.35.0
 - Add support for `BSV` currency
