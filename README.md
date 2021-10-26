@@ -74,3 +74,5 @@ All template edits can be found on their corresponding in the `/templates` folde
 The [openapi-generator](https://github.com/OpenAPITools/openapi-generator) often uses different styles based on the language you are generating.
 
 - We found that we had to modify our mustache templates to get `servers` and `securitySchemes` working for some generators. If possible, try not to modify these templates as they cause breaking changes upon upgrading, but modifications might be necessary for cases like these.
+
+- Enums as used by Plaid are extensible; that is, the API may add new enum values at will. However, OpenAPI generator for some languages will enable enum validation by default. You must disable strict enum validation for responses in your generated libraries, or your users may experience crashes when encountering a newly-added enum value in a response.
