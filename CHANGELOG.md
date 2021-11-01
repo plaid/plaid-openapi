@@ -1,3 +1,32 @@
+### 2020-09-14_1.44.0
+- Add `/transactions/sync` endpoint
+
+### 2020-09-14_1.43.2
+- Removes `income_breakdown` and `ytd_earnings` from required fields in `Paystub`
+
+### 2020-09-14_1.43.1
+- Adds `transactions_access_tokens` to `/income/verification/precheck` to replace singular field.
+
+### 2020-09-14_1.43.0
+- Fix field names on recently created and unused paystub verification fields
+
+### 2020-09-14_1.42.0
+- Docs updates
+- Deprecates `status` enum returned by `/institutions/` endpoints in favor of more granular data returned by the `breakdown` object
+- Adds `DE` as a supported country code to support Payment Initiation
+
+### 2020-09-14_1.41.3
+- Adds `item_id` in `IncomeVerificationStatusWebhook`
+
+### 2020-09-14_1.41.2
+- Adds `account_product_access`, `account_product_access.tax_documents`, `account_product_access.statements`, and `account_product_access.account_data` fields to `AccountAccess`
+
+### 2020-09-14_1.41.1
+- Include `doc_id` in `/income/verification/taxforms/get`
+
+### 2020-09-14_1.41.0
+- Adding minimum and maximum string validation for `client_transaction_id` in `signal/` endpoints
+
 ### 2020-09-14_1.40.3
 - Fixing enum naming for verification object in `income/verification/paystubs/get`
 
