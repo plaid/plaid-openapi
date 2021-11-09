@@ -1,3 +1,24 @@
+### 2020-09-14_1.46.0
+- Adds `merchant_name` and `check_number` to the transaction base and therefore to the asset transaction schema.
+
+### 2020-09-14_1.45.3
+- Changes the type of `sweep_id` from int to UUID string
+
+### 2020-09-14_1.45.2
+- Updated `/income/` enums in responses to not use anonymous objects
+
+### 2020-09-14_1.45.1
+- Add new webhook status `VERIFICATION_STATUS_PENDING_APPROVAL` in `income_verification` apis.
+
+### 2020-09-14_1.45.0
+- Adds product field to item response
+
+### 2020-09-14_1.44.2
+- Marks `/income/verification/create` and `/income/verification/summary/get` as deprecated
+
+### 2020-09-14_1.44.1
+- Updates documentation for the `authorized` field in `/item/application/scopes/update`
+
 ### 2020-09-14_1.44.0
 - Add `/transactions/sync` endpoint
 

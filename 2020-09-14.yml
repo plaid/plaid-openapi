@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.44.0
+  version: 2020-09-14_1.46.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -3995,7 +3995,7 @@ paths:
                 example-1:
                   value:
                     sweep:
-                      id: 0
+                      id: d5394a4d-0b04-4a02-9f4a-7ca5c0f52f9d
                       transfer_id: 460cbe92-2dcc-8eae-5ad6-b37d0ec90fd9
                       created_at: "2020-08-06T17:27:15Z"
                       amount: "12.34"
@@ -4039,7 +4039,7 @@ paths:
                 example-1:
                   value:
                     sweeps:
-                    - id: 0
+                    - id: d5394a4d-0b04-4a02-9f4a-7ca5c0f52f9d
                       transfer_id: 460cbe92-2dcc-8eae-5ad6-b37d0ec90fd9
                       created_at: "2020-08-06T17:27:15Z"
                       amount: "12.34"
@@ -4243,7 +4243,7 @@ paths:
               $ref: '#/components/schemas/EmployersSearchRequest'
   /income/verification/create:
     post:
-      summary: Create an income verification instance
+      summary: (Deprecated) Create an income verification instance
       tags:
       - plaid
       deprecated: true
@@ -4271,7 +4271,7 @@ paths:
               $ref: '#/components/schemas/IncomeVerificationCreateRequest'
   /income/verification/summary/get:
     post:
-      summary: Retrieve a summary of information derived from income verification
+      summary: (Deprecated) Retrieve a summary of information derived from income verification
       tags:
       - plaid
       externalDocs:
@@ -4858,7 +4858,7 @@ paths:
       description: |-
         Use `/signal/evaluate` to evaluate a planned ACH transaction to get a return risk assessment (such as a risk score and risk tier) and additional risk signals.
 
-        In order to obtain a valid score for an ACH transaction, Plaid must have an access token for the account, and the Item must be healthy (receiving product updates) or have recently been in a healthy state. If the transaction does not meet eligibility requirements, an error will be returned corresponding to the underlying cause.
+        In order to obtain a valid score for an ACH transaction, Plaid must have an access token for the account, and the Item must be healthy (receiving product updates) or have recently been in a healthy state. If the transaction does not meet eligibility requirements, an error will be returned corresponding to the underlying cause. If `/signal/evaluate` is called on the same transaction multiple times within a 24-hour period, cached results may be returned.
       responses:
         "200":
           description: OK
@@ -4876,7 +4876,12 @@ paths:
                       bank_initiated_return_risk:
                         score: 72
                         risk_tier: 7
-                    core_attributes: {}
+                    core_attributes:
+                      days_since_first_plaid_connection: 510
+                      plaid_connections_count_7d: 6
+                      plaid_connections_count_30d: 7
+                      total_plaid_connections_count: 15
+                      is_savings_or_money_market_account: false
                     request_id: mdqfuVxeoza6mhu
         default:
           description: Error response.
@@ -7659,6 +7664,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Products'
+        products:
+          description: |
+            A list of authorized products for the Item.
+          type: array
+          items:
+            $ref: '#/components/schemas/Products'
         consent_expiration_time:
           description: |
             The RFC 3339 timestamp after which the consent provided by the end user will expire. Upon consent expiration, the item will enter the `ITEM_LOGIN_REQUIRED` error state. To circumvent the `ITEM_LOGIN_REQUIRED` error and maintain continuous consent, the end user can reauthenticate via Link’s update mode in advance of the consent expiration time.
@@ -8321,6 +8332,14 @@ components:
         transaction_id:
           type: string
           description: The unique ID of the transaction. Like all Plaid identifiers, the `transaction_id` is case sensitive.
+        merchant_name:
+          type: string
+          description: The merchant name, as extracted by Plaid from the `name` field.
+          nullable: true
+        check_number:
+          type: string
+          description: The check number of the transaction. This field is only populated for check transactions.
+          nullable: true
       required:
       - transaction_id
       - pending
@@ -8329,6 +8348,8 @@ components:
       - iso_currency_code
       - amount
       - account_id
+      - merchant_name
+      - check_number
     Transaction:
       title: Transaction
       description: A representation of a transaction
@@ -8353,10 +8374,6 @@ components:
               `other:` transactions that relate to banks, e.g. fees or deposits.
 
               This field replaces the `transaction_type` field.
-          merchant_name:
-            type: string
-            description: The merchant name, as extracted by Plaid from the `name` field.
-            nullable: true
           authorized_date:
             type: string
             format: date
@@ -8378,10 +8395,6 @@ components:
 
               This field is only populated for UK institutions. For institutions in other countries, will be `null`.
             nullable: true
-          check_number:
-            type: string
-            description: The check number of the transaction. This field is only populated for check transactions.
-            nullable: true
           transaction_code:
             $ref: '#/components/schemas/TransactionCode'
           personal_finance_category:
@@ -8396,7 +8409,6 @@ components:
         - payment_channel
         - payment_meta
         - name
-        - merchant_name
         - location
         - authorized_date
         - authorized_datetime
@@ -8404,7 +8416,6 @@ components:
         - category_id
         - category
         - transaction_code
-        - check_number
     Location:
       title: Transaction Location
       type: object
@@ -13758,9 +13769,7 @@ components:
         secret:
           $ref: '#/components/schemas/APISecret'
         sweep_id:
-          type: integer
-          format: int64
-          minimum: 0
+          type: string
           description: Identifier of the sweep.
         origination_account_id:
           type: string
@@ -13793,11 +13802,6 @@ components:
         origination_account_id:
           type: string
           description: If multiple origination accounts are available, `origination_account_id` must be used to specify the account that the sweeps belong to.
-          nullable: true
-        start_id:
-          type: integer
-          minimum: 0
-          description: Starting ID of sweeps to return.
           nullable: true
         start_time:
           type: string
@@ -13838,9 +13842,7 @@ components:
       description: BankTransferSweep describes a sweep transfer.
       properties:
         id:
-          type: integer
-          format: int64
-          minimum: 0
+          type: string
           description: Identifier of the sweep.
         transfer_id:
           type: string
@@ -14377,23 +14379,26 @@ components:
         request_id:
           $ref: '#/components/schemas/RequestID'
         confidence:
-          description: |-
-            The confidence that Plaid can support the user in the income verification flow. One of the following:
-
-            `"HIGH"`: This precheck information submitted is definitively tied to a Plaid-supported integration.
-
-            "`LOW`": This precheck information submitted is known not to be supported by Plaid.
-
-            `"UNKNOWN"`: It was not possible to determine if the user is supportable with the information passed.
-          type: string
-          enum:
-          - HIGH
-          - LOW
-          - UNKNOWN
+          $ref: '#/components/schemas/IncomeVerificationPrecheckConfidence'
       required:
       - precheck_id
       - confidence
       - request_id
+    IncomeVerificationPrecheckConfidence:
+      confidence: null
+      description: |-
+        The confidence that Plaid can support the user in the income verification flow. One of the following:
+
+        `"HIGH"`: This precheck information submitted is definitively tied to a Plaid-supported integration.
+
+        "`LOW`": This precheck information submitted is known not to be supported by Plaid.
+
+        `"UNKNOWN"`: It was not possible to determine if the user is supportable with the information passed.
+      type: string
+      enum:
+      - HIGH
+      - LOW
+      - UNKNOWN
     LinkTokenCreateRequestIncomeVerification:
       title: LinkTokenCreateRequestIncomeVerification
       type: object
@@ -14441,7 +14446,7 @@ components:
           description: The Item ID associated with the verification.
         verification_status:
           type: string
-          description: "`VERIFICATION_STATUS_PROCESSING_COMPLETE`: The income verification status processing has completed. If the user uploaded multiple documents, this status means that at least one document was processed successfully. \n\n`VERIFICATION_STATUS_DOCUMENT_REJECTED`: The documentation uploaded by the end user was recognized as a supported file format, but not recognized as a valid verification document. Common causes include poor image quality or the document not being an acceptable income verification document.\n\n`VERIFICATION_STATUS_PROCESSING_FAILED`: A failure occurred when attempting to process the verification documentation."
+          description: "`VERIFICATION_STATUS_PROCESSING_COMPLETE`: The income verification status processing has completed. If the user uploaded multiple documents, this status means that at least one document was processed successfully. \n\n`VERIFICATION_STATUS_DOCUMENT_REJECTED`: The documentation uploaded by the end user was recognized as a supported file format, but not recognized as a valid verification document. Common causes include poor image quality or the document not being an acceptable income verification document.\n\n`VERIFICATION_STATUS_PROCESSING_FAILED`: A failure occurred when attempting to process the verification documentation.\n\n`VERIFICATION_STATUS_PENDING_APPROVAL`: The income verification has been sent to the user for review."
       required:
       - webhook_type
       - webhook_code
@@ -14630,20 +14635,23 @@ components:
       nullable: true
       properties:
         value:
-          type: string
-          enum:
-          - monthly
-          - semimonthly
-          - weekly
-          - biweekly
-          - unknown
-          - "null"
-          description: The frequency of the pay period.
+          $ref: '#/components/schemas/PayFrequencyValue'
         verification_status:
           $ref: '#/components/schemas/VerificationStatus'
       required:
       - value
       - verification_status
+    PayFrequencyValue:
+      type: string
+      title: PayFrequencyValue
+      enum:
+      - monthly
+      - semimonthly
+      - weekly
+      - biweekly
+      - unknown
+      - null
+      description: The frequency of the pay period.
     VerificationStatus:
       type: string
       title: VerificationStatus
@@ -14760,34 +14768,36 @@ components:
           type: string
           description: An identifier of the document that is also present in the paystub response.
         doc_type:
-          type: string
-          description: |-
-            The type of document.
+          $ref: '#/components/schemas/DocType'
+    DocType:
+      type: string
+      description: |-
+        The type of document.
 
-            `DOCUMENT_TYPE_PAYSTUB`: A paystub.
+        `DOCUMENT_TYPE_PAYSTUB`: A paystub.
 
-            `DOCUMENT_TYPE_BANK_STATEMENT`: A bank statement.
+        `DOCUMENT_TYPE_BANK_STATEMENT`: A bank statement.
 
-            `DOCUMENT_TYPE_US_TAX_W2`: A W-2 wage and tax statement provided by a US employer reflecting wages earned by the employee.
+        `DOCUMENT_TYPE_US_TAX_W2`: A W-2 wage and tax statement provided by a US employer reflecting wages earned by the employee.
 
-            `DOCUMENT_TYPE_US_MILITARY_ERAS`: An electronic Retirement Account Statement (eRAS) issued by the US military.
+        `DOCUMENT_TYPE_US_MILITARY_ERAS`: An electronic Retirement Account Statement (eRAS) issued by the US military.
 
-            `DOCUMENT_TYPE_US_MILITARY_LES`: A Leave and Earnings Statement (LES) issued by the US military.
+        `DOCUMENT_TYPE_US_MILITARY_LES`: A Leave and Earnings Statement (LES) issued by the US military.
 
-            `DOCUMENT_TYPE_US_MILITARY_CLES`: A Civilian Leave and Earnings Statment (CLES) issued by the US military.
+        `DOCUMENT_TYPE_US_MILITARY_CLES`: A Civilian Leave and Earnings Statment (CLES) issued by the US military.
 
-            `DOCUMENT_TYPE_GIG`: Used to indicate that the income is related to gig work. Does not necessarily correspond to a specific document type.
+        `DOCUMENT_TYPE_GIG`: Used to indicate that the income is related to gig work. Does not necessarily correspond to a specific document type.
 
-            `UNKNOWN`: Document type could not be determined.
-          enum:
-          - UNKNOWN
-          - DOCUMENT_TYPE_PAYSTUB
-          - DOCUMENT_TYPE_BANK_STATEMENT
-          - DOCUMENT_TYPE_US_TAX_W2
-          - DOCUMENT_TYPE_US_MILITARY_ERAS
-          - DOCUMENT_TYPE_US_MILITARY_LES
-          - DOCUMENT_TYPE_US_MILITARY_CLES
-          - DOCUMENT_TYPE_GIG
+        `UNKNOWN`: Document type could not be determined.
+      enum:
+      - UNKNOWN
+      - DOCUMENT_TYPE_PAYSTUB
+      - DOCUMENT_TYPE_BANK_STATEMENT
+      - DOCUMENT_TYPE_US_TAX_W2
+      - DOCUMENT_TYPE_US_MILITARY_ERAS
+      - DOCUMENT_TYPE_US_MILITARY_LES
+      - DOCUMENT_TYPE_US_MILITARY_CLES
+      - DOCUMENT_TYPE_GIG
     Paystub:
       title: Paystub
       type: object
@@ -14918,26 +14928,7 @@ components:
       additionalProperties: true
       properties:
         canonical_description:
-          type: string
-          nullable: true
-          description: Commonly used term to describe the line item.
-          enum:
-          - BONUS
-          - COMMISSION
-          - OVERTIME
-          - PAID TIME OFF
-          - REGULAR PAY
-          - VACATION
-          - EMPLOYEE MEDICARE
-          - FICA
-          - SOCIAL SECURITY EMPLOYEE TAX
-          - MEDICAL
-          - VISION
-          - DENTAL
-          - NET PAY
-          - TAXES
-          - NOT_FOUND
-          - OTHER
+          $ref: '#/components/schemas/TotalCanonicalDescription'
         description:
           type: string
           description: Text of the line item as printed on the paystub.
@@ -14946,6 +14937,28 @@ components:
           $ref: '#/components/schemas/Pay'
         ytd_pay:
           $ref: '#/components/schemas/Pay'
+    TotalCanonicalDescription:
+      type: string
+      nullable: true
+      description: Commonly used term to describe the line item.
+      enum:
+      - BONUS
+      - COMMISSION
+      - OVERTIME
+      - PAID TIME OFF
+      - REGULAR PAY
+      - VACATION
+      - EMPLOYEE MEDICARE
+      - FICA
+      - SOCIAL SECURITY EMPLOYEE TAX
+      - MEDICAL
+      - VISION
+      - DENTAL
+      - NET PAY
+      - TAXES
+      - NOT_FOUND
+      - OTHER
+      - null
     Pay:
       title: Pay
       type: object
@@ -14992,18 +15005,7 @@ components:
       description: An object representing the earnings line items for the pay period.
       properties:
         canonical_description:
-          type: string
-          description: Commonly used term to describe the earning line item.
-          enum:
-          - BONUS
-          - COMMISSION
-          - OVERTIME
-          - PAID TIME OFF
-          - REGULAR PAY
-          - VACATION
-          - OTHER
-          - null
-          nullable: true
+          $ref: '#/components/schemas/EarningsBreakdownCanonicalDescription'
         current_amount:
           type: number
           description: Raw amount of the earning line item.
@@ -15035,35 +15037,25 @@ components:
           type: number
           description: The year-to-date amount of the deduction.
           nullable: true
+    EarningsBreakdownCanonicalDescription:
+      type: string
+      description: Commonly used term to describe the earning line item.
+      enum:
+      - BONUS
+      - COMMISSION
+      - OVERTIME
+      - PAID TIME OFF
+      - REGULAR PAY
+      - VACATION
+      - OTHER
+      - null
+      nullable: true
     EarningsTotal:
       title: EarningsTotal
       type: object
       description: An object representing both the current pay period and year to date amount for an earning category.
       additionalProperties: true
       properties:
-        canonical_description:
-          x-private_visibility: true
-          deprecated: true
-          type: string
-          description: Commonly used term to describe the line item.
-          enum:
-          - BONUS
-          - COMMISSION
-          - OVERTIME
-          - PAID TIME OFF
-          - REGULAR PAY
-          - VACATION
-          - EMPLOYEE MEDICARE
-          - FICA
-          - SOCIAL SECURITY EMPLOYEE TAX
-          - MEDICAL
-          - VISION
-          - DENTAL
-          - NET PAY
-          - TAXES
-          - NOT_FOUND
-          - OTHER
-          nullable: true
         current_amount:
           type: number
           description: Total amount of the earnings for this pay period
@@ -15163,14 +15155,17 @@ components:
           description: The name of the payroll provider that generated the paystub, e.g. ADP
           nullable: true
         pay_frequency:
-          type: string
-          description: 'The frequency at which the employee is paid. Possible values: `MONTHLY`, `BI-WEEKLY`, `WEEKLY`, `SEMI-MONTHLY`.'
-          enum:
-          - MONTHLY
-          - BI-WEEKLY
-          - WEEKLY
-          - SEMI-MONTHLY
-          nullable: true
+          $ref: '#/components/schemas/PaystubPayFrequency'
+    PaystubPayFrequency:
+      type: string
+      description: 'The frequency at which the employee is paid. Possible values: `MONTHLY`, `BI-WEEKLY`, `WEEKLY`, `SEMI-MONTHLY`.'
+      enum:
+      - MONTHLY
+      - BI-WEEKLY
+      - WEEKLY
+      - SEMI-MONTHLY
+      - null
+      nullable: true
     IncomeBreakdown:
       title: IncomeBreakdown
       type: object
@@ -15179,18 +15174,7 @@ components:
       deprecated: true
       properties:
         type:
-          type: string
-          description: |-
-            The type of income. Possible values include:
-              `"regular"`: regular income
-              `"overtime"`: overtime income
-              `"bonus"`: bonus income
-          enum:
-          - bonus
-          - overtime
-          - regular
-          - null
-          nullable: true
+          $ref: '#/components/schemas/IncomeBreakdownType'
         rate:
           type: number
           description: The hourly rate at which the income is paid.
@@ -15208,6 +15192,19 @@ components:
       - rate
       - hours
       - total
+    IncomeBreakdownType:
+      type: string
+      description: |-
+        The type of income. Possible values include:
+          `"regular"`: regular income
+          `"overtime"`: overtime income
+          `"bonus"`: bonus income
+      enum:
+      - bonus
+      - overtime
+      - regular
+      - null
+      nullable: true
     Employee:
       title: Employee
       type: object
@@ -15440,14 +15437,7 @@ components:
       nullable: true
       properties:
         verification_status:
-          type: string
-          description: Derived verification status.
-          nullable: true
-          enum:
-          - PAYSTUB_VERIFICATION_STATUS_UNKNOWN
-          - PAYSTUB_VERIFICATION_STATUS_VERIFIED
-          - PAYSTUB_VERIFICATION_STATUS_FRAUDULENT
-          - null
+          $ref: '#/components/schemas/PaystubVerificationStatus'
         verification_attributes:
           type: array
           items:
@@ -15455,6 +15445,15 @@ components:
       required:
       - verification_status
       - fraud_attributes
+    PaystubVerificationStatus:
+      type: string
+      description: Derived verification status.
+      nullable: true
+      enum:
+      - PAYSTUB_VERIFICATION_STATUS_UNKNOWN
+      - PAYSTUB_VERIFICATION_STATUS_VERIFIED
+      - PAYSTUB_VERIFICATION_STATUS_FRAUDULENT
+      - null
     VerificationAttribute:
       title: VerificationAttribute
       description: Details about a certain reason as to why a document could potentially be fraudulent
@@ -15728,13 +15727,7 @@ components:
       description: An object containing proof of employment data for an individual
       properties:
         status:
-          type: string
-          description: Current employment status.
-          nullable: true
-          enum:
-          - EMPLOYMENT_STATUS_ACTIVE
-          - EMPLOYMENT_STATUS_INACTIVE
-          - null
+          $ref: '#/components/schemas/EmploymentVerificationStatus'
         start_date:
           format: date
           type: string
@@ -15753,6 +15746,14 @@ components:
           nullable: true
         platform_ids:
           $ref: '#/components/schemas/PlatformIds'
+    EmploymentVerificationStatus:
+      type: string
+      description: Current employment status.
+      nullable: true
+      enum:
+      - EMPLOYMENT_STATUS_ACTIVE
+      - EMPLOYMENT_STATUS_INACTIVE
+      - null
     EmployerVerification:
       title: EmployerVerification
       type: object
@@ -16080,7 +16081,7 @@ components:
           description: The unique account identifier for this account. This value must match that returned by the data access API for this account.
           type: string
         authorized:
-          description: Allow the application to see this account (and associated details, including balance) in the list of accounts. If relevant to the partner and unset, defaults to `true`.
+          description: Allow the application to see this account (and associated details, including balance) in the list of accounts  If unset, defaults to `true`.
           type: boolean
           nullable: true
           default: true
@@ -16376,7 +16377,7 @@ components:
           description: The transaction amount, in USD (e.g. `102.05`)
         user_present:
           type: boolean
-          description: returns `true` if the end user is present while initiating the ACH transfer and the endpoint is being called; `false` otherwise (for example, when the ACH transfer is scheduled and the end user is not present, or you call this endpoint after the ACH transfer but before submitting the Nacha file for ACH processing).
+          description: '`true` if the end user is present while initiating the ACH transfer and the endpoint is being called; `false` otherwise (for example, when the ACH transfer is scheduled and the end user is not present, or you call this endpoint after the ACH transfer but before submitting the Nacha file for ACH processing).'
           nullable: true
         client_user_id:
           type: string
@@ -16560,7 +16561,7 @@ components:
     SignalEvaluateCoreAttributes:
       title: SignalEvaluateCoreAttributes
       type: object
-      description: The core attributes object contains additional data that can be used to assess the ACH return risk. For detailed documentation of core attributes available, or to request that core attributes not be returned, contact Sales or your Plaid account manager.
+      description: "The core attributes object contains additional data that can be used to assess the ACH return risk. Examples of data include:\n\n`days_since_first_plaid_connection`: The number of days since the first time the Item was connected to an application via Plaid\n`plaid_connections_count_7d`: The number of times the Item has been connected to applications via Plaid over the past 7 days\n`plaid_connections_count_30d`: The number of times the Item has been connected to applications via Plaid over the past 30 days\n`total_plaid_connections_count`: The number of times the Item has been connected to applications via Plaid\n`is_savings_or_money_market_account`: Indicates whether the ACH transaction funding account is a savings/money market account\n\nFor the full list and detailed documentation of core attributes available, or to request that core attributes not be returned, contact Sales or your Plaid account manager      "
       properties:
         unauthorized_transactions_count_7d:
           type: integer
