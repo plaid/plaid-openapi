@@ -1,3 +1,6 @@
+### 2020-09-14_1.46.1
+- Removes `confidence` field from `IncomeVerificationPrecheckConfidence`. This was typo introduced in version 1.45.2
+
 ### 2020-09-14_1.46.0
 - Adds `merchant_name` and `check_number` to the transaction base and therefore to the asset transaction schema.
 
