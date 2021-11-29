@@ -1,3 +1,45 @@
+### 2020-09-14_1.54.0
+- internal changes
+
+### 2020-09-14_1.53.0
+- define `/transfer/sweep/get` & `/transfer/sweep/list` paths
+- update `/transfer/event/list` to accept `sweep_id`
+- new event_types `swept` & `reverse_swept`
+- new sweep_status field on Transfer
+- `sandbox/transfer/sweep/simulate` endpoint to support creating / setting `sweep_status` in sandbox
+
+### 2020-09-14_1.52.0
+- Adds `/wallet/transactions/list` endpoint
+
+### 2020-09-14_1.51.0
+-- Replaces the `emi_account_id` field on Payment Initiation API routes with `wallet_id`
+
+### 2020-09-14_1.50.0
+- Adds `/wallet/transaction/execute` endpoint
+
+### 2020-09-14_1.49.0
+- Adds `/wallet/get` endpoint
+
+### 2020-09-14_1.48.0
+- Adds `transfer` object to the `/link/token/create` request schema
+
+### 2020-09-14_1.47.2
+- Removes the option for `additionalProperties` in `SignalReturnReportRequest` 
+- Adds `additionalProperties` to `SignalReturnReportResponse` 
+
+### 2020-09-14_1.47.1
+- Adds description updates and bug fix for Income Verification endpoints
+- Adds German as supported language for Link
+
+### 2020-09-14_1.47.0
+- Adds `/transfer/intent/create` and `/transfer/intent/get` endpoints for Transfer UI
+
+### 2020-09-14_1.46.3
+- Fix for `/transactions/sync` response object
+
+### 2020-09-14_1.46.2
+- Adds new options to `VerificationAttributes` enum
+
 ### 2020-09-14_1.46.1
 - Removes `confidence` field from `IncomeVerificationPrecheckConfidence`. This was typo introduced in version 1.45.2
 
