@@ -1,3 +1,24 @@
+### 2020-09-14_1.58.1
+- Fixes duplicate entries in `PaymentInitiationPaymentStatus`
+
+### 2020-09-14_1.58.0
+- Updated schema definitions for `/transfer/intent/create` and `/transfer/intent/get` paths
+
+### 2020-09-14_1.57.1
+- Added `x-plaid-income-enum-lint` property to enums used by income team
+
+### 2020-09-14_1.57.0
+- Added `PAYMENT_STATUS_REJECTED` to the `PaymentInitiationPaymentStatus` enum
+
+### 2020-09-14_1.56.0
+- Added new payment statuses to `PaymentInitiationPaymentStatus` enum
+
+### 2020-09-14_1.55.1
+- Added fields to example response for `/income/verification/precheck`
+
+### 2020-09-14_1.55.0
+- Adds enums to `/income/verification/refresh` response
+
 ### 2020-09-14_1.54.2
 - Added `PAYMENT_STATUS_EXECUTED` to the list of allowed `PaymentInitiationPaymentStatus`s, as the API was already returning this. Also created a separate model for the enum instead of defining it inline.
 
