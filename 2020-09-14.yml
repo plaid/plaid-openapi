@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.54.2
+  version: 2020-09-14_1.58.1
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -4242,28 +4242,28 @@ paths:
                 example-1:
                   value:
                     transfer_intent:
-                      id: 460cbe92-2dcc-8eae-5ad6-b37d0ec90fd9
-                      created: "2020-08-06T17:27:15Z"
-                      status: PENDING
                       account_id: 6qL6lWoQkAfNE3mB8Kk5tAnvpX81qefrvvl7B
-                      origination_account_id: 9853defc-e703-463d-86b1-dc0607a45359
-                      amount: "12.34"
-                      mode: DISBURSEMENT
                       ach_class: ppd
+                      amount: "12.34"
+                      created: "2020-08-06T17:27:15Z"
+                      description: Desc
+                      id: 460cbe92-2dcc-8eae-5ad6-b37d0ec90fd9
+                      metadata:
+                        key1: value1
+                        key2: value2
+                      mode: DISBURSEMENT
+                      origination_account_id: 9853defc-e703-463d-86b1-dc0607a45359
+                      status: PENDING
                       user:
-                        legal_name: Foo Bar
-                        phone_number: 123-456-7890
-                        email_address: user@plaid.com
                         address:
                           street: 100 Market Street
                           city: San Francisco
                           region: California
                           postal_code: "94103"
                           country: US
-                      description: Desc
-                      metadata:
-                        key1: value1
-                        key2: value2
+                        email_address: user@plaid.com
+                        legal_name: Foo Bar
+                        phone_number: 123-456-7890
                     request_id: saKrIBuEB9qJZno
         default:
           description: Error response
@@ -4297,30 +4297,32 @@ paths:
                 example-1:
                   value:
                     transfer_intent:
-                      id: 460cbe92-2dcc-8eae-5ad6-b37d0ec90fd9
+                      account_id: 6qL6lWoQkAfNE3mB8Kk5tAnvpX81qefrvvl7B
+                      ach_class: ppd
+                      amount: "12.34"
+                      authorization_decision: APPROVED
+                      authorization_decision_rationale: null
                       created: "2020-08-06T17:27:15Z"
+                      description: Desc
+                      failure_reason: null
+                      id: 460cbe92-2dcc-8eae-5ad6-b37d0ec90fd9
+                      metadata:
+                        key1: value1
+                        key2: value2
+                      mode: DISBURSEMENT
+                      origination_account_id: 9853defc-e703-463d-86b1-dc0607a45359
                       status: SUCCEEDED
                       transfer_id: 8945fedc-e703-463d-86b1-dc0607b55460
-                      authorization_decision: APPROVED
-                      account_id: 6qL6lWoQkAfNE3mB8Kk5tAnvpX81qefrvvl7B
-                      origination_account_id: 9853defc-e703-463d-86b1-dc0607a45359
-                      amount: "12.34"
-                      mode: DISBURSEMENT
-                      ach_class: ppd
                       user:
-                        legal_name: Foo Bar
-                        phone_number: 123-456-7890
-                        email_address: user@plaid.com
                         address:
                           street: 100 Market Street
                           city: San Francisco
                           region: California
                           postal_code: "94103"
                           country: US
-                      description: Desc
-                      metadata:
-                        key1: value1
-                        key2: value2
+                        email_address: user@plaid.com
+                        legal_name: Foo Bar
+                        phone_number: 123-456-7890
                     request_id: saKrIBuEB9qJZno
         default:
           description: Error response
@@ -4385,6 +4387,10 @@ paths:
               examples:
                 example-1:
                   value:
+                    sweep:
+                      id: d5394a4d-0b04-4a02-9f4a-7ca5c0f52f9d
+                      created_at: "2020-08-06T17:27:15Z"
+                      amount: "12.34"
                     request_id: mdqfuVxeoza6mhu
         default:
           description: Error response
@@ -4916,6 +4922,8 @@ paths:
                 example-1:
                   value:
                     request_id: lMjeOeu9X1VUh1F
+                    precheck_id: n9elqYlvYm
+                    confidence: HIGH
       description: '`/income/verification/precheck` returns whether a given user is supportable by the income product'
       requestBody:
         required: true
@@ -6819,16 +6827,16 @@ components:
       - PAYMENT_STATUS_BLOCKED
       - PAYMENT_STATUS_UNKNOWN
       - PAYMENT_STATUS_EXECUTED
+      - PAYMENT_STATUS_AUTHORISING
+      - PAYMENT_STATUS_CANCELLED
+      - PAYMENT_STATUS_ESTABLISHED
+      - PAYMENT_STATUS_REJECTED
       description: |-
         The status of the payment.
 
         `PAYMENT_STATUS_INPUT_NEEDED`: This is the initial state of all payments. It indicates that the payment is waiting on user input to continue processing. A payment may re-enter this state later on if further input is needed.
 
-        `PAYMENT_STATUS_PROCESSING`: The payment is currently being processed. The payment will automatically exit this state when processing is complete.
-
-        `PAYMENT_STATUS_INITIATED`: The payment has been successfully initiated and is considered complete.
-
-        `PAYMENT_STATUS_COMPLETED`: Indicates that the standing order has been successfully established. This state is only used for standing orders.
+        `PAYMENT_STATUS_INITIATED`: The payment has been successfully authorised and accepted by the financial institution but has not been executed.
 
         `PAYMENT_STATUS_INSUFFICIENT_FUNDS`: The payment has failed due to insufficient funds.
 
@@ -6836,7 +6844,24 @@ components:
 
         `PAYMENT_STATUS_BLOCKED`: The payment has been blocked. This is a retryable error.
 
+        `PAYMENT_STATUS_AUTHORISING`: The payment is currently being processed. The payment will automatically exit this state when the financial institution has authorised the transaction.
+
+        `PAYMENT_STATUS_CANCELLED`: The payment was cancelled during authorisation.
+
+        `PAYMENT_STATUS_EXECUTED`: The payment has been successfully initiated and is considered complete.
+
+        `PAYMENT_STATUS_ESTABLISHED`: Indicates that the standing order has been successfully established. This state is only used for standing orders.
+
+        `PAYMENT_STATUS_REJECTED`: The payment was rejected by the financial institution.
+
+        Deprecated:
+        These statuses will be removed in a future release.
+
         `PAYMENT_STATUS_UNKNOWN`: The payment status is unknown.
+
+        `PAYMENT_STATUS_PROCESSING`: The payment is currently being processed. The payment will automatically exit this state when processing is complete.
+
+        `PAYMENT_STATUS_COMPLETED`: Indicates that the standing order has been successfully established. This state is only used for standing orders.
     PaymentInitiationPayment:
       type: object
       additionalProperties: true
@@ -14491,6 +14516,7 @@ components:
         account_id:
           type: string
           description: The Plaid `account_id` for the account that will be debited or credited.
+          nullable: true
         mode:
           $ref: '#/components/schemas/TransferIntentCreateMode'
         amount:
@@ -14509,7 +14535,6 @@ components:
           $ref: '#/components/schemas/TransferUserInRequest'
         metadata:
           $ref: '#/components/schemas/TransferMetadata'
-          nullable: true
       required:
       - client_id
       - secret
@@ -14518,11 +14543,11 @@ components:
       - description
       - ach_class
       - user
-    TransferIntentCreateResponse:
-      title: TransferIntentCreateResponse
+    TransferIntentCreate:
+      title: TransferIntentCreate
       type: object
       additionalProperties: true
-      description: Defines the response schema for `/transfer/intent/create`
+      description: Represents a transfer intent within Transfer UI.
       properties:
         id:
           type: string
@@ -14541,11 +14566,12 @@ components:
             The status of the transfer intent.
 
             - `PENDING` – The transfer intent is pending.
-            - `SUCCEEDED`– The transfer intent was successfully created.
+            - `SUCCEEDED` – The transfer intent was successfully created.
             - `FAILED` – The transfer intent was unable to be created.
         account_id:
           type: string
-          description: The Plaid `account_id` for the account that will be debited or credited.
+          description: The Plaid `account_id` for the account that will be debited or credited. Returned only if `account_id` was set on intent creation.
+          nullable: true
         origination_account_id:
           type: string
           description: Plaid’s unique identifier for the origination account for the intent. If not provided, the default account will be used.
@@ -14562,7 +14588,6 @@ components:
           description: A description for the underlying transfer. Maximum of 8 characters.
         metadata:
           $ref: '#/components/schemas/TransferMetadata'
-          nullable: true
       required:
       - id
       - created
@@ -14573,6 +14598,18 @@ components:
       - ach_class
       - user
       - description
+    TransferIntentCreateResponse:
+      title: TransferIntentCreateResponse
+      type: object
+      additionalProperties: true
+      description: Defines the response schema for `/transfer/intent/create`
+      properties:
+        transfer_intent:
+          $ref: '#/components/schemas/TransferIntentCreate'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - transfer_intent
       - request_id
     TransferIntentGetRequest:
       title: TransferIntentGetRequest
@@ -14591,11 +14628,11 @@ components:
       - client_id
       - secret
       - transfer_intent_id
-    TransferIntentGetResponse:
-      title: TransferIntentGetResponse
+    TransferIntentGet:
+      title: TransferIntentGet
       type: object
       additionalProperties: true
-      description: Defines the response schema for `/transfer/intent/get`
+      description: Represents a transfer intent within Transfer UI.
       properties:
         id:
           type: string
@@ -14610,7 +14647,12 @@ components:
           - PENDING
           - SUCCEEDED
           - FAILED
-          description: The status of the transfer intent.
+          description: |-
+            The status of the transfer intent.
+
+            - `PENDING` – The transfer intent is pending.
+            - `SUCCEEDED` – The transfer intent was successfully created.
+            - `FAILED` – The transfer intent was unable to be created.
         transfer_id:
           type: string
           description: Plaid's unique identifier for the transfer created through the UI. Returned only if the transfer was successfully created. Null value otherwise.
@@ -14629,7 +14671,8 @@ components:
           $ref: '#/components/schemas/TransferAuthorizationDecisionRationale'
         account_id:
           type: string
-          description: The Plaid `account_id` for the account that will be debited or credited.
+          description: The Plaid `account_id` for the account that will be debited or credited. Returned only if `account_id` was set on intent creation.
+          nullable: true
         origination_account_id:
           type: string
           description: Plaid’s unique identifier for the origination account used for the transfer.
@@ -14646,7 +14689,6 @@ components:
           description: A description for the underlying transfer. Maximum of 8 characters.
         metadata:
           $ref: '#/components/schemas/TransferMetadata'
-          nullable: true
       required:
       - id
       - created
@@ -14655,13 +14697,24 @@ components:
       - failure_reason
       - authorization_decision
       - authorization_decision_rationale
-      - account_id
       - origination_account_id
       - amount
       - mode
       - ach_class
       - user
       - description
+    TransferIntentGetResponse:
+      title: TransferIntentGetResponse
+      type: object
+      additionalProperties: true
+      description: Defines the response schema for `/transfer/intent/get`
+      properties:
+        transfer_intent:
+          $ref: '#/components/schemas/TransferIntentGet'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - transfer_intent
       - request_id
     SandboxBankTransferSimulateRequest:
       title: SandboxBankTransferSimulateRequest
@@ -15070,6 +15123,7 @@ components:
           nullable: true
           description: Is the user currently active duty in the US military
         branch:
+          x-plaid-income-enum-lint: github.plaid.com/plaid/go.git/lib/proto/incomeverificationmanagerpb.PrecheckMilitaryBranch
           type: string
           nullable: true
           description: If the user is currently serving in the US military, the branch of the military they are serving in
@@ -15079,6 +15133,7 @@ components:
           - COAST GUARD
           - MARINES
           - NAVY
+          - UNKNOWN
     IncomeVerificationPrecheckUser:
       title: IncomeVerificationPrecheckUser
       type: object
@@ -15115,6 +15170,7 @@ components:
       - confidence
       - request_id
     IncomeVerificationPrecheckConfidence:
+      x-plaid-income-enum-lint: github.plaid.com/plaid/go.git/lib/proto/incomeverificationmanagerpb.PrecheckConfidence
       description: |-
         The confidence that Plaid can support the user in the income verification flow. One of the following:
 
@@ -15378,6 +15434,7 @@ components:
       - value
       - verification_status
     PayFrequencyValue:
+      x-plaid-income-enum-lint: github.plaid.com/plaid/go.git/lib/proto/incomeverificationmanagerpb.PayFrequency
       type: string
       title: PayFrequencyValue
       enum:
@@ -15389,6 +15446,7 @@ components:
       - null
       description: The frequency of the pay period.
     VerificationStatus:
+      x-plaid-income-enum-lint: github.plaid.com/plaid/go.git/lib/proto/incomeverificationmanagerpb.FieldStatus
       type: string
       title: VerificationStatus
       description: |-
@@ -15410,14 +15468,19 @@ components:
       - UNABLE_TO_VERIFY
       - UNKNOWN
     VerificationRefreshStatus:
+      x-plaid-income-enum-lint: github.plaid.com/plaid/go.git/lib/proto/incomeverificationmanagerpb.VerificationRefreshStatus
       type: string
       title: VerificationRefreshStatus
       description: |-
         The verification refresh status. One of the following:
 
         `"VERIFICATION_REFRESH_STATUS_USER_PRESENCE_REQUIRED"` User presence is required to refresh an income verification.
+        `"VERIFICATION_REFRESH_SUCCESSFUL"` The income verification refresh was successful.
+        `"VERIFICATION_REFRESH_NOT_FOUND"` No new data was found after the income verification refresh.
       enum:
       - VERIFICATION_REFRESH_STATUS_USER_PRESENCE_REQUIRED
+      - VERIFICATION_REFRESH_SUCCESSFUL
+      - VERIFICATION_REFRESH_NOT_FOUND
     IncomeVerificationPaystubGetRequest:
       title: IncomeVerificationPaystubGetRequest
       type: object
@@ -15506,6 +15569,8 @@ components:
         doc_type:
           $ref: '#/components/schemas/DocType'
     DocType:
+      x-plaid-income-enum-lint: github.plaid.com/plaid/go.git/lib/proto/incomeverificationmanagerpb.DocumentType
+      title: DocType
       type: string
       description: |-
         The type of document.
@@ -16069,6 +16134,7 @@ components:
           description: The date on which the paystub was issued, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ("yyyy-mm-dd").
           nullable: true
         pay_frequency:
+          x-plaid-income-enum-lint: github.plaid.com/plaid/go.git/lib/proto/incomeverificationmanagerpb.PayFrequency
           type: string
           description: The frequency at which an individual is paid.
           enum:
@@ -16182,7 +16248,9 @@ components:
       - verification_status
       - verification_attributes
     PaystubVerificationStatus:
+      x-plaid-income-enum-lint: github.plaid.com/plaid/go.git/lib/proto/incomeverificationmanagerpb.PaystubVerificationStatus
       type: string
+      title: PaystubVerificationStatus
       description: Derived verification status.
       nullable: true
       enum:
@@ -16198,6 +16266,8 @@ components:
       nullable: true
       properties:
         type:
+          x-plaid-income-enum-lint: github.plaid.com/plaid/go.git/lib/proto/incomeverificationmanagerpb.VerificationAttributeType
+          title: VerificationAttributeType
           type: string
           description: Message indicating the reason as to why the verification failed
           nullable: true
