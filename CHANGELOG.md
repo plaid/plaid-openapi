@@ -1,3 +1,57 @@
+### 2020-09-14_1.61.0
+- Added payment scheme support for EU payments
+
+### 2020-09-14_1.60.7
+- Rename `created_at` field on `sweep` object to `created`
+- Rename `start_time` and `end_time` fields on request to `/transfer/sweep/list` to `start_date` and `end_date`
+
+### 2020-09-14_1.60.6
+- Added `iso_currency_code` to `/transfer/authorization/create`, `/transfer/create`, `/transfer/intent/create`, `/transfer/intent/get` and `Transfer` object
+
+### 2020-09-14_1.60.5
+- Set the `routing_number` field in the `Institution` schema to be not nullable
+
+### 2020-09-14_1.60.4
+- Removed Employer Address fields as required for `/income/verification/precheck` endpoint
+
+### 2020-09-14_1.60.3
+- Update response from `/sandbox/transfer/sweep/simulate` to be nullable
+
+### 2020-09-14_1.60.2
+- Added example response for `/income/verification/refresh/`
+
+### 2020-09-14_1.60.2
+- Allowed empty string or nil values for the `webhook` field in the `/item/webhook/update` request
+- Modified the `url` request validator to allow empty strings if the request field with `x-plaid-validation: url` is also nullable
+
+### 2020-09-14_1.60.1
+- Removed `balance` from the `InstitutionStatus` object, as this field is no longer returned.
+
+### 2020-09-14_1.60.0
+- Sets `format: date-time` on the `created` field in the `transfer/authorization/create` response
+
+### 2020-09-14_1.59.2
+- Drop transfer_id from /sweep/list endpoint
+- Amend semantics of simulate sweep endpoint
+
+### 2020-09-14_1.59.1
+- Updated description for `VERIFICATION_STATUS_PROCESSING_COMPLETE` endpoint
+- Deprecated `VERIFICATION_STATUS_DOCUMENT_REJECTED` endpoint
+
+### 2020-09-14_1.59.0
+- Migrated embedded errors to `PlaidError` type
+
+### 2020-09-14_1.58.4
+- Added missing nullable tag for `client_report_id` in `/asset_report/get` response
+- Updated the description for `/accounts/get`
+
+### 2020-09-14_1.58.3
+- Fixed `last_payment_date` to indicate that it is `nullable`.
+- Fixed example enum for paystub `verification_status`
+
+### 2020-09-14_1.58.2
+- Updating example response for `/income/verification/paystubs/get`
+
 ### 2020-09-14_1.58.1
 - Fixes duplicate entries in `PaymentInitiationPaymentStatus`
 
