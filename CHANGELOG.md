@@ -105,8 +105,8 @@
 - Adds `transfer` object to the `/link/token/create` request schema
 
 ### 2020-09-14_1.47.2
-- Removes the option for `additionalProperties` in `SignalReturnReportRequest` 
-- Adds `additionalProperties` to `SignalReturnReportResponse` 
+- Removes the option for `additionalProperties` in `SignalReturnReportRequest`
+- Adds `additionalProperties` to `SignalReturnReportResponse`
 
 ### 2020-09-14_1.47.1
 - Adds description updates and bug fix for Income Verification endpoints
@@ -203,7 +203,7 @@
 
 ### 2020-09-14_1.37.6
 - Adds `inflow_streams` to required field of `/transactions/recurring/get`.
- 
+
 ### 2020-09-14_1.37.5
 - Make default behavior of `include_insights` in `/asset_report/get` request explicit.
 
@@ -240,7 +240,7 @@
 - Fixed a bug for `SignalEvaluateRequest` and removed `additionalProperties: true` for it.
 
 ### 2020-09-14_1.36.0
-- Add missing `last_statement_balance` liabilities field to OpenAPI file 
+- Add missing `last_statement_balance` liabilities field to OpenAPI file
 
 ### 2020-09-14_1.35.0
 - Add support for `BSV` currency
@@ -304,7 +304,7 @@
 
 ### 2020-09-14_1.29.0
 - Added `include_personal_finance_category_beta` as an optional field to the `TransactionsGetRequestOptions` component
-- Added `personal_finance_category` as a nullable field to the `Transaction` component 
+- Added `personal_finance_category` as a nullable field to the `Transaction` component
 
 ### 2020-09-14_1.28.4
 - Remove iso_currency_code from `/transfer/authorization/create` response
@@ -349,7 +349,7 @@
 - Added `nullable` to the Income `canonical_description` property.
 - Moved some properties that were next to references, which is invalid.
 - Added `fixed annuity` to `AccountSubtype` model.
-- Added `automatically_verified` to `verification_status` enum.  
+- Added `automatically_verified` to `verification_status` enum.
 
 ### 2020-09-14_1.25.0
 - Add schema for `/income/verification/paystub/get`.
@@ -367,7 +367,7 @@
 - Fix description for `/transfer/authorization/create`
 
 ### 2020-09-14_1.24.0
-- Changed `investment_transactions` type/subtype hierachy
+- Changed `investment_transactions` type/subtype hierarchy
 
 ### 2020-09-14_1.23.1
 - Add missing descriptions to `created_at` and `expired_at` webhook verification fields.
@@ -577,7 +577,7 @@
 
 ### 2020-09-14_1.8.0
 - Added `additionalProperties` to all objects to prevent additive keys from breaking.
-- Added new propery to `Transaction` model, `authorized_datetime`, `datetime`.
+- Added new property to `Transaction` model, `authorized_datetime`, `datetime`.
 - Update `access_token` to `required` for `TransactionsGet`.
 - Require `origination_account_id` in `BankTransferBalanceGetResponse`
 - Add new endpoint `/sandbox/bank_transfer/fire_webhook`
