@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.61.0
+  version: 2020-09-14_1.62.1
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -425,7 +425,7 @@ paths:
     post:
       tags:
       - plaid
-      summary: Get incremental transaction updates on an item
+      summary: Get incremental transaction updates on an Item
       externalDocs:
         url: /api/products/#transactionssync
       operationId: transactionsSync
@@ -956,7 +956,7 @@ paths:
       externalDocs:
         url: /api/sandbox/#sandboxitemfire_webhook
       operationId: sandboxItemFireWebhook
-      description: The `/sandbox/item/fire_webhook` endpoint is used to test that code correctly handles webhooks. Calling this endpoint triggers a Transactions `DEFAULT_UPDATE` webhook to be fired for a given Sandbox Item. If the Item does not support Transactions, a `SANDBOX_PRODUCT_NOT_ENABLED` error will result. Note that this endpoint is provided for developer ease-of-use and is not required for testing webhooks; webhooks will also fire in Sandbox under the same conditions that they would in Production or Development.
+      description: The `/sandbox/item/fire_webhook` endpoint is used to test that code correctly handles webhooks. This endpoint can trigger a Transactions `DEFAULT_UPDATE` webhook to be fired for a given Sandbox Item. If the Item does not support Transactions, a `SANDBOX_PRODUCT_NOT_ENABLED` error will result. This endpoint can also trigger a `NEW_ACCOUNTS_AVAILABLE` webhook to be fired for a given Sandbox Item created with Account Select v2. Note that this endpoint is provided for developer ease-of-use and is not required for testing webhooks; webhooks will also fire in Sandbox under the same conditions that they would in Production or Development.
       responses:
         "200":
           description: success
@@ -1486,7 +1486,7 @@ paths:
                       update_type: background
                       webhook: https://www.genericwebhookurl.com/webhook
                     request_id: vYK11LNTfRoAMbj
-      description: The POST `/item/webhook/update` allows you to update the webhook URL associated with an Item. This request triggers a [`WEBHOOK_UPDATE_ACKNOWLEDGED`](https://plaid.com/docs/api/webhooks/#item-webhook-url-updated) webhook to the newly specified webhook URL.
+      description: The POST `/item/webhook/update` allows you to update the webhook URL associated with an Item. This request triggers a [`WEBHOOK_UPDATE_ACKNOWLEDGED`](https://plaid.com/docs/api/webhooks/#item-webhook-update-acknowledged) webhook to the newly specified webhook URL.
       requestBody:
         required: true
         content:
@@ -2180,7 +2180,7 @@ paths:
       description: |-
         The `/asset_report/create` endpoint initiates the process of creating an Asset Report, which can then be retrieved by passing the `asset_report_token` return value to the `/asset_report/get` or `/asset_report/pdf/get` endpoints.
 
-        The Asset Report takes some time to be created and is not available immediately after calling `/asset_report/create`. When the Asset Report is ready to be retrieved using `/asset_report/get` or `/asset_report/pdf/get`, Plaid will fire a `PRODUCT_READY` webhook. For full details of the webhook schema, see [Asset Report webhooks](https://plaid.com/docs/api/webhooks/#Assets-webhooks).
+        The Asset Report takes some time to be created and is not available immediately after calling `/asset_report/create`. When the Asset Report is ready to be retrieved using `/asset_report/get` or `/asset_report/pdf/get`, Plaid will fire a `PRODUCT_READY` webhook. For full details of the webhook schema, see [Asset Report webhooks](https://plaid.com/docs/api/webhooks/#assets-webhooks).
 
         The `/asset_report/create` endpoint creates an Asset Report at a moment in time. Asset Reports are immutable. To get an updated Asset Report, use the `/asset_report/refresh` endpoint.
       requestBody:
@@ -3361,6 +3361,7 @@ paths:
                       origination_account_id: 11111111-1111-1111-1111-111111111111
                       status: pending
                       type: credit
+                      iso_currency_code: USD
                       user:
                         email_address: plaid@plaid.com
                         legal_name: John Smith
@@ -3465,6 +3466,8 @@ paths:
                       created: "2020-08-06T17:27:15Z"
                       decision: approved
                       decision_rationale: null
+                      guarantee_decision: GUARANTEED
+                      guarantee_decision_rationale: null
                       proposed_transfer:
                         ach_class: ppd
                         account_id: 6qL6lWoQkAfNE3mB8Kk5tAnvpX81qefrvvl7B
@@ -3662,6 +3665,7 @@ paths:
                       origination_account_id: 11111111-1111-1111-1111-111111111111
                       status: pending
                       type: credit
+                      iso_currency_code: USD
                       user:
                         email_address: plaid@plaid.com
                         legal_name: John Smith
@@ -3872,11 +3876,9 @@ paths:
                       bank_transfer_type: credit
                       direction: outbound
                       event_id: 1
-                      event_type: receiver_pending
+                      event_type: pending
                       failure_reason: null
                       origination_account_id: null
-                      receiver_details:
-                        available_balance: positive
                       timestamp: "2020-08-06T17:27:15Z"
                     request_id: mdqfuVxeoza6mhu
         default:
@@ -3963,7 +3965,6 @@ paths:
                       event_type: pending
                       failure_reason: null
                       origination_account_id: null
-                      receiver_details: null
                       timestamp: "2020-08-06T17:27:15Z"
                     request_id: mdqfuVxeoza6mhu
         default:
@@ -4330,6 +4331,94 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/TransferIntentGetRequest'
+  /transfer/repayment/list:
+    post:
+      summary: Lists historical repayments.
+      tags:
+      - plaid
+      externalDocs:
+        url: /transfer/reference#transferrepaymentlist
+      operationId: transferRepaymentList
+      responses:
+        "200":
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferRepaymentListResponse'
+              examples:
+                example-1:
+                  value:
+                    repayments:
+                    - repayment_id: d4bfce70-2470-4298-ae87-5e9b3e18bfaf
+                      created: "2022-01-10T12:34:56Z"
+                      amount: "12.34"
+                      iso_currency_code: USD
+                    request_id: h0dvmW8g4r2Z0KX
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      description: The `/transfer/repayment/list` endpoint fetches repayments matching the given filters. Repayments are returned in chronological order (least recent first) starting at the given `start_time`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferRepaymentListRequest'
+            examples:
+              example-1:
+                value:
+                  start_time: "2022-01-10T12:34:56Z"
+                  count: 1
+      parameters: []
+  /transfer/repayment/return/list:
+    post:
+      summary: Retrieves the set of returns that were batched together into the specified repayment. The sum of amounts of returns retrieved by this request equals the amount of the repayment.
+      tags:
+      - plaid
+      externalDocs:
+        url: /transfer/reference#transferrepaymentreturnlist
+      operationId: transferRepaymentReturnList
+      responses:
+        "200":
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferRepaymentReturnListResponse'
+              examples:
+                example-1:
+                  value:
+                    repayments:
+                    - repayment_id: d4bfce70-2470-4298-ae87-5e9b3e18bfaf
+                      created: "2022-01-10T12:34:56Z"
+                      amount: "12.34"
+                      iso_currency_code: USD
+                    request_id: Ay70UHyBmbY0wUf
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      description: The `/transfer/repayment/return/list` endpoint retrieves the set of returns that were batched together into the specified repayment.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferRepaymentReturnListRequest'
+            examples:
+              example-1:
+                value:
+                  start_time: "2022-01-10T12:34:56Z"
+                  count: 1
+      parameters: []
   /sandbox/bank_transfer/simulate:
     post:
       summary: Simulate a bank transfer event in Sandbox
@@ -4348,7 +4437,7 @@ paths:
               examples:
                 example-1:
                   value:
-                    request_id: mdqfuVxeoza6mhu
+                    request_id: LmHYMwBhZUvsM03
         default:
           description: Error response
           content:
@@ -4435,6 +4524,38 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SandboxTransferSimulateRequest'
+  /sandbox/transfer/repayment/simulate:
+    post:
+      summary: Trigger the creation of a repayment.
+      tags:
+      - plaid
+      externalDocs:
+        url: /transfer/reference#sandboxtransferrepaymentsimulate
+      operationId: sandboxTransferRepaymentSimulate
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SandboxTransferRepaymentSimulateResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: 4vAbY6XyqqoPQLB
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      description: Use the `/sandbox/transfer/repayment/simulate` endpoint to trigger the creation of a repayment. As a side effect of calling this route, a repayment is created that includes all unreimbursed returns of guaranteed transfers. If there are no such returns, an 400 error is returned.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SandboxTransferRepaymentSimulateRequest'
   /employers/search:
     post:
       tags:
@@ -4773,7 +4894,7 @@ paths:
         If Document Income was used, the documents will be those the user provided in Link. For Payroll Income, the most recent files available
         for download from the payroll provider will be available from this endpoint.
 
-        The response to `/income/verification/documents/download` is ZIP file in binary data. If a document_id is passed, a single document will be contained in this file.
+        The response to `/income/verification/documents/download` is a ZIP file in binary data. If a `document_id` is passed, a single document will be contained in this file.
         If not, the response will contain all documents associated with the verification.
 
         The `request_id` is returned in the `Plaid-Request-ID` header.
@@ -5635,11 +5756,13 @@ components:
           $ref: '#/components/schemas/APISecret'
         count:
           type: integer
+          minimum: 1
           maximum: 500
           description: The total number of Institutions to return.
         offset:
           type: integer
           description: The number of Institutions to skip.
+          minimum: 0
         country_codes:
           type: array
           description: "Specify an array of Plaid-supported country codes this institution supports, using the ISO-3166-1 alpha-2 country code standard. \n\nIn API versions 2019-05-29 and earlier, the `country_codes` parameter is an optional parameter within the `options` object and will default to `[US]` if it is not supplied.\n"
@@ -5659,15 +5782,19 @@ components:
         products:
           type: array
           description: 'Filter the Institutions based on which products they support. '
+          nullable: true
+          minItems: 1
           items:
             $ref: '#/components/schemas/Products'
         routing_numbers:
           type: array
           description: Specify an array of routing numbers to filter institutions. The response will only return institutions that match all of the routing numbers in the array. Routing number records used for this matching are not comprehensive; failure to match a given routing number to an institution does not mean that the institution is unsupported by Plaid.
+          nullable: true
           items:
             type: string
         oauth:
           type: boolean
+          nullable: true
           description: Limit results to institutions with or without OAuth login flows. This is primarily relevant to institutions with European country codes.
         include_optional_metadata:
           type: boolean
@@ -5713,10 +5840,12 @@ components:
         query:
           type: string
           description: The search query. Institutions with names matching the query are returned
+          minLength: 1
         products:
           type: array
           description: Filter the Institutions based on whether they support all products listed in `products`. Provide `null` to get institutions regardless of supported products. Note that when `auth` is specified as a product, if you are enabled for Instant Match or Automated Micro-deposits, institutions that support those products will be returned even if `auth` is not present in their product array.
           minItems: 1
+          nullable: true
           items:
             $ref: '#/components/schemas/Products'
         country_codes:
@@ -5737,6 +5866,7 @@ components:
       properties:
         oauth:
           type: boolean
+          nullable: true
           description: Limit results to institutions with or without OAuth login flows. This is primarily relevant to institutions with European country codes
         include_optional_metadata:
           type: boolean
@@ -5744,10 +5874,12 @@ components:
         include_auth_metadata:
           type: boolean
           default: false
+          nullable: true
           description: When `true`, returns metadata related to the Auth product indicating which auth methods are supported.
         include_payment_initiation_metadata:
           type: boolean
           default: false
+          nullable: true
           description: When `true`, returns metadata related to the Payment Initiation product indicating which payment configurations are supported.
         payment_initiation:
           $ref: '#/components/schemas/InstitutionsSearchPaymentInitiationOptions'
@@ -5759,6 +5891,7 @@ components:
       properties:
         payment_id:
           type: string
+          nullable: true
           description: A unique ID identifying the payment
     InstitutionsSearchResponse:
       type: object
@@ -5786,6 +5919,7 @@ components:
         institution_id:
           type: string
           description: The ID of the institution to get details about
+          minLength: 1
         country_codes:
           type: array
           description: |
@@ -6036,10 +6170,12 @@ components:
           type: string
           enum:
           - DEFAULT_UPDATE
+          - NEW_ACCOUNTS_AVAILABLE
           description: |-
             The following values for `webhook_code` are supported:
 
             * `DEFAULT_UPDATE`
+            * `NEW_ACCOUNTS_AVAILABLE`
       required:
       - access_token
       - webhook_code
@@ -7731,7 +7867,7 @@ components:
 
             `transactions`, `auth`, `identity`, `assets`, `investments`, `liabilities`, `payment_initiation`, `deposit_switch`, `income_verification`, `transfer`
 
-            `balance` is *not* a valid value, the Balance product does not require explicit initalization and will automatically be initialized when any other product is initialized.
+            `balance` is *not* a valid value, the Balance product does not require explicit initialization and will automatically be initialized when any other product is initialized.
 
             Only institutions that support *all* requested products will be shown in Link; to maximize the number of institutions listed, it is recommended to initialize Link with the minimal product set required for your use case. Additional products can be added after Link initialization by calling the relevant endpoints. For details and exceptions, see [Choosing when to initialize products](https://plaid.com/docs/link/best-practices/#choosing-when-to-initialize-products).
 
@@ -7781,7 +7917,7 @@ components:
       - user
     LinkTokenAccountFilters:
       description: |
-        By default, Link will provide limited account filtering: it will only display Institutions that are compatible with all products supplied in the `products` parameter of `/link/token/create`, and, if `auth` is specified in the `products` array, will also filter out accounts other than `checking` and `savings` accounts on the Account Select pane. You can further limit the accounts shown in Link by using `account_filters` to specify the account subtypes to be shown in Link. Only the specified subtypes will be shown. This filtering applies to both the Account Select view (if enabled) and the Institution Select view. Institutions that do not support the selected subtypes will be omitted from Link. To indicate that all subtypes should be shown, use the value `"all"`. If the `account_filters` filter is used, any account type for which a filter is not specified will be entirely omitted from Link. For a full list of valid types and subtypes, see the [Account schema](https://plaid.com/docs/api/accounts#accounts-schema).
+        By default, Link will provide limited account filtering: it will only display Institutions that are compatible with all products supplied in the `products` parameter of `/link/token/create`, and, if `auth` is specified in the `products` array, will also filter out accounts other than `checking` and `savings` accounts on the Account Select pane. You can further limit the accounts shown in Link by using `account_filters` to specify the account subtypes to be shown in Link. Only the specified subtypes will be shown. This filtering applies to both the Account Select view (if enabled) and the Institution Select view. Institutions that do not support the selected subtypes will be omitted from Link. To indicate that all subtypes should be shown, use the value `"all"`. If the `account_filters` filter is used, any account type for which a filter is not specified will be entirely omitted from Link. For a full list of valid types and subtypes, see the [Account schema](https://plaid.com/docs/api/accounts#account-type-schema).
 
         For institutions using OAuth, the filter will not affect the list of accounts shown by the bank in the OAuth window.
       type: object
@@ -7894,7 +8030,7 @@ components:
       description: |
         By default, Link will only display account types that are compatible with all products supplied in the `products` parameter of `/link/token/create`. You can further limit the accounts shown in Link by using `account_filters` to specify the account subtypes to be shown in Link. Only the specified subtypes will be shown. This filtering applies to both the Account Select view (if enabled) and the Institution Select view. Institutions that do not support the selected subtypes will be omitted from Link. To indicate that all subtypes should be shown, use the value `"all"`. If the `account_filters` filter is used, any account type for which a filter is not specified will be entirely omitted from Link.
 
-        For a full list of valid types and subtypes, see the [Account schema](https://plaid.com/docs/api/accounts#accounts-schema).
+        For a full list of valid types and subtypes, see the [Account schema](https://plaid.com/docs/api/accounts#account-type-schema).
 
         For institutions using OAuth, the filter will not affect the list of institutions or accounts shown by the bank in the OAuth window.
       type: object
@@ -8104,7 +8240,7 @@ components:
           - BANK_TRANSFER_ERROR
           - INCOME_VERIFICATION_ERROR
           type: string
-          description: A broad categorization of the error. Safe for programatic use.
+          description: A broad categorization of the error. Safe for programmatic use.
         error_code:
           description: The particular error code. Safe for programmatic use.
           type: string
@@ -8255,7 +8391,7 @@ components:
 
         `loan:` Loan account
 
-        `payroll:` Payroll acccount
+        `payroll:` Payroll account
 
         `other:` Non-specified account type
 
@@ -8657,7 +8793,7 @@ components:
           nullable: true
         category_id:
           description: |-
-            The ID of the category to which this transaction belongs. See [Categories](https://plaid.com/docs/#category-overview).
+            The ID of the category to which this transaction belongs. For a full list of categories, see [`/categories/get`](https://plaid.com/docs/api/products/#categoriesget).
 
             If the `transactions` object was returned by an Assets endpoint such as `/asset_report/get/` or `/asset_report/pdf/get`, this field will only appear in an Asset Report with Insights.
           type: string
@@ -8665,7 +8801,7 @@ components:
         category:
           type: array
           description: |-
-            A hierarchical array of the categories to which this transaction belongs. See [Categories](https://plaid.com/docs/#category-overview).
+            A hierarchical array of the categories to which this transaction belongs. For a full list of categories, see [`/categories/get`](https://plaid.com/docs/api/products/#categoriesget).
 
             If the `transactions` object was returned by an Assets endpoint such as `/asset_report/get/` or `/asset_report/pdf/get`, this field will only appear in an Asset Report with Insights.
           nullable: true
@@ -10164,7 +10300,7 @@ components:
         maximum_payment_amount:
           type: object
           description: |
-            A mapping of currency to maximum payment amount (denominated in the smallest unit of currency) supported by the insitution.
+            A mapping of currency to maximum payment amount (denominated in the smallest unit of currency) supported by the institution.
 
             Example: `{"GBP": "10000"}`
           additionalProperties:
@@ -11636,7 +11772,7 @@ components:
       - other
     DepositoryAccount:
       title: DepositoryAccount
-      description: 'An account type holding cash, in which funds are deposited. Supported products for `depository` accounts are: Auth, Balance, Transactions, Identity, Payment Initiation, and Assets.'
+      description: 'An account type holding cash, in which funds are deposited. Supported products for `depository` accounts are: Auth (`checking` and `savings` types only), Balance, Transactions, Identity, Payment Initiation, and Assets.'
       type: string
       properties:
         checking:
@@ -12033,63 +12169,9 @@ components:
           type: string
           description: The `payment_id` for the payment being updated
         new_payment_status:
-          enum:
-          - PAYMENT_STATUS_INPUT_NEEDED
-          - PAYMENT_STATUS_PROCESSING
-          - PAYMENT_STATUS_INITIATED
-          - PAYMENT_STATUS_COMPLETED
-          - PAYMENT_STATUS_INSUFFICIENT_FUNDS
-          - PAYMENT_STATUS_FAILED
-          - PAYMENT_STATUS_BLOCKED
-          - PAYMENT_STATUS_UNKNOWN
-          type: string
-          description: |-
-            The new status of the payment.
-
-            `PAYMENT_STATUS_INPUT_NEEDED`: This is the initial state of all payments. It indicates that the payment is waiting on user input to continue processing. A payment may re-enter this state later on if further input is needed.
-
-            `PAYMENT_STATUS_PROCESSING`: The payment is currently being processed. The payment will automatically exit this state when processing is complete.
-
-            `PAYMENT_STATUS_INITIATED`: The payment has been successfully initiated and is considered complete.
-
-            `PAYMENT_STATUS_COMPLETED`: Indicates that the standing order has been successfully established. This state is only used for standing orders.
-
-            `PAYMENT_STATUS_INSUFFICIENT_FUNDS`: The payment has failed due to insufficient funds.
-
-            `PAYMENT_STATUS_FAILED`: The payment has failed to be initiated. This error is retryable once the root cause is resolved.
-
-            `PAYMENT_STATUS_BLOCKED`: The payment has been blocked. This is a retryable error.
-
-            `PAYMENT_STATUS_UNKNOWN`: The payment status is unknown.
+          $ref: '#/components/schemas/PaymentInitiationPaymentStatus'
         old_payment_status:
-          type: string
-          enum:
-          - PAYMENT_STATUS_INPUT_NEEDED
-          - PAYMENT_STATUS_PROCESSING
-          - PAYMENT_STATUS_INITIATED
-          - PAYMENT_STATUS_COMPLETED
-          - PAYMENT_STATUS_INSUFFICIENT_FUNDS
-          - PAYMENT_STATUS_FAILED
-          - PAYMENT_STATUS_BLOCKED
-          - PAYMENT_STATUS_UNKNOWN
-          description: |-
-            The previous status of the payment.
-
-            `PAYMENT_STATUS_INPUT_NEEDED`: This is the initial state of all payments. It indicates that the payment is waiting on user input to continue processing. A payment may re-enter this state later on if further input is needed.
-
-            `PAYMENT_STATUS_PROCESSING`: The payment is currently being processed. The payment will automatically exit this state when processing is complete.
-
-            `PAYMENT_STATUS_INITIATED`: The payment has been successfully initiated and is considered complete.
-
-            `PAYMENT_STATUS_COMPLETED`: Indicates that the standing order has been successfully established. This state is only used for standing orders.
-
-            `PAYMENT_STATUS_INSUFFICIENT_FUNDS`: The payment has failed due to insufficient funds.
-
-            `PAYMENT_STATUS_FAILED`: The payment has failed to be initiated. This error is retryable once the root cause is resolved.
-
-            `PAYMENT_STATUS_BLOCKED`: The payment has been blocked. This is a retryable error.
-
-            `PAYMENT_STATUS_UNKNOWN`: The payment status is unknown.
+          $ref: '#/components/schemas/PaymentInitiationPaymentStatus'
         original_reference:
           type: string
           description: The original value of the reference when creating the payment.
@@ -12529,7 +12611,7 @@ components:
           description: Fees incurred for transfer of a holding or account
         trust fee:
           type: string
-          description: Fees related to adminstration of a trust account
+          description: Fees related to administration of a trust account
         unqualified gain:
           type: string
           description: Unqualified capital gain received as cash
@@ -12597,7 +12679,7 @@ components:
           description: Fees incurred for transfer of a holding or account
         trust fee:
           type: string
-          description: Fees related to adminstration of a trust account
+          description: Fees related to administration of a trust account
         unqualified gain:
           type: string
           description: Unqualified capital gain received as cash
@@ -12650,7 +12732,7 @@ components:
     AccountSubtypes:
       title: AccountSubtypes
       type: array
-      description: 'An array of account subtypes to display in Link. If not specified, all account subtypes will be shown. For a full list of valid types and subtypes, see the [Account schema](https://plaid.com/docs/api/accounts#accounts-schema). '
+      description: 'An array of account subtypes to display in Link. If not specified, all account subtypes will be shown. For a full list of valid types and subtypes, see the [Account schema](https://plaid.com/docs/api/accounts#account-type-schema). '
       items:
         $ref: '#/components/schemas/AccountSubtype'
     UserPermissionRevokedWebhook:
@@ -12965,6 +13047,10 @@ components:
         origination_account_id:
           type: string
           description: Plaid’s unique identifier for the origination account that was used for this transfer.
+        guarantee_decision:
+          $ref: '#/components/schemas/TransferAuthorizationGuaranteeDecision'
+        guarantee_decision_rationale:
+          $ref: '#/components/schemas/TransferAuthorizationGuaranteeDecisionRationale'
         iso_currency_code:
           type: string
           description: The currency of the transfer amount, e.g. "USD"
@@ -13071,7 +13157,7 @@ components:
       - tel
       - web
       description: |-
-        Specifies the use case of the transfer.  Required for transfers on an ACH network.
+        Specifies the use case of the transfer.  Required for transfers on an ACH network. In Sandbox, only `ccd`, `ppd`, or `web` can be used.
 
         `"arc"` - Accounts Receivable Entry
 
@@ -13307,6 +13393,44 @@ components:
         description:
           type: string
           description: A human-readable description of the code associated with a permitted transfer or transfer decline.
+      required:
+      - code
+      - description
+    TransferAuthorizationGuaranteeDecision:
+      type: string
+      nullable: true
+      description: Indicates whether the transfer is guaranteed by Plaid (Guaranteed ACH customers only). This field will contain either `GUARANTEED` or `NOT_GUARANTEED` indicating whether Plaid will guarantee the transfer. If the transfer is not guaranteed, additional information will be provided in the `guarantee_decision_rationale` field. Refer to the `code` field in `guarantee_decision_rationale` for details.
+      enum:
+      - GUARANTEED
+      - NOT_GUARANTEED
+      - null
+    TransferAuthorizationGuaranteeDecisionRationale:
+      title: TransferAuthorizationGuaranteeDecisionRationale
+      type: object
+      nullable: true
+      additionalProperties: true
+      description: The rationale for Plaid's decision to not guarantee a transfer. Will be `null` unless `guarantee_decision` is `NOT_GUARANTEED`.
+      properties:
+        code:
+          type: string
+          description: |-
+            A code representing the reason Plaid declined to guarantee this transfer:
+
+            `RETURN_BANK`: The risk of a bank-initiated return (for example, an R01/NSF) is too high to guarantee this transfer.
+
+            `RETURN_CUSTOMER`: The risk of a customer-initiated return (for example, a R10/Unauthorized) is too high to guarantee this transfer.
+
+            `GUARANTEE_LIMIT_REACHED`: This transfer is low-risk, but Guaranteed ACH has exhausted an internal limit on the number or rate of guarantees that applies to this transfer.
+
+            `RISK_ESTIMATE_UNAVAILABLE`: A risk estimate is unavailable for this Item.
+          enum:
+          - RETURN_BANK
+          - RETURN_CUSTOMER
+          - GUARANTEE_LIMIT_REACHED
+          - RISK_ESTIMATE_UNAVAILABLE
+        description:
+          type: string
+          description: A human-readable description of why the transfer cannot be guaranteed.
       required:
       - code
       - description
@@ -13640,7 +13764,7 @@ components:
       title: TransferAuthorization
       type: object
       additionalProperties: true
-      description: TransferAuthorization contains the authorization decision for a proposed transfer
+      description: Contains the authorization decision for a proposed transfer
       properties:
         id:
           $ref: '#/components/schemas/TransferAuthorizationID'
@@ -13657,6 +13781,10 @@ components:
           - declined
         decision_rationale:
           $ref: '#/components/schemas/TransferAuthorizationDecisionRationale'
+        guarantee_decision:
+          $ref: '#/components/schemas/TransferAuthorizationGuaranteeDecision'
+        guarantee_decision_rationale:
+          $ref: '#/components/schemas/TransferAuthorizationGuaranteeDecisionRationale'
         proposed_transfer:
           $ref: '#/components/schemas/TransferAuthorizationProposedTransfer'
       required:
@@ -13664,6 +13792,8 @@ components:
       - created
       - decision
       - decision_rationale
+      - guarantee_decision
+      - guarantee_decision_rationale
       - proposed_transfer
     TransferCreateResponse:
       title: TransferCreateResponse
@@ -14019,18 +14149,12 @@ components:
         `posted`: The transfer has been successfully submitted to the payment network.
 
         `reversed`: A posted transfer was reversed.
-
-        `receiver_pending`: The matching transfer was found as a pending transaction in the receiver's account
-
-        `receiver_posted`: The matching transfer was found as a posted transaction in the receiver's account
       enum:
       - pending
       - cancelled
       - failed
       - posted
       - reversed
-      - receiver_pending
-      - receiver_posted
     TransferEvent:
       title: TransferEvent
       type: object
@@ -14113,8 +14237,6 @@ components:
           $ref: '#/components/schemas/BankTransferFailure'
         direction:
           $ref: '#/components/schemas/BankTransferDirection'
-        receiver_details:
-          $ref: '#/components/schemas/BankTransferReceiverDetails'
       required:
       - event_id
       - timestamp
@@ -14127,7 +14249,6 @@ components:
       - bank_transfer_iso_currency_code
       - failure_reason
       - direction
-      - receiver_details
     TransferEventListResponse:
       title: TransferEventListResponse
       type: object
@@ -14407,14 +14528,11 @@ components:
       description: |-
         Describes a sweep of funds to / from the sweep account.
 
-        A sweep is associated with many sweep events (events of type `swept` or `reverse_swept`) which
-        can be retrieved by invoking the `/transfer/event/list` endpoint with the corresponding `sweep_id`.
+        A sweep is associated with many sweep events (events of type `swept` or `reverse_swept`) which can be retrieved by invoking the `/transfer/event/list` endpoint with the corresponding `sweep_id`.
 
-        `swept` events occur when the transfer amount is credited or debited from your sweep account, depending
-        on the `type` of the transfer. `reverse_swept` events occur when a transfer is reversed and Plaid undoes the credit or debit.
+        `swept` events occur when the transfer amount is credited or debited from your sweep account, depending on the `type` of the transfer. `reverse_swept` events occur when a transfer is reversed and Plaid undoes the credit or debit.
 
-        The total sum of the `swept` and `reverse_swept` events is equal to the `amount` of the sweep Plaid creates and matches the amount
-        of the entry on your sweep account ledger.
+        The total sum of the `swept` and `reverse_swept` events is equal to the `amount` of the sweep Plaid creates and matches the amount of the entry on your sweep account ledger.
       properties:
         id:
           type: string
@@ -14428,8 +14546,7 @@ components:
           description: |-
             Signed decimal amount of the sweep as it appears on your sweep account ledger (e.g. "-10.00")
 
-            If amount is not present, the sweep was net-settled to zero and outstanding debits and credits between
-            the sweep account and Plaid are balanced.
+            If amount is not present, the sweep was net-settled to zero and outstanding debits and credits between the sweep account and Plaid are balanced.
         iso_currency_code:
           type: string
           description: The currency of the sweep, e.g. "USD".
@@ -14534,6 +14651,142 @@ components:
       - access_token
       - account_id
       - request_id
+    TransferRepaymentListRequest:
+      title: TransferRepaymentListRequest
+      type: object
+      description: Defines the request schema for `/transfer/repayment/list`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        start_date:
+          type: string
+          format: date-time
+          description: The start datetime of repayments to return (RFC 3339 format).
+          nullable: true
+        end_date:
+          type: string
+          format: date-time
+          description: The end datetime of repayments to return (RFC 3339 format).
+          nullable: true
+        count:
+          type: integer
+          minimum: 1
+          maximum: 25
+          default: 25
+          description: The maximum number of repayments to return.
+          nullable: true
+        offset:
+          type: integer
+          default: 0
+          minimum: 0
+          description: The number of repayments to skip before returning results.
+    TransferRepaymentListResponse:
+      title: TransferRepaymentListResponse
+      type: object
+      additionalProperties: true
+      description: Defines the response schema for `/transfer/repayments/list`
+      properties:
+        repayments:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransferRepayment'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - repayments
+      - request_id
+    TransferRepayment:
+      title: TransferRepayment
+      type: object
+      additionalProperties: true
+      description: |-
+        A repayment is created automatically after one or more guaranteed transactions receive a return. If there are multiple eligible returns in a day, they are batched together into a single repayment.
+
+        Repayments are sent over ACH, with funds typically available on the next banking day.
+      properties:
+        repayment_id:
+          type: string
+          description: Identifier of the repayment.
+        created:
+          type: string
+          description: The datetime when the repayment occurred, in RFC 3339 format.
+          format: date-time
+        amount:
+          type: string
+          description: Decimal amount of the repayment as it appears on your account ledger.
+        iso_currency_code:
+          type: string
+          description: The currency of the repayment, e.g. "USD".
+      required:
+      - repayment_id
+      - created
+      - amount
+      - iso_currency_code
+    TransferRepaymentReturnListRequest:
+      title: TransferRepaymentReturnListRequest
+      type: object
+      description: Defines the request schema for `/transfer/repayment/return/list`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        repayment_id:
+          type: string
+          description: Identifier of the repayment to query.
+        count:
+          type: integer
+          minimum: 1
+          maximum: 25
+          default: 25
+          description: The maximum number of repayments to return.
+          nullable: true
+        offset:
+          type: integer
+          default: 0
+          minimum: 0
+          description: The number of repayments to skip before returning results.
+    TransferRepaymentReturnListResponse:
+      title: TransferRepaymentReturnListResponse
+      type: object
+      additionalProperties: true
+      description: Defines the response schema for `/transfer/repayments/return/list`
+      properties:
+        repayment_returns:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransferRepaymentReturn'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - repayment_returns
+      - request_id
+    TransferRepaymentReturn:
+      title: TransferRepaymentReturn
+      type: object
+      additionalProperties: true
+      description: Represents a return on a Guaranteed ACH transfer that is included in the specified repayment.
+      properties:
+        transfer_id:
+          type: string
+          description: The unique identifier of the guaranteed transfer that was returned.
+        event_id:
+          type: integer
+          description: The unique identifier of the corresponding `reversed` transfer event.
+          minimum: 0
+        amount:
+          type: string
+          description: The value of the returned transfer.
+        iso_currency_code:
+          type: string
+          description: The currency of the repayment, e.g. "USD".
+      required:
+      - transfer_id
+      - event_id
+      - amount
+      - iso_currency_code
     TransferIntentCreateRequest:
       title: TransferIntentCreateRequest
       type: object
@@ -14854,23 +15107,25 @@ components:
           $ref: '#/components/schemas/RequestID'
       required:
       - request_id
-    BankTransferReceiverDetails:
-      title: BankTransferReceiverDetails
+    SandboxTransferRepaymentSimulateRequest:
+      title: SandboxTransferRepaymentSimulateRequest
+      type: object
+      description: Defines the request schema for `/sandbox/transfer/repayment/simulate`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+    SandboxTransferRepaymentSimulateResponse:
+      title: SandboxTransferSimulateResponse
       type: object
       additionalProperties: true
-      description: The receiver details if the type of this event is `reciever_pending` or `reciever_posted`. Null value otherwise.
-      nullable: true
+      description: Defines the response schema for `/sandbox/transfer/repayment/simulate`
       properties:
-        available_balance:
-          type: string
-          description: The sign of the available balance for the receiver bank account associated with the receiver event at the time the matching transaction was found. Can be `positive`, `negative`, or null if the balance was not available at the time.
-          enum:
-          - positive
-          - negative
-          - null
-          nullable: true
+        request_id:
+          $ref: '#/components/schemas/RequestID'
       required:
-      - available_balance
+      - request_id
     AccountFiltersResponse:
       title: AccountFiltersResponse
       description: |
@@ -15636,6 +15891,8 @@ components:
 
         `DOCUMENT_TYPE_GIG`: Used to indicate that the income is related to gig work. Does not necessarily correspond to a specific document type.
 
+        `DOCUMENT_TYPE_NONE`: Used to indicate that there is no underlying document for the data.
+
         `UNKNOWN`: Document type could not be determined.
       enum:
       - UNKNOWN
@@ -15646,6 +15903,7 @@ components:
       - DOCUMENT_TYPE_US_MILITARY_LES
       - DOCUMENT_TYPE_US_MILITARY_CLES
       - DOCUMENT_TYPE_GIG
+      - DOCUMENT_TYPE_NONE
     Paystub:
       title: Paystub
       type: object
@@ -15822,8 +16080,6 @@ components:
           type: string
           description: Currency code, e.g. USD
           nullable: true
-          minLength: 3
-          maxLength: 3
     Earnings:
       title: Earnings
       type: object

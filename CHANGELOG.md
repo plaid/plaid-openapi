@@ -1,3 +1,34 @@
+### 2020-09-14_1.62.1
+- Add `minItems` and `minLength` validation to various fields in `/institution/*` request schemas
+
+### 2020-09-14_1.62.0
+- Add guarantee_decision and guarantee_decision rationale fields to the transfer API
+- Add repayment-related resources to the transfer API
+
+### 2020-09-14_1.61.7
+- Remove `receiver_pending` and `receiver_posted` from bank transfer event types.
+- Remove `BankTransferReceiverDetails` from bank transfer event types.
+
+### 2020-09-14_1.61.6
+- Update description formatting for `sweep` and `amount` fields for sweep endpoints
+
+### 2020-09-14_1.61.5
+- Added `NEW_ACCOUNTS_AVAILABLE` webhook code as valid input to `/sandbox/item/fire_webhook`
+- Update description for `/sandbox/item/fire_webhook`
+
+### 2020-09-14_1.61.4
+- Set various fields in `/institutions/*` request schemas to be nullable
+- Set the `minimum` for the `count` and `offset` fields in `InstitutionsGetRequest`
+
+### 2020-09-14_1.61.3
+- Adds `DOCUMENT_TYPE_NONE` enum value for document metadata
+
+### 2020-09-14_1.61.2
+- Relax length restrictions on the `currency` field in the `Pay` schema
+
+### 2020-09-14_1.61.1
+- Use new payment statuses in `PaymentStatusUpdateWebhook`
+
 ### 2020-09-14_1.61.0
 - Added payment scheme support for EU payments
 
