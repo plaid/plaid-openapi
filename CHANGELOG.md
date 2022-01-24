@@ -1,3 +1,26 @@
+### 2020-09-14_1.62.7
+- Update description for `datetime` and `authorized_datetime` fields in Transactions endpoints
+
+### 2020-09-14_1.62.6
+- Make `sweep_id` / `sweep_amount` fields on Transfer Event nullable
+
+### 2020-09-14_1.62.6
+- Set `institution_status` to be nullable in `InstitutionsGetResponse`
+
+### 2020-09-14_1.62.5
+- Update external docs URLs for Transfer and Bank Transfer endpoints
+- Update description for `ach_return_code` field in Transfer endpoints
+
+### 2020-09-14_1.62.4
+- Add `join_date` to `/application/get` and `/item/application/list`
+- Remove `created_at` from `/application/get`
+
+### 2020-09-14_1.62.3
+- Updated various description fields for Income
+
+### 2020-09-14_1.62.2
+- Add `employment` as an available product in Product array.
+
 ### 2020-09-14_1.62.1
 - Add `minItems` and `minLength` validation to various fields in `/institution/*` request schemas
 

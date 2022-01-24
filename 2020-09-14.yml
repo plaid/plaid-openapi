@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.62.1
+  version: 2020-09-14_1.62.7
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -284,9 +284,9 @@ paths:
                       category_id: "19013000"
                       check_number: null
                       date: "2017-01-29"
-                      datetime: null
+                      datetime: "2017-01-27T11:00:00Z"
                       authorized_date: "2017-01-27"
-                      authorized_datetime: null
+                      authorized_datetime: "2017-01-27T10:34:50Z"
                       location:
                         address: 300 Post St
                         city: San Francisco
@@ -3104,7 +3104,7 @@ paths:
       - plaid
       summary: Create a deposit switch
       externalDocs:
-        url: /api/products#deposit_switchcreate
+        url: /deposit-switch/reference#deposit_switchcreate
       responses:
         "200":
           description: OK
@@ -3286,7 +3286,7 @@ paths:
     post:
       summary: Retrieve a deposit switch
       externalDocs:
-        url: /api/products#deposit_switchget
+        url: /deposit-switch/reference#deposit_switchget
       tags:
       - plaid
       responses:
@@ -3330,7 +3330,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /transfer/reference#transferget
+        url: /api/products#transferget
       operationId: transferGet
       responses:
         "200":
@@ -3389,7 +3389,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products#bank_transferget
+        url: /bank-transfers/reference#bank_transferget
       operationId: bankTransferGet
       responses:
         "200":
@@ -3449,7 +3449,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /transfer/reference#transferauthorizationcreate
+        url: /api/products#transferauthorizationcreate
       operationId: transferAuthorizationCreate
       responses:
         "200":
@@ -3521,7 +3521,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /transfer/reference#transfercreate
+        url: /api/products#transfercreate
       operationId: transferCreate
       responses:
         "200":
@@ -3580,7 +3580,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products#bank_transfercreate
+        url: /bank-transfers/reference#bank_transfercreate
       operationId: bankTransferCreate
       responses:
         "200":
@@ -3635,7 +3635,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /transfer/reference#transferlist
+        url: /api/products#transferlist
       operationId: transferList
       responses:
         "200":
@@ -3692,7 +3692,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products#bank_transferlist
+        url: /bank-transfers/reference#bank_transferlist
       operationId: bankTransferList
       responses:
         "200":
@@ -3750,7 +3750,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /transfer/reference#transfercancel
+        url: /api/products#transfercancel
       operationId: transferCancel
       responses:
         "200":
@@ -3782,7 +3782,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products#bank_transfercancel
+        url: /bank-transfers/reference#bank_transfercancel
       operationId: bankTransferCancel
       responses:
         "200":
@@ -3814,7 +3814,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /transfer/reference#transfereventlist
+        url: /api/products#transfereventlist
       operationId: transferEventList
       responses:
         "200":
@@ -3835,6 +3835,8 @@ paths:
                       event_type: posted
                       failure_reason: null
                       origination_account_id: null
+                      sweep_amount: null
+                      sweep_id: null
                       timestamp: "2020-08-06T17:27:15Z"
                     request_id: mdqfuVxeoza6mhu
         default:
@@ -3856,7 +3858,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products#bank_transfereventlist
+        url: /bank-transfers/reference#bank_transfereventlist
       operationId: bankTransferEventList
       responses:
         "200":
@@ -3900,7 +3902,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /transfer/reference#transfereventsync
+        url: /api/products#transfereventsync
       operationId: transferEventSync
       responses:
         "200":
@@ -3921,6 +3923,8 @@ paths:
                       event_type: pending
                       failure_reason: null
                       origination_account_id: null
+                      sweep_amount: null
+                      sweep_id: null
                       timestamp: "2020-08-06T17:27:15Z"
                     request_id: mdqfuVxeoza6mhu
         default:
@@ -3942,7 +3946,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products#bank_transfereventsync
+        url: /bank-transfers/reference#bank_transfereventsync
       operationId: bankTransferEventSync
       responses:
         "200":
@@ -3986,7 +3990,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /transfer/reference#transfersweepget
+        url: /api/products#transfersweepget
       operationId: transferSweepGet
       responses:
         "200":
@@ -4066,7 +4070,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /transfer/reference#transfersweeplist
+        url: /api/products#transfersweeplist
       operationId: transferSweepList
       responses:
         "200":
@@ -4146,7 +4150,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products#bank_transferbalanceget
+        url: /bank-transfers/reference#bank_transferbalanceget
       operationId: bankTransferBalanceGet
       responses:
         "200":
@@ -4187,7 +4191,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products#bank_transfermigrate_account
+        url: /bank-transfers/reference#bank_transfermigrate_account
       operationId: bankTransferMigrateAccount
       responses:
         "200":
@@ -4221,7 +4225,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /transfer/reference#transferintentcreate
+        url: /api/products#transferintentcreate
       operationId: transferIntentCreate
       responses:
         "200":
@@ -4277,7 +4281,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /transfer/reference#transferintentget
+        url: /api/products#transferintentget
       operationId: transferIntentGet
       responses:
         "200":
@@ -4457,7 +4461,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /transfer/reference#sandboxtransfersweepsimulate
+        url: /api/products#sandboxtransfersweepsimulate
       operationId: sandboxTransferSweepSimulate
       responses:
         "200":
@@ -4498,7 +4502,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /transfer/reference#sandboxtransfersimulate
+        url: /api/products#sandboxtransfersimulate
       operationId: sandboxTransferSimulate
       responses:
         "200":
@@ -4946,7 +4950,7 @@ paths:
       externalDocs:
         url: /api/products/#incomeverificationtaxformsget
       operationId: incomeVerificationTaxformsGet
-      description: '`/income/verification/taxforms/get` returns the information collected from taxforms that were used to verify an end user''s income. It can be called once the status of the verification has been set to `VERIFICATION_STATUS_PROCESSING_COMPLETE`, as reported by the `INCOME: verification_status` webhook. Attempting to call the endpoint before verification has been completed will result in an error.'
+      description: '`/income/verification/taxforms/get` returns the information collected from forms that were used to verify an end user''s income. It can be called once the status of the verification has been set to `VERIFICATION_STATUS_PROCESSING_COMPLETE`, as reported by the `INCOME: verification_status` webhook. Attempting to call the endpoint before verification has been completed will result in an error.'
       responses:
         "200":
           description: OK
@@ -5029,7 +5033,7 @@ paths:
         description: ""
   /income/verification/precheck:
     post:
-      summary: Check a user's eligibility for the income verification product
+      summary: Check digital income verification eligibility and optimize conversion.
       tags:
       - plaid
       operationId: incomeVerificationPrecheck
@@ -5048,7 +5052,10 @@ paths:
                     request_id: lMjeOeu9X1VUh1F
                     precheck_id: n9elqYlvYm
                     confidence: HIGH
-      description: '`/income/verification/precheck` returns whether a given user is supportable by the income product'
+      description: |-
+        `/income/verification/precheck` is an optional endpoint that can be called before initializing a Link session for income verification. It evaluates whether a given user is supportable by digital income verification and returns a `precheck_id` that can be provided to `/link/token/create`. If the user is eligible for digital verification, providing the `precheck_id` in this way will generate a Link UI optimized for the end user and their specific employer. If the user cannot be confirmed as eligible, the `precheck_id` can still be provided to `/link/token/create` and the user can still use the income verification flow, but they may be required to manually upload a paystub to verify their income.
+
+        While all request fields are optional, providing either `employer` or `transactions_access_tokens` data will increase the chance of receiving a useful result.
       requestBody:
         required: true
         content:
@@ -5098,7 +5105,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products#deposit_switchaltcreate
+        url: /deposit-switch/reference#deposit_switchaltcreate
       responses:
         "200":
           description: OK
@@ -5817,7 +5824,7 @@ components:
       properties:
         institutions:
           type: array
-          description: A list of Plaid Institution
+          description: A list of Plaid institutions
           items:
             $ref: '#/components/schemas/Institution'
         total:
@@ -7865,7 +7872,7 @@ components:
           description: |-
             List of Plaid product(s) you wish to use. If launching Link in update mode, should be omitted; required otherwise. Valid products are:
 
-            `transactions`, `auth`, `identity`, `assets`, `investments`, `liabilities`, `payment_initiation`, `deposit_switch`, `income_verification`, `transfer`
+            `transactions`, `auth`, `identity`, `assets`, `investments`, `liabilities`, `payment_initiation`, `deposit_switch`, `income_verification`, `transfer`, `employment`
 
             `balance` is *not* a valid value, the Balance product does not require explicit initialization and will automatically be initialized when any other product is initialized.
 
@@ -8216,7 +8223,6 @@ components:
       - $ref: '#/components/schemas/Error'
       - type: object
         additionalProperties: true
-        description: Similar to Error, but renamed to avoid collisions in languages where "Error" is an existing type.
     Error:
       description: We use standard HTTP response codes for success and failure notifications, and our errors are further classified by `error_type`. In general, 200 HTTP codes correspond to success, 40X codes are for developer- or user-related failures, and 50X codes are for Plaid-related issues.  Error fields will be `null` if no error has occurred.
       type: object
@@ -8895,7 +8901,7 @@ components:
           authorized_date:
             type: string
             format: date
-            description: The date that the transaction was authorized. Dates are returned in an [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ( `YYYY-MM-DD` ).
+            description: The date that the transaction was authorized. Dates are returned in an [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ( `YYYY-MM-DD` ). The `authorized_date` field uses machine learning to determine a transaction date for transactions where the `date_transacted` is not available. If the `date_transacted` field is present and not `null`, the `authorized_date` field will have the same value as the `date_transacted` field.
             nullable: true
           authorized_datetime:
             type: string
@@ -8903,7 +8909,7 @@ components:
             description: |-
               Date and time when a transaction was authorized in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ( `YYYY-MM-DDTHH:mm:ssZ` ).
 
-              This field is only populated for UK institutions. For institutions in other countries, will be `null`.
+              This field is returned for select financial institutions and comes as provided by the institution. It may contain default time values (such as 00:00:00).
             nullable: true
           datetime:
             type: string
@@ -8911,7 +8917,7 @@ components:
             description: |-
               Date and time when a transaction was posted in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ( `YYYY-MM-DDTHH:mm:ssZ` ).
 
-              This field is only populated for UK institutions. For institutions in other countries, will be `null`.
+              This field is returned for select financial institutions and comes as provided by the institution. It may contain default time values (such as 00:00:00).
             nullable: true
           transaction_code:
             $ref: '#/components/schemas/TransactionCode'
@@ -9126,6 +9132,7 @@ components:
       title: InstitutionStatus
       type: object
       additionalProperties: true
+      nullable: true
       properties:
         item_logins:
           $ref: '#/components/schemas/ProductStatus'
@@ -10520,6 +10527,7 @@ components:
       - deposit_switch
       - standing_orders
       - transfer
+      - employment
       description: A list of products that an institution can support. All Items must be initialized with at least one product. The Balance product is always available and does not need to be specified during initialization.
       type: string
     ProductStatus:
@@ -10776,7 +10784,7 @@ components:
         date_transacted:
           type: string
           format: date
-          description: The date of the transaction, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) (YYYY-MM-DD) format. Transactions in Sandbox will move from pending to posted once their transaction date has been reached.
+          description: The date of the transaction, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) (YYYY-MM-DD) format. Transactions in Sandbox will move from pending to posted once their transaction date has been reached. If a `date_transacted` is not provided by the institution, a transaction date may be available in the [`authorized_date`](https://plaid.com/docs/api/products/#transactions-get-response-transactions-authorized-date) field.
         date_posted:
           type: string
           format: date
@@ -12919,7 +12927,7 @@ components:
 
             `error`: There was an error processing the deposit switch request.
 
-            For more information, see the [Deposit Switch API reference](/docs/api/products#deposit_switchget).
+            For more information, see the [Deposit Switch API reference](/docs/deposit-switch/reference#deposit_switchget).
         deposit_switch_id:
           type: string
           description: The ID of the deposit switch.
@@ -12997,6 +13005,7 @@ components:
       type: string
       title: TransferSweepID
       description: Plaid’s unique identifier for a sweep.
+      nullable: true
     TransferAuthorizationID:
       type: string
       title: TransferAuthorizationID
@@ -13191,11 +13200,12 @@ components:
     TransferAmount:
       title: TransferAmount
       type: string
-      description: The amount of the transfer (decimal string with two digits of precision e.g. “10.00”).
+      description: The amount of the transfer (decimal string with two digits of precision e.g. "10.00").
     TransferSweepAmount:
       title: TransferSweepAmount
       type: string
-      description: A signed amount of how much was `swept` or `reverse_swept` (decimal string with two digits of precision e.g. “-5.50”).
+      description: A signed amount of how much was `swept` or `reverse_swept` (decimal string with two digits of precision e.g. "-5.50").
+      nullable: true
     TransferIntentGetFailureReason:
       title: TransferIntentGetFailureReason
       type: object
@@ -13230,7 +13240,7 @@ components:
     BankTransferAmount:
       title: BankTransferAmount
       type: string
-      description: The amount of the bank transfer (decimal string with two digits of precision e.g. “10.00”).
+      description: The amount of the bank transfer (decimal string with two digits of precision e.g. "10.00").
     TransferCreateIdempotencyKey:
       title: TransferCreateIdempotencyKey
       type: string
@@ -13583,7 +13593,7 @@ components:
         ach_return_code:
           type: string
           nullable: true
-          description: The ACH return code, e.g. `R01`.  A return code will be provided if and only if the transfer status is `reversed`. For a full listing of ACH return codes, see [Bank Transfers errors](https://plaid.com/docs/errors/bank-transfers/#ach-return-codes).
+          description: The ACH return code, e.g. `R01`.  A return code will be provided if and only if the transfer status is `reversed`. For a full listing of ACH return codes, see [Transfer errors](https://plaid.com/docs/errors/transfer/#ach-return-codes).
         description:
           type: string
           description: A human-readable description of the reason for the failure or reversal.
@@ -14019,7 +14029,8 @@ components:
           items:
             $ref: '#/components/schemas/TransferEventType'
         sweep_id:
-          $ref: '#/components/schemas/TransferSweepID'
+          type: string
+          description: Plaid’s unique identifier for a sweep.
         count:
           type: integer
           description: The maximum number of transfer events to return. If the number of events matching the above parameters is greater than `count`, the most recent events will be returned.
@@ -14200,6 +14211,8 @@ components:
       - transfer_type
       - transfer_amount
       - failure_reason
+      - sweep_id
+      - sweep_amount
     BankTransferEvent:
       title: BankTransferEvent
       type: object
@@ -14377,7 +14390,8 @@ components:
         secret:
           $ref: '#/components/schemas/APISecret'
         sweep_id:
-          $ref: '#/components/schemas/TransferSweepID'
+          type: string
+          description: Plaid’s unique identifier for a sweep.
       required:
       - sweep_id
     BankTransferSweepGetResponse:
@@ -15171,7 +15185,7 @@ components:
         properties:
           owners:
             type: array
-            description: Data returned by the financial institution about the account owner or owners. Only returned by Identity or Assets endpoints. Multiple owners on a single account will be represented in the same `owner` object, not in multiple owner objects within the array. In API versions 2018-05-22 and earlier, the `owners` object is not returned, and instead identity information is returned in the top level `identity` object. For more details, see [Plaid API versioning](https://plaid.com/docs/api/versioning/#version-2019-05-29)
+            description: Data returned by the financial institution about the account owner or owners. Only returned by Identity or Assets endpoints. For business accounts, the name reported may be either the name of the individual or the name of the business, depending on the institution. Multiple owners on a single account will be represented in the same `owner` object, not in multiple owner objects within the array. In API versions 2018-05-22 and earlier, the `owners` object is not returned, and instead identity information is returned in the top level `identity` object. For more details, see [Plaid API versioning](https://plaid.com/docs/api/versioning/#version-2019-05-29)
             items:
               $ref: '#/components/schemas/Owner'
         required:
@@ -15193,7 +15207,7 @@ components:
               $ref: '#/components/schemas/AssetReportTransaction'
           owners:
             type: array
-            description: Data returned by the financial institution about the account owner or owners. Only returned by Identity or Assets endpoints. Multiple owners on a single account will be represented in the same `owner` object, not in multiple owner objects within the array. In API versions 2018-05-22 and earlier, the `owners` object is not returned, and instead identity information is returned in the top level `identity` object. For more details, see [Plaid API versioning](https://plaid.com/docs/api/versioning/#version-2019-05-29)
+            description: Data returned by the financial institution about the account owner or owners. Only returned by Identity or Assets endpoints. For business accounts, the name reported may be either the name of the individual or the name of the business, depending on the institution. Multiple owners on a single account will be represented in the same `owner` object, not in multiple owner objects within the array. In API versions 2018-05-22 and earlier, the `owners` object is not returned, and instead identity information is returned in the top level `identity` object. For more details, see [Plaid API versioning](https://plaid.com/docs/api/versioning/#version-2019-05-29)
             items:
               $ref: '#/components/schemas/Owner'
           historical_balances:
@@ -15326,7 +15340,7 @@ components:
     IncomeVerificationCreateRequestOptions:
       title: IncomeVerificationCreateRequestOptions
       type: object
-      description: IncomeVerificationCreateRequestOptions defines the optional arguments schema for `/income/verification/create`
+      description: Optional arguments for `/income/verification/create`
       properties:
         access_tokens:
           type: array
@@ -15365,7 +15379,7 @@ components:
           $ref: '#/components/schemas/AccessTokenNullable'
         transactions_access_tokens:
           type: array
-          description: An array of access tokens corresponding to the Items that will be cross-referenced with the product data. If the `transactions` product was not initialized for the Items during link, it will be initialized after this Link session.
+          description: An array of access tokens corresponding to Items belonging to the user whose eligibility is being checked. Note that if the Items specified here are not already initialized with `transactions`, providing them in this field will cause these Items to be initialized with (and billed for) the Transactions product.
           items:
             $ref: '#/components/schemas/AccessToken'
         us_military_info:
@@ -15374,6 +15388,7 @@ components:
       title: IncomeVerificationPrecheckEmployer
       type: object
       nullable: true
+      description: Information about the end user's employer
       properties:
         name:
           type: string
@@ -15447,6 +15462,7 @@ components:
       title: IncomeVerificationPrecheckUser
       type: object
       nullable: true
+      description: Information about the user whose eligibility is being evaluated.
       properties:
         first_name:
           type: string
@@ -15469,7 +15485,7 @@ components:
       properties:
         precheck_id:
           type: string
-          description: ID of the precheck.
+          description: ID of the precheck. Provide this value when calling `/link/token/create` in order to optimize Link conversion.
         request_id:
           $ref: '#/components/schemas/RequestID'
         confidence:
@@ -15480,11 +15496,11 @@ components:
       - request_id
     IncomeVerificationPrecheckConfidence:
       description: |-
-        The confidence that Plaid can support the user in the income verification flow. One of the following:
+        The confidence that Plaid can support the user in the digital income verification flow instead of requiring a manual paystub upload. One of the following:
 
-        `"HIGH"`: This precheck information submitted is definitively tied to a Plaid-supported integration.
+        `"HIGH"`: It is very likely that this user can use the digital income verification flow.
 
-        "`LOW`": This precheck information submitted is known not to be supported by Plaid.
+        "`LOW`": It is unlikely that this user can use the digital income verification flow.
 
         `"UNKNOWN"`: It was not possible to determine if the user is supportable with the information passed.
       type: string
@@ -15506,7 +15522,7 @@ components:
           description: The `asset_report_id` of an asset report associated with the user, as provided by `/asset_report/create`. Providing an `asset_report_id` is optional and can be used to verify the user through a streamlined flow. If provided, the bank linking flow will be skipped.
         precheck_id:
           type: string
-          description: The ID of a precheck created with `/income/verification/precheck`. Will be used to improve conversion of the income verification flow.
+          description: The ID of a precheck created with `/income/verification/precheck`. Will be used to improve conversion of the income verification flow by streamlining the Link interface presented to the end user.
         access_tokens:
           type: array
           description: An array of access tokens corresponding to the Items that will be cross-referenced with the product data. If the `transactions` product was not initialized for the Items during link, it will be initialized after this Link session.
@@ -15540,7 +15556,7 @@ components:
         verification_status:
           type: string
           description: |-
-            `VERIFICATION_STATUS_PROCESSING_COMPLETE`: The income verification status processing has completed. If the user uploaded multiple documents, this webhook will fire when all documents have finished processing. Call the `/paystubs/get` endpoint and check the document metadata to see which documents were successfully parsed.
+            `VERIFICATION_STATUS_PROCESSING_COMPLETE`: The income verification status processing has completed. If the user uploaded multiple documents, this webhook will fire when all documents have finished processing. Call the `/income/verification/paystubs/get` endpoint and check the document metadata to see which documents were successfully parsed.
 
             `VERIFICATION_STATUS_PROCESSING_FAILED`: A failure occurred when attempting to process the verification documentation.
 
@@ -15840,6 +15856,7 @@ components:
       description: IncomeVerificationPaystubsGetResponse defines the response schema for `/income/verification/paystubs/get`.
       properties:
         document_metadata:
+          description: Metadata for an income document.
           type: array
           items:
             $ref: '#/components/schemas/DocumentMetadata'
@@ -16637,7 +16654,7 @@ components:
             $ref: '#/components/schemas/DocumentMetadata'
         taxforms:
           type: array
-          description: A list of taxforms.
+          description: A list of forms.
           items:
             $ref: '#/components/schemas/Taxform'
         error:
@@ -16648,6 +16665,7 @@ components:
     Taxform:
       title: Taxform
       type: object
+      description: Data about an official document used to report the user's income to the IRS.
       additionalProperties: true
       properties:
         doc_id:
@@ -16655,7 +16673,7 @@ components:
           description: An identifier of the document referenced by the document metadata.
         document_type:
           type: string
-          description: The type of tax document.
+          description: The type of tax document. Currently, the only supported value is `w2`.
         w2:
           $ref: '#/components/schemas/W2'
       required:
@@ -16825,8 +16843,6 @@ components:
           description: A list of employment verification summaries.
           items:
             $ref: '#/components/schemas/EmploymentVerification'
-        error:
-          $ref: '#/components/schemas/PlaidError'
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
@@ -16843,12 +16859,12 @@ components:
         start_date:
           format: date
           type: string
-          description: Start of employment in ISO_8601 format (YYYY-MM-DD).
+          description: Start of employment in ISO 8601 format (YYYY-MM-DD).
           nullable: true
         end_date:
           format: date
           type: string
-          description: End of employment, if applicable. In ISO_8601 format (YYY-MM-DD).
+          description: End of employment, if applicable. Provided in ISO 8601 format (YYY-MM-DD).
           nullable: true
         employer:
           $ref: '#/components/schemas/EmployerVerification'
@@ -17116,6 +17132,12 @@ components:
           type: string
           format: date
           description: The date this application was linked in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) (YYYY-MM-DD) format in UTC.
+          example: "2020-01-01"
+          deprecated: true
+        join_date:
+          type: string
+          format: date
+          description: The date this application was granted production access at Plaid in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) (YYYY-MM-DD) format in UTC.
         logo_url:
           nullable: true
           type: string
@@ -17130,7 +17152,7 @@ components:
           description: A string provided by the connected app stating why they use their respective enabled products.
       required:
       - application_id
-      - created_at
+      - join_date
       - name
       - logo_url
       - application_url
@@ -17357,6 +17379,10 @@ components:
           format: date
           description: The date this application was linked in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) (YYYY-MM-DD) format in UTC.
           example: "2020-01-01"
+        join_date:
+          type: string
+          format: date
+          description: The date this application was granted production access at Plaid in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) (YYYY-MM-DD) format in UTC.
         product_data_types:
           type: array
           description: (Deprecated) A list of enums representing the data collected and products enabled for this connected application.
@@ -17374,6 +17400,7 @@ components:
       - application_id
       - name
       - created_at
+      - join_date
       - logo
       - logo_url
       - application_url
@@ -17433,7 +17460,7 @@ components:
           - VERIFICATION_STATUS_PROCESSING_FAILED
           - VERIFICATION_STATUS_PENDING_APPROVAL
           description: |-
-            `VERIFICATION_STATUS_PROCESSING_COMPLETE`: The income verification status processing has completed. If the user uploaded multiple documents, this webhook will fire when all documents have finished processing. Call the `/paystubs/get` endpoint and check the document metadata to see which documents were successfully parsed.
+            `VERIFICATION_STATUS_PROCESSING_COMPLETE`: The income verification status processing has completed. If the user uploaded multiple documents, this webhook will fire when all documents have finished processing. Call the `/income/verification/paystubs/get` endpoint and check the document metadata to see which documents were successfully parsed.
 
             `VERIFICATION_STATUS_PROCESSING_FAILED`: A failure occurred when attempting to process the verification documentation.
 
@@ -17635,7 +17662,7 @@ components:
     CustomerInitiatedReturnRisk:
       title: CustomerInitiatedReturnRisk
       type: object
-      description: 'The object contains a risk score and a risk tier that evaluate the transaction return risk of an unauthorized debit. Common return codes in this category include: “R05”, "R07", "R10", "R11", "R29". These returns typically have a return time frame of up to 60 calendar days. During this period, the customer of financial institutions can dispute a transaction as unauthorized.'
+      description: 'The object contains a risk score and a risk tier that evaluate the transaction return risk of an unauthorized debit. Common return codes in this category include: "R05", "R07", "R10", "R11", "R29". These returns typically have a return time frame of up to 60 calendar days. During this period, the customer of financial institutions can dispute a transaction as unauthorized.'
       properties:
         score:
           $ref: '#/components/schemas/SignalScore'
@@ -17661,7 +17688,7 @@ components:
     BankInitiatedReturnRisk:
       title: BankInitiatedReturnRisk
       type: object
-      description: 'The object contains a risk score and a risk tier that evaluate the transaction return risk because an account is overdrawn or because an ineligible account is used. Common return codes in this category include: "R01", "R02", "R03", "R04", "R06", “R08”,  "R09", "R13", "R16", "R17", "R20", "R23". These returns have a turnaround time of 2 banking days.'
+      description: 'The object contains a risk score and a risk tier that evaluate the transaction return risk because an account is overdrawn or because an ineligible account is used. Common return codes in this category include: "R01", "R02", "R03", "R04", "R06", "R08",  "R09", "R13", "R16", "R17", "R20", "R23". These returns have a turnaround time of 2 banking days.'
       properties:
         score:
           $ref: '#/components/schemas/SignalScore'
