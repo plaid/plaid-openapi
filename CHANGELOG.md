@@ -1,3 +1,45 @@
+### 2020-09-14_1.64.9
+- De-anonymized the object filters under `LinkTokenCreateRequestAccountSubtypes`, as anonymous objects aren't compatible with the generated CLibs.
+- De-anonymized some misc. objects
+  - `PaymentInitiationMetadata/properties/maximum_payment_amount`
+  - `PaystubOverride/properties/employer`
+  - `PaystubOverride/properties/employee`
+  - `PaystubOverride/properties/employee/properties/address`
+  - `LiabilitiesDefaultUpdateWebhook/properties/account_ids_with_updated_liabilities`
+
+### 2020-09-14_1.64.8
+- Updated the description of the historical_balances array
+
+### 2020-09-14_1.64.7
+- Add new possible enums for income verification earnings breakdown canonical description
+
+### 2020-09-14_1.64.6
+- Hid a few product enum values that are deprecated or no longer valid for certain request fields. This affects the documentation only.
+
+### 2020-09-14_1.64.5
+- Make guarantee fields required in Transfer endpoints
+
+### 2020-09-14_1.64.4
+- Updated description for `failure_reason` field in Transfer endpoints
+
+### 2020-09-14_1.64.3
+- Make `repayment_id` required in `/transfer/repayment/return/list` endpoint
+
+### 2020-09-14_1.64.2
+- Update description for legal name field in `BankTransferUser` 
+
+### 2020-09-14_1.64.1
+- Update descriptions for `/transfer/repayment/list` and `/transfer/repayment/return/list` endpoints
+
+### 2020-09-14_1.64.0
+- Remove `scheme_automatic_downgrade` from `/payment_initiation/payment/create`
+
+### 2020-09-14_1.63.1
+- Update description for `/sandbox/transfer/sweep/simulate` endpoint
+
+### 2020-09-14_1.63.0
+- Refactor account subtype enums for greater specificity. This has no changes to the API but is a major semver change for Python, Node, Go, and Java client library interfaces to the AccountSubtype object within account filtering contexts in `/link/token/create`. The `AccountSubtype` namespace in this context is now prefixed with the AccountType. (Example for Node: Old: `AccountSubtype.checking` New: `DepositoryAccountSubtype.checking`)
+
 ### 2020-09-14_1.62.7
 - Update description for `datetime` and `authorized_datetime` fields in Transactions endpoints
 
