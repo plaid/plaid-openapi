@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.64.9
+  version: 2020-09-14_1.64.13
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -3355,6 +3355,8 @@ paths:
                       cancellable: true
                       created: "2020-08-06T17:27:15Z"
                       description: Testing2
+                      guarantee_decision: null
+                      guarantee_decision_rationale: null
                       failure_reason:
                         ach_return_code: R13
                         description: Invalid ACH routing number
@@ -3559,6 +3561,8 @@ paths:
                       status: pending
                       network: ach
                       cancellable: true
+                      guarantee_decision: GUARANTEED
+                      guarantee_decision_rationale: null
                       failure_reason: null
                       metadata:
                         key1: value1
@@ -3659,6 +3663,8 @@ paths:
                       cancellable: true
                       created: "2020-08-06T17:27:15Z"
                       description: Testing2
+                      guarantee_decision: null
+                      guarantee_decision_rationale: null
                       failure_reason:
                         ach_return_code: R13
                         description: Invalid ACH routing number
@@ -4427,6 +4433,7 @@ paths:
                 value:
                   start_time: "2022-01-10T12:34:56Z"
                   count: 1
+                  repayment_id: d4bfce70-2470-4298-ae87-5e9b3e18bfaf
       parameters: []
   /sandbox/bank_transfer/simulate:
     post:
@@ -4434,7 +4441,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/sandbox/#sandboxbank_transfersimulate
+        url: /bank-transfers/reference/#sandboxbank_transfersimulate
       operationId: sandboxBankTransferSimulate
       responses:
         "200":
@@ -5139,7 +5146,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/sandbox/#sandboxbank_transferfire_webhook
+        url: /bank-transfers/reference/#sandboxbank_transferfire_webhook
       operationId: sandboxBankTransferFireWebhook
       responses:
         "200":
@@ -5825,7 +5832,7 @@ components:
         oauth:
           type: boolean
           nullable: true
-          description: Limit results to institutions with or without OAuth login flows. This is primarily relevant to institutions with European country codes.
+          description: Limit results to institutions with or without OAuth login flows.
         include_optional_metadata:
           type: boolean
           description: |-
@@ -5910,7 +5917,7 @@ components:
         oauth:
           type: boolean
           nullable: true
-          description: Limit results to institutions with or without OAuth login flows. This is primarily relevant to institutions with European country codes
+          description: Limit results to institutions with or without OAuth login flows.
         include_optional_metadata:
           type: boolean
           description: When true, return the institution's homepage URL, logo and primary brand color.
@@ -9177,7 +9184,7 @@ components:
           description: The official name of the institution
         products:
           type: array
-          description: A list of the Plaid products supported by the institution. Note that only institutions that support Instant Auth will return `auth` in the product array; institutions that do not list `auth` may still support other Auth methods such as Instant Match or Automated Micro-deposit Verification. For more details, see [Full Auth coverage](https://plaid.com/docs/auth/coverage/).
+          description: A list of the Plaid products supported by the institution. Note that only institutions that support Instant Auth will return `auth` in the product array; institutions that do not list `auth` may still support other Auth methods such as Instant Match or Automated Micro-deposit Verification. To identify institutions that support those methods, use the `auth_metadata` object. For more details, see [Full Auth coverage](https://plaid.com/docs/auth/coverage/).
           items:
             $ref: '#/components/schemas/Products'
         country_codes:
@@ -9204,7 +9211,7 @@ components:
             type: string
         oauth:
           type: boolean
-          description: Indicates that the institution has an OAuth login flow. This is primarily relevant to institutions with European country codes.
+          description: Indicates that the institution has an OAuth login flow.
         status:
           $ref: '#/components/schemas/InstitutionStatus'
         payment_initiation_metadata:
@@ -9559,6 +9566,57 @@ components:
       - webhook_code
       - new_transactions
       - item_id
+    IdentityDefaultUpdateWebhook:
+      x-examples:
+        example-1:
+          webhook_type: IDENTITY
+          webhook_code: DEFAULT_UPDATE
+          item_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
+          account_ids_with_updated_identity:
+            BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp:
+            - ADDRESSES
+          error: null
+      type: object
+      additionalProperties: true
+      description: Fired when a change to identity data has been detected on an Item.
+      properties:
+        webhook_type:
+          type: string
+          description: '`IDENTITY`'
+        webhook_code:
+          type: string
+          description: '`DEFAULT_UPDATE`'
+        item_id:
+          $ref: '#/components/schemas/ItemId'
+        account_ids_with_updated_identity:
+          $ref: '#/components/schemas/AccountIdsWithUpdatedIdentity'
+        error:
+          $ref: '#/components/schemas/PlaidError'
+      required:
+      - webhook_type
+      - webhook_code
+      - item_id
+      - error
+      - account_ids_with_updated_identity
+    AccountIdsWithUpdatedIdentity:
+      title: AccountIdsWithUpdatedIdentity
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          $ref: '#/components/schemas/IdentityUpdateTypes'
+      description: |
+        An object with keys of `account_id`'s that are mapped to their respective identity attributes that changed.
+
+        Example: `{ "XMBvvyMGQ1UoLbKByoMqH3nXMj84ALSdE5B58": ["PHONES"] }`
+    IdentityUpdateTypes:
+      type: string
+      description: The possible types of identity data that may have changed.
+      enum:
+      - PHONES
+      - ADDRESSES
+      - EMAILS
+      - NAMES
     HistoricalUpdateWebhook:
       title: HistoricalUpdateWebhook
       description: Fired when an Item's historical transaction pull is completed and Plaid has prepared as much historical transaction data as possible for the Item. Once this webhook has been fired, transaction data beyond the most recent 30 days can be fetched for the Item. If [Account Select v2](https://plaid.com/docs/link/customization/#account-select) is enabled, this webhook will also be fired if account selections for the Item are updated, with `new_transactions` set to the number of net new transactions pulled after the account selection update.
@@ -12531,6 +12589,7 @@ components:
           description: For descriptions of possible transaction types and subtypes, see the [Investment transaction types schema](https://plaid.com/docs/api/accounts/#investment-transaction-types-schema).
           enum:
           - account fee
+          - adjustment
           - assignment
           - buy
           - buy to cover
@@ -13345,8 +13404,11 @@ components:
     TransferCreateIdempotencyKey:
       title: TransferCreateIdempotencyKey
       type: string
+      deprecated: true
       maxLength: 50
       description: |-
+        Deprecated. `authorization_id` is now for used idempotency instead.
+
         A random key provided by the client, per unique transfer. Maximum of 50 characters.
 
         The API supports idempotency for safely retrying requests without accidentally performing the same operation twice. For example, if a request to create a transfer fails due to a network connection error, you can retry the request with the same idempotency key to guarantee that only a single transfer is created.
@@ -13769,7 +13831,8 @@ components:
           type: string
           description: The Plaid `account_id` for the account that will be debited or credited.
         authorization_id:
-          $ref: '#/components/schemas/TransferAuthorizationID'
+          type: string
+          description: Plaid’s unique identifier for a transfer authorization. This parameter also serves the purpose of acting as an idempotency identifier.
         type:
           $ref: '#/components/schemas/TransferType'
         network:
@@ -13794,7 +13857,6 @@ components:
           type: string
           description: The currency of the transfer amount. The default value is "USD".
       required:
-      - idempotency_key
       - access_token
       - account_id
       - authorization_id
@@ -16572,8 +16634,11 @@ components:
           nullable: true
         marital_status:
           type: string
-          description: Marital status of the employee.
+          description: Marital status of the employee - either `single` or `married`.
           nullable: true
+          x-override-enum-values-shown:
+          - single
+          - married
         taxpayer_id:
           $ref: '#/components/schemas/TaxpayerID'
       required:
@@ -17520,17 +17585,11 @@ components:
       type: object
       description: Scope of required and optional account features or content from a ConnectedApplication.
       properties:
-        required_product_access:
-          $ref: '#/components/schemas/ProductAccess'
-        optional_product_access:
-          $ref: '#/components/schemas/ProductAccess'
         account_filters:
           $ref: '#/components/schemas/AccountFilter'
         account_selection_cardinality:
           $ref: '#/components/schemas/AccountSelectionCardinality'
       required:
-      - required_product_access
-      - optional_product_access
       - account_selection_cardinality
     ScopesState:
       description: When scopes are updated during enrollment, this field must be populated with the state sent to the partner in the OAuth Login URI. This field is required when the context is `ENROLLMENT`.
