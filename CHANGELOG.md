@@ -1,3 +1,17 @@
+### 2020-09-14_1.64.13
+- Deprecate `idempotency_key` parameter in transfer/create
+
+### 2020-09-14_1.64.12
+- Removed the unused `required_product_access` and `optional_product_access` parameters from `RequestedScopes`
+
+### 2020-09-14_1.64.11
+- Fix some examples that were not consistent with their schemas
+- Add `adjustments` as an investments transaction type to make OpenAPI file consistent with values returned by the API
+- Clarify description field for `marital_status` to reflect possible values
+
+### 2020-09-14_1.64.10
+- Updated the external docs URL for Bank Transfers sandbox endpoints
+
 ### 2020-09-14_1.64.9
 - De-anonymized the object filters under `LinkTokenCreateRequestAccountSubtypes`, as anonymous objects aren't compatible with the generated CLibs.
 - De-anonymized some misc. objects
