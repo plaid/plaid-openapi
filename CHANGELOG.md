@@ -1,3 +1,80 @@
+### 2020-09-14_1.77.0
+- Explicitly set `format: double` for non-integer numbers so generated fields prefer float64
+
+### 2020-09-14_1.76.0
+- Add three new endpoints for Assets: `/asset_report/relay/create`, `/asset_report/relay/get`, and `/asset_report/relay/rmeove`
+
+### 2020-09-14_1.75.0
+- Added `/asset_report/relay/refresh` endpoint
+
+### 2020-09-14_1.74.0
+- Add `recurring_transactions` to list of products
+
+### 2020-09-14_1.73.0
+- Add new endpoint for `/credit/bank_income/get`
+
+### 2020-09-14_1.72.0
+- Updated documentation URLs for all product endpoints. They can now be found
+at `/docs/api/products/<product-name>/#endpoint` instead of `/docs/api/products/#endpoint`
+
+### 2020-09-14_1.71.0
+- internal changes
+
+### 2020-09-14_1.70.0
+- Remove deprecated `income_verification_id` from `/sandbox/income/fire_webhook`
+
+### 2020-09-14_1.69.1
+- Reorder processors enum
+
+### 2020-09-14_1.69.0
+- Added `/beta/transactions/v1/enhance` endpoint
+
+### 2020-09-14_1.68.1
+- Added `status` object to sample responses for `/institutions/get` and `institutions/search` endpoints
+
+### 2020-09-14_1.68.0
+- Mark `include_personal_finance_category_beta` property as deprecated.
+- Add new argument `include_personal_finance_category` to TransactionsGetRequestOptions.
+- Update docs for `/transactions/get` request and response, referencing personal_finance_category taxonomy csv file.
+
+### 2020-09-14_1.67.1
+- internal changes
+
+### 2020-09-14_1.67.0
+- Removed unused `/income/verification/summary/get` endpoint
+
+### 2020-09-14_1.66.0
+- Added Payment Consent endpoints
+
+### 2020-09-14_1.65.0
+- Removed unused `/income/verification/paystub/get` endpoint
+
+### 2020-09-14_1.64.15
+- De-anonymized enums:
+  - `PaymentInitiationPaymentReverseResponse.properties.status` => `PaymentInitiationRefundStatus`
+  - `PaymentInitiationPaymentCreateResponse.properties.status` => `PaymentInitiationPaymentCreateStatus`
+  - `PaymentInitiationRefund.properties.status` => `PaymentInitiationRefundStatus`
+  - `PaymentAmount.properties.currency` => `PaymentAmountCurrency`
+  - `InvestmentTransaction.properties.type` => `InvestmentTransactionType`
+  - `InvestmentTransaction.properties.subtype` => `InvestmentTransactionSubtype`
+  - `TransferAuthorizationDecisionRationale.properties.code` => `TransferAuthorizationDecisionRationaleCode`
+  - `TransferAuthorizationGuaranteeDecisionRationale.properties.code` => `TransferAuthorizationGuaranteeDecisionRationaleCode`
+  - `TransferAuthorization.properties.decision` => `TransferAuthorizationDecision`
+  - `TransferEventListRequest.properties.transfer_type` => `TransferEventListTransferType`
+  - `BankTransferEventListRequest.properties.bank_transfer_type` => `BankTransferEventListBankTransferType`
+  - `BankTransferEventListRequest.properties.direction` => `BankTransferEventListDirection`
+  - `TransferIntentCreate.properties.status` => `TransferIntentStatus`
+  - `TransferIntentGet.properties.status` => `TransferIntentStatus`
+  - `TransferIntentGet.properties.authorization_decision` => `TransferIntentAuthorizationDecision`
+- `IncomeVerificationPrecheckMilitaryInfo.properties.branch` is now a string field (previously enum)
+
+### 2020-09-14_1.64.15
+- Made `last_statement_balance` and `minimum_payment_amount` `nullable` for credit card liabilities schema to reflect existing API behavior.
+
+### 2020-09-14_1.64.14
+- Made `last_payment_amount` and `last_statement_issue_date` `nullable` for credit card liabilities schema to reflect existing API behavior.
+- Fix transfers examples to reflect more consistent usage of `region` field.
+
 ### 2020-09-14_1.64.13
 - Deprecate `idempotency_key` parameter in transfer/create
 
@@ -40,7 +117,7 @@
 - Make `repayment_id` required in `/transfer/repayment/return/list` endpoint
 
 ### 2020-09-14_1.64.2
-- Update description for legal name field in `BankTransferUser` 
+- Update description for legal name field in `BankTransferUser`
 
 ### 2020-09-14_1.64.1
 - Update descriptions for `/transfer/repayment/list` and `/transfer/repayment/return/list` endpoints
@@ -218,8 +295,8 @@
 - Adds `transfer` object to the `/link/token/create` request schema
 
 ### 2020-09-14_1.47.2
-- Removes the option for `additionalProperties` in `SignalReturnReportRequest` 
-- Adds `additionalProperties` to `SignalReturnReportResponse` 
+- Removes the option for `additionalProperties` in `SignalReturnReportRequest`
+- Adds `additionalProperties` to `SignalReturnReportResponse`
 
 ### 2020-09-14_1.47.1
 - Adds description updates and bug fix for Income Verification endpoints
@@ -316,7 +393,7 @@
 
 ### 2020-09-14_1.37.6
 - Adds `inflow_streams` to required field of `/transactions/recurring/get`.
- 
+
 ### 2020-09-14_1.37.5
 - Make default behavior of `include_insights` in `/asset_report/get` request explicit.
 
@@ -353,7 +430,7 @@
 - Fixed a bug for `SignalEvaluateRequest` and removed `additionalProperties: true` for it.
 
 ### 2020-09-14_1.36.0
-- Add missing `last_statement_balance` liabilities field to OpenAPI file 
+- Add missing `last_statement_balance` liabilities field to OpenAPI file
 
 ### 2020-09-14_1.35.0
 - Add support for `BSV` currency
@@ -417,7 +494,7 @@
 
 ### 2020-09-14_1.29.0
 - Added `include_personal_finance_category_beta` as an optional field to the `TransactionsGetRequestOptions` component
-- Added `personal_finance_category` as a nullable field to the `Transaction` component 
+- Added `personal_finance_category` as a nullable field to the `Transaction` component
 
 ### 2020-09-14_1.28.4
 - Remove iso_currency_code from `/transfer/authorization/create` response
@@ -462,7 +539,7 @@
 - Added `nullable` to the Income `canonical_description` property.
 - Moved some properties that were next to references, which is invalid.
 - Added `fixed annuity` to `AccountSubtype` model.
-- Added `automatically_verified` to `verification_status` enum.  
+- Added `automatically_verified` to `verification_status` enum.
 
 ### 2020-09-14_1.25.0
 - Add schema for `/income/verification/paystub/get`.
