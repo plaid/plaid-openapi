@@ -1,3 +1,56 @@
+### 2020-09-14_1.84.1
+- Fix schema to properly handle personal finance categories in `/transactions/get`
+
+### 2020-09-14_1.84.0
+- Add `user_token` parameter to `link/token/create`
+
+### 2020-09-14_1.83.1
+- Add new fields to `/credit/bank_income/get` response
+
+### 2020-09-14_1.83.0
+- Remove `permitted` decision for `/transfer/authorization/create`
+
+### 2020-09-14_1.82.0
+- Add beta field `consented_products` to `/item/get/` endpoint response
+
+### 2020-09-14_1.82.0
+- Revamp LinkTokenCreate.IncomeVerificationOptions for GA
+
+### 2020-09-14_1.81.0
+- Add `/transaction/rules/create`, `/transaction/rules/list` and `/transaction/rules/remove` endpoints
+
+### 2020-09-14_1.80.0
+- Added `/user/create` endpoint
+
+### 2020-09-14_1.79.0
+- Update to include all changes up to `2020-09-14_1.77.4` (Undo revert from `1.78.x` updates)
+
+### 2020-09-14_1.78.2
+- Revert to `2020-09-14_1.64.13`
+
+### 2020-09-14_1.78.1
+- Revert to `2020-09-14_1.62.7`
+
+### 2020-09-14_1.78.0
+- Revert to `2020-09-14_1.64.14`
+
+### 2020-09-14_1.77.5
+- Add support for `IT` country code for use with Payments.
+- More prominently highlight that the Identity response body changed in the 2019-05-29 API version.
+
+### 2020-09-14_1.77.4
+- Remove the word "Asset" before "Relay" in every asset report relay related responses and request objects
+
+### 2020-09-14_1.77.3
+- Add "AssetReport" at the beginning of relay related responses and request objects to match the same pattern as other assets related objects
+
+### 2020-09-14_1.77.2
+- Add `ProductAccess` fields for upcoming partner
+
+### 2020-09-14_1.77.1
+- Fix extraneous field in enum that caused issue in code generation
+- Added `asset_report_id` to the example for `/asset_report/relay/refresh`
+
 ### 2020-09-14_1.77.0
 - Explicitly set `format: double` for non-integer numbers so generated fields prefer float64
 
