@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.77.0
+  version: 2020-09-14_1.84.1
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -1305,7 +1305,9 @@ paths:
       description: |-
         The `/identity/get` endpoint allows you to retrieve various account holder information on file with the financial institution, including names, emails, phone numbers, and addresses. Only name data is guaranteed to be returned; other fields will be empty arrays if not provided by the institution.
 
-        Note: This request may take some time to complete if identity was not specified as an initial product when creating the Item. This is because Plaid must communicate directly with the institution to retrieve the data.
+        This request may take some time to complete if identity was not specified as an initial product when creating the Item. This is because Plaid must communicate directly with the institution to retrieve the data.
+
+        Note: In API versions 2018-05-22 and earlier, the `owners` object is not returned, and instead identity information is returned in the top level `identity` object. For more details, see [Plaid API versioning](https://plaid.com/docs/api/versioning/#version-2019-05-29).
       requestBody:
         required: true
         content:
@@ -2309,6 +2311,34 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ItemPublicTokenCreateRequest'
+  /user/create:
+    post:
+      tags:
+      - plaid
+      summary: Create user
+      externalDocs:
+        url: /api/users/#usercreate
+      operationId: userCreate
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCreateResponse'
+              examples:
+                example-1:
+                  value:
+                    user_token: user-sandbox-b0e2c4ee-a763-4df5-bfe9-46a46bce993d
+                    user_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
+                    request_id: Aim3b
+      description: 'Note: As of February 2022, the `/user/create` endpoint is in beta. Unless you have been opted-in, you will not have access to this endpoint.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
   /payment_initiation/payment/get:
     post:
       tags:
@@ -2476,6 +2506,7 @@ paths:
                   value:
                     asset_relay_token: assets-relay-sandbox-8218d5f8-6d6d-403d-92f5-13a9afaa4398
                     request_id: NBZaq
+                    asset_report_id: bf3a0490-344c-4620-a219-2693162e4b1d
       operationId: assetReportRelayRefresh
       description: The `/asset_report/relay/refresh` endpoint allows third parties to refresh an Asset Report that was relayed to them, using an `asset_relay_token` that was created by the report owner. A new Asset Report will be created based on the old one, but with the most recent data available.
       requestBody:
@@ -2881,7 +2912,7 @@ paths:
       summary: Create an `asset_relay_token` to share an Asset Report with a partner client
       tags:
       - plaid
-      operationId: assetRelayCreate
+      operationId: assetReportRelayCreate
       externalDocs:
         url: /none/
       requestBody:
@@ -2889,14 +2920,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AssetRelayCreateRequest'
+              $ref: '#/components/schemas/AssetReportRelayCreateRequest'
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AssetRelayCreateResponse'
+                $ref: '#/components/schemas/AssetReportRelayCreateResponse'
               examples:
                 example-1:
                   value:
@@ -2911,7 +2942,7 @@ paths:
       summary: Retrieve an Asset Report that was shared with you
       tags:
       - plaid
-      operationId: assetRelayGet
+      operationId: assetReportRelayGet
       externalDocs:
         url: /none/
       requestBody:
@@ -2919,7 +2950,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AssetRelayGetRequest'
+              $ref: '#/components/schemas/AssetReportRelayGetRequest'
       responses:
         "200":
           description: OK
@@ -3151,19 +3182,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AssetRelayRemoveResponse'
+                $ref: '#/components/schemas/AssetReportRelayRemoveResponse'
               examples:
                 example-1:
                   value:
                     removed: true
                     request_id: m8MDnv9okwxFNBV
-      operationId: assetRelayRemove
+      operationId: assetReportRelayRemove
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AssetRelayRemoveRequest'
+              $ref: '#/components/schemas/AssetReportRelayRemoveRequest'
         description: ""
       description: The `/asset_report/relay/remove` endpoint allows you to invalidate an `asset_relay_token`, meaning the third party holding the token will no longer be able to use it to access the Asset Report to which the `asset_relay_token` gives access to. The Asset Report, Items associated with it, and other Asset Relay Tokens that provide access to the same Asset Report are not affected and will remain accessible after removing the given `asset_relay_token.
   /investments/holdings/get:
@@ -4049,22 +4080,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      description: |-
-        Use the `/transfer/authorization/create` endpoint to determine transfer failure risk.
-
-        In Plaid's sandbox environment the decisions will be returned as follows:
-
-          - To approve a transfer, make an authorization request with an `amount` less than the available balance in the account.
-
-          - To decline a transfer with the rationale code `NSF`, the available balance on the account must be less than the authorization `amount`. See [Create Sandbox test data](https://plaid.com/docs/sandbox/user-custom/) for details on how to customize data in Sandbox.
-
-          - To decline a transfer with the rationale code `RISK`, the available balance on the account must be exactly $0. See [Create Sandbox test data](https://plaid.com/docs/sandbox/user-custom/) for details on how to customize data in Sandbox.
-
-          - To permit a transfer with the rationale code `MANUALLY_VERIFIED_ITEM`, create an Item in Link through the [Same Day Micro-deposits flow](https://plaid.com/docs/auth/coverage/testing/#testing-same-day-micro-deposits).
-
-          - To permit a transfer with the rationale code `LOGIN_REQUIRED`, [reset the login for an Item](https://plaid.com/docs/sandbox/#item_login_required).
-
-        All username/password combinations other than the ones listed above will result in a decision of permitted and rationale code `ERROR`.
+      description: "Use the `/transfer/authorization/create` endpoint to determine transfer failure risk.\n\nIn Plaid's sandbox environment the decisions will be returned as follows:\n\n  - To approve a transfer with null rationale code, make an authorization request with an `amount` less than the available balance in the account.\n\n  - To approve a transfer with the rationale code `MANUALLY_VERIFIED_ITEM`, create an Item in Link through the [Same Day Micro-deposits flow](https://plaid.com/docs/auth/coverage/testing/#testing-same-day-micro-deposits).\n  \n  - To approve a transfer with the rationale code `LOGIN_REQUIRED`, [reset the login for an Item](https://plaid.com/docs/sandbox/#item_login_required).\n  \n  - To decline a transfer with the rationale code `NSF`, the available balance on the account must be less than the authorization `amount`. See [Create Sandbox test data](https://plaid.com/docs/sandbox/user-custom/) for details on how to customize data in Sandbox.\n\n  - To decline a transfer with the rationale code `RISK`, the available balance on the account must be exactly $0. See [Create Sandbox test data](https://plaid.com/docs/sandbox/user-custom/) for details on how to customize data in Sandbox."
       requestBody:
         required: true
         content:
@@ -5580,6 +5596,44 @@ paths:
                           official_name: Plaid Checking Account
                           type: depository
                           subtype: checking
+                          owners:
+                          - addresses:
+                            - data:
+                                city: Malakoff
+                                country: US
+                                postal_code: "14236"
+                                region: NY
+                                street: 2992 Cameron Road
+                              primary: true
+                            - data:
+                                city: San Matias
+                                country: US
+                                postal_code: 93405-2255
+                                region: CA
+                                street: 2493 Leisure Lane
+                              primary: false
+                            emails:
+                            - data: accountholder0@example.com
+                              primary: true
+                              type: primary
+                            - data: accountholder1@example.com
+                              primary: false
+                              type: secondary
+                            - data: extraordinarily.long.email.username.123456@reallylonghostname.com
+                              primary: false
+                              type: other
+                            names:
+                            - Alberta Bobbeth Charleson
+                            phone_numbers:
+                            - data: "1112223333"
+                              primary: false
+                              type: home
+                            - data: "1112224444"
+                              primary: false
+                              type: work
+                            - data: "1112225555"
+                              primary: false
+                              type: mobile1
                         bank_income_sources:
                         - account_id: GeooLPBGDEunl54q7N3ZcyD5aLPLEai1nkzM9
                           income_source_id: “f17efbdd-caab-4278-8ece-963511cd3d51”
@@ -5691,6 +5745,7 @@ paths:
                             check_number: null
                             iso_currency_code: USD
                             unofficial_currency_code: null
+                      warnings: []
       externalDocs:
         url: /api/products/#creditbankincomeget
       operationId: creditBankIncomeGet
@@ -6028,7 +6083,7 @@ paths:
                       amount: 2307.21
                       iso_currency_code: USD
                       enhancements:
-                      - category:
+                        category:
                         - Shops
                         - Computers and Electronics
                         category_id: "19013000"
@@ -6063,6 +6118,151 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/TransactionsEnhanceGetRequest'
+  /beta/transactions/rules/create:
+    post:
+      tags:
+      - plaid
+      summary: Create transaction category rule
+      operationId: transactionsRulesCreate
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionsRulesCreateResponse'
+              examples:
+                example-1:
+                  value:
+                    rule:
+                      id: lPNjeW1nR6CDn5okmGQ6hEpMo4lLNo
+                      item_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
+                      created_at: "2022-02-28T11:00:00Z"
+                      personal_finance_category: FOOD_AND_DRINK_FAST_FOOD
+                      rule_details:
+                        field: NAME
+                        type: SUBSTRING_MATCH
+                        query: Burger Shack
+                    request_id: 4zlKapIkTm8p5KM
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error response
+      description: |-
+        The `/transactions/rules/create` endpoint creates transaction categorization rules.
+
+        Rules will be applied on the Item's transactions returned in `/transactions/get` response.
+
+        The product is currently in beta. To request access, contact transactions-feedback@plaid.com.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionsRulesCreateRequest'
+            examples:
+              example-1:
+                value:
+                  client_id: 7f57eb3d2a9j6480121fx361
+                  secret: 79g03eoofwl8240v776r2h667442119
+                  access_token: access-sandbox-71e02f71-0960-4a27-abd2-5631e04f2175
+                  personal_finance_category: FOOD_AND_DRINK_FAST_FOOD
+                  rule_details:
+                    field: NAME
+                    type: SUBSTRING_MATCH
+                    query: Burger Shack
+  /beta/transactions/rules/list:
+    post:
+      tags:
+      - plaid
+      summary: Return a list of rules created for the Item associated with the access token.
+      operationId: transactionsRulesList
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionsRulesListResponse'
+              examples:
+                example-1:
+                  value:
+                    rules:
+                    - id: lPNjeW1nR6CDn5okmGQ6hEpMo4lLNo
+                      item_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
+                      created_at: "2022-02-28T11:00:00Z"
+                      personal_finance_category: FOOD_AND_DRINK_FAST_FOOD
+                      rule_details:
+                        field: NAME
+                        type: SUBSTRING_MATCH
+                        query: Burger Shack
+                    - id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBF
+                      item_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
+                      created_at: "2022-02-27T14:50:00Z"
+                      personal_finance_category: TRANSFER_IN_ACCOUNT_TRANSFER
+                      rule_details:
+                        field: TRANSACTION_ID
+                        type: EXACT_MATCH
+                        query: kgygNvAVPzSX9KkddNdWHaVGRVex1MHm3k9no
+                    request_id: 4zlKapIkTm8p5KM
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error response
+      description: The `/transactions/rules/list` returns a list of transaction rules created for the Item associated with the access token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionsRulesListRequest'
+            examples:
+              example-1:
+                value:
+                  client_id: 7f57eb3d2a9j6480121fx361
+                  secret: 79g03eoofwl8240v776r2h667442119
+                  access_token: access-sandbox-71e02f71-0960-4a27-abd2-5631e04f2175
+  /beta/transactions/rules/remove:
+    post:
+      tags:
+      - plaid
+      summary: Remove transaction rule
+      operationId: transactionsRulesRemove
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionsRulesRemoveResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: 4zlKapIkTm8p5KM
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error response
+      description: The `/transactions/rules/remove` endpoint is used to remove a transaction rule.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionsRulesRemoveRequest'
+            examples:
+              example-1:
+                value:
+                  client_id: 7f57eb3d2a9j6480121fx361
+                  secret: 79g03eoofwl8240v776r2h667442119
+                  access_token: access-sandbox-71e02f71-0960-4a27-abd2-5631e04f2175
+                  rule_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBF
 components:
   securitySchemes:
     clientId:
@@ -6335,6 +6535,98 @@ components:
       required:
       - inflow_streams
       - outflow_streams
+      - request_id
+    TransactionsRulesCreateRequest:
+      type: object
+      description: TransactionsRulesCreateRequest defines the request schema for `/transactions/rules/create`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        personal_finance_category:
+          type: string
+          description: |
+            Personal finance detailed category.
+
+            See the [`taxonomy csv file`](https://plaid.com/documents/transactions-personal-finance-category-taxonomy.csv) for a full list of personal finance categories.
+        rule_details:
+          $ref: '#/components/schemas/TransactionsRuleDetails'
+      required:
+      - client_id
+      - access_token
+      - secret
+      - personal_finance_category
+      - rule_details
+    TransactionsRulesCreateResponse:
+      type: object
+      additionalProperties: true
+      description: TransactionsRulesCreateResponse defines the response schema for `/transactions/rules/create`
+      properties:
+        rule:
+          $ref: '#/components/schemas/TransactionsCategoryRule'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - rule
+      - request_id
+    TransactionsRulesListRequest:
+      type: object
+      description: TransactionsRulesListRequest defines the request schema for `/transactions/rules/list`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+      required:
+      - client_id
+      - access_token
+      - secret
+    TransactionsRulesListResponse:
+      type: object
+      additionalProperties: true
+      description: TransactionsRulesListResponse defines the response schema for `/transactions/rules/list`
+      properties:
+        rules:
+          type: array
+          description: A list of the Item's transaction rules
+          items:
+            $ref: '#/components/schemas/TransactionsCategoryRule'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - rules
+      - request_id
+    TransactionsRulesRemoveRequest:
+      type: object
+      description: TransactionsRulesRemoveRequest defines the request schema for `/transactions/rules/remove`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        rule_id:
+          type: string
+          description: A rule's unique identifier
+      required:
+      - client_id
+      - access_token
+      - secret
+      - rule_id
+    TransactionsRulesRemoveResponse:
+      type: object
+      additionalProperties: true
+      description: TransactionsRulesRemoveResponse defines the response schema for `/transactions/rules/remove`
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
       - request_id
     TransactionsSyncRequest:
       type: object
@@ -7618,6 +7910,34 @@ components:
       required:
       - public_token
       - request_id
+    UserCreateRequest:
+      type: object
+      description: UserCreateRequest defines the request schema for `/user/create`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        client_user_id:
+          description: A unique ID representing the end user. Typically this will be a user ID number from your application. Personally identifiable information, such as an email address or phone number, should not be used in the `client_user_id`.
+          type: string
+      required:
+      - client_user_id
+    UserCreateResponse:
+      type: object
+      additionalProperties: true
+      description: UserCreateResponse defines the response schema for `/user/create`
+      properties:
+        user_token:
+          $ref: '#/components/schemas/UserToken'
+        user_id:
+          type: string
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - user_token
+      - user_id
+      - request_id
     PaymentInitiationPaymentGetRequest:
       type: object
       description: PaymentInitiationPaymentGetRequest defines the request schema for `/payment_initiation/payment/get`
@@ -8337,9 +8657,9 @@ components:
       required:
       - removed
       - request_id
-    AssetRelayCreateRequest:
+    AssetReportRelayCreateRequest:
       type: object
-      description: AssetRelayCreateRequest defines the request schema for `/asset_report/relay/create`
+      description: AssetReportRelayCreateRequest defines the request schema for `/asset_report/relay/create`
       properties:
         client_id:
           $ref: '#/components/schemas/APIClientID'
@@ -8357,10 +8677,10 @@ components:
       required:
       - asset_report_token
       - secondary_client_id
-    AssetRelayCreateResponse:
+    AssetReportRelayCreateResponse:
       type: object
       additionalProperties: true
-      description: AssetRelayCreateResponse defines the response schema for `/asset_report/relay/create`
+      description: AssetReportRelayCreateResponse defines the response schema for `/asset_report/relay/create`
       properties:
         asset_relay_token:
           type: string
@@ -8370,10 +8690,10 @@ components:
       required:
       - asset_relay_token
       - request_id
-    AssetRelayGetRequest:
-      title: AssetRelayGetRequest
+    AssetReportRelayGetRequest:
+      title: AssetReportRelayGetRequest
       type: object
-      description: AssetRelayGetRequest defines the request schema for `/asset_report/relay/get`
+      description: AssetReportRelayGetRequest defines the request schema for `/asset_report/relay/get`
       properties:
         client_id:
           $ref: '#/components/schemas/APIClientID'
@@ -8384,9 +8704,9 @@ components:
           description: The `asset_relay_token` granting access to the Asset Report you would like to get.
       required:
       - asset_relay_token
-    AssetRelayRemoveRequest:
+    AssetReportRelayRemoveRequest:
       type: object
-      description: AssetRelayRemoveRequest defines the request schema for `/asset_report/relay/remove`
+      description: AssetReportRelayRemoveRequest defines the request schema for `/asset_report/relay/remove`
       properties:
         client_id:
           $ref: '#/components/schemas/APIClientID'
@@ -8397,10 +8717,10 @@ components:
           description: The `asset_relay_token` you would like to revoke.
       required:
       - asset_relay_token
-    AssetRelayRemoveResponse:
+    AssetReportRelayRemoveResponse:
       type: object
       additionalProperties: true
-      description: AssetRelayRemoveResponse defines the response schema for `/asset_report/relay/remove`
+      description: AssetReportRelayRemoveResponse defines the response schema for `/asset_report/relay/remove`
       properties:
         removed:
           type: boolean
@@ -8838,7 +9158,7 @@ components:
         country_codes:
           type: array
           description: |-
-            Specify an array of Plaid-supported country codes using the ISO-3166-1 alpha-2 country code standard. Institutions from all listed countries will be shown.  Supported country codes are: `US`, `CA`, `DE`, `ES`, `FR`, `GB`, `IE`, `NL`. For a complete mapping of supported products by country, see https://plaid.com/global/.
+            Specify an array of Plaid-supported country codes using the ISO-3166-1 alpha-2 country code standard. Institutions from all listed countries will be shown.  Supported country codes are: `US`, `CA`, `DE`, `ES`, `FR`, `GB`, `IE`, `IT`, `NL`. For a complete mapping of supported products by country, see https://plaid.com/global/.
 
             If Link is launched with multiple country codes, only products that you are enabled for in all countries will be used by Link. Note that while all countries are enabled by default in Sandbox and Development, in Production only US and Canada are enabled by default. To gain access to European institutions in the Production environment, [file a product access Support ticket](https://dashboard.plaid.com/support/new/product-and-development/product-troubleshooting/request-product-access) via the Plaid dashboard. If you initialize with a European country code, your users will see the European consent panel during the Link flow.
 
@@ -8979,6 +9299,9 @@ components:
       type: object
       description: An object specifying information about the end user who will be linking their account.
       properties:
+        user_token:
+          type: string
+          description: A user token generated using /user/create. Any item created during the link session will be associated with the user.
         client_user_id:
           type: string
           description: A unique ID representing the end user. Typically this will be a user ID number from your application. Personally identifiable information, such as an email address or phone number, should not be used in the `client_user_id`. It is currently used as a means of searching logs for the given user in the Plaid Dashboard.
@@ -9189,6 +9512,12 @@ components:
         products:
           description: |
             A list of authorized products for the Item.
+          type: array
+          items:
+            $ref: '#/components/schemas/Products'
+        consented_products:
+          description: |
+            Beta: A list of products that have gone through consent collection for the Item. Only present for those enabled in the beta.
           type: array
           items:
             $ref: '#/components/schemas/Products'
@@ -9778,6 +10107,65 @@ components:
       title: RequestID
       type: string
       description: A unique identifier for the request, which can be used for troubleshooting. This identifier, like all Plaid identifiers, is case sensitive.
+    TransactionsRuleDetails:
+      title: TransactionsRuleDetails
+      type: object
+      description: A representation of transactions rule details.
+      x-examples: {}
+      properties:
+        field:
+          $ref: '#/components/schemas/TransactionsRuleField'
+        type:
+          $ref: '#/components/schemas/TransactionsRuleType'
+        query:
+          type: string
+          description: |
+            For TRANSACTION_ID field, provide transaction_id. For NAME field, provide a string pattern.
+      required:
+      - field
+      - type
+      - query
+    TransactionsRuleField:
+      title: TransactionsRuleField
+      type: string
+      enum:
+      - TRANSACTION_ID
+      - NAME
+      description: Transaction field for which the rule is defined.
+    TransactionsRuleType:
+      title: TransactionsRuleType
+      type: string
+      enum:
+      - EXACT_MATCH
+      - SUBSTRING_MATCH
+      description: |
+        Transaction rule's match type. For TRANSACTION_ID field, EXACT_MATCH is available.
+        Matches are case sensitive.
+    TransactionsCategoryRule:
+      title: TransactionsCategoryRule
+      type: object
+      description: A representation of a transactions category rule.
+      x-examples: {}
+      properties:
+        id:
+          type: string
+          description: A unique identifier of the rule created
+        item_id:
+          type: string
+          description: A unique identifier of the item the rule was created for
+        created_at:
+          type: string
+          format: date-time
+          description: |
+            Date and time when a rule was created in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ( `YYYY-MM-DDTHH:mm:ssZ` ).
+        personal_finance_category:
+          type: string
+          description: |
+            Personal finance category unique identifier.
+
+            In the personal finance category taxonomy, this field is represented by the detailed category field.
+        rule_details:
+          $ref: '#/components/schemas/TransactionsRuleDetails'
     TransactionBase:
       title: TransactionBase
       type: object
@@ -9933,11 +10321,7 @@ components:
           transaction_code:
             $ref: '#/components/schemas/TransactionCode'
           personal_finance_category:
-            nullable: true
-            allOf:
-            - $ref: '#/components/schemas/PersonalFinanceCategory'
-            - type: object
-              additionalProperties: true
+            $ref: '#/components/schemas/PersonalFinanceCategory'
         required:
         - account_owner
         - pending_transaction_id
@@ -10254,6 +10638,7 @@ components:
       - IE
       - CA
       - DE
+      - IT
       description: ISO-3166-1 alpha-2 country code standard.
     PaymentMeta:
       title: PaymentMeta
@@ -10391,6 +10776,10 @@ components:
       required:
       - primary
       - detailed
+    UserToken:
+      title: UserToken
+      type: string
+      description: The user token associated with the User data is being requested for.
     AccessToken:
       title: AccessToken
       type: string
@@ -12290,6 +12679,10 @@ components:
       title: ItemId
       type: string
       description: The `item_id` of the Item associated with this webhook, warning, or error
+    UserId:
+      title: UserId
+      type: string
+      description: The Plaid `user_id` of the User associated with this webhook, warning, or error.
     AutomaticallyVerifiedWebhook:
       title: AutomaticallyVerifiedWebhook
       type: object
@@ -12759,7 +13152,6 @@ components:
     RelayEvent:
       title: RelayEventName
       type: string
-      additionalProperties: true
       enum:
       - GET_CALLED
       - REFRESH_CALLED
@@ -14686,17 +15078,17 @@ components:
     TransferAuthorizationDecisionRationaleCode:
       type: string
       description: |-
-        A code representing the rationale for permitting or declining the proposed transfer. Possible values are:
+        A code representing the rationale for approving or declining the proposed transfer. Possible values are:
 
-        `NSF` – Transaction likely to result in a return due to insufficient funds.
+        `MANUALLY_VERIFIED_ITEM` – Item created via same-day micro deposits, limited information available. Plaid will offer `approved` as a transaction decision.
 
-        `RISK` - Transaction is high-risk.
+        `LOGIN_REQUIRED` – Unable to collect the account information due to Item staleness. Can be rectified using Link in update mode. Plaid will offer `approved` as a transaction decision.
 
-        `MANUALLY_VERIFIED_ITEM` – Item created via same-day micro deposits, limited information available. Plaid can only offer `permitted` as a transaction decision.
+        `ERROR` – Unable to collect the account information due to an error. Plaid will offer `approved` as a transaction decision.
 
-        `LOGIN_REQUIRED` – Unable to collect the account information required for an authorization decision due to Item staleness. Can be rectified using Link update mode.
+        `NSF` – Transaction likely to result in a return due to insufficient funds. Plaid will offer `declined` as a transaction decision.
 
-        `ERROR` – Unable to collect the account information required for an authorization decision due to an error.
+        `RISK` - Transaction is high-risk. Plaid will offer `declined` as a transaction decision.
       enum:
       - NSF
       - RISK
@@ -14708,13 +15100,13 @@ components:
       type: object
       nullable: true
       additionalProperties: true
-      description: The rationale for Plaid's decision regarding a proposed transfer. Will be null for `approved` decisions.
+      description: The rationale for Plaid's decision regarding a proposed transfer. It is always set for `declined` decisions, and may or may not be null for `approved` decisions.
       properties:
         code:
           $ref: '#/components/schemas/TransferAuthorizationDecisionRationaleCode'
         description:
           type: string
-          description: A human-readable description of the code associated with a permitted transfer or transfer decline.
+          description: A human-readable description of the code associated with a transfer approval or transfer decline.
       required:
       - code
       - description
@@ -15086,10 +15478,15 @@ components:
       - request_id
     TransferAuthorizationDecision:
       type: string
-      description: "\nA decision regarding the proposed transfer.\n\n`approved` – The proposed transfer has received the end user's consent and has been approved for processing. Plaid has also reviewed the proposed transfer and has approved it for processing. \n\n`permitted` – Plaid was unable to fetch the information required to approve or decline the proposed transfer. You may proceed with the transfer, but further review is recommended. Plaid is awaiting further instructions from the client.\n\n`declined` – Plaid reviewed the proposed transfer and declined processing. Refer to the `code` field in the `decision_rationale` object for details."
+      description: |2-
+
+        A decision regarding the proposed transfer.
+
+        `approved` – The proposed transfer has received the end user's consent and has been approved for processing by Plaid. The `decision_rationale` field is set if Plaid was unable to fetch the account information. You may proceed with the transfer, but further review is recommended (i.e., use Link in update to re-authenticate your user when `decision_rationale.code` is `LOGIN_REQUIRED`). Refer to the `code` field in the `decision_rationale` object for details.
+
+        `declined` – Plaid reviewed the proposed transfer and declined processing. Refer to the `code` field in the `decision_rationale` object for details.
       enum:
       - approved
-      - permitted
       - declined
     TransferAuthorization:
       title: TransferAuthorization
@@ -16263,9 +16660,14 @@ components:
       type: string
       enum:
       - APPROVED
-      - PERMITTED
       - DECLINED
-      description: "\nA decision regarding the proposed transfer.\n\n`APPROVED` – The proposed transfer has received the end user's consent and has been approved for processing. Plaid has also reviewed the proposed transfer and has approved it for processing. \n\n`PERMITTED` – Plaid was unable to fetch the information required to approve or decline the proposed transfer. You may proceed with the transfer, but further review is recommended. Plaid is awaiting further instructions from the client.\n\n`DECLINED` – Plaid reviewed the proposed transfer and declined processing. Refer to the `code` field in the `decision_rationale` object for details. Null value otherwise."
+      description: |2-
+
+        A decision regarding the proposed transfer.
+
+        `APPROVED` – The proposed transfer has received the end user's consent and has been approved for processing by Plaid. The `decision_rationale` field is set if Plaid was unable to fetch the account information. You may proceed with the transfer, but further review is recommended (i.e., use Link in update to re-authenticate your user when `decision_rationale.code` is `LOGIN_REQUIRED`). Refer to the `code` field in the `decision_rationale` object for details.
+
+        `DECLINED` – Plaid reviewed the proposed transfer and declined processing. Refer to the `code` field in the `decision_rationale` object for details.
       nullable: true
     TransferIntentGet:
       title: TransferIntentGet
@@ -16962,6 +17364,48 @@ components:
           description: An array of access tokens corresponding to the Items that will be cross-referenced with the product data. If the `transactions` product was not initialized for the Items during link, it will be initialized after this Link session.
           items:
             $ref: '#/components/schemas/AccessToken'
+        income_source_types:
+          type: array
+          description: The types of source income data that users will be permitted to share. Options include `bank` and `payroll`. Currently you can only specify one of these options.
+          items:
+            $ref: '#/components/schemas/IncomeVerificationSourceType'
+        bank_income:
+          $ref: '#/components/schemas/LinkTokenCreateRequestIncomeVerificationBankIncome'
+        payroll_income:
+          $ref: '#/components/schemas/LinkTokenCreateRequestIncomeVerificationPayrollIncome'
+    IncomeVerificationSourceType:
+      title: IncomeVerificationSourceType
+      enum:
+      - bank
+      - payroll
+      description: The types of source income data that users should be able to share
+      type: string
+    LinkTokenCreateRequestIncomeVerificationBankIncome:
+      title: LinkTokenCreateRequestIncomeVerificationBankIncome
+      type: object
+      description: Specifies options for initializing Link for use with Bank Income. This field is required if `income_verification` is included in the `products` array and `bank` is specified in `income_source_types`.
+      properties:
+        days_requested:
+          type: integer
+          description: The number of days of data to request for the Bank Income product
+    LinkTokenCreateRequestIncomeVerificationPayrollIncome:
+      title: LinkTokenCreateRequestIncomeVerificationPayrollIncome
+      type: object
+      description: Specifies options for initializing Link for use with Payroll Income. This field is required if `income_verification` is included in the `products` array and `payroll` is specified in `income_source_types`.
+      properties:
+        flow_types:
+          type: array
+          nullable: true
+          description: The types of payroll income verification to enable for the link session. If none are specified, then users will see both document and digital payroll income.
+          items:
+            $ref: '#/components/schemas/IncomeVerificationPayrollFlowType'
+    IncomeVerificationPayrollFlowType:
+      title: IncomeVerificationPayrollFlowType
+      enum:
+      - payroll_digital_income
+      - payroll_document_income
+      description: Flow types to retrieve payroll income data
+      type: string
     IncomeVerificationStatusWebhook:
       title: IncomeVerificationStatusWebhook
       type: object
@@ -18561,6 +19005,11 @@ components:
             $ref: '#/components/schemas/CreditBankIncomeItem'
         bank_income_summary:
           $ref: '#/components/schemas/CreditBankIncomeSummary'
+        warnings:
+          type: array
+          description: If data from the Bank Income report was unable to be retrieved, the warnings will contain information about the error that caused the data to be incomplete.
+          items:
+            $ref: '#/components/schemas/CreditBankIncomeWarning'
     CreditBankIncomeItem:
       type: object
       description: The details and metadata for an end user's Item.
@@ -18612,6 +19061,10 @@ components:
           $ref: '#/components/schemas/DepositoryAccountSubtype'
         type:
           $ref: '#/components/schemas/CreditBankIncomeAccountType'
+        owners:
+          type: array
+          items:
+            $ref: '#/components/schemas/Owner'
     CreditBankIncomeAccountType:
       type: string
       description: The account type. This will always be `depository`.
@@ -18794,6 +19247,72 @@ components:
           $ref: '#/components/schemas/CreditIsoCurrencyCode'
         unofficial_currency_code:
           $ref: '#/components/schemas/CreditUnofficialCurrencyCode'
+    CreditBankIncomeWarning:
+      type: object
+      description: The warning associated with the data that was unavailable for the Bank Income Report.
+      properties:
+        warning_type:
+          $ref: '#/components/schemas/CreditBankIncomeWarningType'
+        warning_code:
+          $ref: '#/components/schemas/CreditBankIncomeWarningCode'
+        cause:
+          $ref: '#/components/schemas/CreditBankIncomeCause'
+    CreditBankIncomeWarningType:
+      type: string
+      description: The warning type which will always be `BANK_INCOME_WARNING`.
+      enum:
+      - BANK_INCOME_WARNING
+    CreditBankIncomeWarningCode:
+      type: string
+      description: |-
+        The warning code identifies a specific kind of warning.
+        `IDENTITY_UNAVAILABLE`: Unable to extract identity for the Item
+        `TRANSACTIONS_UNAVAILABLE`: Unable to extract transactions for the Item
+        `ITEM_UNAPPROVED`: User did not grant permission to share income data for the Item
+      enum:
+      - IDENTITY_UNAVAILABLE
+      - TRANSACTIONS_UNAVAILABLE
+      - ITEM_UNAPPROVED
+    CreditBankIncomeCause:
+      type: object
+      description: An error object and associated `item_id` used to identify a specific Item and error when a batch operation operating on multiple Items has encountered an error in one of the Items.
+      properties:
+        error_type:
+          $ref: '#/components/schemas/CreditBankIncomeErrorType'
+        error_code:
+          type: string
+          description: "We use standard HTTP response codes for success and failure notifications, and our errors are further classified by error_type. \nIn general, 200 HTTP codes correspond to success, 40X codes are for developer- or user-related failures, and 50X codes are for Plaid-related issues.  \nError fields will be null if no error has occurred."
+        error_message:
+          type: string
+          description: A developer-friendly representation of the error code. This may change over time and is not safe for programmatic use.
+        display_message:
+          type: string
+          description: |-
+            A user-friendly representation of the error code. null if the error is not related to user action.
+            This may change over time and is not safe for programmatic use.
+        item_id:
+          type: string
+          description: The `item_id` of the Item associated with this warning.
+    CreditBankIncomeErrorType:
+      type: string
+      description: A broad categorization of the error. Safe for programmatic use.
+      enum:
+      - INTERNAL_SERVER_ERROR
+      - INSUFFICIENT_CREDENTIALS
+      - ITEM_LOCKED
+      - USER_SETUP_REQUIRED
+      - COUNTRY_NOT_SUPPORTED
+      - INSTITUTION_DOWN
+      - INSTITUTION_NO_LONGER_SUPPORTED
+      - INSTITUTION_NOT_RESPONDING
+      - INVALID_CREDENTIALS
+      - INVALID_MFA
+      - INVALID_SEND_METHOD
+      - ITEM_LOGIN_REQUIRED
+      - MFA_NOT_SUPPORTED
+      - NO_ACCOUNTS
+      - ITEM_NOT_SUPPORTED
+      - ACCESS_NOT_GRANTED
     SandboxBankTransferFireWebhookRequest:
       title: SandboxBankTransferFireWebhookRequest
       type: object
@@ -18908,6 +19427,31 @@ components:
           default: true
         transactions:
           description: Allow access to transaction details. Only used by certain partners. If relevant to the partner and unset, defaults to `true`.
+          type: boolean
+          nullable: true
+          default: true
+        accounts_details_transactions:
+          description: Allow access to "accounts_details_transactions". Only used by certain partners. If relevant to the partner and unset, defaults to `true`.
+          type: boolean
+          nullable: true
+          default: true
+        accounts_routing_number:
+          description: Allow access to "accounts_routing_number". Only used by certain partners. If relevant to the partner and unset, defaults to `true`.
+          type: boolean
+          nullable: true
+          default: true
+        accounts_statements:
+          description: Allow access to "accounts_statements". Only used by certain partners. If relevant to the partner and unset, defaults to `true`.
+          type: boolean
+          nullable: true
+          default: true
+        accounts_tax_statements:
+          description: Allow access to "accounts_tax_statements". Only used by certain partners. If relevant to the partner and unset, defaults to `true`.
+          type: boolean
+          nullable: true
+          default: true
+        customers_profiles:
+          description: Allow access to "customers_profiles". Only used by certain partners. If relevant to the partner and unset, defaults to `true`.
           type: boolean
           nullable: true
           default: true
