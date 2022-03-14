@@ -1,17 +1,20 @@
-name: 'Lock down repository'
+# Commented this out since it seemed to be an unnecessary extra step. We can add this back if we find
+# that external folks are creating a lot of PRs against the https://github.com/plaid/plaid-openapi repo.
 
-on:
-  pull_request:
-    types: opened
+# name: 'Lock down repository'
 
-jobs:
-  lockdown:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: dessant/repo-lockdown@v2
-        with:
-          github-token: ${{ github.token }}
-          lock-pr: true
-          process-only: 'prs'
-          exclude-pr-labels: 'publish'
-          pr-comment: 'The Plaid OpenAPI file is generated internally. Please open an [issue](https://github.com/plaid/plaid-openapi/issues/new) detailing your fix and we will backport it into our generator. Thanks!'
+# on:
+#   pull_request:
+#     types: opened
+
+# jobs:
+#   lockdown:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: dessant/repo-lockdown@v2
+#         with:
+#           github-token: ${{ github.token }}
+#           lock-pr: true
+#           process-only: 'prs'
+#           exclude-pr-labels: 'publish'
+#           pr-comment: 'The Plaid OpenAPI file is generated internally. Please open an [issue](https://github.com/plaid/plaid-openapi/issues/new) detailing your fix and we will backport it into our generator. Thanks!'

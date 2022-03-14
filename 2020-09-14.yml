@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.84.1
+  version: 2020-09-14_1.84.5
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -5566,7 +5566,7 @@ paths:
               $ref: '#/components/schemas/DepositSwitchAltCreateRequest'
   /credit/bank_income/get:
     post:
-      summary: Get bank income report(s) for a user
+      summary: Retrieve information from the bank accounts used for income verification
       tags:
       - plaid
       responses:
@@ -5747,9 +5747,9 @@ paths:
                             unofficial_currency_code: null
                       warnings: []
       externalDocs:
-        url: /api/products/#creditbankincomeget
+        url: /api/products/income/#creditbank_incomeget
       operationId: creditBankIncomeGet
-      description: This endpoint gets the bank income report(s) for a specified user.
+      description: '`/credit/bank_income/get` returns the bank income report(s) for a specified user.'
       requestBody:
         required: true
         content:
@@ -6530,11 +6530,16 @@ components:
           description: An array of expense transaction streams.
           items:
             $ref: '#/components/schemas/TransactionStream'
+        updated_datetime:
+          type: string
+          format: date-time
+          description: Timestamp in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (`YYYY-MM-DDTHH:mm:ssZ`) indicating the last time transaction streams for the given account were updated on
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
       - inflow_streams
       - outflow_streams
+      - updated_datetime
       - request_id
     TransactionsRulesCreateRequest:
       type: object
@@ -8488,6 +8493,8 @@ components:
       properties:
         asset_relay_token:
           type: string
+        asset_report_id:
+          $ref: '#/components/schemas/AssetReportId'
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
@@ -9230,6 +9237,9 @@ components:
           $ref: '#/components/schemas/LinkTokenCreateRequestTransfer'
         update:
           $ref: '#/components/schemas/LinkTokenCreateRequestUpdate'
+        user_token:
+          type: string
+          description: A user token generated using /user/create. Any item created during the link session will be associated with the user.
       required:
       - client_name
       - language
@@ -9299,9 +9309,6 @@ components:
       type: object
       description: An object specifying information about the end user who will be linking their account.
       properties:
-        user_token:
-          type: string
-          description: A user token generated using /user/create. Any item created during the link session will be associated with the user.
         client_user_id:
           type: string
           description: A unique ID representing the end user. Typically this will be a user ID number from your application. Personally identifiable information, such as an email address or phone number, should not be used in the `client_user_id`. It is currently used as a means of searching logs for the given user in the Plaid Dashboard.
@@ -10408,6 +10415,9 @@ components:
         description:
           type: string
           description: A description of the transaction stream.
+        merchant_name:
+          type: string
+          description: The merchant associated with the transaction stream.
         first_date:
           type: string
           description: The posted date of the earliest transaction in the stream.
@@ -10425,21 +10435,28 @@ components:
             type: string
         average_amount:
           $ref: '#/components/schemas/TransactionStreamAmount'
+        last_amount:
+          $ref: '#/components/schemas/TransactionStreamAmount'
         is_active:
           type: boolean
-          description: indicates whether the transaction stream is still live.
+          description: Indicates whether the transaction stream is still live.
+        status:
+          $ref: '#/components/schemas/TransactionStreamStatus'
       required:
       - account_id
       - stream_id
       - category
       - category_id
       - description
+      - merchant_name
       - first_date
       - last_date
       - frequency
       - transaction_ids
       - average_amount
+      - last_amount
       - is_active
+      - status
     TransactionStreamAmount:
       type: object
       title: TransactionStreamAmount
@@ -10449,7 +10466,7 @@ components:
         amount:
           type: number
           format: double
-          description: represents the numerical value of an amount.
+          description: Represents the numerical value of an amount.
         iso_currency_code:
           type: string
           description: |-
@@ -10463,7 +10480,7 @@ components:
           nullable: true
     RecurringTransactionFrequency:
       type: string
-      description: describes the frequency of the transaction stream.
+      description: Describes the frequency of the transaction stream.
       title: RecurringTransactionFrequency
       enum:
       - UNKNOWN
@@ -10471,6 +10488,15 @@ components:
       - BIWEEKLY
       - SEMI_MONTHLY
       - MONTHLY
+    TransactionStreamStatus:
+      type: string
+      description: "The current status of the transaction stream.\n\n`mature`: A mature recurring stream should have at least 3 transactions and happen on a regular cadence. \n\n`early_detection`: When a recurring transaction first appears in the transaction history and before it fulfills the requirement of a mature stream, we set the status as early_detection.\n\n`tombstoned`: An early_detection stream would be tombstoned if no further transactions were found at the next expected date.\n\n`unknown`: A stream is assigned an unknown status when none of the other statuses are applicable."
+      title: TransactionStreamStatus
+      enum:
+      - UNKNOWN
+      - MATURE
+      - EARLY_DETECTION
+      - TOMBSTONED
     Institution:
       title: Institution
       type: object
@@ -17074,7 +17100,7 @@ components:
       - other
       - other annuity
       - other insurance
-      - person
+      - pension
       - prif
       - profit sharing plan
       - qshr
@@ -18958,8 +18984,7 @@ components:
         secret:
           $ref: '#/components/schemas/APISecret'
         user_token:
-          type: string
-          title: UserToken
+          $ref: '#/components/schemas/UserToken'
         options:
           $ref: '#/components/schemas/CreditBankIncomeGetRequestOptions'
     CreditBankIncomeGetRequestOptions:
@@ -19140,7 +19165,7 @@ components:
     CreditUnofficialCurrencyCode:
       type: string
       description: |-
-        The unofficial currency code associated with the amount or balance. Always `null` if iso_currency_code is non-null.
+        The unofficial currency code associated with the amount or balance. Always `null` if `iso_currency_code` is non-null.
         Unofficial currency codes are used for currencies that do not have official ISO currency codes, such as cryptocurrencies and the currencies of certain countries.
       nullable: true
     CreditBankIncomeSummary:
@@ -19281,7 +19306,7 @@ components:
           $ref: '#/components/schemas/CreditBankIncomeErrorType'
         error_code:
           type: string
-          description: "We use standard HTTP response codes for success and failure notifications, and our errors are further classified by error_type. \nIn general, 200 HTTP codes correspond to success, 40X codes are for developer- or user-related failures, and 50X codes are for Plaid-related issues.  \nError fields will be null if no error has occurred."
+          description: We use standard HTTP response codes for success and failure notifications, and our errors are further classified by `error_type`. In general, 200 HTTP codes correspond to success, 40X codes are for developer- or user-related failures, and 50X codes are for Plaid-related issues. Error fields will be `null` if no error has occurred.
         error_message:
           type: string
           description: A developer-friendly representation of the error code. This may change over time and is not safe for programmatic use.
@@ -19594,6 +19619,12 @@ components:
             $ref: '#/components/schemas/ConnectedApplication'
       required:
       - applications
+    ConnectedApplicationStatus:
+      description: Describes if the connected item is active (i.e. has not been revoked or unlinked)
+      type: string
+      enum:
+      - ACTIVE
+      - INACTIVE
     ConnectedApplication:
       description: Describes the connected application for a particular end user.
       type: object
@@ -19642,6 +19673,8 @@ components:
           $ref: '#/components/schemas/ScopesNullable'
         requested_scopes:
           $ref: '#/components/schemas/RequestedScopes'
+        status:
+          $ref: '#/components/schemas/ConnectedApplicationStatus'
       required:
       - application_id
       - name
@@ -19652,6 +19685,7 @@ components:
       - application_url
       - reason_for_access
       - product_data_types
+      - status
     AccountSelectionCardinality:
       type: string
       description: |-
