@@ -1,3 +1,21 @@
+### 2020-09-14_1.85.0
+- Add `status` field to `ConnectedApplication`
+
+### 2020-09-14_1.84.5
+- Added missing `asset_report_id` field to `/asset_report/relay/refresh`
+
+### 2020-09-14_1.84.4
+- Change summary description and url for `/credit/bank_income/get`
+
+### 2020-09-14_1.84.3
+- Slight wording change for `/credit/bank_income/get` response fields
+
+### 2020-09-14_1.84.3
+- Move `user_token` to top level of `link/token/create` request 
+
+### 2020-09-14_1.84.2
+- Correct typo in enum value for Investment subtypes (`person` -> `pension`)
+
 ### 2020-09-14_1.84.1
 - Fix schema to properly handle personal finance categories in `/transactions/get`
 
