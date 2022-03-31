@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.84.5
+  version: 2020-09-14_1.94.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -842,7 +842,7 @@ paths:
       operationId: accountsGet
       description: |-
         The `/accounts/get` endpoint can be used to retrieve a list of accounts associated with any linked Item. Plaid will only return active bank accounts — that is, accounts that are not closed and are capable of carrying a balance.
-        This endpoint only returns accounts that were permissioned by the user when they initially created the Item. If a user creates a new account after the initial link, you can capture this event through the [`NEW_ACCOUNTS_AVAILABLE`](https://plaid.com/docs/api/items/#new_accounts_available) webhook and then use Link's [update mode](https://plaid.com/docs/link/update-mode/) to request that the user share this new account with you.
+        For items that went through the updated account selection pane, this endpoint only returns accounts that were permissioned by the user when they initially created the Item. If a user creates a new account after the initial link, you can capture this event through the [`NEW_ACCOUNTS_AVAILABLE`](https://plaid.com/docs/api/items/#new_accounts_available) webhook and then use Link's [update mode](https://plaid.com/docs/link/update-mode/) to request that the user share this new account with you.
 
         This endpoint retrieves cached information, rather than extracting fresh information from the institution. As a result, balances returned may not be up-to-date; for realtime balance information, use `/accounts/balance/get` instead. Note that some information is nullable.
       responses:
@@ -1052,7 +1052,15 @@ paths:
       externalDocs:
         url: /api/sandbox/#sandboxitemfire_webhook
       operationId: sandboxItemFireWebhook
-      description: The `/sandbox/item/fire_webhook` endpoint is used to test that code correctly handles webhooks. This endpoint can trigger a Transactions `DEFAULT_UPDATE` webhook to be fired for a given Sandbox Item. If the Item does not support Transactions, a `SANDBOX_PRODUCT_NOT_ENABLED` error will result. This endpoint can also trigger a `NEW_ACCOUNTS_AVAILABLE` webhook to be fired for a given Sandbox Item created with Account Select v2. Note that this endpoint is provided for developer ease-of-use and is not required for testing webhooks; webhooks will also fire in Sandbox under the same conditions that they would in Production or Development.
+      description: |-
+        The `/sandbox/item/fire_webhook` endpoint is used to test that code correctly handles webhooks. This endpoint can trigger the following webhooks:
+        `DEFAULT_UPDATE`: Transactions update webhook to be fired for a given Sandbox Item. If the Item does not support Transactions, a `SANDBOX_PRODUCT_NOT_ENABLED` error will result.
+
+        `NEW_ACCOUNTS_AVAILABLE`: Webhook to be fired for a given Sandbox Item created with Account Select v2.
+
+        `AUTH_DATA_UPDATE`: Webhook to be fired for a given Sandbox Item created with Auth as an enabled product.
+
+        Note that this endpoint is provided for developer ease-of-use and is not required for testing webhooks; webhooks will also fire in Sandbox under the same conditions that they would in Production or Development'
       responses:
         "200":
           description: success
@@ -2317,7 +2325,7 @@ paths:
       - plaid
       summary: Create user
       externalDocs:
-        url: /api/users/#usercreate
+        url: /api/products/income/#usercreate
       operationId: userCreate
       responses:
         "200":
@@ -2332,7 +2340,7 @@ paths:
                     user_token: user-sandbox-b0e2c4ee-a763-4df5-bfe9-46a46bce993d
                     user_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
                     request_id: Aim3b
-      description: 'Note: As of February 2022, the `/user/create` endpoint is in beta. Unless you have been opted-in, you will not have access to this endpoint.'
+      description: This endpoint should be called for each of your end users before they begin a Plaid income flow. This provides you a single token to access all income data associated with the user. You should only create one per end user.
       requestBody:
         required: true
         content:
@@ -4080,7 +4088,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      description: "Use the `/transfer/authorization/create` endpoint to determine transfer failure risk.\n\nIn Plaid's sandbox environment the decisions will be returned as follows:\n\n  - To approve a transfer with null rationale code, make an authorization request with an `amount` less than the available balance in the account.\n\n  - To approve a transfer with the rationale code `MANUALLY_VERIFIED_ITEM`, create an Item in Link through the [Same Day Micro-deposits flow](https://plaid.com/docs/auth/coverage/testing/#testing-same-day-micro-deposits).\n  \n  - To approve a transfer with the rationale code `LOGIN_REQUIRED`, [reset the login for an Item](https://plaid.com/docs/sandbox/#item_login_required).\n  \n  - To decline a transfer with the rationale code `NSF`, the available balance on the account must be less than the authorization `amount`. See [Create Sandbox test data](https://plaid.com/docs/sandbox/user-custom/) for details on how to customize data in Sandbox.\n\n  - To decline a transfer with the rationale code `RISK`, the available balance on the account must be exactly $0. See [Create Sandbox test data](https://plaid.com/docs/sandbox/user-custom/) for details on how to customize data in Sandbox."
+      description: |-
+        Use the `/transfer/authorization/create` endpoint to determine transfer failure risk.
+
+        In Plaid's sandbox environment the decisions will be returned as follows:
+
+          - To approve a transfer with null rationale code, make an authorization request with an `amount` less than the available balance in the account.
+
+          - To approve a transfer with the rationale code `MANUALLY_VERIFIED_ITEM`, create an Item in Link through the [Same Day Micro-deposits flow](https://plaid.com/docs/auth/coverage/testing/#testing-same-day-micro-deposits).
+
+          - To approve a transfer with the rationale code `LOGIN_REQUIRED`, [reset the login for an Item](https://plaid.com/docs/sandbox/#item_login_required).
+
+          - To decline a transfer with the rationale code `NSF`, the available balance on the account must be less than the authorization `amount`. See [Create Sandbox test data](https://plaid.com/docs/sandbox/user-custom/) for details on how to customize data in Sandbox.
+
+          - To decline a transfer with the rationale code `RISK`, the available balance on the account must be exactly $0. See [Create Sandbox test data](https://plaid.com/docs/sandbox/user-custom/) for details on how to customize data in Sandbox.
       requestBody:
         required: true
         content:
@@ -4795,6 +4816,40 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/BankTransferMigrateAccountRequest'
+  /transfer/migrate_account:
+    post:
+      summary: Migrate account into Transfers
+      tags:
+      - plaid
+      externalDocs:
+        url: /api/products/transfer/#transfermigrateaccount
+      operationId: transferMigrateAccount
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferMigrateAccountResponse'
+              examples:
+                example-1:
+                  value:
+                    access_token: access-sandbox-435beced-94e8-4df3-a181-1dde1cfa19f0
+                    account_id: zvyDgbeeDluZ43AJP6m5fAxDlgoZXDuoy5gjN
+                    request_id: mdqfuVxeoza6mhu
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      description: As an alternative to adding Items via Link, you can also use the `/transfer/migrate_account` endpoint to migrate known account and routing numbers to Plaid Items.  Note that Items created in this way are not compatible with endpoints for other products, such as `/accounts/balance/get`, and can only be used with Transfer endpoints.  If you require access to other endpoints, create the Item through Link instead.  Access to `/transfer/migrate_account` is not enabled by default; to obtain access, contact your Plaid Account Manager.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferMigrateAccountRequest'
   /transfer/intent/create:
     post:
       summary: Create a transfer intent object to invoke the Transfer UI
@@ -5133,6 +5188,38 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SandboxTransferRepaymentSimulateRequest'
+  /sandbox/transfer/fire_webhook:
+    post:
+      summary: Manually fire a Transfer webhook
+      tags:
+      - plaid
+      externalDocs:
+        url: /api/sandbox/#sandboxtransferfire_webhook
+      operationId: sandboxTransferFireWebhook
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SandboxTransferFireWebhookResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: mdqfuVxeoza6mhu
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      description: Use the `/sandbox/transfer/fire_webhook` endpoint to manually trigger a Transfer webhook in the Sandbox environment.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SandboxTransferFireWebhookRequest'
   /employers/search:
     post:
       tags:
@@ -5202,7 +5289,8 @@ paths:
               $ref: '#/components/schemas/IncomeVerificationCreateRequest'
   /income/verification/paystubs/get:
     post:
-      summary: Retrieve information from the paystubs used for income verification
+      summary: (Deprecated) Retrieve information from the paystubs used for income verification
+      deprecated: true
       tags:
       - plaid
       externalDocs:
@@ -5313,10 +5401,11 @@ paths:
             schema:
               $ref: '#/components/schemas/IncomeVerificationPaystubsGetRequest'
         description: ""
-      description: '`/income/verification/paystubs/get` returns the information collected from the paystubs that were used to verify an end user''s income. It can be called once the status of the verification has been set to `VERIFICATION_STATUS_PROCESSING_COMPLETE`, as reported by the `INCOME: verification_status` webhook. Attempting to call the endpoint before verification has been completed will result in an error.'
+      description: "`/income/verification/paystubs/get` returns the information collected from the paystubs that were used to verify an end user''s income. It can be called once the status of the verification has been set to `VERIFICATION_STATUS_PROCESSING_COMPLETE`, as reported by the `INCOME: verification_status` webhook. Attempting to call the endpoint before verification has been completed will result in an error.\n\nThis endpoint has been deprecated; new integrations should use `/credit/payroll_income/get` instead. "
   /income/verification/documents/download:
     post:
-      summary: Download the original documents used for income verification
+      deprecated: true
+      summary: (Deprecated) Download the original documents used for income verification
       tags:
       - plaid
       externalDocs:
@@ -5349,9 +5438,10 @@ paths:
     parameters: []
   /income/verification/refresh:
     post:
+      deprecated: true
       tags:
       - plaid
-      summary: Refresh an income verification
+      summary: (Deprecated) Refresh an income verification
       externalDocs:
         url: /api/products/income/#incomeverificationrefresh
       operationId: incomeVerificationRefresh
@@ -5382,13 +5472,14 @@ paths:
               $ref: '#/components/schemas/IncomeVerificationRefreshRequest'
   /income/verification/taxforms/get:
     post:
+      deprecated: true
       tags:
       - plaid
-      summary: Retrieve information from the tax documents used for income verification
+      summary: (Deprecated) Retrieve information from the tax documents used for income verification
       externalDocs:
         url: /api/products/income/#incomeverificationtaxformsget
       operationId: incomeVerificationTaxformsGet
-      description: '`/income/verification/taxforms/get` returns the information collected from forms that were used to verify an end user''s income. It can be called once the status of the verification has been set to `VERIFICATION_STATUS_PROCESSING_COMPLETE`, as reported by the `INCOME: verification_status` webhook. Attempting to call the endpoint before verification has been completed will result in an error.'
+      description: "`/income/verification/taxforms/get` returns the information collected from forms that were used to verify an end user''s income. It can be called once the status of the verification has been set to `VERIFICATION_STATUS_PROCESSING_COMPLETE`, as reported by the `INCOME: verification_status` webhook. Attempting to call the endpoint before verification has been completed will result in an error.\n\nThis endpoint has been deprecated; new integrations should use `/credit/payroll_income/get` instead. "
       responses:
         "200":
           description: OK
@@ -5471,7 +5562,8 @@ paths:
         description: ""
   /income/verification/precheck:
     post:
-      summary: Check digital income verification eligibility and optimize conversion
+      deprecated: true
+      summary: (Deprecated) Check digital income verification eligibility and optimize conversion
       tags:
       - plaid
       operationId: incomeVerificationPrecheck
@@ -5490,10 +5582,7 @@ paths:
                     request_id: lMjeOeu9X1VUh1F
                     precheck_id: n9elqYlvYm
                     confidence: HIGH
-      description: |-
-        `/income/verification/precheck` is an optional endpoint that can be called before initializing a Link session for income verification. It evaluates whether a given user is supportable by digital income verification and returns a `precheck_id` that can be provided to `/link/token/create`. If the user is eligible for digital verification, providing the `precheck_id` in this way will generate a Link UI optimized for the end user and their specific employer. If the user cannot be confirmed as eligible, the `precheck_id` can still be provided to `/link/token/create` and the user can still use the income verification flow, but they may be required to manually upload a paystub to verify their income.
-
-        While all request fields are optional, providing either `employer` or `transactions_access_tokens` data will increase the chance of receiving a useful result.
+      description: "`/income/verification/precheck` is an optional endpoint that can be called before initializing a Link session for income verification. It evaluates whether a given user is supportable by digital income verification and returns a `precheck_id` that can be provided to `/link/token/create`. If the user is eligible for digital verification, providing the `precheck_id` in this way will generate a Link UI optimized for the end user and their specific employer. If the user cannot be confirmed as eligible, the `precheck_id` can still be provided to `/link/token/create` and the user can still use the income verification flow, but they may be required to manually upload a paystub to verify their income.\n\nWhile all request fields are optional, providing either `employer` or `transactions_access_tokens` data will increase the chance of receiving a useful result.\n\nThis endpoint has been deprecated; new integrations should use `/credit/payroll_income/precheck` instead. "
       requestBody:
         required: true
         content:
@@ -5502,7 +5591,8 @@ paths:
               $ref: '#/components/schemas/IncomeVerificationPrecheckRequest'
   /employment/verification/get:
     post:
-      summary: Retrieve a summary of an individual's employment information
+      deprecated: true
+      summary: (Deprecated) Retrieve a summary of an individual's employment information
       tags:
       - plaid
       operationId: employmentVerificationGet
@@ -5530,7 +5620,7 @@ paths:
                         position_id: "8888"
                         payroll_id: "1234567"
                     request_id: LhQf0THi8SH1yJm
-      description: '`/employment/verification/get` returns a list of employments through a user payroll that was verified by an end user.'
+      description: "`/employment/verification/get` returns a list of employments through a user payroll that was verified by an end user.\n\nThis endpoint has been deprecated; new integrations should use `/credit/employment/get` instead. "
       requestBody:
         required: true
         content:
@@ -5756,6 +5846,247 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreditBankIncomeGetRequest'
+  /credit/payroll_income/get:
+    post:
+      summary: Retrieve a user's payroll information
+      tags:
+      - plaid
+      externalDocs:
+        url: /api/products/income/#creditpayroll_incomeget
+      operationId: creditPayrollIncomeGet
+      description: This endpoint gets payroll income information for a specific user, either as a result of the user connecting to their payroll provider or uploading a pay related document.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditPayrollIncomeGetRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditPayrollIncomeGetResponse'
+              examples:
+                example-1:
+                  value:
+                    payroll_income_id: bz666MBjYWTp2PDzzggYhM6oWWmBe
+                    items:
+                    - item_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBFL9DrE6
+                      payroll_income:
+                      - account_id: GeooLPBGDEunl54q7N3ZcyD5aLPLEai1nkzM9
+                        pay_stubs:
+                        - deductions:
+                            breakdown:
+                            - current_amount: 123.45
+                              description: taxes
+                              iso_currency_code: USD
+                              unofficial_currency_code: null
+                              ytd_amount: 246.9
+                            total:
+                              current_amount: 123.45
+                              iso_currency_code: USD
+                              unofficial_currency_code: null
+                              ytd_amount: 246.9
+                          document_metadata:
+                            document_type: PAYSTUB
+                            name: paystub.pdf
+                            status: PROCESSING_COMPLETE
+                            download_url: null
+                          document_id: 2jkflanbd
+                          earnings:
+                            breakdown:
+                            - canonical_description: REGULAR_PAY
+                              current_amount: 200.22
+                              description: salary earned
+                              hours: 80
+                              iso_currency_code: USD
+                              rate: null
+                              unofficial_currency_code: null
+                              ytd_amount: 400.44
+                            - canonical_description: BONUS
+                              current_amount: 100
+                              description: bonus earned
+                              hours: null
+                              iso_currency_code: USD
+                              rate: null
+                              unofficial_currency_code: null
+                              ytd_amount: 100
+                            total:
+                              current_amount: 300.22
+                              hours: 160
+                              iso_currency_code: USD
+                              unofficial_currency_code: null
+                              ytd_amount: 500.44
+                          employee:
+                            address:
+                              city: SAN FRANCISCO
+                              country: US
+                              postal_code: "94133"
+                              region: CA
+                              street: 2140 TAYLOR ST
+                            name: ANNA CHARLESTON
+                            marital_status: SINGLE
+                            taxpayer_id:
+                              id_type: SSN
+                              id_mask: "3333"
+                          employer:
+                            name: PLAID INC
+                            address:
+                              city: SAN FRANCISCO
+                              country: US
+                              postal_code: "94111"
+                              region: CA
+                              street: 1098 HARRISON ST
+                          net_pay:
+                            current_amount: 123.34
+                            description: TOTAL NET PAY
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
+                            ytd_amount: 253.54
+                          pay_period_details:
+                            distribution_breakdown:
+                            - account_name: Big time checking
+                              bank_name: bank of plaid
+                              current_amount: 176.77
+                              iso_currency_code: USD
+                              mask: "1223"
+                              type: checking
+                              unofficial_currency_code: null
+                            end_date: "2020-12-15"
+                            gross_earnings: 4500
+                            iso_currency_code: USD
+                            pay_amount: 1490.21
+                            pay_date: "2020-12-15"
+                            pay_frequency: BIWEEKLY
+                            start_date: "2020-12-01"
+                            unofficial_currency_code: null
+                          verification:
+                            verification_status: VERIFIED
+                            verification_attributes: []
+                        w2s:
+                        - allocated_tips: "1000"
+                          box_12:
+                          - amount: "200"
+                            code: AA
+                          box_9: box9
+                          dependent_care_benefits: "1000"
+                          document_metadata:
+                            document_type: US_TAX_W2
+                            name: w_2.pdf
+                            status: PROCESSING_COMPLETE
+                          document_id: 1pkflebk4
+                          employee:
+                            address:
+                              city: San Francisco
+                              country: US
+                              postal_code: "94103"
+                              region: CA
+                              street: 1234 Grand St
+                            name: Josie Georgia Harrison
+                            marital_status: SINGLE
+                            taxpayer_id:
+                              id_type: SSN
+                              id_mask: "1234"
+                          employer:
+                            address:
+                              city: New York
+                              country: US
+                              postal_code: "10010"
+                              region: NY
+                              street: 456 Main St
+                            name: Acme Inc
+                          employee_id_number: 12-1234567
+                          federal_income_tax_withheld: "1000"
+                          medicare_tax_withheld: "1000"
+                          medicare_wages_and_tips: "1000"
+                          nonqualified_plans: "1000"
+                          other: other
+                          retirement_plan: CHECKED
+                          social_security_tax_withheld: "1000"
+                          social_security_tips: "1000"
+                          social_security_wages: "1000"
+                          state_and_local_wages:
+                          - employer_state_id_number: 11111111111AAA
+                            local_income_tax: "200"
+                            local_wages_and_tips: "200"
+                            locality_name: local
+                            state: UT
+                            state_income_tax: "200"
+                            state_wages_tips: "200"
+                          statutory_employee: CHECKED
+                          tax_year: "2020"
+                          third_party_sick_ppay: CHECKED
+                          wages_tips_other_comp: "1000"
+                    request_id: 2pxQ59buGdsHRef
+  /credit/payroll_income/precheck:
+    post:
+      summary: Check income verification eligibility and optimize conversion
+      tags:
+      - plaid
+      operationId: creditPayrollIncomePrecheck
+      externalDocs:
+        url: /api/products/income/#creditpayroll_incomeprecheck
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditPayrollIncomePrecheckResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: lMjeOeu9X1VUh1F
+                    confidence: HIGH
+      description: |-
+        `/credit/payroll_income/precheck` is an optional endpoint that can be called before initializing a Link session for income verification. It evaluates whether a given user is supportable by digital income verification. If the user is eligible for digital verification, that information will be associated with the user token, and in this way will generate a Link UI optimized for the end user and their specific employer. If the user cannot be confirmed as eligible, the user can still use the income verification flow, but they may be required to manually upload a paystub to verify their income.
+
+        While all request fields are optional, providing `employer` data will increase the chance of receiving a useful result.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditPayrollIncomePrecheckRequest'
+  /credit/employment/get:
+    post:
+      summary: Retrieve a summary of an individual's employment information
+      tags:
+      - plaid
+      operationId: creditEmploymentGet
+      externalDocs:
+        url: /api/products/income/#creditemploymentget
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditEmploymentGetResponse'
+              examples:
+                example-1:
+                  value:
+                    employments:
+                    - status: ACTIVE
+                      start_date: "2020-01-01"
+                      end_date: null
+                      employer:
+                        name: Plaid Inc
+                      title: Software Engineer
+                      platform_ids:
+                        employee_id: "1234567"
+                        position_id: "8888"
+                        payroll_id: "1234567"
+                    request_id: LhQf0THi8SH1yJm
+      description: '`/credit/employment/get` returns a list of employments through a user payroll that was verified by an end user.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditEmploymentGetRequest'
   /sandbox/bank_transfer/fire_webhook:
     post:
       summary: Manually fire a Bank Transfer webhook
@@ -5981,6 +6312,10 @@ paths:
                       iso_currency_code: GBP
                       current: 123.12
                     request_id: 4zlKapIkTm8p5KM
+                    numbers:
+                      bacs:
+                        account: "1234567890"
+                        sort_code: "123456"
       description: |
         Fetch an e-wallet. The response includes the current balance.
       requestBody:
@@ -6436,13 +6771,13 @@ components:
         include_personal_finance_category_beta:
           type: boolean
           default: false
-          description: Please use [`include_personal_finance_category`](https://plaid.com/docs/api/products/#transactions-get-request-options-include-personal-finance-category) instead.
+          description: Please use [`include_personal_finance_category`](https://plaid.com/docs/api/products/transactions/#transactions-get-request-options-include-personal-finance-category) instead.
           deprecated: true
         include_personal_finance_category:
           type: boolean
           default: false
           description: |-
-            Include the [`personal_finance_category`](https://plaid.com/docs/api/products/#transactions-get-response-transactions-personal-finance-category) object in the response.
+            Include the [`personal_finance_category`](https://plaid.com/docs/api/products/transactions/#transactions-get-response-transactions-personal-finance-category) object in the response.
 
             See the [`taxonomy csv file`](https://plaid.com/documents/transactions-personal-finance-category-taxonomy.csv) for a full list of personal finance categories.
     TransactionsGetResponse:
@@ -6869,6 +7204,10 @@ components:
           type: string
           nullable: true
           description: A unique ID identifying the payment
+        consent_id:
+          type: string
+          nullable: true
+          description: A unique ID identifying the payment consent
     InstitutionsSearchResponse:
       type: object
       additionalProperties: true
@@ -7156,19 +7495,41 @@ components:
           $ref: '#/components/schemas/APISecret'
         access_token:
           $ref: '#/components/schemas/AccessToken'
+        webhook_type:
+          $ref: '#/components/schemas/WebhookType'
         webhook_code:
           type: string
           enum:
           - DEFAULT_UPDATE
           - NEW_ACCOUNTS_AVAILABLE
+          - AUTH_DATA_UPDATE
           description: |-
             The following values for `webhook_code` are supported:
 
             * `DEFAULT_UPDATE`
             * `NEW_ACCOUNTS_AVAILABLE`
+            * `AUTH_DATA_UPDATE`
       required:
       - access_token
       - webhook_code
+    WebhookType:
+      type: string
+      enum:
+      - AUTH
+      - HOLDINGS
+      - INVESTMENTS_TRANSACTIONS
+      - ITEM
+      - LIABILITIES
+      - TRANSACTIONS
+      description: |-
+        The following values for `webhook_type` are supported:
+
+        * `AUTH`
+        * `HOLDINGS`
+        * `INVESTMENTS_TRANSACTIONS`
+        * `ITEM`
+        * `LIABILITIES`
+        * `TRANSACTIONS`
     SandboxItemFireWebhookResponse:
       type: object
       additionalProperties: true
@@ -7434,7 +7795,7 @@ components:
           $ref: '#/components/schemas/AccessToken'
         webhook:
           type: string
-          description: The new webhook URL to associate with the Item.
+          description: The new webhook URL to associate with the Item. To remove a webhook from an Item, set to `null`.
           nullable: true
       required:
       - access_token
@@ -8907,6 +9268,10 @@ components:
           - astra
           - moov
           - treasury_prime
+          - marqeta
+          - checkout
+          - solid
+          - apex_clearing
           description: The processor you are integrating with.
       required:
       - access_token
@@ -10066,7 +10431,7 @@ components:
       type: object
       additionalProperties: true
       nullable: true
-      description: An object containing a BACS account number and sort code. If an IBAN is not provided or if this recipient needs to accept domestic GBP-denominated payments, BACS data is required.
+      description: An object containing a BACS account number and sort code. If an IBAN is not provided or if you need to accept domestic GBP-denominated payments, BACS data is required.
       properties:
         account:
           type: string
@@ -10490,7 +10855,16 @@ components:
       - MONTHLY
     TransactionStreamStatus:
       type: string
-      description: "The current status of the transaction stream.\n\n`mature`: A mature recurring stream should have at least 3 transactions and happen on a regular cadence. \n\n`early_detection`: When a recurring transaction first appears in the transaction history and before it fulfills the requirement of a mature stream, we set the status as early_detection.\n\n`tombstoned`: An early_detection stream would be tombstoned if no further transactions were found at the next expected date.\n\n`unknown`: A stream is assigned an unknown status when none of the other statuses are applicable."
+      description: |-
+        The current status of the transaction stream.
+
+        `mature`: A mature recurring stream should have at least 3 transactions and happen on a regular cadence.
+
+        `early_detection`: When a recurring transaction first appears in the transaction history and before it fulfills the requirement of a mature stream, we set the status as early_detection.
+
+        `tombstoned`: An early_detection stream would be tombstoned if no further transactions were found at the next expected date.
+
+        `unknown`: A stream is assigned an unknown status when none of the other statuses are applicable.
       title: TransactionStreamStatus
       enum:
       - UNKNOWN
@@ -13187,14 +13561,18 @@ components:
       title: Cause
       type: object
       additionalProperties: true
-      properties:
-        item_id:
-          $ref: '#/components/schemas/ItemId'
-        error:
-          $ref: '#/components/schemas/PlaidError'
+      allOf:
+      - $ref: '#/components/schemas/PlaidError'
+      - type: object
+        properties:
+          item_id:
+            $ref: '#/components/schemas/ItemId'
       required:
       - item_id
-      - error
+      - error_type
+      - error_code
+      - error_message
+      - display_message
       description: An error object and associated `item_id` used to identify a specific Item and error when a batch operation operating on multiple Items has encountered an error in one of the Items.
     Warning:
       title: Warning
@@ -13254,15 +13632,18 @@ components:
       type: object
       title: PaymentConsentValidDateTime
       description: Life span for the payment consent. After the `to` date the payment consent expires and can no longer be used for payment initiation.
+      nullable: true
       additionalProperties: true
       properties:
         from:
           type: string
           format: date-time
+          nullable: true
           description: The date and time from which the consent should be active, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format.
         to:
           type: string
           format: date-time
+          nullable: true
           description: The date and time at which the consent expires, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format.
     PaymentConsentPeriodicAmount:
       type: object
@@ -16386,6 +16767,9 @@ components:
         routing_number:
           type: string
           description: The user's routing number.
+        wire_routing_number:
+          type: string
+          description: The user's wire transfer routing number. This is the ABA number; for some institutions, this may differ from the ACH number used in `routing_number`.
         account_type:
           type: string
           description: The type of the bank account (`checking` or `savings`).
@@ -16398,6 +16782,49 @@ components:
       type: object
       additionalProperties: true
       description: Defines the response schema for `/bank_transfer/migrate_account`
+      properties:
+        access_token:
+          type: string
+          description: The Plaid `access_token` for the newly created Item.
+        account_id:
+          type: string
+          description: The Plaid `account_id` for the newly created Item.
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - access_token
+      - account_id
+      - request_id
+    TransferMigrateAccountRequest:
+      title: TransferMigrateAccountRequest
+      type: object
+      description: Defines the request schema for `/transfer/migrate_account`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        account_number:
+          type: string
+          description: The user's account number.
+        routing_number:
+          type: string
+          description: The user's routing number.
+        wire_routing_number:
+          type: string
+          description: The user's wire transfer routing number. This is the ABA number; for some institutions, this may differ from the ACH number used in `routing_number`.
+        account_type:
+          type: string
+          description: The type of the bank account (`checking` or `savings`).
+      required:
+      - account_number
+      - routing_number
+      - account_type
+    TransferMigrateAccountResponse:
+      title: TransferMigrateAccountResponse
+      type: object
+      additionalProperties: true
+      description: Defines the response schema for `/transfer/migrate_account`
       properties:
         access_token:
           type: string
@@ -16569,6 +16996,7 @@ components:
         description:
           type: string
           description: A description for the underlying transfer. Maximum of 8 characters.
+          minLength: 1
           maxLength: 8
         ach_class:
           $ref: '#/components/schemas/ACHClass'
@@ -17287,6 +17715,12 @@ components:
         city:
           type: string
           description: The full city name
+        country:
+          type: string
+          description: The ISO 3166-1 alpha-2 country code
+        postal_code:
+          type: string
+          description: The postal code. In API versions 2018-05-22 and earlier, this field is called `zip`.
         region:
           type: string
           description: |-
@@ -17297,12 +17731,6 @@ components:
           description: |-
             The full street address
             Example: `"564 Main Street, APT 15"`
-        postal_code:
-          type: string
-          description: The postal code. In API versions 2018-05-22 and earlier, this field is called `zip`.
-        country:
-          type: string
-          description: The ISO 3166-1 alpha-2 country code
     IncomeVerificationPrecheckMilitaryInfo:
       title: IncomeVerificationPrecheckMilitaryInfo
       description: Data about military info in the income verification precheck.
@@ -17440,8 +17868,7 @@ components:
       x-examples:
         example-1:
           webhook_type: INCOME
-          webhook_code: income_verification
-          income_verification_id: f6f5132f-853b-421c-8c41-d24f93ebc39f
+          webhook_code: INCOME_VERIFICATION
           item_id: gAXlMgVEw5uEGoQnnXZ6tn9E7Mn3LBc4PJVKZ
           verification_status: VERIFICATION_STATUS_PROCESSING_COMPLETE
       properties:
@@ -17450,10 +17877,7 @@ components:
           description: '`"INCOME"`'
         webhook_code:
           type: string
-          description: '`income_verification`'
-        income_verification_id:
-          type: string
-          description: The `income_verification_id` of the verification instance whose status is being reported.
+          description: '`INCOME_VERIFICATION`'
         item_id:
           type: string
           description: The Item ID associated with the verification.
@@ -17468,7 +17892,6 @@ components:
       required:
       - webhook_type
       - webhook_code
-      - income_verification_id
       - item_id
       - verification_status
     IncomeVerificationRefreshRequest:
@@ -19272,6 +19695,921 @@ components:
           $ref: '#/components/schemas/CreditIsoCurrencyCode'
         unofficial_currency_code:
           $ref: '#/components/schemas/CreditUnofficialCurrencyCode'
+    CreditPayrollIncomeGetRequest:
+      title: CreditPayrollIncomeGetRequest
+      type: object
+      description: CreditPayrollIncomeGetRequest defines the request schema for `/credit/payroll_income/get`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        user_token:
+          $ref: '#/components/schemas/UserToken'
+    CreditPayrollIncomeGetResponse:
+      title: CreditPayrollIncomeGetResponse
+      type: object
+      additionalProperties: true
+      description: Defines the response body for `/credit/payroll_income/get`.
+      properties:
+        payroll_income_id:
+          type: string
+          description: The unique identifier associated with the payroll income response.
+        items:
+          description: Array of payroll items.
+          type: array
+          items:
+            $ref: '#/components/schemas/PayrollItem'
+        error:
+          $ref: '#/components/schemas/PlaidError'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - items
+      - request_id
+    CreditDocumentMetadata:
+      title: CreditDocumentMetadata
+      type: object
+      additionalProperties: true
+      description: Object representing metadata pertaining to the document.
+      properties:
+        name:
+          type: string
+          description: The name of the document.
+        document_type:
+          $ref: '#/components/schemas/CreditDocumentType'
+        download_url:
+          type: string
+          description: Signed URL to retrieve the underlying file.
+          nullable: true
+        status:
+          type: string
+          description: The processing status of the document.
+          nullable: true
+      required:
+      - name
+      - document_type
+      - download_url
+      - status
+    CreditDocumentType:
+      title: CreditDocumentType
+      type: string
+      nullable: true
+      description: |-
+        The type of document.
+
+        `PAYSTUB`: A paystub.
+
+        `BANK_STATEMENT`: A bank statement.
+
+        `US_TAX_W2`: A W-2 wage and tax statement provided by a US employer reflecting wages earned by the employee.
+
+        `US_MILITARY_ERAS`: An electronic Retirement Account Statement (eRAS) issued by the US military.
+
+        `US_MILITARY_LES`: A Leave and Earnings Statement (LES) issued by the US military.
+
+        `US_MILITARY_CLES`: A Civilian Leave and Earnings Statment (CLES) issued by the US military.
+
+        `GIG`: Used to indicate that the income is related to gig work. Does not necessarily correspond to a specific document type.
+
+        `NONE`: Used to indicate that there is no underlying document for the data.
+
+        `UNKNOWN`: Document type could not be determined.
+      x-override-enum-values-shown:
+      - UNKNOWN
+      - PAYSTUB
+      - BANK_STATEMENT
+      - US_TAX_W2
+      - US_MILITARY_ERAS
+      - US_MILITARY_LES
+      - US_MILITARY_CLES
+      - GIG
+      - NONE
+    PayrollItem:
+      title: PayrollItem
+      type: object
+      description: An object containing information about the payroll item.
+      properties:
+        item_id:
+          $ref: '#/components/schemas/ItemId'
+        payroll_income:
+          type: array
+          items:
+            $ref: '#/components/schemas/PayrollIncomeObject'
+      required:
+      - item_id
+      - payroll_income
+    PayrollIncomeObject:
+      title: PayrollIncomeObject
+      type: object
+      additionalProperties: true
+      description: An object representing payroll data.
+      properties:
+        account_id:
+          type: string
+          description: ID of the payroll provider account.
+          nullable: true
+        pay_stubs:
+          description: Array of pay stubs for the user.
+          type: array
+          items:
+            $ref: '#/components/schemas/PayStub'
+        w2s:
+          description: Array of tax form W-2s.
+          type: array
+          items:
+            $ref: '#/components/schemas/CreditW2'
+      required:
+      - account_id
+      - pay_stubs
+      - w2s
+    PayStub:
+      title: PayStub
+      type: object
+      additionalProperties: true
+      description: An object representing an end user's pay stub.
+      properties:
+        deductions:
+          $ref: '#/components/schemas/PayStubDeductions'
+        document_id:
+          type: string
+          description: An identifier of the document referenced by the document metadata.
+          nullable: true
+        document_metadata:
+          $ref: '#/components/schemas/CreditDocumentMetadata'
+        earnings:
+          $ref: '#/components/schemas/PayStubEarnings'
+        employee:
+          $ref: '#/components/schemas/PayStubEmployee'
+        employer:
+          $ref: '#/components/schemas/PayStubEmployer'
+        net_pay:
+          $ref: '#/components/schemas/PayStubNetPay'
+        pay_period_details:
+          $ref: '#/components/schemas/PayStubPayPeriodDetails'
+        verification:
+          $ref: '#/components/schemas/PayStubVerification'
+      required:
+      - deductions
+      - document_id
+      - document_metadata
+      - earnings
+      - employee
+      - employer
+      - net_pay
+      - pay_period_details
+      - verification
+    PayStubDeductions:
+      title: PayStubDeductions
+      type: object
+      description: An object with the deduction information found on a pay stub.
+      additionalProperties: true
+      properties:
+        breakdown:
+          type: array
+          items:
+            $ref: '#/components/schemas/PayStubDeductionsBreakdown'
+        total:
+          $ref: '#/components/schemas/PayStubDeductionsTotal'
+      required:
+      - breakdown
+      - total
+    PayStubDeductionsBreakdown:
+      title: PayStubDeductionsBreakdown
+      type: object
+      additionalProperties: true
+      description: An object representing the deduction line items for the pay period
+      properties:
+        current_amount:
+          type: number
+          format: double
+          description: Raw amount of the deduction
+          nullable: true
+        description:
+          type: string
+          description: Description of the deduction line item
+          nullable: true
+        iso_currency_code:
+          type: string
+          description: The ISO-4217 currency code of the line item. Always `null` if `unofficial_currency_code` is non-null.
+          nullable: true
+        unofficial_currency_code:
+          nullable: true
+          type: string
+          description: |-
+            The unofficial currency code associated with the line item. Always `null` if `iso_currency_code` is non-`null`. Unofficial currency codes are used for currencies that do not have official ISO currency codes, such as cryptocurrencies and the currencies of certain countries.
+
+            See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `iso_currency_code`s.
+        ytd_amount:
+          type: number
+          format: double
+          description: The year-to-date amount of the deduction
+          nullable: true
+      required:
+      - current_amount
+      - description
+      - iso_currency_code
+      - unofficial_currency_code
+      - ytd_amount
+    PayStubDeductionsTotal:
+      title: PayStubDeductionsTotal
+      type: object
+      description: An object representing the total deductions for the pay period
+      additionalProperties: true
+      properties:
+        current_amount:
+          type: number
+          format: double
+          description: Raw amount of the deduction
+          nullable: true
+        iso_currency_code:
+          type: string
+          description: The ISO-4217 currency code of the line item. Always `null` if `unofficial_currency_code` is non-null.
+          nullable: true
+        unofficial_currency_code:
+          nullable: true
+          type: string
+          description: |-
+            The unofficial currency code associated with the line item. Always `null` if `iso_currency_code` is non-`null`. Unofficial currency codes are used for currencies that do not have official ISO currency codes, such as cryptocurrencies and the currencies of certain countries.
+
+            See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `iso_currency_code`s.
+        ytd_amount:
+          type: number
+          format: double
+          description: The year-to-date total amount of the deductions
+          nullable: true
+      required:
+      - current_amount
+      - iso_currency_code
+      - unofficial_currency_code
+      - ytd_amount
+    PayStubEarnings:
+      title: PayStubEarnings
+      type: object
+      description: An object representing both a breakdown of earnings on a pay stub and the total earnings.
+      additionalProperties: true
+      properties:
+        breakdown:
+          type: array
+          items:
+            $ref: '#/components/schemas/PayStubEarningsBreakdown'
+        total:
+          $ref: '#/components/schemas/PayStubEarningsTotal'
+      required:
+      - breakdown
+      - total
+    PayStubEarningsBreakdown:
+      title: PayStubEarningsBreakdown
+      type: object
+      additionalProperties: true
+      description: An object representing the earnings line items for the pay period.
+      properties:
+        canonical_description:
+          $ref: '#/components/schemas/PayStubEarningsBreakdownCanonicalDescription'
+        current_amount:
+          type: number
+          format: double
+          description: Raw amount of the earning line item.
+          nullable: true
+        description:
+          type: string
+          description: Description of the earning line item.
+          nullable: true
+        hours:
+          type: number
+          description: Number of hours applicable for this earning.
+          nullable: true
+        iso_currency_code:
+          type: string
+          description: The ISO-4217 currency code of the line item. Always `null` if `unofficial_currency_code` is non-null.
+          nullable: true
+        rate:
+          type: number
+          format: double
+          description: Hourly rate applicable for this earning.
+          nullable: true
+        unofficial_currency_code:
+          nullable: true
+          type: string
+          description: |-
+            The unofficial currency code associated with the line item. Always `null` if `iso_currency_code` is non-`null`. Unofficial currency codes are used for currencies that do not have official ISO currency codes, such as cryptocurrencies and the currencies of certain countries.
+
+            See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `iso_currency_code`s.
+        ytd_amount:
+          type: number
+          format: double
+          description: The year-to-date amount of the deduction.
+          nullable: true
+      required:
+      - canonical_description
+      - current_amount
+      - description
+      - hours
+      - iso_currency_code
+      - rate
+      - unofficial_currency_code
+      - ytd_amount
+    PayStubEarningsBreakdownCanonicalDescription:
+      type: string
+      description: Commonly used term to describe the earning line item.
+      x-override-enum-values-shown:
+      - BONUS
+      - COMMISSION
+      - OVERTIME
+      - PAID_TIME_OFF
+      - REGULAR_PAY
+      - VACATION
+      - BASIC_ALLOWANCE_HOUSING
+      - BASIC_ALLOWANCE_SUBSISTENCE
+      - OTHER
+      - null
+      nullable: true
+    PayStubEarningsTotal:
+      title: PayStubEarningsTotal
+      type: object
+      description: An object representing both the current pay period and year to date amount for an earning category.
+      additionalProperties: true
+      properties:
+        current_amount:
+          type: number
+          format: double
+          description: Total amount of the earnings for this pay period.
+          nullable: true
+        hours:
+          type: number
+          description: Total number of hours worked for this pay period.
+          nullable: true
+        iso_currency_code:
+          type: string
+          description: The ISO-4217 currency code of the line item. Always `null` if `unofficial_currency_code` is non-null.
+          nullable: true
+        unofficial_currency_code:
+          nullable: true
+          type: string
+          description: |-
+            The unofficial currency code associated with the security. Always `null` if `iso_currency_code` is non-`null`. Unofficial currency codes are used for currencies that do not have official ISO currency codes, such as cryptocurrencies and the currencies of certain countries.
+
+            See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `iso_currency_code`s.
+        ytd_amount:
+          type: number
+          format: double
+          description: The total year-to-date amount of the earnings.
+          nullable: true
+      required:
+      - current_amount
+      - hours
+      - iso_currency_code
+      - unofficial_currency_code
+      - ytd_amount
+    PayStubEmployee:
+      title: PayStubEmployee
+      type: object
+      additionalProperties: true
+      description: Data about the employee.
+      properties:
+        address:
+          $ref: '#/components/schemas/PayStubAddress'
+        name:
+          type: string
+          description: The name of the employee.
+          nullable: true
+        marital_status:
+          type: string
+          description: Marital status of the employee - either `SINGLE` or `MARRIED`.
+          nullable: true
+          x-override-enum-values-shown:
+          - SINGLE
+          - MARRIED
+          - null
+        taxpayer_id:
+          $ref: '#/components/schemas/PayStubTaxpayerID'
+      required:
+      - name
+      - address
+      - marital_status
+      - taxpayer_id
+    PayStubAddress:
+      title: PayStubAddress
+      description: Address on the pay stub.
+      type: object
+      additionalProperties: true
+      properties:
+        city:
+          type: string
+          description: The full city name.
+          nullable: true
+        country:
+          type: string
+          description: The ISO 3166-1 alpha-2 country code.
+          nullable: true
+        postal_code:
+          type: string
+          description: The postal code of the address.
+          nullable: true
+        region:
+          type: string
+          description: |-
+            The region or state.
+            Example: `"NC"`
+          nullable: true
+        street:
+          type: string
+          description: The full street address.
+          nullable: true
+      required:
+      - city
+      - country
+      - postal_code
+      - region
+      - street
+    PayStubTaxpayerID:
+      title: PayStubTaxpayerID
+      type: object
+      additionalProperties: true
+      description: Taxpayer ID of the individual receiving the paystub.
+      properties:
+        id_type:
+          type: string
+          description: Type of ID, e.g. 'SSN'.
+          nullable: true
+        id_mask:
+          type: string
+          description: ID mask; i.e. last 4 digits of the taxpayer ID.
+          nullable: true
+      required:
+      - id_type
+      - id_mask
+    PayStubEmployer:
+      title: PayStubEmployer
+      description: Information about the employer on the pay stub.
+      type: object
+      additionalProperties: true
+      properties:
+        address:
+          $ref: '#/components/schemas/PayStubAddress'
+        name:
+          type: string
+          description: The name of the employer on the pay stub.
+          nullable: true
+      required:
+      - address
+      - name
+    PayStubNetPay:
+      title: PayStubNetPay
+      type: object
+      description: An object representing information about the net pay amount on the pay stub.
+      additionalProperties: true
+      properties:
+        current_amount:
+          type: number
+          format: double
+          description: Raw amount of the net pay for the pay period.
+          nullable: true
+        description:
+          type: string
+          description: Description of the net pay.
+          nullable: true
+        iso_currency_code:
+          type: string
+          description: The ISO-4217 currency code of the net pay. Always `null` if `unofficial_currency_code` is non-null.
+          nullable: true
+        unofficial_currency_code:
+          nullable: true
+          type: string
+          description: |-
+            The unofficial currency code associated with the net pay. Always `null` if `iso_currency_code` is non-`null`. Unofficial currency codes are used for currencies that do not have official ISO currency codes, such as cryptocurrencies and the currencies of certain countries.
+
+            See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `iso_currency_code`s.
+        ytd_amount:
+          type: number
+          format: double
+          description: The year-to-date amount of the net pay.
+          nullable: true
+      required:
+      - current_amount
+      - description
+      - iso_currency_code
+      - unofficial_currency_code
+      - ytd_amount
+    PayStubPayPeriodDetails:
+      title: PayStubPayPeriodDetails
+      type: object
+      additionalProperties: true
+      description: Details about the pay period.
+      properties:
+        pay_amount:
+          type: number
+          format: double
+          description: The amount of the paycheck.
+          nullable: true
+        distribution_breakdown:
+          type: array
+          items:
+            $ref: '#/components/schemas/PayStubDistributionBreakdown'
+        end_date:
+          type: string
+          format: date
+          description: The date on which the pay period ended, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ("yyyy-mm-dd").
+          nullable: true
+        gross_earnings:
+          type: number
+          format: double
+          description: Total earnings before tax/deductions.
+          nullable: true
+        iso_currency_code:
+          type: string
+          description: The ISO-4217 currency code of the net pay. Always `null` if `unofficial_currency_code` is non-null.
+          nullable: true
+        pay_date:
+          type: string
+          format: date
+          description: The date on which the pay stub was issued, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ("yyyy-mm-dd").
+          nullable: true
+        pay_frequency:
+          type: string
+          description: The frequency at which an individual is paid.
+          x-override-enum-values-shown:
+          - UNKNOWN
+          - WEEKLY
+          - BIWEEKLY
+          - SEMI_MONTHLY
+          - MONTHLY
+          - null
+          nullable: true
+        start_date:
+          type: string
+          format: date
+          description: The date on which the pay period started, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ("yyyy-mm-dd").
+          nullable: true
+        unofficial_currency_code:
+          nullable: true
+          type: string
+          description: |-
+            The unofficial currency code associated with the net pay. Always `null` if `iso_currency_code` is non-`null`. Unofficial currency codes are used for currencies that do not have official ISO currency codes, such as cryptocurrencies and the currencies of certain countries.
+
+            See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `iso_currency_code`s.
+      required:
+      - pay_amount
+      - distribution_breakdown
+      - end_date
+      - gross_earnings
+      - iso_currency_code
+      - pay_date
+      - pay_frequency
+      - start_date
+      - unofficial_currency_code
+    PayStubDistributionBreakdown:
+      title: PayStubDistributionBreakdown
+      type: object
+      description: Information about the accounts that the payment was distributed to.
+      additionalProperties: true
+      properties:
+        account_name:
+          type: string
+          description: Name of the account for the given distribution.
+          nullable: true
+        bank_name:
+          type: string
+          description: The name of the bank that the payment is being deposited to.
+          nullable: true
+        current_amount:
+          type: number
+          format: double
+          description: The amount distributed to this account.
+          nullable: true
+        iso_currency_code:
+          type: string
+          description: The ISO-4217 currency code of the net pay. Always `null` if `unofficial_currency_code` is non-null.
+          nullable: true
+        mask:
+          type: string
+          description: The last 2-4 alphanumeric characters of an account's official account number.
+          nullable: true
+        type:
+          type: string
+          description: Type of the account that the paystub was sent to (e.g. 'checking').
+          nullable: true
+        unofficial_currency_code:
+          nullable: true
+          type: string
+          description: |-
+            The unofficial currency code associated with the net pay. Always `null` if `iso_currency_code` is non-`null`. Unofficial currency codes are used for currencies that do not have official ISO currency codes, such as cryptocurrencies and the currencies of certain countries.
+
+            See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `iso_currency_code`s.
+      required:
+      - account_name
+      - bank_name
+      - current_amount
+      - iso_currency_code
+      - mask
+      - type
+      - unofficial_currency_code
+    PayStubVerification:
+      title: PayStubVerification
+      description: An object containing details on the paystub's verification status. This object will only be populated if the [`income_verification.access_tokens`](/docs/api/tokens/#link-token-create-request-income-verification-access-tokens) parameter was provided during the `/link/token/create` call or if a problem was detected with the information supplied by the user; otherwise it will be `null`.
+      type: object
+      additionalProperties: true
+      nullable: true
+      properties:
+        verification_status:
+          $ref: '#/components/schemas/PayStubVerificationStatus'
+        verification_attributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/PayStubVerificationAttribute'
+      required:
+      - verification_status
+      - verification_attributes
+    PayStubVerificationStatus:
+      type: string
+      title: PayStubVerificationStatus
+      description: Derived verification status.
+      nullable: true
+      x-override-enum-values-shown:
+      - UNKNOWN
+      - VERIFIED
+      - FRAUDULENT
+      - null
+    PayStubVerificationAttribute:
+      title: PayStubVerificationAttribute
+      description: Details about a certain reason as to why a document could potentially be fraudulent.
+      type: object
+      additionalProperties: true
+      nullable: true
+      properties:
+        type:
+          title: PayStubVerificationAttributeType
+          type: string
+          description: Message indicating the reason as to why the verification failed.
+          nullable: true
+          x-override-enum-values-shown:
+          - UNKNOWN
+          - AMOUNT_MATCH
+          - DATE_MATCH
+          - DATE_MISMATCH
+          - FILE_TAMPERING
+          - DESCRIPTION_MATCH
+          - DESCRIPTION_MISMATCH
+          - FIRST_NAME_MATCH
+          - FIRST_NAME_MISMATCH
+          - LAST_NAME_MATCH
+          - LAST_NAME_MISMATCH
+          - null
+      required:
+      - type
+    CreditW2:
+      title: CreditW2
+      type: object
+      additionalProperties: true
+      description: W2 is an object that represents income data taken from a W2 tax document.
+      properties:
+        document_metadata:
+          $ref: '#/components/schemas/CreditDocumentMetadata'
+        document_id:
+          type: string
+          description: An identifier of the document referenced by the document metadata.
+        employer:
+          $ref: '#/components/schemas/PayStubEmployer'
+        employee:
+          $ref: '#/components/schemas/PayStubEmployee'
+        tax_year:
+          type: string
+          description: The tax year of the W2 document.
+          nullable: true
+        employer_id_number:
+          type: string
+          description: An employee identification number or EIN.
+          nullable: true
+        wages_tips_other_comp:
+          type: string
+          description: Wages from tips and other compensation.
+          nullable: true
+        federal_income_tax_withheld:
+          type: string
+          description: Federal income tax withheld for the tax year.
+          nullable: true
+        social_security_wages:
+          type: string
+          description: Wages from social security.
+          nullable: true
+        social_security_tax_withheld:
+          type: string
+          description: Social security tax withheld for the tax year.
+          nullable: true
+        medicare_wages_and_tips:
+          type: string
+          description: Wages and tips from medicare.
+          nullable: true
+        medicare_tax_withheld:
+          type: string
+          description: Medicare tax withheld for the tax year.
+          nullable: true
+        social_security_tips:
+          type: string
+          description: Tips from social security.
+          nullable: true
+        allocated_tips:
+          type: string
+          description: Allocated tips.
+          nullable: true
+        box_9:
+          type: string
+          description: Contents from box 9 on the W2.
+          nullable: true
+        dependent_care_benefits:
+          type: string
+          description: Dependent care benefits.
+          nullable: true
+        nonqualified_plans:
+          type: string
+          description: Nonqualified plans.
+          nullable: true
+        box_12:
+          type: array
+          items:
+            $ref: '#/components/schemas/W2Box12'
+        statutory_employee:
+          type: string
+          description: Statutory employee.
+          nullable: true
+        retirement_plan:
+          type: string
+          description: Retirement plan.
+          nullable: true
+        third_party_sick_pay:
+          type: string
+          description: Third party sick pay.
+          nullable: true
+        other:
+          type: string
+          description: Other.
+          nullable: true
+        state_and_local_wages:
+          type: array
+          items:
+            $ref: '#/components/schemas/W2StateAndLocalWages'
+      required:
+      - document_metadata
+      - document_id
+      - employer
+      - employee
+      - tax_year
+      - employer_id_number
+      - wages_tips_other_comp
+      - federal_income_tax_withheld
+      - social_security_wages
+      - social_security_tax_withheld
+      - medicare_wages_and_tips
+      - medicare_tax_withheld
+      - social_security_tips
+      - allocated_tips
+      - box_9
+      - dependent_care_benefits
+      - nonqualified_plans
+      - box_12
+      - statutory_employee
+      - retirement_plan
+      - third_party_sick_pay
+      - other
+      - state_and_local_wages
+    CreditPayrollIncomePrecheckRequest:
+      title: CreditPayrollIncomePrecheckRequest
+      type: object
+      description: Defines the request schema for `/credit/payroll_income/precheck`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        user_token:
+          $ref: '#/components/schemas/UserToken'
+        access_tokens:
+          type: array
+          description: An array of access tokens corresponding to Items belonging to the user whose eligibility is being checked. Note that if the Items specified here are not already initialized with `transactions`, providing them in this field will cause these Items to be initialized with (and billed for) the Transactions product.
+          items:
+            $ref: '#/components/schemas/AccessToken'
+        employer:
+          $ref: '#/components/schemas/IncomeVerificationPrecheckEmployer'
+        us_military_info:
+          $ref: '#/components/schemas/IncomeVerificationPrecheckMilitaryInfo'
+    CreditPayrollIncomePrecheckResponse:
+      title: CreditPayrollIncomePrecheckResponse
+      additionalProperties: true
+      type: object
+      description: Defines the response schema for `/credit/payroll_income/precheck`.
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+        confidence:
+          $ref: '#/components/schemas/IncomeVerificationPrecheckConfidence'
+      required:
+      - confidence
+      - request_id
+    CreditEmploymentGetRequest:
+      title: CreditEmploymentGetRequest
+      type: object
+      description: CreditEmploymentGetRequest defines the request schema for `/credit/employment/get`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        user_token:
+          $ref: '#/components/schemas/UserToken'
+      required:
+      - user_token
+    CreditEmploymentGetResponse:
+      title: CreditEmploymentGetResponse
+      type: object
+      additionalProperties: true
+      description: CreditEmploymentGetResponse defines the response schema for `/credit/employment/get`.
+      properties:
+        employments:
+          type: array
+          description: A list of employment verification summaries.
+          items:
+            $ref: '#/components/schemas/CreditEmploymentVerification'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - employments
+      - request_id
+    CreditEmploymentVerification:
+      title: CreditEmploymentVerification
+      type: object
+      additionalProperties: true
+      description: The object containing proof of employment data for an individual.
+      properties:
+        status:
+          $ref: '#/components/schemas/CreditEmploymentVerificationStatus'
+        start_date:
+          format: date
+          type: string
+          description: Start of employment in ISO 8601 format (YYYY-MM-DD).
+          nullable: true
+        end_date:
+          format: date
+          type: string
+          description: End of employment, if applicable. Provided in ISO 8601 format (YYY-MM-DD).
+          nullable: true
+        employer:
+          $ref: '#/components/schemas/CreditEmployerVerification'
+        title:
+          type: string
+          description: Current title of employee.
+          nullable: true
+        platform_ids:
+          $ref: '#/components/schemas/CreditPlatformIds'
+      required:
+      - status
+      - start_date
+      - end_date
+      - employer
+      - title
+      - platform_ids
+    CreditEmploymentVerificationStatus:
+      type: string
+      title: CreditEmploymentVerificationStatus
+      description: Current employment status.
+      nullable: true
+      x-override-enum-values-shown:
+      - ACTIVE
+      - INACTIVE
+      - null
+    CreditEmployerVerification:
+      title: CreditEmployerVerification
+      type: object
+      additionalProperties: true
+      description: An object containing employer data.
+      properties:
+        name:
+          type: string
+          description: Name of employer.
+          nullable: true
+      required:
+      - name
+    CreditPlatformIds:
+      title: CreditPlatformIds
+      type: object
+      additionalProperties: true
+      description: The object containing a set of ids related to an employee.
+      properties:
+        employee_id:
+          type: string
+          description: The ID of an employee as given by their employer.
+          nullable: true
+        payroll_id:
+          type: string
+          description: The ID of an employee as given by their payroll.
+          nullable: true
+        position_id:
+          type: string
+          description: The ID of the position of the employee.
+          nullable: true
+      required:
+      - employee_id
+      - payroll_id
+      - position_id
     CreditBankIncomeWarning:
       type: object
       description: The warning associated with the data that was unavailable for the Bank Income Report.
@@ -19294,10 +20632,12 @@ components:
         `IDENTITY_UNAVAILABLE`: Unable to extract identity for the Item
         `TRANSACTIONS_UNAVAILABLE`: Unable to extract transactions for the Item
         `ITEM_UNAPPROVED`: User did not grant permission to share income data for the Item
+        `REPORT_DELETED`: Report deleted due to customer or consumer request
       enum:
       - IDENTITY_UNAVAILABLE
       - TRANSACTIONS_UNAVAILABLE
       - ITEM_UNAPPROVED
+      - REPORT_DELETED
     CreditBankIncomeCause:
       type: object
       description: An error object and associated `item_id` used to identify a specific Item and error when a batch operation operating on multiple Items has encountered an error in one of the Items.
@@ -19362,6 +20702,30 @@ components:
           $ref: '#/components/schemas/RequestID'
       required:
       - request_id
+    SandboxTransferFireWebhookRequest:
+      title: SandboxTransferFireWebhookRequest
+      type: object
+      description: Defines the request schema for `/sandbox/transfer/fire_webhook`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        webhook:
+          type: string
+          description: The URL to which the webhook should be sent.
+      required:
+      - webhook
+    SandboxTransferFireWebhookResponse:
+      title: SandboxTransferFireWebhookResponse
+      additionalProperties: true
+      type: object
+      description: Defines the response schema for `/sandbox/transfer/fire_webhook`
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
     ApplicationID:
       title: ApplicationID
       type: string
@@ -19397,6 +20761,30 @@ components:
           nullable: true
           type: string
           description: A string provided by the connected app stating why they use their respective enabled products.
+        use_case:
+          nullable: true
+          type: string
+          description: A string representing client’s broad use case as assessed by Plaid.
+        company_legal_name:
+          nullable: true
+          type: string
+          description: A string representing the name of client’s legal entity.
+        city:
+          nullable: true
+          type: string
+          description: A string representing the city of the client’s headquarters.
+        region:
+          nullable: true
+          type: string
+          description: A string representing the region of the client’s headquarters.
+        postal_code:
+          nullable: true
+          type: string
+          description: A string representing the postal code of the client’s headquarters.
+        country_code:
+          nullable: true
+          type: string
+          description: A string representing the country code of the client’s headquarters.
       required:
       - application_id
       - join_date
@@ -19404,6 +20792,12 @@ components:
       - logo_url
       - application_url
       - reason_for_access
+      - use_case
+      - company_legal_name
+      - city
+      - region
+      - postal_code
+      - country_code
     ApplicationGetRequest:
       description: ApplicationGetRequest defines the schema for `/application/get`
       type: object
@@ -19544,16 +20938,6 @@ components:
           type: boolean
           nullable: true
           default: true
-    RequestedScopes:
-      type: object
-      description: Scope of required and optional account features or content from a ConnectedApplication.
-      properties:
-        account_filters:
-          $ref: '#/components/schemas/AccountFilter'
-        account_selection_cardinality:
-          $ref: '#/components/schemas/AccountSelectionCardinality'
-      required:
-      - account_selection_cardinality
     ScopesState:
       description: When scopes are updated during enrollment, this field must be populated with the state sent to the partner in the OAuth Login URI. This field is required when the context is `ENROLLMENT`.
       type: string
@@ -19619,12 +21003,6 @@ components:
             $ref: '#/components/schemas/ConnectedApplication'
       required:
       - applications
-    ConnectedApplicationStatus:
-      description: Describes if the connected item is active (i.e. has not been revoked or unlinked)
-      type: string
-      enum:
-      - ACTIVE
-      - INACTIVE
     ConnectedApplication:
       description: Describes the connected application for a particular end user.
       type: object
@@ -19634,11 +21012,6 @@ components:
         name:
           type: string
           description: The name of the application
-        logo:
-          nullable: true
-          type: string
-          description: A URL that links to the application logo image (will be deprecated in the future, please use logo_url).
-          deprecated: true
         logo_url:
           nullable: true
           type: string
@@ -19656,36 +21029,12 @@ components:
           format: date
           description: The date this application was linked in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) (YYYY-MM-DD) format in UTC.
           example: "2020-01-01"
-        join_date:
-          type: string
-          format: date
-          description: The date this application was granted production access at Plaid in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) (YYYY-MM-DD) format in UTC.
-        product_data_types:
-          type: array
-          description: (Deprecated) A list of enums representing the data collected and products enabled for this connected application.
-          items:
-            type: string
-            enum:
-            - ACCOUNT_BALANCE
-            - ACCOUNT_USER_INFO
-            - ACCOUNT_TRANSACTIONS
         scopes:
           $ref: '#/components/schemas/ScopesNullable'
-        requested_scopes:
-          $ref: '#/components/schemas/RequestedScopes'
-        status:
-          $ref: '#/components/schemas/ConnectedApplicationStatus'
       required:
       - application_id
       - name
       - created_at
-      - join_date
-      - logo
-      - logo_url
-      - application_url
-      - reason_for_access
-      - product_data_types
-      - status
     AccountSelectionCardinality:
       type: string
       description: |-
@@ -20133,6 +21482,137 @@ components:
           type: integer
           description: The number of times the account's addresses on file have changed over the past 90 days
           nullable: true
+        plaid_non_oauth_authentication_attempts_count_3d:
+          type: integer
+          description: The number of non-OAuth authentication attempts via Plaid for this bank account over the past 3 days
+          nullable: true
+        plaid_non_oauth_authentication_attempts_count_7d:
+          type: integer
+          description: The number of non-OAuth authentication attempts via Plaid for this bank account over the past 7 days
+          nullable: true
+        plaid_non_oauth_authentication_attempts_count_30d:
+          type: integer
+          description: The number of non-OAuth authentication attempts via Plaid for this bank account over the past 30 days
+          nullable: true
+        failed_plaid_non_oauth_authentication_attempts_count_3d:
+          type: integer
+          description: The number of failed non-OAuth authentication attempts via Plaid for this bank account over the past 3 days
+          nullable: true
+        failed_plaid_non_oauth_authentication_attempts_count_7d:
+          type: integer
+          description: The number of failed non-OAuth authentication attempts via Plaid for this bank account over the past 7 days
+          nullable: true
+        failed_plaid_non_oauth_authentication_attempts_count_30d:
+          type: integer
+          description: The number of failed non-OAuth authentication attempts via Plaid for this bank account over the past 30 days
+          nullable: true
+        debit_transactions_count_10d:
+          type: integer
+          description: The total number of debit (outflow) transactions over the past 10 days from the account that will be debited
+          nullable: true
+        credit_transactions_count_10d:
+          type: integer
+          description: The total number of credit (inflow) transactions over the past 10 days from the account that will be debited
+          nullable: true
+        debit_transactions_count_30d:
+          type: integer
+          description: The total number of debit (outflow) transactions over the past 30 days from the account that will be debited
+          nullable: true
+        credit_transactions_count_30d:
+          type: integer
+          description: The total number of credit (inflow) transactions over the past 30 days from the account that will be debited
+          nullable: true
+        debit_transactions_count_60d:
+          type: integer
+          description: The total number of debit (outflow) transactions over the past 60 days from the account that will be debited
+          nullable: true
+        credit_transactions_count_60d:
+          type: integer
+          description: The total number of credit (inflow) transactions over the past 60 days from the account that will be debited
+          nullable: true
+        debit_transactions_count_90d:
+          type: integer
+          description: The total number of debit (outflow) transactions over the past 90 days from the account that will be debited
+          nullable: true
+        credit_transactions_count_90d:
+          type: integer
+          description: The total number of credit (inflow) transactions over the past 90 days from the account that will be debited
+          nullable: true
+        total_debit_transactions_amount_30d:
+          type: number
+          format: double
+          description: The total debit (outflow) transaction amount over the past 30 days from the account that will be debited
+          nullable: true
+        total_credit_transactions_amount_30d:
+          type: number
+          format: double
+          description: The total credit (inflow) transaction amount over the past 30 days from the account that will be debited
+          nullable: true
+        total_debit_transactions_amount_60d:
+          type: number
+          format: double
+          description: The total debit (outflow) transaction amount over the past 60 days from the account that will be debited
+          nullable: true
+        total_credit_transactions_amount_60d:
+          type: number
+          format: double
+          description: The total credit (inflow) transaction amount over the past 60 days from the account that will be debited
+          nullable: true
+        total_debit_transactions_amount_90d:
+          type: number
+          format: double
+          description: The total debit (outflow) transaction amount over the past 90 days from the account that will be debited
+          nullable: true
+        total_credit_transactions_amount_90d:
+          type: number
+          format: double
+          description: The total credit (inflow) transaction amount over the past 90 days from the account that will be debited
+          nullable: true
+        p50_eod_balance_30d:
+          type: number
+          format: double
+          description: The 50th percentile of the end-of-day available balance over the past 30 days of the account that will be debited
+          nullable: true
+        p50_eod_balance_60d:
+          type: number
+          format: double
+          description: The 50th percentile of the end-of-day available balance over the past 60 days of the account that will be debited
+          nullable: true
+        p50_eod_balance_90d:
+          type: number
+          format: double
+          description: The 50th percentile of the end-of-day available balance over the past 90 days of the account that will be debited
+          nullable: true
+        p50_eod_balance_31d_to_60d:
+          type: number
+          format: double
+          description: The 50th percentile of the end-of-day available balance between day 31 and day 60 over the past 60 days of the account that will be debited
+          nullable: true
+        p50_eod_balance_61d_to_90d:
+          type: number
+          format: double
+          description: The 50th percentile of the end-of-day available balance between day 61 and day 90 over the past 60 days of the account that will be debited
+          nullable: true
+        p90_eod_balance_31d_to_60d:
+          type: number
+          format: double
+          description: The 90th percentile of the end-of-day available balance between day 31 and day 60 over the past 60 days of the account that will be debited
+          nullable: true
+        p90_eod_balance_61d_to_90d:
+          type: number
+          format: double
+          description: The 90th percentile of the end-of-day available balance between day 61 and day 90 over the past 60 days of the account that will be debited
+          nullable: true
+        p10_eod_balance_31d_to_60d:
+          type: number
+          format: double
+          description: The 10th percentile of the end-of-day available balance between day 31 and day 60 over the past 60 days of the account that will be debited
+          nullable: true
+        p10_eod_balance_61d_to_90d:
+          type: number
+          format: double
+          description: The 10th percentile of the end-of-day available balance between day 61 and day 90 over the past 60 days of the account that will be debited
+          nullable: true
     SignalDecisionReportRequest:
       title: SignalDecisionReportRequest
       description: SignalDecisionReportRequest defines the request schema for `/signal/decision/report`
@@ -20264,10 +21744,20 @@ components:
           $ref: '#/components/schemas/WalletBalance'
         request_id:
           $ref: '#/components/schemas/RequestID'
+        numbers:
+          $ref: '#/components/schemas/WalletNumbers'
       required:
       - wallet_id
       - balance
       - request_id
+    WalletNumbers:
+      title: WalletNumbers
+      type: object
+      additionalProperties: true
+      description: An object representing the e-wallet account numbers
+      properties:
+        bacs:
+          $ref: '#/components/schemas/RecipientBACS'
     WalletBalance:
       title: WalletBalance
       type: object
@@ -20599,12 +22089,12 @@ components:
         payment_channel:
           $ref: '#/components/schemas/PaymentChannel'
         category_id:
-          description: The ID of the category to which this transaction belongs. For a full list of categories, see [`/categories/get`](https://plaid.com/docs/api/products/#categoriesget).
+          description: The ID of the category to which this transaction belongs. For a full list of categories, see [`/categories/get`](https://plaid.com/docs/api/products/transactions/#categoriesget).
           type: string
           nullable: true
         category:
           type: array
-          description: A hierarchical array of the categories to which this transaction belongs. For a full list of categories, see [`/categories/get`](https://plaid.com/docs/api/products/#categoriesget).
+          description: A hierarchical array of the categories to which this transaction belongs. For a full list of categories, see [`/categories/get`](https://plaid.com/docs/api/products/transactions/#categoriesget).
           items:
             type: string
         location:
