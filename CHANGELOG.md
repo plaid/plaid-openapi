@@ -1,3 +1,22 @@
+### 2020-09-14_1.97.0
+- Rename some `Credit` refs that were preventing client library generation from completing successfully
+
+### 2020-09-14_1.96.0
+- remove unused `payroll_income_id` from `/credit/payroll_income/get` field
+- add status object to items in `/credit/payroll_income/get` response body
+
+### 2020-09-14_1.95.1
+- Add `TransferEventsUpdateWebhook` schema
+
+### 2020-09-14_1.95.0
+- Add `institution_data` parameter to `/link/token/create`
+
+### 2020-09-14_1.94.2
+- Tidy up YAML
+
+### 2020-09-14_1.94.1
+- Add `highnote` processor to `/processor/token/create`
+
 ### 2020-09-14_1.94.0
 - Add `use_case`, `company_legal_name`, `city`, `region`, `country_code`, `postal_code` as a required response field of `Application`
 
@@ -11,7 +30,7 @@
 
 ### 2020-09-14_1.93.0
 - Add several new fields to `/signal/evaluate` response
-- 
+-
 ### 2020-09-14_1.92.4
 - Add `/sandbox/transfer/fire_webhook` endpoint
 
@@ -32,7 +51,7 @@
 - Add `marqeta` and `solid` as Auth processor partners
 - Fix schema of `cause` parameter for Asset Reports
 - Fix some invalid examples
- 
+
 ### 2020-09-14_1.90.0
 - Add `/credit/employment/get` endpoint
 - Add optional `access_tokens` array to `/credit/payroll_income/precheck` request
