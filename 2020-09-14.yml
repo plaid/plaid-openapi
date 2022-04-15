@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.94.0
+  version: 2020-09-14_1.97.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -5401,7 +5401,10 @@ paths:
             schema:
               $ref: '#/components/schemas/IncomeVerificationPaystubsGetRequest'
         description: ""
-      description: "`/income/verification/paystubs/get` returns the information collected from the paystubs that were used to verify an end user''s income. It can be called once the status of the verification has been set to `VERIFICATION_STATUS_PROCESSING_COMPLETE`, as reported by the `INCOME: verification_status` webhook. Attempting to call the endpoint before verification has been completed will result in an error.\n\nThis endpoint has been deprecated; new integrations should use `/credit/payroll_income/get` instead. "
+      description: |-
+        `/income/verification/paystubs/get` returns the information collected from the paystubs that were used to verify an end user''s income. It can be called once the status of the verification has been set to `VERIFICATION_STATUS_PROCESSING_COMPLETE`, as reported by the `INCOME: verification_status` webhook. Attempting to call the endpoint before verification has been completed will result in an error.
+
+        This endpoint has been deprecated; new integrations should use `/credit/payroll_income/get` instead.
   /income/verification/documents/download:
     post:
       deprecated: true
@@ -5479,7 +5482,10 @@ paths:
       externalDocs:
         url: /api/products/income/#incomeverificationtaxformsget
       operationId: incomeVerificationTaxformsGet
-      description: "`/income/verification/taxforms/get` returns the information collected from forms that were used to verify an end user''s income. It can be called once the status of the verification has been set to `VERIFICATION_STATUS_PROCESSING_COMPLETE`, as reported by the `INCOME: verification_status` webhook. Attempting to call the endpoint before verification has been completed will result in an error.\n\nThis endpoint has been deprecated; new integrations should use `/credit/payroll_income/get` instead. "
+      description: |-
+        `/income/verification/taxforms/get` returns the information collected from forms that were used to verify an end user''s income. It can be called once the status of the verification has been set to `VERIFICATION_STATUS_PROCESSING_COMPLETE`, as reported by the `INCOME: verification_status` webhook. Attempting to call the endpoint before verification has been completed will result in an error.
+
+        This endpoint has been deprecated; new integrations should use `/credit/payroll_income/get` instead.
       responses:
         "200":
           description: OK
@@ -5582,7 +5588,12 @@ paths:
                     request_id: lMjeOeu9X1VUh1F
                     precheck_id: n9elqYlvYm
                     confidence: HIGH
-      description: "`/income/verification/precheck` is an optional endpoint that can be called before initializing a Link session for income verification. It evaluates whether a given user is supportable by digital income verification and returns a `precheck_id` that can be provided to `/link/token/create`. If the user is eligible for digital verification, providing the `precheck_id` in this way will generate a Link UI optimized for the end user and their specific employer. If the user cannot be confirmed as eligible, the `precheck_id` can still be provided to `/link/token/create` and the user can still use the income verification flow, but they may be required to manually upload a paystub to verify their income.\n\nWhile all request fields are optional, providing either `employer` or `transactions_access_tokens` data will increase the chance of receiving a useful result.\n\nThis endpoint has been deprecated; new integrations should use `/credit/payroll_income/precheck` instead. "
+      description: |-
+        `/income/verification/precheck` is an optional endpoint that can be called before initializing a Link session for income verification. It evaluates whether a given user is supportable by digital income verification and returns a `precheck_id` that can be provided to `/link/token/create`. If the user is eligible for digital verification, providing the `precheck_id` in this way will generate a Link UI optimized for the end user and their specific employer. If the user cannot be confirmed as eligible, the `precheck_id` can still be provided to `/link/token/create` and the user can still use the income verification flow, but they may be required to manually upload a paystub to verify their income.
+
+        While all request fields are optional, providing either `employer` or `transactions_access_tokens` data will increase the chance of receiving a useful result.
+
+        This endpoint has been deprecated; new integrations should use `/credit/payroll_income/precheck` instead.
       requestBody:
         required: true
         content:
@@ -5620,7 +5631,10 @@ paths:
                         position_id: "8888"
                         payroll_id: "1234567"
                     request_id: LhQf0THi8SH1yJm
-      description: "`/employment/verification/get` returns a list of employments through a user payroll that was verified by an end user.\n\nThis endpoint has been deprecated; new integrations should use `/credit/employment/get` instead. "
+      description: |-
+        `/employment/verification/get` returns a list of employments through a user payroll that was verified by an end user.
+
+        This endpoint has been deprecated; new integrations should use `/credit/employment/get` instead.
       requestBody:
         required: true
         content:
@@ -5871,7 +5885,6 @@ paths:
               examples:
                 example-1:
                   value:
-                    payroll_income_id: bz666MBjYWTp2PDzzggYhM6oWWmBe
                     items:
                     - item_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBFL9DrE6
                       payroll_income:
@@ -6019,6 +6032,8 @@ paths:
                           tax_year: "2020"
                           third_party_sick_ppay: CHECKED
                           wages_tips_other_comp: "1000"
+                      status:
+                        processing_status: PROCESSING_COMPLETE
                     request_id: 2pxQ59buGdsHRef
   /credit/payroll_income/precheck:
     post:
@@ -6839,6 +6854,8 @@ components:
           $ref: '#/components/schemas/AccessToken'
         secret:
           $ref: '#/components/schemas/APISecret'
+        options:
+          $ref: '#/components/schemas/TransactionsRecurringGetRequestOptions'
         account_ids:
           type: array
           description: |-
@@ -6850,6 +6867,17 @@ components:
       required:
       - access_token
       - account_ids
+    TransactionsRecurringGetRequestOptions:
+      type: object
+      description: An optional object to be used with the request. If specified, `options` must not be `null`.
+      properties:
+        include_personal_finance_category:
+          type: boolean
+          default: false
+          description: |-
+            Include the [`personal_finance_category`](https://plaid.com/docs/api/products/transactions/#transactions-get-response-transactions-personal-finance-category) object for each transaction stream in the response.
+
+            See the [`taxonomy csv file`](https://plaid.com/documents/transactions-personal-finance-category-taxonomy.csv) for a full list of personal finance categories.
     TransactionsRecurringGetResponse:
       type: object
       additionalProperties: true
@@ -9271,6 +9299,7 @@ components:
           - marqeta
           - checkout
           - solid
+          - highnote
           - apex_clearing
           description: The processor you are integrating with.
       required:
@@ -9583,6 +9612,8 @@ components:
         android_package_name:
           type: string
           description: 'The name of your app''s Android package. Required if using the `link_token` to initialize Link on Android. When creating a `link_token` for initializing Link on other platforms, this field must be left blank. Any package name specified here must also be added to the Allowed Android package names setting on the [developer dashboard](https://dashboard.plaid.com/team/api). '
+        institution_data:
+          $ref: '#/components/schemas/LinkTokenCreateInstitutionData'
         account_filters:
           $ref: '#/components/schemas/LinkTokenAccountFilters'
         eu_config:
@@ -9670,6 +9701,13 @@ components:
           description: The optional Auth flow to use. Currently only used to enable Flexible Auth.
       required:
       - flow_type
+    LinkTokenCreateInstitutionData:
+      type: object
+      description: A map containing data used to highlight institutions in Link.
+      properties:
+        routing_number:
+          type: string
+          description: The routing number of the bank to highlight.
     LinkTokenCreateRequestUser:
       type: object
       description: An object specifying information about the end user who will be linking their account.
@@ -9817,6 +9855,8 @@ components:
           type: string
           nullable: true
           description: The `language` specified in the `/link/token/create` call.
+        institution_data:
+          $ref: '#/components/schemas/LinkTokenCreateInstitutionData'
         account_filters:
           $ref: '#/components/schemas/AccountFiltersResponse'
         redirect_uri:
@@ -10807,6 +10847,8 @@ components:
           description: Indicates whether the transaction stream is still live.
         status:
           $ref: '#/components/schemas/TransactionStreamStatus'
+        personal_finance_category:
+          $ref: '#/components/schemas/PersonalFinanceCategory'
       required:
       - account_id
       - stream_id
@@ -13328,6 +13370,25 @@ components:
         webhook_code:
           type: string
           description: '`BANK_TRANSFERS_EVENTS_UPDATE`'
+      required:
+      - webhook_type
+      - webhook_code
+    TransferEventsUpdateWebhook:
+      title: TransferEventsUpdateWebhook
+      type: object
+      additionalProperties: true
+      description: Fired when new transfer events are available. Receiving this webhook indicates you should fetch the new events from `/transfer/event/sync`.
+      x-examples:
+        example-1:
+          webhook_type: TRANSFER
+          webhook_code: TRANSFER_EVENTS_UPDATE
+      properties:
+        webhook_type:
+          type: string
+          description: '`TRANSFER`'
+        webhook_code:
+          type: string
+          description: '`TRANSFER_EVENTS_UPDATE`'
       required:
       - webhook_type
       - webhook_code
@@ -19712,9 +19773,6 @@ components:
       additionalProperties: true
       description: Defines the response body for `/credit/payroll_income/get`.
       properties:
-        payroll_income_id:
-          type: string
-          description: The unique identifier associated with the payroll income response.
         items:
           description: Array of payroll items.
           type: array
@@ -19796,9 +19854,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PayrollIncomeObject'
+        status:
+          $ref: '#/components/schemas/PayrollItemStatus'
       required:
       - item_id
       - payroll_income
+      - status
     PayrollIncomeObject:
       title: PayrollIncomeObject
       type: object
@@ -19813,7 +19874,7 @@ components:
           description: Array of pay stubs for the user.
           type: array
           items:
-            $ref: '#/components/schemas/PayStub'
+            $ref: '#/components/schemas/CreditPayStub'
         w2s:
           description: Array of tax form W-2s.
           type: array
@@ -19823,14 +19884,14 @@ components:
       - account_id
       - pay_stubs
       - w2s
-    PayStub:
-      title: PayStub
+    CreditPayStub:
+      title: CreditPayStub
       type: object
       additionalProperties: true
       description: An object representing an end user's pay stub.
       properties:
         deductions:
-          $ref: '#/components/schemas/PayStubDeductions'
+          $ref: '#/components/schemas/CreditPayStubDeductions'
         document_id:
           type: string
           description: An identifier of the document referenced by the document metadata.
@@ -19838,17 +19899,17 @@ components:
         document_metadata:
           $ref: '#/components/schemas/CreditDocumentMetadata'
         earnings:
-          $ref: '#/components/schemas/PayStubEarnings'
+          $ref: '#/components/schemas/CreditPayStubEarnings'
         employee:
-          $ref: '#/components/schemas/PayStubEmployee'
+          $ref: '#/components/schemas/CreditPayStubEmployee'
         employer:
-          $ref: '#/components/schemas/PayStubEmployer'
+          $ref: '#/components/schemas/CreditPayStubEmployer'
         net_pay:
-          $ref: '#/components/schemas/PayStubNetPay'
+          $ref: '#/components/schemas/CreditPayStubNetPay'
         pay_period_details:
           $ref: '#/components/schemas/PayStubPayPeriodDetails'
         verification:
-          $ref: '#/components/schemas/PayStubVerification'
+          $ref: '#/components/schemas/CreditPayStubVerification'
       required:
       - deductions
       - document_id
@@ -19859,8 +19920,8 @@ components:
       - net_pay
       - pay_period_details
       - verification
-    PayStubDeductions:
-      title: PayStubDeductions
+    CreditPayStubDeductions:
+      title: CreditPayStubDeductions
       type: object
       description: An object with the deduction information found on a pay stub.
       additionalProperties: true
@@ -19943,8 +20004,8 @@ components:
       - iso_currency_code
       - unofficial_currency_code
       - ytd_amount
-    PayStubEarnings:
-      title: PayStubEarnings
+    CreditPayStubEarnings:
+      title: CreditPayStubEarnings
       type: object
       description: An object representing both a breakdown of earnings on a pay stub and the total earnings.
       additionalProperties: true
@@ -20061,14 +20122,14 @@ components:
       - iso_currency_code
       - unofficial_currency_code
       - ytd_amount
-    PayStubEmployee:
-      title: PayStubEmployee
+    CreditPayStubEmployee:
+      title: CreditPayStubEmployee
       type: object
       additionalProperties: true
       description: Data about the employee.
       properties:
         address:
-          $ref: '#/components/schemas/PayStubAddress'
+          $ref: '#/components/schemas/CreditPayStubAddress'
         name:
           type: string
           description: The name of the employee.
@@ -20088,8 +20149,8 @@ components:
       - address
       - marital_status
       - taxpayer_id
-    PayStubAddress:
-      title: PayStubAddress
+    CreditPayStubAddress:
+      title: CreditPayStubAddress
       description: Address on the pay stub.
       type: object
       additionalProperties: true
@@ -20139,14 +20200,14 @@ components:
       required:
       - id_type
       - id_mask
-    PayStubEmployer:
-      title: PayStubEmployer
+    CreditPayStubEmployer:
+      title: CreditPayStubEmployer
       description: Information about the employer on the pay stub.
       type: object
       additionalProperties: true
       properties:
         address:
-          $ref: '#/components/schemas/PayStubAddress'
+          $ref: '#/components/schemas/CreditPayStubAddress'
         name:
           type: string
           description: The name of the employer on the pay stub.
@@ -20154,8 +20215,8 @@ components:
       required:
       - address
       - name
-    PayStubNetPay:
-      title: PayStubNetPay
+    CreditPayStubNetPay:
+      title: CreditPayStubNetPay
       type: object
       description: An object representing information about the net pay amount on the pay stub.
       additionalProperties: true
@@ -20304,15 +20365,15 @@ components:
       - mask
       - type
       - unofficial_currency_code
-    PayStubVerification:
-      title: PayStubVerification
+    CreditPayStubVerification:
+      title: CreditPayStubVerification
       description: An object containing details on the paystub's verification status. This object will only be populated if the [`income_verification.access_tokens`](/docs/api/tokens/#link-token-create-request-income-verification-access-tokens) parameter was provided during the `/link/token/create` call or if a problem was detected with the information supplied by the user; otherwise it will be `null`.
       type: object
       additionalProperties: true
       nullable: true
       properties:
         verification_status:
-          $ref: '#/components/schemas/PayStubVerificationStatus'
+          $ref: '#/components/schemas/CreditPayStubVerificationStatus'
         verification_attributes:
           type: array
           items:
@@ -20320,9 +20381,9 @@ components:
       required:
       - verification_status
       - verification_attributes
-    PayStubVerificationStatus:
+    CreditPayStubVerificationStatus:
       type: string
-      title: PayStubVerificationStatus
+      title: CreditPayStubVerificationStatus
       description: Derived verification status.
       nullable: true
       x-override-enum-values-shown:
@@ -20357,6 +20418,44 @@ components:
           - null
       required:
       - type
+    PayrollItemStatus:
+      title: PayrollItemStatus
+      description: Details about the status of the payroll item.
+      type: object
+      additionalProperties: true
+      nullable: true
+      properties:
+        processing_status:
+          title: PayrollItemStatusProcessingStatus
+          type: string
+          description: |-
+            Denotes the processing status for the verification.
+
+            `UNKNOWN`: The processing status could not be determined.
+
+            `PROCESSING_COMPLETE`: The processing has completed and the data is available to be retrieved.
+
+            `PROCESSING`: The verification is still processing. The data is not available yet.
+
+            `UPLOADED`: The user uploaded a document. The document has not yet begun processing.
+
+            `CREATED`: The verification has been created but no data is associated with it yet.
+
+            `FAILED`: The processing failed to complete successfully.
+
+            `APPROVAL_STATUS_PENDING`: The user has not yet approved the sharing of the data.
+
+            `APPROVAL_STATUS_APPROVED`: The user has approved the sharing of the data.
+          nullable: true
+          x-override-enum-values-shown:
+          - UNKNOWN
+          - PROCESSING_COMPLETE
+          - PROCESSING
+          - UPLOADED
+          - CREATED
+          - FAILED
+          - APPROVAL_STATUS_APPROVED
+          - APPROVAL_STATUS_PENDING
     CreditW2:
       title: CreditW2
       type: object
@@ -20369,9 +20468,9 @@ components:
           type: string
           description: An identifier of the document referenced by the document metadata.
         employer:
-          $ref: '#/components/schemas/PayStubEmployer'
+          $ref: '#/components/schemas/CreditPayStubEmployer'
         employee:
-          $ref: '#/components/schemas/PayStubEmployee'
+          $ref: '#/components/schemas/CreditPayStubEmployee'
         tax_year:
           type: string
           description: The tax year of the W2 document.
