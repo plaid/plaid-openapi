@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.97.0
+  version: 2020-09-14_1.105.1
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -420,6 +420,47 @@ paths:
             schema:
               $ref: '#/components/schemas/TransactionsRecurringGetRequest'
             examples: {}
+  /transactions/recurring/deactivate:
+    post:
+      tags:
+      - plaid
+      summary: Deactivate recurring transactions product for Item
+      externalDocs:
+        url: /api/products/transactions/#transactionsrecurringdeactivate
+      operationId: transactionsRecurringDeactivate
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionsRecurringDeactivateResponse'
+              examples:
+                example-1:
+                  value:
+                    message: string
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Error response
+      description: |-
+        The `/transactions/recurring/deactivate` endpoint returns returns a message indicating the success in removing the product from the Item or returns an error.
+
+        The product is currently in beta. To request access, contact transactions-feedback@plaid.com.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionsRecurringDeactivateRequest'
+            examples:
+              example-1:
+                value:
+                  client_id: string
+                  secret: string
+                  access_token: string
   /transactions/sync:
     post:
       tags:
@@ -5860,6 +5901,32 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreditBankIncomeGetRequest'
+  /credit/bank_income/refresh:
+    post:
+      summary: Refresh a user's bank income information
+      tags:
+      - plaid
+      externalDocs:
+        url: /api/products/income/#creditbank_incomerefresh
+      operationId: creditBankIncomeRefresh
+      description: '`/credit/bank_income/refresh` refreshes the bank income report data for a specific user.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditBankIncomeRefreshRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditBankIncomeRefreshResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: LhQf0THi8SH1yJm
   /credit/payroll_income/get:
     post:
       summary: Retrieve a user's payroll information
@@ -5987,6 +6054,7 @@ paths:
                           dependent_care_benefits: "1000"
                           document_metadata:
                             document_type: US_TAX_W2
+                            download_url: null
                             name: w_2.pdf
                             status: PROCESSING_COMPLETE
                           document_id: 1pkflebk4
@@ -6010,7 +6078,7 @@ paths:
                               region: NY
                               street: 456 Main St
                             name: Acme Inc
-                          employee_id_number: 12-1234567
+                          employer_id_number: 12-1234567
                           federal_income_tax_withheld: "1000"
                           medicare_tax_withheld: "1000"
                           medicare_wages_and_tips: "1000"
@@ -6030,7 +6098,7 @@ paths:
                             state_wages_tips: "200"
                           statutory_employee: CHECKED
                           tax_year: "2020"
-                          third_party_sick_ppay: CHECKED
+                          third_party_sick_pay: CHECKED
                           wages_tips_other_comp: "1000"
                       status:
                         processing_status: PROCESSING_COMPLETE
@@ -6083,25 +6151,61 @@ paths:
               examples:
                 example-1:
                   value:
-                    employments:
-                    - status: ACTIVE
-                      start_date: "2020-01-01"
-                      end_date: null
-                      employer:
-                        name: Plaid Inc
-                      title: Software Engineer
-                      platform_ids:
-                        employee_id: "1234567"
-                        position_id: "8888"
-                        payroll_id: "1234567"
+                    items:
+                    - item_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBFL9DrE6
+                      employments:
+                      - account_id: GeooLPBGDEunl54q7N3ZcyD5aLPLEai1nkzM9
+                        status: ACTIVE
+                        start_date: "2020-01-01"
+                        end_date: null
+                        employer:
+                          name: Plaid Inc
+                        title: Software Engineer
+                        platform_ids:
+                          employee_id: "1234567"
+                          position_id: "8888"
+                          payroll_id: "1234567"
                     request_id: LhQf0THi8SH1yJm
-      description: '`/credit/employment/get` returns a list of employments through a user payroll that was verified by an end user.'
+      description: '`/credit/employment/get` returns a list of items with employment information from a user''s payroll provider that was verified by an end user.'
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/CreditEmploymentGetRequest'
+  /credit/payroll_income/refresh:
+    post:
+      tags:
+      - plaid
+      summary: Refresh a digital payroll income verification
+      externalDocs:
+        url: /api/products/income/#creditpayroll_incomerefresh
+      operationId: creditPayrollIncomeRefresh
+      description: '`/credit/payroll_income/refresh` refreshes a given digital payroll income verification.'
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditPayrollIncomeRefreshResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: nTkbCH41HYmpbm5
+                    verification_refresh_status: USER_PRESENCE_REQUIRED
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditPayrollIncomeRefreshRequest'
   /sandbox/bank_transfer/fire_webhook:
     post:
       summary: Manually fire a Bank Transfer webhook
@@ -6304,6 +6408,38 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SignalReturnReportRequest'
+  /signal/prepare:
+    post:
+      tags:
+      - plaid
+      summary: Prepare the Signal product before calling `/signal/evaluate`
+      externalDocs:
+        url: /signal/reference#signalprepare
+      operationId: signalPrepare
+      description: Call `/signal/prepare` with Plaid-linked bank account information at least 10 seconds before calling `/signal/evaluate` or as soon as an end-user enters the ACH deposit flow in your application.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignalPrepareResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: mdqfuVxeoza6mhu
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignalPrepareRequest'
   /wallet/get:
     post:
       tags:
@@ -7019,8 +7155,26 @@ components:
           minimum: 1
           maximum: 500
           exclusiveMinimum: false
+        options:
+          $ref: '#/components/schemas/TransactionsSyncRequestOptions'
       required:
       - access_token
+    TransactionsSyncRequestOptions:
+      type: object
+      description: An optional object to be used with the request. If specified, `options` must not be `null`.
+      properties:
+        include_original_description:
+          type: boolean
+          default: false
+          description: Include the raw unparsed transaction description from the financial institution. This field is disabled by default. If you need this information in addition to the parsed data provided, contact your Plaid Account Manager.
+          nullable: true
+        include_personal_finance_category:
+          type: boolean
+          default: false
+          description: |-
+            Include the [`personal_finance_category`](https://plaid.com/docs/api/products/transactions/#transactions-sync-response-transactions-personal-finance-category) object in the response.
+
+            See the [`taxonomy csv file`](https://plaid.com/documents/transactions-personal-finance-category-taxonomy.csv) for a full list of personal finance categories.
     TransactionsSyncResponse:
       type: object
       additionalProperties: true
@@ -7056,6 +7210,30 @@ components:
       - next_cursor
       - has_more
       - request_id
+    TransactionsRecurringDeactivateRequest:
+      type: object
+      description: TransactionsRecurringDeactivateRequest defines the request schema for `/transactions/recurring/deactivate`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+      required:
+      - client_id
+      - access_token
+      - secret
+    TransactionsRecurringDeactivateResponse:
+      type: object
+      additionalProperties: true
+      description: TransactionsRecurringDeactivateResponse defines the response schema for `/transactions/recurring/deactivate`
+      properties:
+        message:
+          type: string
+          description: Message indicating that the deactivation of the product was successful.
+      required:
+      - message
     InstitutionsGetRequest:
       type: object
       description: InstitutionsGetRequest defines the request schema for `/institutions/get`
@@ -7471,6 +7649,8 @@ components:
           - transfer
         options:
           $ref: '#/components/schemas/SandboxPublicTokenCreateRequestOptions'
+        user_token:
+          $ref: '#/components/schemas/UserToken'
       required:
       - institution_id
       - initial_products
@@ -9301,6 +9481,7 @@ components:
           - solid
           - highnote
           - apex_clearing
+          - gusto
           description: The processor you are integrating with.
       required:
       - access_token
@@ -9911,13 +10092,13 @@ components:
         error:
           $ref: '#/components/schemas/Error'
         available_products:
-          description: A list of products available for the Item that have not yet been accessed.
+          description: A list of products available for the Item that have not yet been accessed. The contents of this array will be mutually exclusive with `billed_products`.
           type: array
           items:
             $ref: '#/components/schemas/Products'
         billed_products:
           description: |
-            A list of products that have been billed for the Item. Note - `billed_products` is populated in all environments but only requests in Production are billed.
+            A list of products that have been billed for the Item. The contents of this array will be mutually exclusive with `available_products`. Note - `billed_products` is populated in all environments but only requests in Production are billed. Also note that products that are billed on a pay-per-call basis rather than a pay-per-Item basis, such as `balance`, will not appear here.
           type: array
           items:
             $ref: '#/components/schemas/Products'
@@ -10998,10 +11179,6 @@ components:
             $ref: '#/components/schemas/HealthIncident'
       required:
       - item_logins
-      - transactions_updates
-      - auth
-      - identity
-      - investments_updates
       description: |
         The status of an institution is determined by the health of its Item logins, Transactions updates, Investments updates, Liabilities updates, Auth requests, Balance requests, Identity requests, Investments requests, and Liabilities requests. A login attempt is conducted during the initial Item add in Link. If there is not enough traffic to accurately calculate an institution's status, Plaid will return null rather than potentially inaccurate data.
 
@@ -12273,7 +12450,7 @@ components:
       title: PaymentInitiationAddress
       type: object
       additionalProperties: true
-      description: The optional address of the payment recipient. This object is not currently required to make payments from UK institutions and should not be populated, though may be necessary for future European expansion.
+      description: The optional address of the payment recipient.
       nullable: true
       properties:
         street:
@@ -17073,8 +17250,6 @@ components:
           type: string
           description: The currency of the transfer amount, e.g. "USD"
       required:
-      - client_id
-      - secret
       - mode
       - amount
       - description
@@ -17168,8 +17343,6 @@ components:
           type: string
           description: Plaid's unique identifier for a transfer intent object.
       required:
-      - client_id
-      - secret
       - transfer_intent_id
     TransferIntentAuthorizationDecision:
       type: string
@@ -18163,6 +18336,19 @@ components:
       - VERIFICATION_REFRESH_STATUS_USER_PRESENCE_REQUIRED
       - VERIFICATION_REFRESH_SUCCESSFUL
       - VERIFICATION_REFRESH_NOT_FOUND
+    CreditPayrollIncomeRefreshStatus:
+      type: string
+      title: CreditPayrollIncomeRefreshStatus
+      description: |-
+        The verification refresh status. One of the following:
+
+        `"USER_PRESENCE_REQUIRED"` User presence is required to refresh an income verification.
+        `"SUCCESSFUL"` The income verification refresh was successful.
+        `"NOT_FOUND"` No new data was found after the income verification refresh.
+      x-override-enum-values-shown:
+      - USER_PRESENCE_REQUIRED
+      - SUCCESSFUL
+      - NOT_FOUND
     IncomeVerificationPaystubsGetRequest:
       title: IncomeVerificationPaystubsGetRequest
       type: object
@@ -19756,6 +19942,43 @@ components:
           $ref: '#/components/schemas/CreditIsoCurrencyCode'
         unofficial_currency_code:
           $ref: '#/components/schemas/CreditUnofficialCurrencyCode'
+    CreditBankIncomeRefreshRequest:
+      title: CreditBankIncomeRefreshRequest
+      type: object
+      description: CreditBankIncomeRefreshRequest defines the request schema for `/credit/bank_income/refresh`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        user_token:
+          $ref: '#/components/schemas/UserToken'
+        options:
+          $ref: '#/components/schemas/CreditBankIncomeRefreshRequestOptions'
+      required:
+      - client_id
+      - secret
+      - user_token
+    CreditBankIncomeRefreshRequestOptions:
+      description: An optional object for `/credit/bank_income/refresh` request options.
+      type: object
+      properties:
+        days_requested:
+          type: integer
+          description: How many days of data to include in the refresh. If not specified, this will default to the days requested in the most recently generated bank income report for the user.
+        webhook:
+          type: string
+          description: The URL where Plaid will send the bank income webhook.
+    CreditBankIncomeRefreshResponse:
+      title: CreditBankIncomeRefreshResponse
+      type: object
+      additionalProperties: true
+      description: CreditBankIncomeRefreshResponse defines the response schema for `/credit/bank_income/refresh`.
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
     CreditPayrollIncomeGetRequest:
       title: CreditPayrollIncomeGetRequest
       type: object
@@ -20604,6 +20827,30 @@ components:
       required:
       - confidence
       - request_id
+    CreditPayrollIncomeRefreshRequest:
+      title: CreditPayrollIncomeRefreshRequest
+      type: object
+      description: CreditPayrollIncomeRefreshRequest defines the request schema for `/credit/payroll_income/refresh`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        user_token:
+          $ref: '#/components/schemas/UserToken'
+    CreditPayrollIncomeRefreshResponse:
+      title: CreditPayrollIncomeRefreshResponse
+      type: object
+      additionalProperties: true
+      description: CreditPayrollIncomeRefreshResponse defines the response schema for `/credit/payroll_income/refresh`
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+        verification_refresh_status:
+          $ref: '#/components/schemas/CreditPayrollIncomeRefreshStatus'
+      required:
+      - request_id
+      - verification_refresh_status
     CreditEmploymentGetRequest:
       title: CreditEmploymentGetRequest
       type: object
@@ -20616,6 +20863,8 @@ components:
         user_token:
           $ref: '#/components/schemas/UserToken'
       required:
+      - client_id
+      - secret
       - user_token
     CreditEmploymentGetResponse:
       title: CreditEmploymentGetResponse
@@ -20623,22 +20872,41 @@ components:
       additionalProperties: true
       description: CreditEmploymentGetResponse defines the response schema for `/credit/employment/get`.
       properties:
-        employments:
+        items:
+          description: Array of employment items.
           type: array
-          description: A list of employment verification summaries.
           items:
-            $ref: '#/components/schemas/CreditEmploymentVerification'
+            $ref: '#/components/schemas/CreditEmploymentItem'
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
-      - employments
+      - items
       - request_id
+    CreditEmploymentItem:
+      title: CreditEmploymentItem
+      type: object
+      additionalProperties: true
+      description: The object containing employment items.
+      properties:
+        item_id:
+          $ref: '#/components/schemas/ItemId'
+        employments:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreditEmploymentVerification'
+      required:
+      - item_id
+      - employments
     CreditEmploymentVerification:
       title: CreditEmploymentVerification
       type: object
       additionalProperties: true
       description: The object containing proof of employment data for an individual.
       properties:
+        account_id:
+          type: string
+          description: ID of the payroll provider account.
+          nullable: true
         status:
           $ref: '#/components/schemas/CreditEmploymentVerificationStatus'
         start_date:
@@ -20660,6 +20928,7 @@ components:
         platform_ids:
           $ref: '#/components/schemas/CreditPlatformIds'
       required:
+      - account_id
       - status
       - start_date
       - end_date
@@ -21770,6 +22039,29 @@ components:
     SignalReturnReportResponse:
       title: SignalReturnReportResponse
       description: SignalReturnReportResponse defines the response schema for `/signal/return/report`
+      additionalProperties: true
+      type: object
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
+    SignalPrepareRequest:
+      title: SignalPrepareRequest
+      description: SignalPrepareRequest defines the request schema for `/signal/prepare`
+      type: object
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+      required:
+      - access_token
+    SignalPrepareResponse:
+      title: SignalPrepareResponse
+      description: SignalPrepareResponse defines the response schema for `/signal/prepare`
       additionalProperties: true
       type: object
       properties:
