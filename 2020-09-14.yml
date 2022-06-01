@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.115.2
+  version: 2020-09-14_1.121.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -1529,7 +1529,6 @@ paths:
         required: true
       externalDocs:
         url: /api/products/monitor/dashboard_userget
-    x-private-visibility: false
   /dashboard_user/list:
     post:
       summary: List dashboard users
@@ -1562,13 +1561,12 @@ paths:
         required: true
       externalDocs:
         url: /api/products/monitor/#dashboard_userlist
-    x-private-visibility: false
   /identity_verification/create:
     post:
       summary: Create a new identity verification
       description: |
         Create a new Identity Verification for the user specified by the `client_user_id` field. The requirements and behavior of the verification are determined by the `template_id` provided.
-        If you don't know whether the associated user already has an active Identity Verification, you can specify `"idempotent": true` in the request body. With idempotency enabled, a new Identity Verification will only be created if one does not already exist for the associated `client_user_id` and `template_id`. If an Identity Verification is found, it will be returned unmodified with an `200 OK` HTTP status code.
+        If you don't know whether the associated user already has an active Identity Verification, you can specify `"is_idempotent": true` in the request body. With idempotency enabled, a new Identity Verification will only be created if one does not already exist for the associated `client_user_id` and `template_id`. If an Identity Verification is found, it will be returned unmodified with an `200 OK` HTTP status code.
       tags:
       - plaid
       responses:
@@ -1666,7 +1664,6 @@ paths:
         required: true
       externalDocs:
         url: /api/products/identity-verification/identity_verificationcreate
-    x-private-visibility: false
   /identity_verification/get:
     post:
       summary: Retrieve Identity Verification
@@ -1768,7 +1765,6 @@ paths:
         required: true
       externalDocs:
         url: /api/products/identity-verification/identity_verificationget
-    x-private-visibility: false
   /identity_verification/list:
     post:
       summary: List Identity Verifications
@@ -1873,7 +1869,6 @@ paths:
         required: true
       externalDocs:
         url: /api/products/monitor/dashboard_userget
-    x-private-visibility: false
   /identity_verification/retry:
     post:
       summary: Retry an Identity Verification
@@ -1975,7 +1970,6 @@ paths:
       description: Allow a customer to retry their identity verification
       externalDocs:
         url: /api/products/identity-verification/identity_verificationretry
-    x-private-visibility: false
   /watchlist_screening/entity/create:
     post:
       summary: Create a watchlist screening for an entity
@@ -1994,7 +1988,7 @@ paths:
                     search_terms:
                       entity_watchlist_program_id: entprg_2eRPsDnL66rZ7H
                       legal_name: Al-Qaida
-                      document: C31195855
+                      document_number: C31195855
                       email_address: user@example.com
                       country: US
                       phone_number: "+14025671234"
@@ -2018,7 +2012,6 @@ paths:
         required: true
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningentitycreate
-    x-private-visibility: false
   /watchlist_screening/entity/get:
     post:
       summary: Get an entity screening
@@ -2038,7 +2031,7 @@ paths:
                     search_terms:
                       entity_watchlist_program_id: entprg_2eRPsDnL66rZ7H
                       legal_name: Al-Qaida
-                      document: C31195855
+                      document_number: C31195855
                       email_address: user@example.com
                       country: US
                       phone_number: "+14025671234"
@@ -2061,7 +2054,6 @@ paths:
         required: true
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningentityget
-    x-private-visibility: false
   /watchlist_screening/entity/history/list:
     post:
       summary: List history for entity watchlist screenings
@@ -2082,7 +2074,7 @@ paths:
                       search_terms:
                         entity_watchlist_program_id: entprg_2eRPsDnL66rZ7H
                         legal_name: Al-Qaida
-                        document: C31195855
+                        document_number: C31195855
                         email_address: user@example.com
                         country: US
                         phone_number: "+14025671234"
@@ -2107,7 +2099,6 @@ paths:
         required: true
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningentityhistorylist
-    x-private-visibility: false
   /watchlist_screening/entity/hit/list:
     post:
       summary: List hits for entity watchlist screenings
@@ -2129,7 +2120,7 @@ paths:
                       first_active: "2020-07-24T03:26:02Z"
                       inactive_since: "2020-07-24T03:26:02Z"
                       historical_since: "2020-07-24T03:26:02Z"
-                      entity_list_code: EU_CON
+                      list_code: EU_CON
                       plaid_uid: uid_3NggckTimGSJHS
                       source_uid: 26192ABC
                       analysis:
@@ -2146,7 +2137,7 @@ paths:
                             summary: match
                           data:
                             type: swift
-                            value: C31195855
+                            number: C31195855
                         email_addresses:
                         - analysis:
                             summary: match
@@ -2163,7 +2154,7 @@ paths:
                             summary: match
                           data:
                             full: Al Qaida
-                            primary: false
+                            is_primary: false
                             weak_alias_determination: none
                         phone_numbers:
                         - analysis:
@@ -2188,7 +2179,6 @@ paths:
         required: true
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningentityhitlist
-    x-private-visibility: false
   /watchlist_screening/entity/list:
     post:
       summary: List entity watchlist screenings
@@ -2207,7 +2197,7 @@ paths:
                       search_terms:
                         entity_watchlist_program_id: entprg_2eRPsDnL66rZ7H
                         legal_name: Al-Qaida
-                        document: C31195855
+                        document_number: C31195855
                         email_address: user@example.com
                         country: US
                         phone_number: "+14025671234"
@@ -2234,7 +2224,6 @@ paths:
         required: true
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningentitylist
-    x-private-visibility: false
   /watchlist_screening/entity/program/get:
     post:
       summary: Get entity watchlist screening program
@@ -2252,7 +2241,7 @@ paths:
                   value:
                     id: entprg_2eRPsDnL66rZ7H
                     created_at: "2020-07-24T03:26:02Z"
-                    enabled: true
+                    is_rescanning_enabled: true
                     lists_enabled:
                     - EU_CON
                     name: Sample Program
@@ -2261,7 +2250,7 @@ paths:
                       source: dashboard
                       dashboard_user_id: usr_1SUuwqBdK75GKi
                       timestamp: "2020-07-24T03:26:02Z"
-                    archived: false
+                    is_archived: false
       operationId: watchlistScreeningEntityProgramGet
       description: Get an entity watchlist screening program
       requestBody:
@@ -2272,7 +2261,6 @@ paths:
         required: true
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningentityprogramget
-    x-private-visibility: false
   /watchlist_screening/entity/program/list:
     post:
       summary: List entity watchlist screening programs
@@ -2289,7 +2277,7 @@ paths:
                     entity_watchlist_programs:
                     - id: entprg_2eRPsDnL66rZ7H
                       created_at: "2020-07-24T03:26:02Z"
-                      enabled: true
+                      is_rescanning_enabled: true
                       lists_enabled:
                       - EU_CON
                       name: Sample Program
@@ -2298,7 +2286,7 @@ paths:
                         source: dashboard
                         dashboard_user_id: usr_1SUuwqBdK75GKi
                         timestamp: "2020-07-24T03:26:02Z"
-                      archived: false
+                      is_archived: false
                     next_cursor: eyJkaXJlY3Rpb24iOiJuZXh0Iiwib2Zmc2V0IjoiMTU5NDM
                     request_id: saKrIBuEB9qJZng
       operationId: watchlistScreeningEntityProgramList
@@ -2313,7 +2301,6 @@ paths:
         required: true
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningentityprogramlist
-    x-private-visibility: false
   /watchlist_screening/entity/review/create:
     post:
       summary: Create a review for an entity watchlist screening
@@ -2349,7 +2336,6 @@ paths:
       - plaid
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningentityreviewcreate
-    x-private-visibility: false
   /watchlist_screening/entity/review/list:
     post:
       summary: List reviews for entity watchlist screenings
@@ -2388,7 +2374,6 @@ paths:
         required: true
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningentityreviewlist
-    x-private-visibility: false
   /watchlist_screening/entity/update:
     post:
       summary: Update an entity screening
@@ -2407,7 +2392,7 @@ paths:
                     search_terms:
                       entity_watchlist_program_id: entprg_2eRPsDnL66rZ7H
                       legal_name: Al-Qaida
-                      document: C31195855
+                      document_number: C31195855
                       email_address: user@example.com
                       country: US
                       phone_number: "+14025671234"
@@ -2432,7 +2417,6 @@ paths:
         required: true
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningentityupdate
-    x-private-visibility: false
   /watchlist_screening/individual/create:
     post:
       summary: Create a watchlist screening for a person
@@ -2452,7 +2436,7 @@ paths:
                       watchlist_program_id: prg_2eRPsDnL66rZ7H
                       legal_name: Aleksey Potemkin
                       date_of_birth: "1990-05-29"
-                      document: C31195855
+                      document_number: C31195855
                       country: US
                       version: 1
                     assignee: usr_1SUuwqBdK75GKi
@@ -2473,7 +2457,6 @@ paths:
         required: true
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningindividualcreate
-    x-private-visibility: false
   /watchlist_screening/individual/get:
     post:
       summary: Retrieve an individual watchlist screening
@@ -2494,7 +2477,7 @@ paths:
                       watchlist_program_id: prg_2eRPsDnL66rZ7H
                       legal_name: Aleksey Potemkin
                       date_of_birth: "1990-05-29"
-                      document: C31195855
+                      document_number: C31195855
                       country: US
                       version: 1
                     assignee: usr_1SUuwqBdK75GKi
@@ -2514,7 +2497,6 @@ paths:
         required: true
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningindividualget
-    x-private-visibility: false
   /watchlist_screening/individual/history/list:
     post:
       summary: List history for individual watchlist screenings
@@ -2536,7 +2518,7 @@ paths:
                         watchlist_program_id: prg_2eRPsDnL66rZ7H
                         legal_name: Aleksey Potemkin
                         date_of_birth: "1990-05-29"
-                        document: C31195855
+                        document_number: C31195855
                         country: US
                         version: 1
                       assignee: usr_1SUuwqBdK75GKi
@@ -2557,8 +2539,7 @@ paths:
               $ref: '#/components/schemas/ListWatchlistScreeningIndividualHistoryRequest'
         required: true
       externalDocs:
-        url: /api/products/monitor/#watchlist_screeninghistorylist
-    x-private-visibility: false
+        url: /api/products/monitor/#watchlist_screeningindividualhistorylist
   /watchlist_screening/individual/hit/list:
     post:
       summary: List hits for individual watchlist screening
@@ -2601,7 +2582,7 @@ paths:
                             summary: match
                           data:
                             type: passport
-                            value: C31195855
+                            number: C31195855
                         locations:
                         - analysis:
                             summary: match
@@ -2613,7 +2594,7 @@ paths:
                             summary: match
                           data:
                             full: Aleksey Potemkin
-                            primary: false
+                            is_primary: false
                             weak_alias_determination: none
                     next_cursor: eyJkaXJlY3Rpb24iOiJuZXh0Iiwib2Zmc2V0IjoiMTU5NDM
                     request_id: saKrIBuEB9qJZng
@@ -2627,7 +2608,6 @@ paths:
         required: true
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningindividualhitlist
-    x-private-visibility: false
   /watchlist_screening/individual/list:
     post:
       summary: List Individual Watchlist Screenings
@@ -2647,7 +2627,7 @@ paths:
                         watchlist_program_id: prg_2eRPsDnL66rZ7H
                         legal_name: Aleksey Potemkin
                         date_of_birth: "1990-05-29"
-                        document: C31195855
+                        document_number: C31195855
                         country: US
                         version: 1
                       assignee: usr_1SUuwqBdK75GKi
@@ -2671,7 +2651,6 @@ paths:
         required: true
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningindividuallist
-    x-private-visibility: false
   /watchlist_screening/individual/program/get:
     post:
       summary: Get individual watchlist screening program
@@ -2689,7 +2668,7 @@ paths:
                   value:
                     id: prg_2eRPsDnL66rZ7H
                     created_at: "2020-07-24T03:26:02Z"
-                    enabled: true
+                    is_rescanning_enabled: true
                     lists_enabled:
                     - US_SDN
                     name: Sample Program
@@ -2698,7 +2677,7 @@ paths:
                       source: dashboard
                       dashboard_user_id: usr_1SUuwqBdK75GKi
                       timestamp: "2020-07-24T03:26:02Z"
-                    archived: false
+                    is_archived: false
       operationId: watchlistScreeningIndividualProgramGet
       description: Get an individual watchlist screening program
       requestBody:
@@ -2709,7 +2688,6 @@ paths:
         required: true
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningindividualprogramget
-    x-private-visibility: false
   /watchlist_screening/individual/program/list:
     post:
       summary: List individual watchlist screening programs
@@ -2723,10 +2701,10 @@ paths:
               examples:
                 example-1:
                   value:
-                    individual_watchlist_programs:
+                    watchlist_programs:
                     - id: prg_2eRPsDnL66rZ7H
                       created_at: "2020-07-24T03:26:02Z"
-                      enabled: true
+                      is_rescanning_enabled: true
                       lists_enabled:
                       - US_SDN
                       name: Sample Program
@@ -2735,7 +2713,7 @@ paths:
                         source: dashboard
                         dashboard_user_id: usr_1SUuwqBdK75GKi
                         timestamp: "2020-07-24T03:26:02Z"
-                      archived: false
+                      is_archived: false
                     next_cursor: eyJkaXJlY3Rpb24iOiJuZXh0Iiwib2Zmc2V0IjoiMTU5NDM
       operationId: watchlistScreeningIndividualProgramList
       description: List all individual watchlist screening programs
@@ -2749,7 +2727,6 @@ paths:
         required: true
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningindividualprogramlist
-    x-private-visibility: false
   /watchlist_screening/individual/review/create:
     post:
       summary: Create a review for an individual watchlist screening
@@ -2785,7 +2762,6 @@ paths:
       - plaid
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningindividualreviewcreate
-    x-private-visibility: false
   /watchlist_screening/individual/review/list:
     post:
       summary: List reviews for individual watchlist screenings
@@ -2824,7 +2800,6 @@ paths:
         required: true
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningindividualreviewlist
-    x-private-visibility: false
   /watchlist_screening/individual/update:
     post:
       summary: Update individual watchlist screening
@@ -2844,7 +2819,7 @@ paths:
                       watchlist_program_id: prg_2eRPsDnL66rZ7H
                       legal_name: Aleksey Potemkin
                       date_of_birth: "1990-05-29"
-                      document: C31195855
+                      document_number: C31195855
                       country: US
                       version: 1
                     assignee: usr_1SUuwqBdK75GKi
@@ -2865,7 +2840,6 @@ paths:
         required: true
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningindividualupdate
-    x-private-visibility: false
   /processor/auth/get:
     post:
       tags:
@@ -6672,7 +6646,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      description: Use the `/sandbox/transfer/sweep/simulate` endpoint to create a sweep and associated events in the Sandbox environment. Upon calling this endpoint, all `posted` or `pending` transfers with a sweep status of `unswept` will become `swept`, and all `reversed` transfers with a sweep status of `swept` will become `reverse_swept`.
+      description: Use the `/sandbox/transfer/sweep/simulate` endpoint to create a sweep and associated events in the Sandbox environment. Upon calling this endpoint, all `posted` or `pending` transfers with a sweep status of `unswept` will become `swept`, and all `returned` transfers with a sweep status of `swept` will become `return_swept`.
       requestBody:
         required: true
         content:
@@ -7223,6 +7197,36 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/DepositSwitchAltCreateRequest'
+  /credit/audit_copy_token/create:
+    post:
+      tags:
+      - plaid
+      summary: Create Asset or Income Report Audit Copy Token
+      externalDocs:
+        url: /api/products/income/#creditaudit_copy_tokencreate
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditAuditCopyTokenCreateResponse'
+              examples:
+                example-1:
+                  value:
+                    audit_copy_token: a-sandbox-3TAU2CWVYBDVRHUCAAAI27ULU4
+                    request_id: Iam3b
+      operationId: creditAuditCopyTokenCreate
+      description: |-
+        Plaid can provide an Audit Copy token of an Asset Report and/or Income Report directly to a participating third party on your behalf. For example, Plaid can supply an Audit Copy token directly to Fannie Mae on your behalf if you participate in the Day 1 Certainty™ program. An Audit Copy token contains the same underlying data as the Asset Report and/or Income Report (result of /credit/payroll_income/get).
+
+        To grant access to an Audit Copy token, use the `/credit/audit_copy_token/create` endpoint to create an `audit_copy_token` and then pass that token to the third party who needs access. Each third party has its own `auditor_id`, for example `fannie_mae`. You’ll need to create a separate Audit Copy for each third party to whom you want to grant access to the Report.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditAuditCopyTokenCreateRequest'
   /credit/bank_income/get:
     post:
       summary: Retrieve information from the bank accounts used for income verification
@@ -7680,6 +7684,8 @@ paths:
                           employee_id: "1234567"
                           position_id: "8888"
                           payroll_id: "1234567"
+                        employee_type: FULL_TIME
+                        last_paystub_date: "2022-01-15"
                     request_id: LhQf0THi8SH1yJm
       description: '`/credit/employment/get` returns a list of items with employment information from a user''s payroll provider that was verified by an end user.'
       requestBody:
@@ -8023,6 +8029,41 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/WalletGetRequest'
+  /wallet/list:
+    post:
+      tags:
+      - plaid
+      summary: Fetch a list of e-wallets
+      externalDocs:
+        url: /api/products/#walletlist
+      operationId: walletList
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletListResponse'
+              examples:
+                example-1:
+                  value:
+                    wallets:
+                    - wallet_id: wallet-id-production-53e58b32-fc1c-46fe-bbd6-e584b27a88
+                      balance:
+                        iso_currency_code: GBP
+                        current: 123.12
+                      numbers:
+                        bacs:
+                          account: "1234567890"
+                          sort_code: "123456"
+                    request_id: 4zlKapIkTm8p5KM
+      description: This endpoint lists all e-wallets in descending order of creation.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WalletListRequest'
   /wallet/transaction/execute:
     post:
       tags:
@@ -13963,8 +14004,12 @@ components:
         periodic_amounts:
           type: array
           description: A list of amount limitations per period of time.
+          minItems: 1
           items:
             $ref: '#/components/schemas/PaymentConsentPeriodicAmount'
+      required:
+      - max_payment_amount
+      - periodic_amounts
     PaymentConsentMaxPaymentAmount:
       description: Maximum amount of a single payment initiated using the payment consent.
       allOf:
@@ -15269,6 +15314,7 @@ components:
       required:
       - amount
       - interval
+      - alignment
     PaymentConsentPeriodicAmountAmount:
       description: Maximum cumulative amount for all payments in the specified interval.
       allOf:
@@ -16886,7 +16932,7 @@ components:
     TransferSweepAmount:
       title: TransferSweepAmount
       type: string
-      description: A signed amount of how much was `swept` or `reverse_swept` (decimal string with two digits of precision e.g. "-5.50").
+      description: A signed amount of how much was `swept` or `return_swept` (decimal string with two digits of precision e.g. "-5.50").
       nullable: true
     TransferIntentGetFailureReason:
       title: TransferIntentGetFailureReason
@@ -17232,6 +17278,13 @@ components:
       - cancelled
       - failed
       - reversed
+      - returned
+      x-override-enum-values-shown:
+      - pending
+      - posted
+      - cancelled
+      - failed
+      - returned
     TransferSweepStatus:
       type: string
       nullable: true
@@ -17240,13 +17293,19 @@ components:
         The status of the sweep for the transfer.
         `unswept`: The transfer hasn't been swept yet.
         `swept`: The transfer was swept to the sweep account.
-        `reverse_swept`: The transfer was reversed, funds were pulled back or pushed back to the sweep account.
-        `null`: The transfer will never be swept (e.g. if the transfer is cancelled or reversed before being swept)
+        `return_swept`: The transfer was returned, funds were pulled back or pushed back to the sweep account.
+        `null`: The transfer will never be swept (e.g. if the transfer is cancelled or returned before being swept)
       enum:
       - null
       - unswept
       - swept
       - reverse_swept
+      - return_swept
+      x-override-enum-values-shown:
+      - null
+      - unswept
+      - swept
+      - return_swept
     BankTransferStatus:
       type: string
       title: BankTransferStatus
@@ -17277,12 +17336,12 @@ components:
       type: object
       additionalProperties: true
       nullable: true
-      description: The failure reason if the event type for a transfer is `"failed"` or `"reversed"`. Null value otherwise.
+      description: The failure reason if the event type for a transfer is `"failed"` or `"returned"`. Null value otherwise.
       properties:
         ach_return_code:
           type: string
           nullable: true
-          description: The ACH return code, e.g. `R01`.  A return code will be provided if and only if the transfer status is `reversed`. For a full listing of ACH return codes, see [Transfer errors](https://plaid.com/docs/errors/transfer/#ach-return-codes).
+          description: The ACH return code, e.g. `R01`.  A return code will be provided if and only if the transfer status is `returned`. For a full listing of ACH return codes, see [Transfer errors](https://plaid.com/docs/errors/transfer/#ach-return-codes).
         description:
           type: string
           description: A human-readable description of the reason for the failure or reversal.
@@ -17834,19 +17893,29 @@ components:
 
         `posted`: The transfer has been successfully submitted to the payment network.
 
-        `reversed`: A posted transfer was reversed.
+        `returned`: A posted transfer was returned.
 
         `swept`: The transfer was swept to / from the sweep account.
 
-        `reverse_swept`: Due to the transfer reversing, funds were pulled from or pushed back to the sweep account.
+        `return_swept`: Due to the transfer being returned, funds were pulled from or pushed back to the sweep account.
       enum:
       - pending
       - cancelled
       - failed
       - posted
       - reversed
+      - returned
       - swept
       - reverse_swept
+      - return_swept
+      x-override-enum-values-shown:
+      - pending
+      - cancelled
+      - failed
+      - posted
+      - returned
+      - swept
+      - return_swept
     BankTransferEventType:
       type: string
       title: BankTransferEventType
@@ -18244,11 +18313,11 @@ components:
       description: |-
         Describes a sweep of funds to / from the sweep account.
 
-        A sweep is associated with many sweep events (events of type `swept` or `reverse_swept`) which can be retrieved by invoking the `/transfer/event/list` endpoint with the corresponding `sweep_id`.
+        A sweep is associated with many sweep events (events of type `swept` or `return_swept`) which can be retrieved by invoking the `/transfer/event/list` endpoint with the corresponding `sweep_id`.
 
-        `swept` events occur when the transfer amount is credited or debited from your sweep account, depending on the `type` of the transfer. `reverse_swept` events occur when a transfer is reversed and Plaid undoes the credit or debit.
+        `swept` events occur when the transfer amount is credited or debited from your sweep account, depending on the `type` of the transfer. `return_swept` events occur when a transfer is returned and Plaid undoes the credit or debit.
 
-        The total sum of the `swept` and `reverse_swept` events is equal to the `amount` of the sweep Plaid creates and matches the amount of the entry on your sweep account ledger.
+        The total sum of the `swept` and `return_swept` events is equal to the `amount` of the sweep Plaid creates and matches the amount of the entry on your sweep account ledger.
       properties:
         id:
           type: string
@@ -18539,7 +18608,7 @@ components:
           description: The unique identifier of the guaranteed transfer that was returned.
         event_id:
           type: integer
-          description: The unique identifier of the corresponding `reversed` transfer event.
+          description: The unique identifier of the corresponding `returned` transfer event.
           minimum: 0
         amount:
           type: string
@@ -18832,7 +18901,7 @@ components:
         event_type:
           type: string
           description: |
-            The asynchronous event to be simulated. May be: `posted`, `failed`, or `reversed`.
+            The asynchronous event to be simulated. May be: `posted`, `failed`, or `returned`.
 
             An error will be returned if the event type is incompatible with the current transfer status. Compatible status --> event type transitions include:
 
@@ -18840,7 +18909,7 @@ components:
 
             `pending` --> `posted`
 
-            `posted` --> `reversed`
+            `posted` --> `returned`
         failure_reason:
           $ref: '#/components/schemas/TransferFailure'
       required:
@@ -21464,6 +21533,39 @@ components:
       required:
       - document_references
       - risk_signals
+    CreditAuditCopyTokenCreateRequest:
+      type: object
+      description: CreditAuditCopyTokenCreateRequest defines the request schema for `/credit/audit_copy_token/get`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        tokens:
+          type: array
+          description: List of report tokens; can include both Asset Report tokens and Income Report tokens.
+          items:
+            type: string
+            description: List of report tokens; can include both Asset Report tokens and Income Report tokens.
+        auditor_id:
+          type: string
+          description: The `auditor_id` of the third party with whom you would like to share the Asset Report and/or Income Report.
+      required:
+      - tokens
+      - auditor_id
+    CreditAuditCopyTokenCreateResponse:
+      type: object
+      additionalProperties: true
+      description: CreditAuditCopyTokenCreateResponse defines the response schema for `/credit/audit_copy_token/get`
+      properties:
+        audit_copy_token:
+          type: string
+          description: A token that can be shared with a third party auditor to allow them to obtain access to the Asset or Income Report. This token should be stored securely.
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - audit_copy_token
+      - request_id
     CreditPayrollIncomeGetRequest:
       title: CreditPayrollIncomeGetRequest
       type: object
@@ -22193,28 +22295,19 @@ components:
 
             `UNKNOWN`: The processing status could not be determined.
 
-            `PROCESSING_COMPLETE`: The processing has completed and the data is available to be retrieved.
+            `PROCESSING_COMPLETE`: The processing has completed and the user has approved for sharing. The data is available to be retrieved.
 
             `PROCESSING`: The verification is still processing. The data is not available yet.
 
-            `UPLOADED`: The user uploaded a document. The document has not yet begun processing.
-
-            `CREATED`: The verification has been created but no data is associated with it yet.
-
             `FAILED`: The processing failed to complete successfully.
 
-            `APPROVAL_STATUS_PENDING`: The user has not yet approved the sharing of the data.
-
-            `APPROVAL_STATUS_APPROVED`: The user has approved the sharing of the data.
+            `APPROVAL_STATUS_PENDING`: The processing has completed but the user has not yet approved the sharing of the data.
           nullable: true
           x-override-enum-values-shown:
           - UNKNOWN
           - PROCESSING_COMPLETE
           - PROCESSING
-          - UPLOADED
-          - CREATED
           - FAILED
-          - APPROVAL_STATUS_APPROVED
           - APPROVAL_STATUS_PENDING
     CreditW2:
       title: CreditW2
@@ -22464,6 +22557,13 @@ components:
           nullable: true
         platform_ids:
           $ref: '#/components/schemas/CreditPlatformIds'
+        employee_type:
+          $ref: '#/components/schemas/CreditEmploymentEmployeeType'
+        last_paystub_date:
+          format: date
+          type: string
+          description: The date of the employee's most recent paystub in ISO 8601 format (YYYY-MM-DD).
+          nullable: true
       required:
       - account_id
       - status
@@ -22472,6 +22572,26 @@ components:
       - employer
       - title
       - platform_ids
+      - employee_type
+      - last_paystub_date
+    CreditEmploymentEmployeeType:
+      type: string
+      title: CreditEmploymentEmployeeType
+      description: |-
+        The type of employment for the individual.
+        `"FULL_TIME"`: A full-time employee.
+        `"PART_TIME"`: A part-time employee.
+        `"CONTRACTOR"`: An employee typically hired externally through a contracting group.
+        `"TEMPORARY"`: A temporary employee.
+        `"OTHER"`: The employee type is not one of the above defined types.
+      nullable: true
+      x-override-enum-values-shown:
+      - FULL_TIME
+      - PART_TIME
+      - CONTRACTOR
+      - TEMPORARY
+      - OTHER
+      - null
     CreditEmploymentVerificationStatus:
       type: string
       title: CreditEmploymentVerificationStatus
@@ -23705,6 +23825,44 @@ components:
       - wallet_id
       - balance
       - request_id
+    WalletListRequest:
+      type: object
+      description: WalletListRequest defines the request schema for `/wallet/list`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        iso_currency_code:
+          $ref: '#/components/schemas/WalletISOCurrencyCode'
+        cursor:
+          type: string
+          maxLength: 256
+          description: A base64 value representing the latest e-wallet that has already been requested. Set this to `next_cursor` received from the previous `/wallet/list` request. If provided, the response will only contain e-wallets created before that e-wallet. If omitted, the response will contain e-wallets starting from the most recent, and in descending order.
+        count:
+          type: integer
+          description: The number of e-wallets to fetch
+          minimum: 1
+          maximum: 20
+          default: 10
+    WalletListResponse:
+      type: object
+      additionalProperties: true
+      description: WalletListResponse defines the response schema for `/wallet/list`
+      properties:
+        wallets:
+          type: array
+          description: An array of e-wallets
+          items:
+            $ref: '#/components/schemas/Wallet'
+        next_cursor:
+          type: string
+          description: Cursor used for fetching e-wallets created before the latest e-wallet provided in this response
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - wallets
+      - request_id
     Wallet:
       title: Wallet
       type: object
@@ -24136,13 +24294,11 @@ components:
       - commercial
       - no_data
       example: residential
-      x-private-visibility: false
     City:
       type: string
       example: Pawnee
       title: CityName
       description: City from the end user's address
-      x-private-visibility: false
     ClientUserID:
       type: string
       title: ClientUserID
@@ -24150,7 +24306,6 @@ components:
       pattern: ^\S+(\s+\S+)*$
       example: your-db-id-3b24110
       description: An identifier to help you connect this object to your internal systems. For example, your database ID corresponding to this object.
-      x-private-visibility: false
     CreateEntityScreeningRequest:
       type: object
       description: Request input for creating an entity screening review
@@ -24167,7 +24322,6 @@ components:
           $ref: '#/components/schemas/APISecret'
       required:
       - search_terms
-      x-private-visibility: false
     CreateEntityWatchlistScreeningReviewRequest:
       type: object
       description: Request input for creating a review for an entity screening
@@ -24194,7 +24348,6 @@ components:
       - confirmed_hits
       - dismissed_hits
       - entity_watchlist_screening_id
-      x-private-visibility: false
     CreateIndividualWatchlistScreeningReviewRequest:
       type: object
       description: Request input for creating a screening review
@@ -24221,13 +24374,11 @@ components:
       - confirmed_hits
       - dismissed_hits
       - watchlist_screening_id
-      x-private-visibility: false
     Cursor:
       description: An identifier that determines which page of results you receive.
       type: string
       example: eyJkaXJlY3Rpb24iOiJuZXh0Iiwib2Zmc2V0IjoiMTU5NDM
       nullable: true
-      x-private-visibility: false
     DashboardUser:
       title: DashboardUser
       type: object
@@ -24246,13 +24397,11 @@ components:
       - created_at
       - email_address
       - status
-      x-private-visibility: false
     DashboardUserID:
       type: string
       title: DashboardUserID
       example: usr_1SUuwqBdK75GKi
       description: ID of the associated user.
-      x-private-visibility: false
     DashboardUserList:
       type: object
       description: List of dashboard users
@@ -24267,7 +24416,6 @@ components:
       required:
       - dashboard_users
       - request_id
-      x-private-visibility: false
     DashboardUserStatus:
       type: string
       example: active
@@ -24276,14 +24424,12 @@ components:
       - invited
       - active
       - deactivated
-      x-private-visibility: false
     Date:
       type: string
       format: date
       title: Date
       example: "1990-05-29"
       description: A date in the format YYYY-MM-DD (RFC 3339 Section 5.6).
-      x-private-visibility: false
     DateRange:
       type: object
       description: A date range with a start and end date
@@ -24299,7 +24445,6 @@ components:
       - beginning
       - ending
       title: DateRange
-      x-private-visibility: false
     DocumentAnalysis:
       description: High level descriptions of how the associated document was processed. If a document fails verification, the details in the `analysis` object should help clarify why the document was rejected.
       type: object
@@ -24314,7 +24459,6 @@ components:
       - authenticity
       - image_quality
       - extracted_data
-      x-private-visibility: false
     DocumentAuthenticityMatchCode:
       description: |-
         High level summary of whether the document in the provided image matches the formatting rules and security checks for the associated jurisdiction.
@@ -24341,7 +24485,6 @@ components:
       - no_match
       - no_data
       example: match
-      x-private-visibility: false
     DocumentDateOfBirthMatchCode:
       description: A match summary describing the cross comparison between the subject's date of birth, extracted from the document image, and the date of birth they separately provided to the identity verification attempt.
       type: string
@@ -24350,36 +24493,30 @@ components:
       - partial_match
       - no_match
       example: match
-      x-private-visibility: false
     DocumentImage__Back:
       type: string
       example: https://example.plaid.com/verifications/idver_52xR9LKo77r1Np/documents/1/original_back.jpeg
       description: Temporary URL that expires after 60 seconds for downloading the original image of the back of the document. Might be null if the back of the document was not collected.
       nullable: true
-      x-private-visibility: false
     DocumentImage__CroppedBack:
       type: string
       example: https://example.plaid.com/verifications/idver_52xR9LKo77r1Np/documents/1/cropped_back.jpeg
       description: Temporary URL that expires after 60 seconds for downloading a cropped image containing just the back of the document. Might be null if the back of the document was not collected.
       nullable: true
-      x-private-visibility: false
     DocumentImage__CroppedFront:
       type: string
       example: https://example.plaid.com/verifications/idver_52xR9LKo77r1Np/documents/1/cropped_front.jpeg
       description: Temporary URL that expires after 60 seconds for downloading a cropped image containing just the front of the document.
       nullable: true
-      x-private-visibility: false
     DocumentImage__Face:
       type: string
       example: https://example.plaid.com/verifications/idver_52xR9LKo77r1Np/documents/1/face.jpeg
       description: Temporary URL that expires after 60 seconds for downloading a crop of just the user's face from the document image. Might be null if the document does not contain a face photo.
       nullable: true
-      x-private-visibility: false
     DocumentImage__Front:
       type: string
       example: https://example.plaid.com/verifications/idver_52xR9LKo77r1Np/documents/1/original_front.jpeg
       description: Temporary URL that expires after 60 seconds for downloading the uncropped original image of the front of the document.
-      x-private-visibility: false
     DocumentNameMatchCode:
       description: A match summary describing the cross comparison between the subject's name, extracted from the document image, and the name they separately provided to identity verification attempt.
       type: string
@@ -24388,7 +24525,6 @@ components:
       - partial_match
       - no_match
       example: match
-      x-private-visibility: false
     DocumentStatus:
       type: string
       enum:
@@ -24398,7 +24534,6 @@ components:
       example: success
       title: DocumentStatus
       description: An outcome status for this specific document submission. Distinct from the overall `documentary_verification.status` that summarizes the verification outcome from one or more documents.
-      x-private-visibility: false
     DocumentaryVerification:
       description: data, images, analysis, and results from the `documentary_verification` step.
       title: DocumentaryVerification
@@ -24420,7 +24555,6 @@ components:
       - status
       - documents
       nullable: true
-      x-private-visibility: false
     DocumentaryVerificationDocument:
       type: object
       description: Images, extracted data, and analysis from a user's identity document
@@ -24443,14 +24577,12 @@ components:
       - extracted_data
       - images
       - status
-      x-private-visibility: false
     EmailAddress:
       type: string
       format: email
       example: user@example.com
       title: EmailAddress
       description: A valid email address.
-      x-private-visibility: false
     EntityDocument:
       title: EntityDocument
       type: object
@@ -24458,12 +24590,11 @@ components:
       properties:
         type:
           $ref: '#/components/schemas/EntityDocumentType'
-        value:
+        number:
           $ref: '#/components/schemas/WatchlistScreeningDocumentValue'
       required:
       - type
-      - value
-      x-private-visibility: false
+      - number
     EntityDocumentType:
       type: string
       enum:
@@ -24489,7 +24620,6 @@ components:
         `swift` - Number identifying a bank and branch.
 
         `tax_id` - Identification issued for the purpose of collecting taxes
-      x-private-visibility: false
     EntityScreeningHitAnalysis:
       type: object
       description: Analysis information describing why a screening hit matched the provided entity information
@@ -24512,7 +24642,6 @@ components:
           example: 1
       required:
       - search_terms_version
-      x-private-visibility: false
     EntityScreeningHitData:
       type: object
       description: Information associated with the entity watchlist hit
@@ -24547,7 +24676,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EntityScreeningHitUrlsItems'
-      x-private-visibility: false
     EntityScreeningHitDocumentsItems:
       type: object
       description: Analyzed documents for the associated hit
@@ -24556,7 +24684,6 @@ components:
           $ref: '#/components/schemas/MatchSummary'
         data:
           $ref: '#/components/schemas/EntityDocument'
-      x-private-visibility: false
     EntityScreeningHitEmails:
       type: object
       description: Email address information for the associated entity watchlist hit
@@ -24565,7 +24692,6 @@ components:
           $ref: '#/components/schemas/EmailAddress'
       required:
       - email_address
-      x-private-visibility: false
     EntityScreeningHitEmailsItems:
       type: object
       description: Analyzed emails for the associated hit
@@ -24574,7 +24700,6 @@ components:
           $ref: '#/components/schemas/MatchSummary'
         data:
           $ref: '#/components/schemas/EntityScreeningHitEmails'
-      x-private-visibility: false
     EntityScreeningHitNames:
       type: object
       description: Name information for the associated entity watchlist hit
@@ -24583,7 +24708,7 @@ components:
           type: string
           example: Al Qaida
           description: The full name of the entity.
-        primary:
+        is_primary:
           type: boolean
           example: false
           description: Primary names are those most commonly used to refer to this entity. Only one name will ever be marked as primary.
@@ -24591,9 +24716,8 @@ components:
           $ref: '#/components/schemas/WeakAliasDetermination'
       required:
       - full
-      - primary
+      - is_primary
       - weak_alias_determination
-      x-private-visibility: false
     EntityScreeningHitNamesItems:
       type: object
       description: Analyzed names for the associated hit
@@ -24602,7 +24726,6 @@ components:
           $ref: '#/components/schemas/MatchSummary'
         data:
           $ref: '#/components/schemas/EntityScreeningHitNames'
-      x-private-visibility: false
     EntityScreeningHitPhoneNumbers:
       type: object
       description: Phone number information associated with the entity screening hit
@@ -24614,7 +24737,6 @@ components:
       required:
       - type
       - phone_number
-      x-private-visibility: false
     EntityScreeningHitUrls:
       type: object
       description: URLs associated with the entity screening hit
@@ -24623,7 +24745,6 @@ components:
           $ref: '#/components/schemas/URL'
       required:
       - url
-      x-private-visibility: false
     EntityScreeningHitUrlsItems:
       type: object
       description: Analyzed URLs for the associated hit
@@ -24632,7 +24753,6 @@ components:
           $ref: '#/components/schemas/MatchSummary'
         data:
           $ref: '#/components/schemas/EntityScreeningHitUrls'
-      x-private-visibility: false
     EntityScreeningHitsPhoneNumberItems:
       type: object
       description: Analyzed phone numbers for the associated hit
@@ -24641,7 +24761,6 @@ components:
           $ref: '#/components/schemas/MatchSummary'
         data:
           $ref: '#/components/schemas/EntityScreeningHitPhoneNumbers'
-      x-private-visibility: false
     EntityWatchlistCode:
       type: string
       enum:
@@ -24661,7 +24780,6 @@ components:
       example: EU_CON
       description: Shorthand identifier for a specific screening list for entities.
       title: EntityWatchlistCode
-      x-private-visibility: false
     EntityWatchlistProgram:
       type: object
       description: A program that configures the active lists, search parameters, and other behavior for initial and ongoing screening of entities.
@@ -24671,8 +24789,8 @@ components:
           $ref: '#/components/schemas/EntityWatchlistProgramID'
         created_at:
           $ref: '#/components/schemas/Timestamp'
-        enabled:
-          description: Indicator specifying whether the program is enabled and can be used to screen entities.
+        is_rescanning_enabled:
+          description: Indicator specifying whether the program is enabled and will perform daily rescans.
           type: boolean
           example: true
         lists_enabled:
@@ -24689,24 +24807,22 @@ components:
           $ref: '#/components/schemas/ProgramNameSensitivity'
         audit_trail:
           $ref: '#/components/schemas/WatchlistScreeningAuditTrail'
-        archived:
+        is_archived:
           $ref: '#/components/schemas/ProgramArchived'
       required:
       - id
       - created_at
-      - enabled
+      - is_rescanning_enabled
       - lists_enabled
       - name
       - name_sensitivity
       - audit_trail
-      - archived
-      x-private-visibility: false
+      - is_archived
     EntityWatchlistProgramID:
       type: string
       example: entprg_2eRPsDnL66rZ7H
       title: EntityWatchlistProgramID
       description: ID of the associated entity program.
-      x-private-visibility: false
     EntityWatchlistScreening:
       type: object
       properties:
@@ -24735,7 +24851,6 @@ components:
       - audit_trail
       title: EntityWatchlistScreening
       description: 'The entity screening object allows you to represent an entity in your system, update its profile, and search for it on various watchlists. Note: Rejected entity screenings will not receive new hits, regardless of entity program configuration.'
-      x-private-visibility: false
     EntityWatchlistScreeningHit:
       type: object
       description: Data from a government watchlist that has been attached to the screening.
@@ -24748,14 +24863,10 @@ components:
         first_active:
           $ref: '#/components/schemas/Timestamp'
         inactive_since:
-          nullable: true
-          allOf:
-          - $ref: '#/components/schemas/Timestamp'
+          $ref: '#/components/schemas/TimestampNullable'
         historical_since:
-          nullable: true
-          allOf:
-          - $ref: '#/components/schemas/Timestamp'
-        entity_list_code:
+          $ref: '#/components/schemas/TimestampNullable'
+        list_code:
           $ref: '#/components/schemas/EntityWatchlistCode'
         plaid_uid:
           $ref: '#/components/schemas/InternalUID'
@@ -24771,16 +24882,14 @@ components:
       - first_active
       - inactive_since
       - historical_since
-      - entity_list_code
+      - list_code
       - plaid_uid
       - source_uid
-      x-private-visibility: false
     EntityWatchlistScreeningHitID:
       type: string
       example: enthit_52xR9LKo77r1Np
       title: EntityWatchlistScreeningHitID
       description: ID of the associated entity screening hit.
-      x-private-visibility: false
     EntityWatchlistScreeningHitList:
       type: object
       description: List of entity watchlist screening hits
@@ -24795,13 +24904,11 @@ components:
       required:
       - entity_watchlist_screening_hits
       - request_id
-      x-private-visibility: false
     EntityWatchlistScreeningID:
       type: string
       example: entscr_52xR9LKo77r1Np
       title: EntityWatchlistScreeningID
       description: ID of the associated entity screening.
-      x-private-visibility: false
     EntityWatchlistScreeningList:
       type: object
       description: List of entity watchlist screening
@@ -24816,7 +24923,6 @@ components:
       required:
       - entity_watchlist_screenings
       - request_id
-      x-private-visibility: false
     EntityWatchlistScreeningName:
       type: string
       title: EntityWatchlistScreeningName
@@ -24824,7 +24930,6 @@ components:
       pattern: ^\S+(\s+\S+)*$
       example: Al-Qaida
       description: The name of the organization being screened.
-      x-private-visibility: false
     EntityWatchlistScreeningProgramList:
       type: object
       description: List of entity watchlist screening programs
@@ -24839,7 +24944,6 @@ components:
       required:
       - entity_watchlist_programs
       - request_id
-      x-private-visibility: false
     EntityWatchlistScreeningProgramName:
       type: string
       title: EntityWatchlistScreeningProgramName
@@ -24847,7 +24951,6 @@ components:
       minLength: 1
       pattern: ^\S+(\s+\S+)*$
       description: A name for the entity program to define its purpose. For example, "High Risk Organizations" or "Applicants".
-      x-private-visibility: false
     EntityWatchlistScreeningReview:
       title: EntityWatchlistScreeningReview
       type: object
@@ -24877,13 +24980,11 @@ components:
       - dismissed_hits
       - comment
       - audit_trail
-      x-private-visibility: false
     EntityWatchlistScreeningReviewID:
       type: string
       title: EntityWatchlistScreeningReviewID
       example: entrev_aCLNRxK3UVzn2r
       description: ID of the associated entity review.
-      x-private-visibility: false
     EntityWatchlistScreeningSearchTerms:
       type: object
       description: Search terms associated with an entity used for searching against watchlists
@@ -24892,7 +24993,7 @@ components:
           $ref: '#/components/schemas/EntityWatchlistProgramID'
         legal_name:
           $ref: '#/components/schemas/EntityWatchlistScreeningName'
-        document:
+        document_number:
           nullable: true
           allOf:
           - $ref: '#/components/schemas/WatchlistScreeningDocumentValue'
@@ -24919,13 +25020,12 @@ components:
       required:
       - entity_watchlist_program_id
       - legal_name
-      - document
+      - document_number
       - email_address
       - country
       - phone_number
       - url
       - version
-      x-private-visibility: false
     EntityWatchlistSearchTerms:
       type: object
       required:
@@ -24937,7 +25037,7 @@ components:
           $ref: '#/components/schemas/EntityWatchlistProgramID'
         legal_name:
           $ref: '#/components/schemas/EntityWatchlistScreeningName'
-        document:
+        document_number:
           nullable: true
           allOf:
           - $ref: '#/components/schemas/WatchlistScreeningDocumentValue'
@@ -24957,7 +25057,6 @@ components:
           nullable: true
           allOf:
           - $ref: '#/components/schemas/URL'
-      x-private-visibility: false
     ExpirationDate:
       description: |-
         A description of whether the associated document was expired when the verification was performed.
@@ -24969,13 +25068,11 @@ components:
       - expired
       - no_data
       example: not_expired
-      x-private-visibility: false
     FamilyNameField:
       type: string
       example: Knope
       title: FamilyName
       description: A string with at least one non-whitespace character, with a max length of 100 characters.
-      x-private-visibility: false
     GenericCountryCode:
       type: string
       title: GenericCountryCode
@@ -24983,7 +25080,6 @@ components:
       pattern: ^[A-Z]{2}$
       example: US
       description: Valid, capitalized, two-letter ISO code representing the country of this object. Must be in ISO 3166-1 alpha-2 form.
-      x-private-visibility: false
     GenericScreeningHitLocationItems:
       type: object
       description: Analyzed location information for the associated hit
@@ -24992,7 +25088,6 @@ components:
           $ref: '#/components/schemas/MatchSummary'
         data:
           $ref: '#/components/schemas/WatchlistScreeningHitLocations'
-      x-private-visibility: false
     GetDashboardUserRequest:
       description: Request input for fetching a dashboard user
       type: object
@@ -25005,7 +25100,6 @@ components:
           $ref: '#/components/schemas/APIClientID'
       required:
       - dashboard_user_id
-      x-private-visibility: false
     GetEntityWatchlistScreeningRequest:
       description: Request input for fetching a entity watchlist screening
       type: object
@@ -25018,7 +25112,6 @@ components:
           $ref: '#/components/schemas/APIClientID'
       required:
       - entity_watchlist_screening_id
-      x-private-visibility: false
     GetIdentityVerificationRequest:
       description: Request input for fetching an identity verification
       type: object
@@ -25031,7 +25124,6 @@ components:
           $ref: '#/components/schemas/APIClientID'
       required:
       - identity_verification_id
-      x-private-visibility: false
     GetIndividualWatchlistScreeningRequest:
       description: Request input for fetching an individual watchlist screening
       type: object
@@ -25044,7 +25136,6 @@ components:
           $ref: '#/components/schemas/APIClientID'
       required:
       - watchlist_screening_id
-      x-private-visibility: false
     GetWatchlistScreeningEntityProgramRequest:
       description: Request input for fetching an entity watchlist program
       type: object
@@ -25057,7 +25148,6 @@ components:
           $ref: '#/components/schemas/APIClientID'
       required:
       - entity_watchlist_program_id
-      x-private-visibility: false
     GetWatchlistScreeningIndividualProgramRequest:
       description: Request input for fetching an individual watchlist program
       type: object
@@ -25070,13 +25160,11 @@ components:
           $ref: '#/components/schemas/APIClientID'
       required:
       - watchlist_program_id
-      x-private-visibility: false
     GivenNameField:
       type: string
       example: Leslie
       title: GivenName
       description: A string with at least one non-whitespace character, with a max length of 100 characters.
-      x-private-visibility: false
     IDNumberType:
       description: A globally unique and human readable ID type, specific to the country and document category. For more context on this field, see [Hybrid Input Validation](https://cognitohq.com/docs/flow/flow-hybrid-input-validation)
       type: string
@@ -25118,20 +25206,17 @@ components:
       - za_smart_id
       example: us_ssn
       title: IDNumberType
-      x-private-visibility: false
     IDNumberValue:
       type: string
       example: "123456789"
       title: IDNumberValue
       description: Value of identity document value typed in by user. Alpha-numeric, with all formatting characters stripped.
-      x-private-visibility: false
     IPAddress:
       description: An IPv4 or IPV6 address.
       type: string
       example: 192.0.2.42
       title: IPAddress
       nullable: true
-      x-private-visibility: false
     ISO8601Date:
       type: string
       format: date
@@ -25139,7 +25224,6 @@ components:
       example: "1990-05-29"
       description: A date in the format YYYY-MM-DD (RFC 3339 Section 5.6).
       nullable: true
-      x-private-visibility: false
     IdempotencyFlag:
       type: boolean
       example: true
@@ -25148,7 +25232,6 @@ components:
         An optional flag specifying how you would like Plaid to handle attempts to create an Identity Verification when an Identity Verification already exists for the provided `client_user_id` and `template_id`.
         If idempotency is enabled, Plaid will return the existing Identity Verification. If idempotency is disabled, Plaid will reject the request with a `400 Bad Request` status code if an Identity Verification already exists for the supplied `client_user_id` and `template_id`.
       nullable: true
-      x-private-visibility: false
     IdentityVerification:
       type: object
       description: A identity verification attempt represents a customer's attempt to verify their identity, reflecting the required steps for completing the session, the results for each step, and information collected in the process.
@@ -25160,9 +25243,7 @@ components:
         created_at:
           $ref: '#/components/schemas/Timestamp'
         completed_at:
-          nullable: true
-          allOf:
-          - $ref: '#/components/schemas/Timestamp'
+          $ref: '#/components/schemas/TimestampNullable'
         previous_attempt_id:
           $ref: '#/components/schemas/PreviousIdentityVerificationAttemptID'
         shareable_url:
@@ -25200,7 +25281,6 @@ components:
       - kyc_check
       - watchlist_screening_id
       - request_id
-      x-private-visibility: false
     IdentityVerificationConsent:
       type: boolean
       example: true
@@ -25209,19 +25289,18 @@ components:
       description: |-
         A flag specifying whether the end user has already agreed to a privacy policy specifying that their data will be shared with Plaid for verification purposes.
 
-        If `consent` is set to `true`, the `accept_tos` step will be marked as `skipped` and the end user's session will start at the next step requirement.
-      x-private-visibility: false
+        If `gave_consent` is set to `true`, the `accept_tos` step will be marked as `skipped` and the end user's session will start at the next step requirement.
     IdentityVerificationCreateRequest:
       type: object
       properties:
-        shareable:
+        is_shareable:
           type: boolean
           example: true
           title: EnableSharableLink
           description: A flag specifying whether you would like Plaid to expose a shareable URL for the verification being created.
         template_id:
           $ref: '#/components/schemas/IdentityVerificationTemplateID'
-        consent:
+        gave_consent:
           $ref: '#/components/schemas/IdentityVerificationConsent'
         user:
           $ref: '#/components/schemas/IdentityVerificationRequestUser'
@@ -25229,21 +25308,19 @@ components:
           $ref: '#/components/schemas/APIClientID'
         secret:
           $ref: '#/components/schemas/APISecret'
-        idempotent:
+        is_idempotent:
           $ref: '#/components/schemas/IdempotencyFlag'
       required:
-      - shareable
+      - is_shareable
       - template_id
       - user
-      - consent
+      - gave_consent
       description: Request schema for '/identity_verification/create'
-      x-private-visibility: false
     IdentityVerificationID:
       type: string
       example: idver_52xR9LKo77r1Np
       title: IdentityVerificationID
       description: ID of the associated Identity Verification attempt.
-      x-private-visibility: false
     IdentityVerificationList:
       type: object
       description: List of Plaid sessions
@@ -25258,7 +25335,6 @@ components:
       required:
       - identity_verifications
       - request_id
-      x-private-visibility: false
     IdentityVerificationRequestUser:
       type: object
       description: |-
@@ -25279,7 +25355,7 @@ components:
         `id_number`
         Specifically, these fields are optional in that they can either be fully provided (satisfying every required field in their subschema)
         or omitted from the request entirely by not providing the key or value.
-        Providing these fields via the API will result in Link skipping the data collection process for the associated user. All verification steps enabled in the associated Identity Verification Template will still be run. Verification steps will either be run immediately, or once the user completes the `accept_tos` step, depending on the value provided to the `consent` field.
+        Providing these fields via the API will result in Link skipping the data collection process for the associated user. All verification steps enabled in the associated Identity Verification Template will still be run. Verification steps will either be run immediately, or once the user completes the `accept_tos` step, depending on the value provided to the `gave_consent` field.
       properties:
         client_user_id:
           $ref: '#/components/schemas/ClientUserID'
@@ -25299,7 +25375,6 @@ components:
           $ref: '#/components/schemas/UserIDNumber'
       required:
       - client_user_id
-      x-private-visibility: false
     IdentityVerificationRetryRequest:
       type: object
       description: Request input for retrying a identity verification attempt
@@ -25320,7 +25395,6 @@ components:
       - client_user_id
       - strategy
       - template_id
-      x-private-visibility: false
     IdentityVerificationRetryRequestStepsObject:
       type: object
       description: |-
@@ -25354,7 +25428,6 @@ components:
       - documentary_verification
       - selfie_check
       nullable: true
-      x-private-visibility: false
     IdentityVerificationStatus:
       type: string
       enum:
@@ -25381,7 +25454,6 @@ components:
         `canceled` - The Identity Verification attempt was canceled, either via the dashboard by a user, or via API. The user may have completed part of the session, but has neither failed or passed.
 
         `pending_review` - The Identity Verification attempt template was configured to perform a screening that had one or more hits needing review.
-      x-private-visibility: false
     IdentityVerificationStepStatus:
       type: string
       enum:
@@ -25399,7 +25471,6 @@ components:
       example: success
       title: IdentityVerificationStepStatus
       description: The status of a step in the identity verification process.
-      x-private-visibility: false
     IdentityVerificationStepSummary:
       type: object
       description: |-
@@ -25450,13 +25521,11 @@ components:
           $ref: '#/components/schemas/IdentityVerificationStepStatus'
         risk_check:
           $ref: '#/components/schemas/IdentityVerificationStepStatus'
-      x-private-visibility: false
     IdentityVerificationTemplateID:
       type: string
       example: idvtmp_4FrXJvfQU3zGUR
       title: IdentityVerificationTemplateID
       description: ID of the associated Identity Verification template.
-      x-private-visibility: false
     IdentityVerificationTemplateReference:
       type: object
       properties:
@@ -25468,13 +25537,11 @@ components:
       - id
       - version
       description: The resource ID and version number of the template configuring the behavior of a given identity verification.
-      x-private-visibility: false
     IdentityVerificationTemplateVersion:
       type: number
       example: 2
       title: IdentityVerificationTemplateVersion
       description: Version of the associated Identity Verification template.
-      x-private-visibility: false
     IdentityVerificationUserAddress:
       description: 'Even if an address has been collected, some fields may be null depending on the region''s addressing system. For example: * Addresses from the United Kingdom will not include a region * Addresses from Hong Kong will not include postal code'
       type: object
@@ -25507,7 +25574,6 @@ components:
       - postal_code
       - country
       nullable: true
-      x-private-visibility: false
     IdentityVerificationUserData:
       type: object
       properties:
@@ -25536,7 +25602,6 @@ components:
       - address
       - id_number
       description: The identity data that was either collected from the user or provided via API in order to perform an identity verification.
-      x-private-visibility: false
     IdentityVerificationUserPhoneNumber:
       type: string
       pattern: ^\+[1-9]\d{6,14}$
@@ -25544,7 +25609,6 @@ components:
       example: "+19876543212"
       title: PhoneNumber
       nullable: true
-      x-private-visibility: false
     ImageQuality:
       description: |-
         A high level description of the quality of the image the user submitted.
@@ -25558,7 +25622,6 @@ components:
       - medium
       - low
       example: high
-      x-private-visibility: false
     IndividualScreeningHitNames:
       type: object
       description: Name information for the associated individual watchlist hit
@@ -25567,7 +25630,7 @@ components:
           type: string
           example: Aleksey Potemkin
           description: The full name of the individual, including all parts.
-        primary:
+        is_primary:
           type: boolean
           example: false
           description: Primary names are those most commonly used to refer to this person. Only one name will ever be marked as primary.
@@ -25575,9 +25638,8 @@ components:
           $ref: '#/components/schemas/WeakAliasDetermination'
       required:
       - full
-      - primary
+      - is_primary
       - weak_alias_determination
-      x-private-visibility: false
     IndividualWatchlistCode:
       type: string
       enum:
@@ -25606,7 +25668,6 @@ components:
       example: US_SDN
       description: Shorthand identifier for a specific screening list for individuals.
       title: IndividualWatchlistCode
-      x-private-visibility: false
     IndividualWatchlistProgram:
       type: object
       description: A program that configures the active lists, search parameters, and other behavior for initial and ongoing screening of individuals.
@@ -25616,8 +25677,8 @@ components:
           $ref: '#/components/schemas/WatchlistProgramID'
         created_at:
           $ref: '#/components/schemas/Timestamp'
-        enabled:
-          description: Indicator specifying whether the program is enabled and can be used to screen customers.
+        is_rescanning_enabled:
+          description: Indicator specifying whether the program is enabled and will perform daily rescans.
           type: boolean
           example: true
         lists_enabled:
@@ -25634,30 +25695,28 @@ components:
           $ref: '#/components/schemas/ProgramNameSensitivity'
         audit_trail:
           $ref: '#/components/schemas/WatchlistScreeningAuditTrail'
-        archived:
+        is_archived:
           $ref: '#/components/schemas/ProgramArchived'
       required:
       - id
       - created_at
-      - enabled
+      - is_rescanning_enabled
       - lists_enabled
       - name
       - name_sensitivity
       - audit_trail
-      - archived
-      x-private-visibility: false
+      - is_archived
     IndividualWatchlistProgramList:
       type: object
       description: List of individual watchlist screening programs
       properties:
-        individual_watchlist_programs:
+        watchlist_programs:
           description: List of individual watchlist screening programs
           type: array
           items:
             $ref: '#/components/schemas/IndividualWatchlistProgram'
       required:
-      - individual_watchlist_programs
-      x-private-visibility: false
+      - watchlist_programs
     IndividualWatchlistScreeningProgramName:
       type: string
       title: IndividualWatchlistScreeningProgramName
@@ -25665,13 +25724,11 @@ components:
       minLength: 1
       pattern: ^\S+(\s+\S+)*$
       description: A name for the program to define its purpose. For example, "High Risk Individuals", "US Cardholders", or "Applicants".
-      x-private-visibility: false
     InternalUID:
       type: string
       title: InternalUID
       description: A universal identifier for a watchlist individual that is stable across searches and updates.
       example: uid_3NggckTimGSJHS
-      x-private-visibility: false
     IssuingCountry:
       description: |-
         A binary match indicator specifying whether the country that issued the provided document matches the country that the user separately provided to Plaid.
@@ -25681,7 +25738,6 @@ components:
       enum:
       - match
       - no_match
-      x-private-visibility: false
     KYCCheckAddressSummary:
       type: object
       description: Result summary object specifying how the `address` field matched.
@@ -25696,7 +25752,6 @@ components:
       - summary
       - po_box
       - type
-      x-private-visibility: false
     KYCCheckDateOfBirthSummary:
       description: Result summary object specifying how the `date_of_birth` field matched.
       type: object
@@ -25705,7 +25760,6 @@ components:
           $ref: '#/components/schemas/MatchSummaryCode'
       required:
       - summary
-      x-private-visibility: false
     KYCCheckDetails:
       type: object
       description: The outcome of the `kyc_check` step.
@@ -25732,7 +25786,6 @@ components:
       - date_of_birth
       - id_number
       nullable: true
-      x-private-visibility: false
     KYCCheckIDNumberSummary:
       description: Result summary object specifying how the `id_number` field matched.
       type: object
@@ -25741,7 +25794,6 @@ components:
           $ref: '#/components/schemas/MatchSummaryCode'
       required:
       - summary
-      x-private-visibility: false
     KYCCheckNameSummary:
       description: Result summary object specifying how the `name` field matched.
       type: object
@@ -25750,7 +25802,6 @@ components:
           $ref: '#/components/schemas/MatchSummaryCode'
       required:
       - summary
-      x-private-visibility: false
     KYCCheckPhoneSummary:
       description: Result summary object specifying how the `phone` field matched.
       type: object
@@ -25759,7 +25810,6 @@ components:
           $ref: '#/components/schemas/MatchSummaryCode'
       required:
       - summary
-      x-private-visibility: false
     ListDashboardUserRequest:
       description: Request input for listing dashboard users
       type: object
@@ -25770,7 +25820,6 @@ components:
           $ref: '#/components/schemas/APIClientID'
         cursor:
           $ref: '#/components/schemas/Cursor'
-      x-private-visibility: false
     ListEntityWatchlistScreeningRequest:
       description: Request input for listing entity watchlist screenings
       type: object
@@ -25797,7 +25846,6 @@ components:
           $ref: '#/components/schemas/Cursor'
       required:
       - entity_watchlist_program_id
-      x-private-visibility: false
     ListIdentityVerificationRequest:
       description: Request input for listing identity verifications
       type: object
@@ -25815,7 +25863,6 @@ components:
       required:
       - template_id
       - client_user_id
-      x-private-visibility: false
     ListIndividualWatchlistScreeningRequest:
       description: Request input for listinging watchlist screenings for individuals
       type: object
@@ -25842,7 +25889,6 @@ components:
           $ref: '#/components/schemas/Cursor'
       required:
       - watchlist_program_id
-      x-private-visibility: false
     ListPagination:
       type: object
       description: A response that contains 0-20 records and, optionally, links for the next and/or previous page.
@@ -25852,7 +25898,6 @@ components:
       required:
       - next_cursor
       title: ListPagination
-      x-private-visibility: false
     ListWatchlistScreeningEntityHistoryRequest:
       description: Request input for listing changes to entity watchlist screenings
       type: object
@@ -25867,7 +25912,6 @@ components:
           $ref: '#/components/schemas/Cursor'
       required:
       - entity_watchlist_screening_id
-      x-private-visibility: false
     ListWatchlistScreeningEntityHitRequest:
       description: Request input for listing hits for an entity watchlist screening
       type: object
@@ -25882,7 +25926,6 @@ components:
           $ref: '#/components/schemas/Cursor'
       required:
       - entity_watchlist_screening_id
-      x-private-visibility: false
     ListWatchlistScreeningEntityProgramsRequest:
       description: Request input for listing entity watchlist screening programs
       type: object
@@ -25893,7 +25936,6 @@ components:
           $ref: '#/components/schemas/APIClientID'
         cursor:
           $ref: '#/components/schemas/Cursor'
-      x-private-visibility: false
     ListWatchlistScreeningEntityReviewsRequest:
       description: Request input for listing reviews for an entity watchlist screening
       type: object
@@ -25908,7 +25950,6 @@ components:
           $ref: '#/components/schemas/Cursor'
       required:
       - entity_watchlist_screening_id
-      x-private-visibility: false
     ListWatchlistScreeningIndividualHistoryRequest:
       description: Request input for listing changes to watchlist screenings for individuals
       type: object
@@ -25923,7 +25964,6 @@ components:
           $ref: '#/components/schemas/Cursor'
       required:
       - watchlist_screening_id
-      x-private-visibility: false
     ListWatchlistScreeningIndividualHitRequest:
       description: Request input for listing hits for an individual watchlist screening
       type: object
@@ -25938,7 +25978,6 @@ components:
           $ref: '#/components/schemas/Cursor'
       required:
       - watchlist_screening_id
-      x-private-visibility: false
     ListWatchlistScreeningIndividualProgramsRequest:
       description: Request input for listing watchlist screening programs for individuals
       type: object
@@ -25949,7 +25988,6 @@ components:
           $ref: '#/components/schemas/APIClientID'
         cursor:
           $ref: '#/components/schemas/Cursor'
-      x-private-visibility: false
     ListWatchlistScreeningIndividualReviewsRequest:
       description: Request input for listing reviews for an individual watchlist screening
       type: object
@@ -25964,7 +26002,6 @@ components:
           $ref: '#/components/schemas/Cursor'
       required:
       - watchlist_screening_id
-      x-private-visibility: false
     MatchSummary:
       type: object
       description: Summary object reflecting the match result of the associated data
@@ -25973,7 +26010,6 @@ components:
           $ref: '#/components/schemas/MatchSummaryCode'
       required:
       - summary
-      x-private-visibility: false
     MatchSummaryCode:
       description: |-
         An enum indicating the match type between data provided by user and data checked against an external data source.
@@ -25997,7 +26033,6 @@ components:
       - no_data
       - no_input
       example: match
-      x-private-visibility: false
     POBoxStatus:
       description: Field describing whether the associated address is a post office box. Will be `yes` when a P.O. box is detected, `no` when Plaid confirmed the address is not a P.O. box, and `no_data` when Plaid was not able to determine if the address is a P.O. box.
       type: string
@@ -26006,74 +26041,62 @@ components:
       - "no"
       - no_data
       example: "yes"
-      x-private-visibility: false
     PaginatedDashboardUserList:
       description: Paginated list of dashboard users
       allOf:
       - $ref: '#/components/schemas/DashboardUserList'
       - $ref: '#/components/schemas/ListPagination'
-      x-private-visibility: false
     PaginatedEntityWatchlistProgramList:
       description: Paginated list of entity watchlist screening programs
       allOf:
       - $ref: '#/components/schemas/EntityWatchlistScreeningProgramList'
       - $ref: '#/components/schemas/ListPagination'
-      x-private-visibility: false
     PaginatedEntityWatchlistScreeningHitList:
       description: Paginated list of entity watchlist screening hits
       allOf:
       - $ref: '#/components/schemas/EntityWatchlistScreeningHitList'
       - $ref: '#/components/schemas/ListPagination'
-      x-private-visibility: false
     PaginatedEntityWatchlistScreeningList:
       description: Paginated list of entity watchlist screenings
       allOf:
       - $ref: '#/components/schemas/EntityWatchlistScreeningList'
       - $ref: '#/components/schemas/ListPagination'
-      x-private-visibility: false
     PaginatedEntityWatchlistScreeningReviewList:
       description: Paginated list of entity watchlist screening reviews
       allOf:
       - $ref: '#/components/schemas/WatchlistScreeningEntityReviewList'
       - $ref: '#/components/schemas/ListPagination'
-      x-private-visibility: false
     PaginatedIdentityVerificationPaginatedList:
       description: Paginated list of Plaid sessions.
       allOf:
       - $ref: '#/components/schemas/IdentityVerificationList'
       - $ref: '#/components/schemas/ListPagination'
-      x-private-visibility: false
     PaginatedIndividualWatchlistProgramList:
       description: Paginated list of individual watchlist screening programs
       allOf:
       - $ref: '#/components/schemas/IndividualWatchlistProgramList'
       - $ref: '#/components/schemas/ListPagination'
-      x-private-visibility: false
     PaginatedIndividualWatchlistScreeningHitList:
       description: Paginated list of individual watchlist screening hits
       allOf:
       - $ref: '#/components/schemas/WatchlistScreeningHitList'
       - $ref: '#/components/schemas/ListPagination'
-      x-private-visibility: false
     PaginatedIndividualWatchlistScreeningList:
       description: Paginated list of individual watchlist screenings.
       allOf:
       - $ref: '#/components/schemas/WatchlistScreeningList'
       - $ref: '#/components/schemas/ListPagination'
-      x-private-visibility: false
     PaginatedIndividualWatchlistScreeningReviewList:
       description: Paginated list of screening reviews
       allOf:
       - $ref: '#/components/schemas/WatchlistScreeningReviewList'
       - $ref: '#/components/schemas/ListPagination'
-      x-private-visibility: false
     PhoneType:
       description: An enum indicating whether a phone number is a phone line or a fax line.
       type: string
       enum:
       - phone
       - fax
-      x-private-visibility: false
     PhysicalDocumentCategory:
       type: string
       description: |-
@@ -26097,7 +26120,6 @@ components:
       - residence_permit_card
       - resident_card
       example: drivers_license
-      x-private-visibility: false
     PhysicalDocumentExtractedData:
       type: object
       description: Data extracted from a user-submitted document.
@@ -26118,7 +26140,6 @@ components:
       - expiration_date
       - issuing_country
       nullable: true
-      x-private-visibility: false
     PhysicalDocumentExtractedDataAnalysis:
       type: object
       description: Analysis of the data extracted from the submitted document.
@@ -26137,14 +26158,12 @@ components:
       - expiration_date
       - issuing_country
       nullable: true
-      x-private-visibility: false
     PhysicalDocumentIDNumber:
       type: string
       description: Alpha-numeric ID number extracted via OCR from the user's document image.
       pattern: ^[A-Z0-9]+$
       example: AB123456
       nullable: true
-      x-private-visibility: false
     PhysicalDocumentImages:
       type: object
       description: URLs for downloading original and cropped images for this document submission. The URLs are designed to only allow downloading, not hot linking, so the URL will only serve the document image for 60 seconds before expiring. The expiration time is 60 seconds after the `GET` request for the associated Identity Verification attempt. A new expiring URL is generated with each request, so you can always rerequest the Identity Verification attempt if one of your URLs expires.
@@ -26165,25 +26184,21 @@ components:
       - cropped_front
       - cropped_back
       - face
-      x-private-visibility: false
     PostalCode:
       type: string
       example: "46001"
       title: PostalCode
       description: The postal code for the associated address. Between 2 and 10 alphanumeric characters.
-      x-private-visibility: false
     PreviousIdentityVerificationAttemptID:
       type: string
       example: idver_42cF1MNo42r9Xj
       description: The ID for the Identity Verification preceding this session. This field will only be filled if the current Identity Verification is a retry of a previous attempt.
       nullable: true
-      x-private-visibility: false
     ProgramArchived:
       type: boolean
       example: false
       title: Archived
       description: Archived programs are read-only and cannot screen new customers nor participate in ongoing monitoring.
-      x-private-visibility: false
     ProgramNameSensitivity:
       type: string
       enum:
@@ -26203,13 +26218,11 @@ components:
 
         `exact` - Matches must be nearly exact. This sensitivity will only show hits with exact or nearly exact name matches with only basic correction such as extraneous symbols and capitalization. This setting is generally not recommended unless you have a very specific use case.
       title: ProgramNameSensitivity
-      x-private-visibility: false
     Region:
       type: string
       example: IN
       title: Region
       description: An ISO 3166-2 subdivision code. Related terms would be "state", "province", "prefecture", "zone", "subdivision", etc.
-      x-private-visibility: false
     ReviewComment:
       description: A comment submitted by a team member as part of reviewing a watchlist screening.
       type: string
@@ -26217,7 +26230,6 @@ components:
       minLength: 1
       example: These look like legitimate matches, rejecting the customer.
       nullable: true
-      x-private-visibility: false
     ScreeningHitAnalysis:
       description: Analysis information describing why a screening hit matched the provided user information
       type: object
@@ -26236,7 +26248,6 @@ components:
           example: 1
       required:
       - search_terms_version
-      x-private-visibility: false
     ScreeningHitData:
       description: Information associated with the watchlist hit
       type: object
@@ -26261,7 +26272,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ScreeningHitNamesItems'
-      x-private-visibility: false
     ScreeningHitDateOfBirthItem:
       type: object
       description: Analyzed date of birth for the associated hit
@@ -26270,7 +26280,6 @@ components:
           $ref: '#/components/schemas/MatchSummary'
         data:
           $ref: '#/components/schemas/DateRange'
-      x-private-visibility: false
     ScreeningHitDocumentsItems:
       description: Analyzed document information for the associated hit
       type: object
@@ -26279,7 +26288,6 @@ components:
           $ref: '#/components/schemas/MatchSummary'
         data:
           $ref: '#/components/schemas/WatchlistScreeningDocument'
-      x-private-visibility: false
     ScreeningHitNamesItems:
       type: object
       description: Analyzed name information for the associated hit
@@ -26288,13 +26296,11 @@ components:
           $ref: '#/components/schemas/MatchSummary'
         data:
           $ref: '#/components/schemas/IndividualScreeningHitNames'
-      x-private-visibility: false
     ShareableURL:
       type: string
       example: https://flow.plaid.com/verify/idver_4FrXJvfQU3zGUR?key=e004115db797f7cc3083bff3167cba30644ef630fb46f5b086cde6cc3b86a36f
       description: A shareable URL that can be sent directly to the user to complete verification
       nullable: true
-      x-private-visibility: false
     Source:
       type: string
       enum:
@@ -26303,14 +26309,12 @@ components:
       - api
       - system
       description: A type indicating whether a dashboard user, an API-based user, or Plaid last touched this object.
-      x-private-visibility: false
     SourceUID:
       description: The identifier provided by the source sanction or watchlist. When one is not provided by the source, this is `null`.
       type: string
       minLength: 1
       example: 26192ABC
       nullable: true
-      x-private-visibility: false
     Strategy:
       description: |-
         An instruction specifying what steps the new Identity Verification attempt should require the user to complete:
@@ -26335,20 +26339,17 @@ components:
       - incomplete
       - infer
       - custom
-      x-private-visibility: false
     Street:
       type: string
       example: 123 Main St.
       title: Street
       description: The primary street portion of an address. If the user has submitted their address, this field will always be filled.
-      x-private-visibility: false
     Street2:
       type: string
       example: Unit 42
       title: Street2
       description: Extra street information, like an apartment or suite number.
       nullable: true
-      x-private-visibility: false
     Timestamp:
       description: An ISO8601 formatted timestamp.
       type: string
@@ -26356,13 +26357,20 @@ components:
       title: Timestamp
       example: "2020-07-24T03:26:02Z"
       x-private-visibility: false
+    TimestampNullable:
+      description: An ISO8601 formatted timestamp.
+      type: string
+      format: date-time
+      title: Timestamp
+      example: "2020-07-24T03:26:02Z"
+      x-private-visibility: false
+      nullable: true
     URL:
       type: string
       format: uri
       title: URL
       example: https://example.com
       description: An 'http' or 'https' URL (must begin with either of those).
-      x-private-visibility: false
     UpdateEntityScreeningRequest:
       type: object
       description: Request input for editing an entity watchlist screening
@@ -26387,9 +26395,21 @@ components:
           $ref: '#/components/schemas/APIClientID'
         secret:
           $ref: '#/components/schemas/APISecret'
+        reset_fields:
+          $ref: '#/components/schemas/UpdateEntityScreeningRequestResettableFieldList'
       required:
       - entity_watchlist_screening_id
-      x-private-visibility: false
+    UpdateEntityScreeningRequestResettableField:
+      type: string
+      enum:
+      - assignee
+      description: The name of a field that can be reset back to null
+    UpdateEntityScreeningRequestResettableFieldList:
+      type: array
+      items:
+        $ref: '#/components/schemas/UpdateEntityScreeningRequestResettableField'
+      description: A list of fields to reset back to null
+      nullable: true
     UpdateEntityScreeningRequestSearchTerms:
       type: object
       description: Search terms for editing an entity watchlist screening
@@ -26400,7 +26420,7 @@ components:
           nullable: true
           allOf:
           - $ref: '#/components/schemas/EntityWatchlistScreeningName'
-        document:
+        document_number:
           nullable: true
           allOf:
           - $ref: '#/components/schemas/WatchlistScreeningDocumentValue'
@@ -26429,7 +26449,6 @@ components:
       - client_id
       - secret
       nullable: true
-      x-private-visibility: false
     UpdateIndividualScreeningRequest:
       type: object
       description: Request input for editing an individual watchlist screening
@@ -26454,9 +26473,21 @@ components:
           $ref: '#/components/schemas/APIClientID'
         secret:
           $ref: '#/components/schemas/APISecret'
+        reset_fields:
+          $ref: '#/components/schemas/UpdateIndividualScreeningRequestResettableFieldList'
       required:
       - watchlist_screening_id
-      x-private-visibility: false
+    UpdateIndividualScreeningRequestResettableField:
+      type: string
+      enum:
+      - assignee
+      description: The name of a field that can be reset back to null
+    UpdateIndividualScreeningRequestResettableFieldList:
+      type: array
+      items:
+        $ref: '#/components/schemas/UpdateIndividualScreeningRequestResettableField'
+      description: A list of fields to reset back to null
+      nullable: true
     UpdateIndividualScreeningRequestSearchTerms:
       type: object
       description: Search terms for editing an individual watchlist screening
@@ -26473,7 +26504,7 @@ components:
           nullable: true
           allOf:
           - $ref: '#/components/schemas/Date'
-        document:
+        document_number:
           nullable: true
           allOf:
           - $ref: '#/components/schemas/WatchlistScreeningDocumentValue'
@@ -26482,7 +26513,6 @@ components:
           allOf:
           - $ref: '#/components/schemas/GenericCountryCode'
       nullable: true
-      x-private-visibility: false
     UserAddress:
       type: object
       properties:
@@ -26506,7 +26536,6 @@ components:
       - country
       description: Home address for user supplied to `/identity_verification/create`
       nullable: true
-      x-private-visibility: false
     UserIDNumber:
       description: ID number submitted by the user, currently used only for the Identity Verification product. If the user has not submitted this data yet, this field will be `null`. Otherwise, both fields are guaranteed to be filled.
       type: object
@@ -26519,7 +26548,6 @@ components:
       - value
       - type
       nullable: true
-      x-private-visibility: false
     UserName:
       description: The first and last name provided by the user. If the user has not submitted their name, this field will be null. Otherwise, both fields are guaranteed to be filled.
       type: object
@@ -26532,13 +26560,11 @@ components:
       - given_name
       - family_name
       nullable: true
-      x-private-visibility: false
     WatchlistProgramID:
       type: string
       example: prg_2eRPsDnL66rZ7H
       title: WatchlistProgramID
       description: ID of the associated program.
-      x-private-visibility: false
     WatchlistScreeningAuditTrail:
       title: WatchlistScreeningAuditTrail
       description: Information about the last change made to the parent object specifying what caused the change as well as when it occurred.
@@ -26556,7 +26582,6 @@ components:
       - source
       - dashboard_user_id
       - timestamp
-      x-private-visibility: false
     WatchlistScreeningCreateRequest:
       type: object
       description: Request input for creating an individual watchlist screening
@@ -26573,7 +26598,6 @@ components:
           $ref: '#/components/schemas/APISecret'
       required:
       - search_terms
-      x-private-visibility: false
     WatchlistScreeningDocument:
       title: WatchlistScreeningDocument
       type: object
@@ -26581,12 +26605,11 @@ components:
       properties:
         type:
           $ref: '#/components/schemas/WatchlistScreeningDocumentType'
-        value:
+        number:
           $ref: '#/components/schemas/WatchlistScreeningDocumentValue'
       required:
       - type
-      - value
-      x-private-visibility: false
+      - number
     WatchlistScreeningDocumentType:
       type: string
       enum:
@@ -26633,7 +26656,6 @@ components:
         `travel_document` - Visas, entry permits, refugee documents, etc.
 
         `voter_id` - Identification issued for the purpose of voting
-      x-private-visibility: false
     WatchlistScreeningDocumentValue:
       type: string
       title: WatchlistScreeningDocumentValue
@@ -26641,7 +26663,6 @@ components:
       pattern: ^\S+(\s+\S+)*$
       example: C31195855
       description: The numeric or alphanumeric identifier associated with this document.
-      x-private-visibility: false
     WatchlistScreeningEntityReviewList:
       type: object
       description: List of entity watchlist screening reviews
@@ -26656,7 +26677,6 @@ components:
       required:
       - entity_watchlist_screening_reviews
       - request_id
-      x-private-visibility: false
     WatchlistScreeningHit:
       type: object
       description: Data from a government watchlist or PEP list that has been attached to the screening.
@@ -26669,13 +26689,9 @@ components:
         first_active:
           $ref: '#/components/schemas/Timestamp'
         inactive_since:
-          nullable: true
-          allOf:
-          - $ref: '#/components/schemas/Timestamp'
+          $ref: '#/components/schemas/TimestampNullable'
         historical_since:
-          nullable: true
-          allOf:
-          - $ref: '#/components/schemas/Timestamp'
+          $ref: '#/components/schemas/TimestampNullable'
         list_code:
           $ref: '#/components/schemas/IndividualWatchlistCode'
         plaid_uid:
@@ -26695,13 +26711,11 @@ components:
       - list_code
       - plaid_uid
       - source_uid
-      x-private-visibility: false
     WatchlistScreeningHitID:
       type: string
       example: scrhit_52xR9LKo77r1Np
       title: WatchlistScreeningHitID
       description: ID of the associated screening hit.
-      x-private-visibility: false
     WatchlistScreeningHitList:
       type: object
       description: List of individual watchlist screening hits
@@ -26716,7 +26730,6 @@ components:
       required:
       - watchlist_screening_hits
       - request_id
-      x-private-visibility: false
     WatchlistScreeningHitLocations:
       type: object
       description: Location information for the associated individual watchlist hit
@@ -26730,7 +26743,6 @@ components:
       required:
       - full
       - country
-      x-private-visibility: false
     WatchlistScreeningHitStatus:
       type: string
       title: WatchlistScreeningHitStatus
@@ -26740,7 +26752,6 @@ components:
       - dismissed
       example: pending_review
       description: The current state of review. All watchlist screening hits begin in a `pending_review` state but can be changed by creating a review. When a hit is in the `pending_review` state, it will always show the latest version of the watchlist data Plaid has available and be compared against the latest customer information saved in the watchlist screening. Once a hit has been marked as `confirmed` or `dismissed` it will no longer be updated so that the state is as it was when the review was first conducted.
-      x-private-visibility: false
     WatchlistScreeningIndividual:
       type: object
       properties:
@@ -26769,13 +26780,11 @@ components:
       - audit_trail
       title: WatchlistScreeningIndividual
       description: 'The screening object allows you to represent a customer in your system, update their profile, and search for them on various watchlists. Note: Rejected customers will not receive new hits, regardless of program configuration.'
-      x-private-visibility: false
     WatchlistScreeningIndividualID:
       type: string
       example: scr_52xR9LKo77r1Np
       title: WatchlistScreeningIndividualID
       description: ID of the associated screening.
-      x-private-visibility: false
     WatchlistScreeningIndividualName:
       type: string
       title: WatchlistScreeningIndividualName
@@ -26783,7 +26792,6 @@ components:
       pattern: ^\S+(\s+\S+)*$
       example: Aleksey Potemkin
       description: The legal name of the individual being screened.
-      x-private-visibility: false
     WatchlistScreeningList:
       type: object
       description: List of individual watchlist screenings
@@ -26798,14 +26806,12 @@ components:
       required:
       - watchlist_screenings
       - request_id
-      x-private-visibility: false
     WatchlistScreeningPhoneNumber:
       type: string
       pattern: ^\+[1-9]\d{6,14}$
       description: A phone number in E.164 format.
       example: "+14025671234"
       title: WatchlistScreeningPhoneNumber
-      x-private-visibility: false
     WatchlistScreeningRequestSearchTerms:
       type: object
       description: Search inputs for creating a watchlist screening
@@ -26821,7 +26827,7 @@ components:
           nullable: true
           allOf:
           - $ref: '#/components/schemas/Date'
-        document:
+        document_number:
           nullable: true
           allOf:
           - $ref: '#/components/schemas/WatchlistScreeningDocumentValue'
@@ -26829,7 +26835,6 @@ components:
           nullable: true
           allOf:
           - $ref: '#/components/schemas/GenericCountryCode'
-      x-private-visibility: false
     WatchlistScreeningReview:
       title: WatchlistScreeningReview
       type: object
@@ -26859,13 +26864,11 @@ components:
       - dismissed_hits
       - comment
       - audit_trail
-      x-private-visibility: false
     WatchlistScreeningReviewID:
       type: string
       title: WatchlistScreeningReviewID
       example: rev_aCLNRxK3UVzn2r
       description: ID of the associated review.
-      x-private-visibility: false
     WatchlistScreeningReviewList:
       type: object
       description: List of screening reviews
@@ -26880,7 +26883,6 @@ components:
       required:
       - watchlist_screening_reviews
       - request_id
-      x-private-visibility: false
     WatchlistScreeningSearchTerms:
       type: object
       description: Search terms for creating an individual watchlist screening
@@ -26893,7 +26895,7 @@ components:
           nullable: true
           allOf:
           - $ref: '#/components/schemas/Date'
-        document:
+        document_number:
           nullable: true
           allOf:
           - $ref: '#/components/schemas/WatchlistScreeningDocumentValue'
@@ -26909,10 +26911,9 @@ components:
       - watchlist_program_id
       - legal_name
       - date_of_birth
-      - document
+      - document_number
       - country
       - version
-      x-private-visibility: false
     WatchlistScreeningStatus:
       description: A status enum indicating whether a screening is still pending review, has been rejected, or has been cleared.
       type: string
@@ -26922,7 +26923,6 @@ components:
       - cleared
       example: cleared
       title: WatchlistScreeningStatus
-      x-private-visibility: false
     WeakAliasDetermination:
       type: string
       enum:
@@ -26932,7 +26932,6 @@ components:
       example: none
       description: Names that are explicitly marked as low quality either by their `source` list, or by `plaid` by a series of additional checks done by Plaid. Plaid does not ever surface a hit as a result of a weak name alone. If a name has no quality issues, this value will be `none`.
       title: WeakAliasDetermination
-      x-private-visibility: false
     ItemGetRequest:
       description: ItemGetRequest defines the request schema for `/item/get`
       type: object
