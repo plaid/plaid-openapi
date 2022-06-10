@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.121.0
+  version: 2020-09-14_1.128.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -1511,14 +1511,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DashboardUser'
+                $ref: '#/components/schemas/DashboardUserResponse'
               examples:
                 example-1:
                   value:
-                    id: usr_1SUuwqBdK75GKi
+                    id: 54350110fedcbaf01234ffee
                     created_at: "2020-07-24T03:26:02Z"
                     email_address: user@example.com
                     status: active
+                    request_id: saKrIBuEB9qJZng
       operationId: dashobardUserGet
       description: Retrieve information about a dashboard user.
       requestBody:
@@ -1540,12 +1541,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedDashboardUserList'
+                $ref: '#/components/schemas/PaginatedDashboardUserListResponse'
               examples:
                 example-1:
                   value:
                     dashboard_users:
-                    - id: usr_1SUuwqBdK75GKi
+                    - id: 54350110fedcbaf01234ffee
                       created_at: "2020-07-24T03:26:02Z"
                       email_address: user@example.com
                       status: active
@@ -1575,7 +1576,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IdentityVerification'
+                $ref: '#/components/schemas/IdentityVerificationResponse'
               examples:
                 example-1:
                   value:
@@ -1663,7 +1664,7 @@ paths:
               $ref: '#/components/schemas/IdentityVerificationCreateRequest'
         required: true
       externalDocs:
-        url: /api/products/identity-verification/identity_verificationcreate
+        url: /api/products/identity-verification/#identity_verificationcreate
   /identity_verification/get:
     post:
       summary: Retrieve Identity Verification
@@ -1675,7 +1676,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IdentityVerification'
+                $ref: '#/components/schemas/IdentityVerificationResponse'
               examples:
                 example-1:
                   value:
@@ -1764,7 +1765,7 @@ paths:
               $ref: '#/components/schemas/GetIdentityVerificationRequest'
         required: true
       externalDocs:
-        url: /api/products/identity-verification/identity_verificationget
+        url: /api/products/identity-verification/#identity_verificationget
   /identity_verification/list:
     post:
       summary: List Identity Verifications
@@ -1776,7 +1777,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedIdentityVerificationPaginatedList'
+                $ref: '#/components/schemas/PaginatedIdentityVerificationListResponse'
               examples:
                 example-1:
                   value:
@@ -1856,7 +1857,6 @@ paths:
                         phone_number:
                           summary: match
                       watchlist_screening_id: scr_52xR9LKo77r1Np
-                      request_id: saKrIBuEB9qJZng
                     next_cursor: eyJkaXJlY3Rpb24iOiJuZXh0Iiwib2Zmc2V0IjoiMTU5NDM
                     request_id: saKrIBuEB9qJZng
       operationId: identityVerificationList
@@ -1868,7 +1868,7 @@ paths:
               $ref: '#/components/schemas/ListIdentityVerificationRequest'
         required: true
       externalDocs:
-        url: /api/products/monitor/dashboard_userget
+        url: /api/products/identity-verification/#identity_verificationlist
   /identity_verification/retry:
     post:
       summary: Retry an Identity Verification
@@ -1886,7 +1886,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IdentityVerification'
+                $ref: '#/components/schemas/IdentityVerificationResponse'
               examples:
                 example-1:
                   value:
@@ -1969,7 +1969,7 @@ paths:
       operationId: identityVerificationRetry
       description: Allow a customer to retry their identity verification
       externalDocs:
-        url: /api/products/identity-verification/identity_verificationretry
+        url: /api/products/identity-verification/#identity_verificationretry
   /watchlist_screening/entity/create:
     post:
       summary: Create a watchlist screening for an entity
@@ -1980,7 +1980,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EntityWatchlistScreening'
+                $ref: '#/components/schemas/EntityWatchlistScreeningResponse'
               examples:
                 example-1:
                   value:
@@ -1994,13 +1994,14 @@ paths:
                       phone_number: "+14025671234"
                       url: https://example.com
                       version: 1
-                    assignee: usr_1SUuwqBdK75GKi
+                    assignee: 54350110fedcbaf01234ffee
                     status: cleared
                     client_user_id: your-db-id-3b24110
                     audit_trail:
                       source: dashboard
-                      dashboard_user_id: usr_1SUuwqBdK75GKi
+                      dashboard_user_id: 54350110fedcbaf01234ffee
                       timestamp: "2020-07-24T03:26:02Z"
+                    request_id: saKrIBuEB9qJZng
       description: Create a new entity watchlist screening to check your customer against watchlists defined in the associated entity watchlist program. If your associated program has ongoing screening enabled, this is the profile information that will be used to monitor your customer over time.
       tags:
       - plaid
@@ -2023,7 +2024,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EntityWatchlistScreening'
+                $ref: '#/components/schemas/EntityWatchlistScreeningResponse'
               examples:
                 example-1:
                   value:
@@ -2037,13 +2038,14 @@ paths:
                       phone_number: "+14025671234"
                       url: https://example.com
                       version: 1
-                    assignee: usr_1SUuwqBdK75GKi
+                    assignee: 54350110fedcbaf01234ffee
                     status: cleared
                     client_user_id: your-db-id-3b24110
                     audit_trail:
                       source: dashboard
-                      dashboard_user_id: usr_1SUuwqBdK75GKi
+                      dashboard_user_id: 54350110fedcbaf01234ffee
                       timestamp: "2020-07-24T03:26:02Z"
+                    request_id: saKrIBuEB9qJZng
       operationId: watchlistScreeningEntityGet
       description: Retrieve an entity watchlist screening.
       requestBody:
@@ -2065,7 +2067,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedEntityWatchlistScreeningList'
+                $ref: '#/components/schemas/PaginatedEntityWatchlistScreeningListResponse'
               examples:
                 example-1:
                   value:
@@ -2080,12 +2082,12 @@ paths:
                         phone_number: "+14025671234"
                         url: https://example.com
                         version: 1
-                      assignee: usr_1SUuwqBdK75GKi
+                      assignee: 54350110fedcbaf01234ffee
                       status: cleared
                       client_user_id: your-db-id-3b24110
                       audit_trail:
                         source: dashboard
-                        dashboard_user_id: usr_1SUuwqBdK75GKi
+                        dashboard_user_id: 54350110fedcbaf01234ffee
                         timestamp: "2020-07-24T03:26:02Z"
                     next_cursor: eyJkaXJlY3Rpb24iOiJuZXh0Iiwib2Zmc2V0IjoiMTU5NDM
                     request_id: saKrIBuEB9qJZng
@@ -2110,7 +2112,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedEntityWatchlistScreeningHitList'
+                $ref: '#/components/schemas/PaginatedEntityWatchlistScreeningHitListResponse'
               examples:
                 example-1:
                   value:
@@ -2188,7 +2190,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedEntityWatchlistScreeningList'
+                $ref: '#/components/schemas/PaginatedEntityWatchlistScreeningListResponse'
               examples:
                 example-1:
                   value:
@@ -2203,12 +2205,12 @@ paths:
                         phone_number: "+14025671234"
                         url: https://example.com
                         version: 1
-                      assignee: usr_1SUuwqBdK75GKi
+                      assignee: 54350110fedcbaf01234ffee
                       status: cleared
                       client_user_id: your-db-id-3b24110
                       audit_trail:
                         source: dashboard
-                        dashboard_user_id: usr_1SUuwqBdK75GKi
+                        dashboard_user_id: 54350110fedcbaf01234ffee
                         timestamp: "2020-07-24T03:26:02Z"
                     next_cursor: eyJkaXJlY3Rpb24iOiJuZXh0Iiwib2Zmc2V0IjoiMTU5NDM
                     request_id: saKrIBuEB9qJZng
@@ -2235,7 +2237,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EntityWatchlistProgram'
+                $ref: '#/components/schemas/EntityWatchlistProgramResponse'
               examples:
                 example-1:
                   value:
@@ -2248,9 +2250,10 @@ paths:
                     name_sensitivity: balanced
                     audit_trail:
                       source: dashboard
-                      dashboard_user_id: usr_1SUuwqBdK75GKi
+                      dashboard_user_id: 54350110fedcbaf01234ffee
                       timestamp: "2020-07-24T03:26:02Z"
                     is_archived: false
+                    request_id: saKrIBuEB9qJZng
       operationId: watchlistScreeningEntityProgramGet
       description: Get an entity watchlist screening program
       requestBody:
@@ -2270,7 +2273,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedEntityWatchlistProgramList'
+                $ref: '#/components/schemas/PaginatedEntityWatchlistProgramListResponse'
               examples:
                 example-1:
                   value:
@@ -2284,7 +2287,7 @@ paths:
                       name_sensitivity: balanced
                       audit_trail:
                         source: dashboard
-                        dashboard_user_id: usr_1SUuwqBdK75GKi
+                        dashboard_user_id: 54350110fedcbaf01234ffee
                         timestamp: "2020-07-24T03:26:02Z"
                       is_archived: false
                     next_cursor: eyJkaXJlY3Rpb24iOiJuZXh0Iiwib2Zmc2V0IjoiMTU5NDM
@@ -2318,7 +2321,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EntityWatchlistScreeningReview'
+                $ref: '#/components/schemas/EntityWatchlistScreeningReviewResponse'
               examples:
                 example-1:
                   value:
@@ -2330,8 +2333,9 @@ paths:
                     comment: These look like legitimate matches, rejecting the customer.
                     audit_trail:
                       source: dashboard
-                      dashboard_user_id: usr_1SUuwqBdK75GKi
+                      dashboard_user_id: 54350110fedcbaf01234ffee
                       timestamp: "2020-07-24T03:26:02Z"
+                    request_id: saKrIBuEB9qJZng
       tags:
       - plaid
       externalDocs:
@@ -2347,7 +2351,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedEntityWatchlistScreeningReviewList'
+                $ref: '#/components/schemas/PaginatedEntityWatchlistScreeningReviewListResponse'
               examples:
                 example-1:
                   value:
@@ -2360,7 +2364,7 @@ paths:
                       comment: These look like legitimate matches, rejecting the customer.
                       audit_trail:
                         source: dashboard
-                        dashboard_user_id: usr_1SUuwqBdK75GKi
+                        dashboard_user_id: 54350110fedcbaf01234ffee
                         timestamp: "2020-07-24T03:26:02Z"
                     next_cursor: eyJkaXJlY3Rpb24iOiJuZXh0Iiwib2Zmc2V0IjoiMTU5NDM
                     request_id: saKrIBuEB9qJZng
@@ -2384,7 +2388,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EntityWatchlistScreening'
+                $ref: '#/components/schemas/EntityWatchlistScreeningResponse'
               examples:
                 example-1:
                   value:
@@ -2398,13 +2402,14 @@ paths:
                       phone_number: "+14025671234"
                       url: https://example.com
                       version: 1
-                    assignee: usr_1SUuwqBdK75GKi
+                    assignee: 54350110fedcbaf01234ffee
                     status: cleared
                     client_user_id: your-db-id-3b24110
                     audit_trail:
                       source: dashboard
-                      dashboard_user_id: usr_1SUuwqBdK75GKi
+                      dashboard_user_id: 54350110fedcbaf01234ffee
                       timestamp: "2020-07-24T03:26:02Z"
+                    request_id: saKrIBuEB9qJZng
       description: Update an entity watchlist screening.
       tags:
       - plaid
@@ -2427,7 +2432,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WatchlistScreeningIndividual'
+                $ref: '#/components/schemas/WatchlistScreeningIndividualResponse'
               examples:
                 example-1:
                   value:
@@ -2439,13 +2444,14 @@ paths:
                       document_number: C31195855
                       country: US
                       version: 1
-                    assignee: usr_1SUuwqBdK75GKi
+                    assignee: 54350110fedcbaf01234ffee
                     status: cleared
                     client_user_id: your-db-id-3b24110
                     audit_trail:
                       source: dashboard
-                      dashboard_user_id: usr_1SUuwqBdK75GKi
+                      dashboard_user_id: 54350110fedcbaf01234ffee
                       timestamp: "2020-07-24T03:26:02Z"
+                    request_id: saKrIBuEB9qJZng
       description: Create a new Watchlist Screening to check your customer against watchlists defined in the associated Watchlist Program. If your associated program has ongoing screening enabled, this is the profile information that will be used to monitor your customer over time.
       tags:
       - plaid
@@ -2468,7 +2474,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WatchlistScreeningIndividual'
+                $ref: '#/components/schemas/WatchlistScreeningIndividualResponse'
               examples:
                 example-1:
                   value:
@@ -2480,13 +2486,14 @@ paths:
                       document_number: C31195855
                       country: US
                       version: 1
-                    assignee: usr_1SUuwqBdK75GKi
+                    assignee: 54350110fedcbaf01234ffee
                     status: cleared
                     client_user_id: your-db-id-3b24110
                     audit_trail:
                       source: dashboard
-                      dashboard_user_id: usr_1SUuwqBdK75GKi
+                      dashboard_user_id: 54350110fedcbaf01234ffee
                       timestamp: "2020-07-24T03:26:02Z"
+                    request_id: saKrIBuEB9qJZng
       operationId: watchlistScreeningIndividualGet
       description: Retrieve a previously created individual watchlist screening
       requestBody:
@@ -2508,7 +2515,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedIndividualWatchlistScreeningList'
+                $ref: '#/components/schemas/PaginatedIndividualWatchlistScreeningListResponse'
               examples:
                 example-1:
                   value:
@@ -2521,12 +2528,12 @@ paths:
                         document_number: C31195855
                         country: US
                         version: 1
-                      assignee: usr_1SUuwqBdK75GKi
+                      assignee: 54350110fedcbaf01234ffee
                       status: cleared
                       client_user_id: your-db-id-3b24110
                       audit_trail:
                         source: dashboard
-                        dashboard_user_id: usr_1SUuwqBdK75GKi
+                        dashboard_user_id: 54350110fedcbaf01234ffee
                         timestamp: "2020-07-24T03:26:02Z"
                     next_cursor: eyJkaXJlY3Rpb24iOiJuZXh0Iiwib2Zmc2V0IjoiMTU5NDM
                     request_id: saKrIBuEB9qJZng
@@ -2551,7 +2558,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedIndividualWatchlistScreeningHitList'
+                $ref: '#/components/schemas/PaginatedIndividualWatchlistScreeningHitListResponse'
               examples:
                 example-1:
                   value:
@@ -2617,7 +2624,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedIndividualWatchlistScreeningList'
+                $ref: '#/components/schemas/PaginatedIndividualWatchlistScreeningListResponse'
               examples:
                 example-1:
                   value:
@@ -2630,12 +2637,12 @@ paths:
                         document_number: C31195855
                         country: US
                         version: 1
-                      assignee: usr_1SUuwqBdK75GKi
+                      assignee: 54350110fedcbaf01234ffee
                       status: cleared
                       client_user_id: your-db-id-3b24110
                       audit_trail:
                         source: dashboard
-                        dashboard_user_id: usr_1SUuwqBdK75GKi
+                        dashboard_user_id: 54350110fedcbaf01234ffee
                         timestamp: "2020-07-24T03:26:02Z"
                     next_cursor: eyJkaXJlY3Rpb24iOiJuZXh0Iiwib2Zmc2V0IjoiMTU5NDM
                     request_id: saKrIBuEB9qJZng
@@ -2662,7 +2669,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IndividualWatchlistProgram'
+                $ref: '#/components/schemas/IndividualWatchlistProgramResponse'
               examples:
                 example-1:
                   value:
@@ -2675,9 +2682,10 @@ paths:
                     name_sensitivity: balanced
                     audit_trail:
                       source: dashboard
-                      dashboard_user_id: usr_1SUuwqBdK75GKi
+                      dashboard_user_id: 54350110fedcbaf01234ffee
                       timestamp: "2020-07-24T03:26:02Z"
                     is_archived: false
+                    request_id: saKrIBuEB9qJZng
       operationId: watchlistScreeningIndividualProgramGet
       description: Get an individual watchlist screening program
       requestBody:
@@ -2697,7 +2705,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedIndividualWatchlistProgramList'
+                $ref: '#/components/schemas/PaginatedIndividualWatchlistProgramListResponse'
               examples:
                 example-1:
                   value:
@@ -2711,10 +2719,11 @@ paths:
                       name_sensitivity: balanced
                       audit_trail:
                         source: dashboard
-                        dashboard_user_id: usr_1SUuwqBdK75GKi
+                        dashboard_user_id: 54350110fedcbaf01234ffee
                         timestamp: "2020-07-24T03:26:02Z"
                       is_archived: false
                     next_cursor: eyJkaXJlY3Rpb24iOiJuZXh0Iiwib2Zmc2V0IjoiMTU5NDM
+                    request_id: saKrIBuEB9qJZng
       operationId: watchlistScreeningIndividualProgramList
       description: List all individual watchlist screening programs
       tags:
@@ -2744,7 +2753,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WatchlistScreeningReview'
+                $ref: '#/components/schemas/WatchlistScreeningReviewResponse'
               examples:
                 example-1:
                   value:
@@ -2756,8 +2765,9 @@ paths:
                     comment: These look like legitimate matches, rejecting the customer.
                     audit_trail:
                       source: dashboard
-                      dashboard_user_id: usr_1SUuwqBdK75GKi
+                      dashboard_user_id: 54350110fedcbaf01234ffee
                       timestamp: "2020-07-24T03:26:02Z"
+                    request_id: saKrIBuEB9qJZng
       tags:
       - plaid
       externalDocs:
@@ -2773,7 +2783,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedIndividualWatchlistScreeningReviewList'
+                $ref: '#/components/schemas/PaginatedIndividualWatchlistScreeningReviewListResponse'
               examples:
                 example-1:
                   value:
@@ -2786,7 +2796,7 @@ paths:
                       comment: These look like legitimate matches, rejecting the customer.
                       audit_trail:
                         source: dashboard
-                        dashboard_user_id: usr_1SUuwqBdK75GKi
+                        dashboard_user_id: 54350110fedcbaf01234ffee
                         timestamp: "2020-07-24T03:26:02Z"
                     next_cursor: eyJkaXJlY3Rpb24iOiJuZXh0Iiwib2Zmc2V0IjoiMTU5NDM
                     request_id: saKrIBuEB9qJZng
@@ -2810,7 +2820,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WatchlistScreeningIndividual'
+                $ref: '#/components/schemas/WatchlistScreeningIndividualResponse'
               examples:
                 example-1:
                   value:
@@ -2822,13 +2832,14 @@ paths:
                       document_number: C31195855
                       country: US
                       version: 1
-                    assignee: usr_1SUuwqBdK75GKi
+                    assignee: 54350110fedcbaf01234ffee
                     status: cleared
                     client_user_id: your-db-id-3b24110
                     audit_trail:
                       source: dashboard
-                      dashboard_user_id: usr_1SUuwqBdK75GKi
+                      dashboard_user_id: 54350110fedcbaf01234ffee
                       timestamp: "2020-07-24T03:26:02Z"
+                    request_id: saKrIBuEB9qJZng
       description: Update a specific individual watchlist screening. This endpoint can be used to add additional customer information, correct outdated information, add a reference id, assign the individual to a reviewer, and update which program it is associated with. Please note that you may not update `search_terms` and `status` at the same time since editing `search_terms` may trigger an automatic `status` change.
       tags:
       - plaid
@@ -7472,6 +7483,12 @@ paths:
                   value:
                     items:
                     - item_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBFL9DrE6
+                      accounts:
+                      - account_id: GeooLPBGDEunl54q7N3ZcyD5aLPLEai1nkzM9
+                        rate_of_pay:
+                          pay_amount: 100000
+                          pay_rate: ANNUAL
+                        pay_frequency: BIWEEKLY
                       payroll_income:
                       - account_id: GeooLPBGDEunl54q7N3ZcyD5aLPLEai1nkzM9
                         pay_stubs:
@@ -7727,6 +7744,36 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreditPayrollIncomeRefreshRequest'
+  /credit/relay/create:
+    post:
+      summary: Create a `relay_token` to share an Asset Report with a partner client
+      tags:
+      - plaid
+      operationId: creditRelayCreate
+      externalDocs:
+        url: /none/
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditRelayCreateRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditRelayCreateResponse'
+              examples:
+                example-1:
+                  value:
+                    relay_token: credit-relay-production-3TAU2CWVYBDVRHUCAAAI27ULU4
+                    request_id: Iam3b
+      description: |-
+        Plaid can share an Asset Report directly with a participating third party on your behalf. The shared Asset Report is the exact same Asset Report originally created in `/asset_report/create`.
+
+        To grant access to an Asset Report to a third party, use the `/credit/relay/create` endpoint to create a `relay_token` and then pass that token to the third party who needs access. Each third party has its own `secondary_client_id`, for example `ce5bd328dcd34123456`. You'll need to create a separate `relay_token` for each third party to whom you want to grant access to the Report.
   /sandbox/bank_transfer/fire_webhook:
     post:
       summary: Manually fire a Bank Transfer webhook
@@ -10336,6 +10383,11 @@ components:
           description: A string in RFC 3339 format (i.e. "2019-12-06T22:35:49Z"). Only payments created before the cursor will be returned.
           format: date-time
           nullable: true
+        consent_id:
+          type: string
+          description: The consent ID. If specified, only payments, executed using this consent, will be returned.
+          minLength: 1
+          nullable: true
     PaymentInitiationPaymentListResponse:
       type: object
       additionalProperties: true
@@ -10397,6 +10449,11 @@ components:
           type: string
           description: URL to which Plaid will send Assets webhooks, for example when the requested Asset Report is ready.
           nullable: true
+        include_fast_report:
+          type: boolean
+          description: true to return balance and identity earlier as a fast report. Defaults to false if omitted.
+          nullable: true
+          x-hidden-from-docs: true
         user:
           $ref: '#/components/schemas/AssetReportUser'
     AssetReportCreateResponse:
@@ -10566,6 +10623,11 @@ components:
           type: boolean
           default: false
           description: '`true` if you would like to retrieve the Asset Report with Insights, `false` otherwise. This field defaults to `false` if omitted.'
+        fast_report:
+          type: boolean
+          default: false
+          description: '`true` to fetch "fast" version of asset report. Defaults to false if omitted.'
+          x-hidden-from-docs: true
       required:
       - asset_report_token
     AssetReportGetResponse:
@@ -11227,6 +11289,10 @@ components:
           type: string
           description: The `payment_id` provided by the `/payment_initiation/payment/create` endpoint.
           minLength: 1
+        consent_id:
+          type: string
+          description: The `consent_id` provided by the `/payment_initiation/consent/create` endpoint.
+          minLength: 1
       required:
       - payment_id
     LinkTokenCreateRequestDepositSwitch:
@@ -11247,15 +11313,27 @@ components:
           description: The `id` returned by the `/transfer/intent/create` endpoint.
     LinkTokenCreateRequestAuth:
       type: object
-      description: Specifies options for initializing Link for use with the Auth product. This field is currently only required if using the Flexible Auth product (currently in closed beta).
+      description: Specifies options for initializing Link for use with the Auth product. This field can be used to enable or disable extended Auth flows for the resulting Link session. Omitting any field will result in a default that can be configured by your account manager.
       properties:
+        auth_type_select_enabled:
+          type: boolean
+          description: Specifies whether Auth Type Select is enabled for the Link session, allowing the end user to choose between linking instantly or manually prior to selecting their financial institution. Note that this can only be true if `same_day_microdeposits_enabled` is set to true.
+          default: false
+        automated_microdeposits_enabled:
+          type: boolean
+          description: Specifies whether the Link session is enabled for the Automated Micro-deposits flow.
+        instant_match_enabled:
+          type: boolean
+          description: Specifies whether the Link session is enabled for the Instant Match flow.
+        same_day_microdeposits_enabled:
+          type: boolean
+          description: Specifies whether the Link session is enabled for the Same Day Micro-deposits flow.
         flow_type:
           type: string
           enum:
           - FLEXIBLE_AUTH
-          description: The optional Auth flow to use. Currently only used to enable Flexible Auth.
-      required:
-      - flow_type
+          description: This field has been deprecated in favor of `auth_type_select_enabled`.
+          deprecated: true
     LinkTokenCreateInstitutionData:
       type: object
       description: A map containing data used to highlight institutions in Link.
@@ -17785,6 +17863,14 @@ components:
           description: Filter events by event type.
           items:
             $ref: '#/components/schemas/TransferEventType'
+          x-override-enum-values-shown:
+          - pending
+          - cancelled
+          - failed
+          - posted
+          - returned
+          - swept
+          - return_swept
         sweep_id:
           type: string
           description: Plaid’s unique identifier for a sweep.
@@ -19538,6 +19624,7 @@ components:
           webhook_type: INCOME
           webhook_code: INCOME_VERIFICATION
           item_id: gAXlMgVEw5uEGoQnnXZ6tn9E7Mn3LBc4PJVKZ
+          user_id: 9eaba3c2fdc916bc197f279185b986607dd21682a5b04eab04a5a03e8b3f3334
           verification_status: VERIFICATION_STATUS_PROCESSING_COMPLETE
       properties:
         webhook_type:
@@ -21535,23 +21622,22 @@ components:
       - risk_signals
     CreditAuditCopyTokenCreateRequest:
       type: object
-      description: CreditAuditCopyTokenCreateRequest defines the request schema for `/credit/audit_copy_token/get`
+      description: CreditAuditCopyTokenCreateRequest defines the request schema for `/credit/audit_copy_token/create`
       properties:
         client_id:
           $ref: '#/components/schemas/APIClientID'
         secret:
           $ref: '#/components/schemas/APISecret'
-        tokens:
+        report_tokens:
           type: array
           description: List of report tokens; can include both Asset Report tokens and Income Report tokens.
           items:
-            type: string
-            description: List of report tokens; can include both Asset Report tokens and Income Report tokens.
+            $ref: '#/components/schemas/ReportToken'
         auditor_id:
           type: string
           description: The `auditor_id` of the third party with whom you would like to share the Asset Report and/or Income Report.
       required:
-      - tokens
+      - report_tokens
       - auditor_id
     CreditAuditCopyTokenCreateResponse:
       type: object
@@ -21664,6 +21750,10 @@ components:
       properties:
         item_id:
           $ref: '#/components/schemas/ItemId'
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/PayrollIncomeAccountData'
         payroll_income:
           type: array
           items:
@@ -21674,6 +21764,40 @@ components:
       - item_id
       - payroll_income
       - status
+      - accounts
+    PayrollIncomeAccountData:
+      title: PayrollIncomeAccountData
+      type: object
+      nullable: true
+      additionalProperties: true
+      description: An object containing account level data.
+      properties:
+        account_id:
+          type: string
+          description: ID of the payroll provider account.
+          nullable: true
+        rate_of_pay:
+          $ref: '#/components/schemas/PayrollIncomeRateOfPay'
+        pay_frequency:
+          type: string
+          description: The frequency at which an individual is paid.
+          nullable: true
+          x-override-enum-values-shown:
+          - DAILY
+          - WEEKLY
+          - BIWEEKLY
+          - SEMI_MONTHLY
+          - MONTHLY
+          - CONTRACT
+          - QUARTERLY
+          - SEMI_ANNUALLY
+          - ANNUALLY
+          - OTHER
+          - null
+      required:
+      - account_id
+      - rate_of_pay
+      - pay_frequency
     PayrollIncomeObject:
       title: PayrollIncomeObject
       type: object
@@ -22232,6 +22356,22 @@ components:
           - null
       required:
       - type
+    ReportToken:
+      title: ReportToken
+      description: ReportToken is a representation of a token that has a `report_type` field that can be one of `assets` or `income` and a `token` field which is the associated token with the `report_type`. The `token` can be an Asset Report token or Income Report token.
+      type: object
+      additionalProperties: true
+      properties:
+        report_type:
+          title: ReportType
+          type: string
+          description: The report type. It can be `assets` or `income`.
+          nullable: false
+        token:
+          title: Token
+          type: string
+          description: The report token. It can be an asset report token or an income report token.
+          nullable: false
     DocumentRiskSignal:
       title: DocumentRiskSignal
       description: Details about a certain reason as to why a document could potentially be fraudulent.
@@ -22424,6 +22564,27 @@ components:
       - third_party_sick_pay
       - other
       - state_and_local_wages
+    PayrollIncomeRateOfPay:
+      title: PayrollIncomeRateOfPay
+      type: object
+      additionalProperties: true
+      description: An object representing the rate at which an individual is paid.
+      properties:
+        pay_rate:
+          type: string
+          description: The rate at which an employee is paid.
+          nullable: true
+          x-override-enum-values-shown:
+          - ANNUAL
+          - HOURLY
+          - CONTRACT
+          - OTHER
+          - null
+        pay_amount:
+          type: number
+          format: double
+          description: The amount at which an employee is paid.
+          nullable: true
     CreditPayrollIncomePrecheckRequest:
       title: CreditPayrollIncomePrecheckRequest
       type: object
@@ -22703,6 +22864,42 @@ components:
       - NO_ACCOUNTS
       - ITEM_NOT_SUPPORTED
       - ACCESS_NOT_GRANTED
+    CreditRelayCreateRequest:
+      type: object
+      description: CreditRelayCreateRequest defines the request schema for `/credit/relay/create`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        report_tokens:
+          type: array
+          description: List of report tokens, with at most one token of each report type. Currently only Asset Report token is supported.
+          items:
+            $ref: '#/components/schemas/ReportToken'
+        secondary_client_id:
+          type: string
+          description: The `secondary_client_id` is the client id of the third party with whom you would like to share the Relay Token.
+        webhook:
+          type: string
+          description: URL to which Plaid will send webhooks when the Secondary Client successfully retrieves an Asset Report by calling `/credit/relay/get`.
+          nullable: true
+      required:
+      - report_tokens
+      - secondary_client_id
+    CreditRelayCreateResponse:
+      type: object
+      additionalProperties: true
+      description: CreditRelayCreateResponse defines the response schema for `/credit/relay/create`
+      properties:
+        relay_token:
+          type: string
+          description: A token that can be shared with a third party to allow them to access the Asset Report. This token should be stored securely.
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - relay_token
+      - request_id
     SandboxBankTransferFireWebhookRequest:
       title: SandboxBankTransferFireWebhookRequest
       type: object
@@ -24400,22 +24597,29 @@ components:
     DashboardUserID:
       type: string
       title: DashboardUserID
-      example: usr_1SUuwqBdK75GKi
+      example: 54350110fedcbaf01234ffee
       description: ID of the associated user.
-    DashboardUserList:
-      type: object
-      description: List of dashboard users
+    DashboardUserResponse:
+      description: Account information associated with a team member with access to the Plaid dashboard.
+      additionalProperties: true
       properties:
-        dashboard_users:
-          description: List of dashboard users
-          type: array
-          items:
-            $ref: '#/components/schemas/DashboardUser'
+        id:
+          $ref: '#/components/schemas/DashboardUserID'
+        created_at:
+          $ref: '#/components/schemas/Timestamp'
+        email_address:
+          $ref: '#/components/schemas/EmailAddress'
+        status:
+          $ref: '#/components/schemas/DashboardUserStatus'
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
-      - dashboard_users
+      - id
+      - created_at
+      - email_address
+      - status
       - request_id
+      type: object
     DashboardUserStatus:
       type: string
       example: active
@@ -24823,6 +25027,47 @@ components:
       example: entprg_2eRPsDnL66rZ7H
       title: EntityWatchlistProgramID
       description: ID of the associated entity program.
+    EntityWatchlistProgramResponse:
+      description: A program that configures the active lists, search parameters, and other behavior for initial and ongoing screening of entities.
+      additionalProperties: true
+      properties:
+        id:
+          $ref: '#/components/schemas/EntityWatchlistProgramID'
+        created_at:
+          $ref: '#/components/schemas/Timestamp'
+        is_rescanning_enabled:
+          description: Indicator specifying whether the program is enabled and will perform daily rescans.
+          type: boolean
+          example: true
+        lists_enabled:
+          description: Watchlists enabled for the associated program
+          type: array
+          example:
+          - EU_CON
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/EntityWatchlistCode'
+        name:
+          $ref: '#/components/schemas/EntityWatchlistScreeningProgramName'
+        name_sensitivity:
+          $ref: '#/components/schemas/ProgramNameSensitivity'
+        audit_trail:
+          $ref: '#/components/schemas/WatchlistScreeningAuditTrail'
+        is_archived:
+          $ref: '#/components/schemas/ProgramArchived'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - id
+      - created_at
+      - is_rescanning_enabled
+      - lists_enabled
+      - name
+      - name_sensitivity
+      - audit_trail
+      - is_archived
+      - request_id
+      type: object
     EntityWatchlistScreening:
       type: object
       properties:
@@ -24890,39 +25135,11 @@ components:
       example: enthit_52xR9LKo77r1Np
       title: EntityWatchlistScreeningHitID
       description: ID of the associated entity screening hit.
-    EntityWatchlistScreeningHitList:
-      type: object
-      description: List of entity watchlist screening hits
-      properties:
-        entity_watchlist_screening_hits:
-          description: List of entity watchlist screening hits
-          type: array
-          items:
-            $ref: '#/components/schemas/EntityWatchlistScreeningHit'
-        request_id:
-          $ref: '#/components/schemas/RequestID'
-      required:
-      - entity_watchlist_screening_hits
-      - request_id
     EntityWatchlistScreeningID:
       type: string
       example: entscr_52xR9LKo77r1Np
       title: EntityWatchlistScreeningID
       description: ID of the associated entity screening.
-    EntityWatchlistScreeningList:
-      type: object
-      description: List of entity watchlist screening
-      properties:
-        entity_watchlist_screenings:
-          description: List of entity watchlist screening
-          type: array
-          items:
-            $ref: '#/components/schemas/EntityWatchlistScreening'
-        request_id:
-          $ref: '#/components/schemas/RequestID'
-      required:
-      - entity_watchlist_screenings
-      - request_id
     EntityWatchlistScreeningName:
       type: string
       title: EntityWatchlistScreeningName
@@ -24930,20 +25147,6 @@ components:
       pattern: ^\S+(\s+\S+)*$
       example: Al-Qaida
       description: The name of the organization being screened.
-    EntityWatchlistScreeningProgramList:
-      type: object
-      description: List of entity watchlist screening programs
-      properties:
-        entity_watchlist_programs:
-          description: List of entity watchlist screening programs
-          type: array
-          items:
-            $ref: '#/components/schemas/EntityWatchlistProgram'
-        request_id:
-          $ref: '#/components/schemas/RequestID'
-      required:
-      - entity_watchlist_programs
-      - request_id
     EntityWatchlistScreeningProgramName:
       type: string
       title: EntityWatchlistScreeningProgramName
@@ -24951,6 +25154,37 @@ components:
       minLength: 1
       pattern: ^\S+(\s+\S+)*$
       description: A name for the entity program to define its purpose. For example, "High Risk Organizations" or "Applicants".
+    EntityWatchlistScreeningResponse:
+      description: 'The entity screening object allows you to represent an entity in your system, update its profile, and search for it on various watchlists. Note: Rejected entity screenings will not receive new hits, regardless of entity program configuration.'
+      additionalProperties: true
+      properties:
+        id:
+          $ref: '#/components/schemas/EntityWatchlistScreeningID'
+        search_terms:
+          $ref: '#/components/schemas/EntityWatchlistScreeningSearchTerms'
+        assignee:
+          nullable: true
+          allOf:
+          - $ref: '#/components/schemas/DashboardUserID'
+        status:
+          $ref: '#/components/schemas/WatchlistScreeningStatus'
+        client_user_id:
+          nullable: true
+          allOf:
+          - $ref: '#/components/schemas/ClientUserID'
+        audit_trail:
+          $ref: '#/components/schemas/WatchlistScreeningAuditTrail'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - id
+      - search_terms
+      - assignee
+      - status
+      - client_user_id
+      - audit_trail
+      - request_id
+      type: object
     EntityWatchlistScreeningReview:
       title: EntityWatchlistScreeningReview
       type: object
@@ -24985,6 +25219,38 @@ components:
       title: EntityWatchlistScreeningReviewID
       example: entrev_aCLNRxK3UVzn2r
       description: ID of the associated entity review.
+    EntityWatchlistScreeningReviewResponse:
+      description: |-
+        A review submitted by a team member for an entity watchlist screening. A review can be either a comment on the current screening state, actions taken
+        against hits attached to the watchlist screening, or both.
+      additionalProperties: true
+      properties:
+        id:
+          $ref: '#/components/schemas/EntityWatchlistScreeningReviewID'
+        confirmed_hits:
+          type: array
+          description: Hits marked as a true positive after thorough manual review. These hits will never recur or be updated once dismissed. In most cases, confirmed hits indicate that the customer should be rejected.
+          items:
+            $ref: '#/components/schemas/EntityWatchlistScreeningHitID'
+        dismissed_hits:
+          type: array
+          description: Hits marked as a false positive after thorough manual review. These hits will never recur or be updated once dismissed.
+          items:
+            $ref: '#/components/schemas/EntityWatchlistScreeningHitID'
+        comment:
+          $ref: '#/components/schemas/ReviewComment'
+        audit_trail:
+          $ref: '#/components/schemas/WatchlistScreeningAuditTrail'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - id
+      - confirmed_hits
+      - dismissed_hits
+      - comment
+      - audit_trail
+      - request_id
+      type: object
     EntityWatchlistScreeningSearchTerms:
       type: object
       description: Search terms associated with an entity used for searching against watchlists
@@ -25101,7 +25367,7 @@ components:
       required:
       - dashboard_user_id
     GetEntityWatchlistScreeningRequest:
-      description: Request input for fetching a entity watchlist screening
+      description: Request input for fetching an entity watchlist screening
       type: object
       properties:
         entity_watchlist_screening_id:
@@ -25264,8 +25530,6 @@ components:
           nullable: true
           allOf:
           - $ref: '#/components/schemas/WatchlistScreeningIndividualID'
-        request_id:
-          $ref: '#/components/schemas/RequestID'
       required:
       - id
       - client_user_id
@@ -25280,7 +25544,6 @@ components:
       - documentary_verification
       - kyc_check
       - watchlist_screening_id
-      - request_id
     IdentityVerificationConsent:
       type: boolean
       example: true
@@ -25321,20 +25584,6 @@ components:
       example: idver_52xR9LKo77r1Np
       title: IdentityVerificationID
       description: ID of the associated Identity Verification attempt.
-    IdentityVerificationList:
-      type: object
-      description: List of Plaid sessions
-      properties:
-        identity_verifications:
-          description: List of Plaid sessions
-          type: array
-          items:
-            $ref: '#/components/schemas/IdentityVerification'
-        request_id:
-          $ref: '#/components/schemas/RequestID'
-      required:
-      - identity_verifications
-      - request_id
     IdentityVerificationRequestUser:
       type: object
       description: |-
@@ -25375,9 +25624,59 @@ components:
           $ref: '#/components/schemas/UserIDNumber'
       required:
       - client_user_id
+    IdentityVerificationResponse:
+      description: A identity verification attempt represents a customer's attempt to verify their identity, reflecting the required steps for completing the session, the results for each step, and information collected in the process.
+      additionalProperties: true
+      properties:
+        id:
+          $ref: '#/components/schemas/IdentityVerificationID'
+        client_user_id:
+          $ref: '#/components/schemas/ClientUserID'
+        created_at:
+          $ref: '#/components/schemas/Timestamp'
+        completed_at:
+          $ref: '#/components/schemas/TimestampNullable'
+        previous_attempt_id:
+          $ref: '#/components/schemas/PreviousIdentityVerificationAttemptID'
+        shareable_url:
+          $ref: '#/components/schemas/ShareableURL'
+        template:
+          $ref: '#/components/schemas/IdentityVerificationTemplateReference'
+        user:
+          $ref: '#/components/schemas/IdentityVerificationUserData'
+        status:
+          $ref: '#/components/schemas/IdentityVerificationStatus'
+        steps:
+          $ref: '#/components/schemas/IdentityVerificationStepSummary'
+        documentary_verification:
+          $ref: '#/components/schemas/DocumentaryVerification'
+        kyc_check:
+          $ref: '#/components/schemas/KYCCheckDetails'
+        watchlist_screening_id:
+          nullable: true
+          allOf:
+          - $ref: '#/components/schemas/WatchlistScreeningIndividualID'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - id
+      - client_user_id
+      - created_at
+      - completed_at
+      - previous_attempt_id
+      - shareable_url
+      - template
+      - user
+      - status
+      - steps
+      - documentary_verification
+      - kyc_check
+      - watchlist_screening_id
+      - request_id
+      type: object
     IdentityVerificationRetryRequest:
       type: object
-      description: Request input for retrying a identity verification attempt
+      description: Request input for retrying an identity verification attempt
       properties:
         client_user_id:
           $ref: '#/components/schemas/ClientUserID'
@@ -25706,17 +26005,47 @@ components:
       - name_sensitivity
       - audit_trail
       - is_archived
-    IndividualWatchlistProgramList:
-      type: object
-      description: List of individual watchlist screening programs
+    IndividualWatchlistProgramResponse:
+      description: A program that configures the active lists, search parameters, and other behavior for initial and ongoing screening of individuals.
+      additionalProperties: true
       properties:
-        watchlist_programs:
-          description: List of individual watchlist screening programs
+        id:
+          $ref: '#/components/schemas/WatchlistProgramID'
+        created_at:
+          $ref: '#/components/schemas/Timestamp'
+        is_rescanning_enabled:
+          description: Indicator specifying whether the program is enabled and will perform daily rescans.
+          type: boolean
+          example: true
+        lists_enabled:
+          description: Watchlists enabled for the associated program
           type: array
+          example:
+          - US_SDN
+          uniqueItems: true
           items:
-            $ref: '#/components/schemas/IndividualWatchlistProgram'
+            $ref: '#/components/schemas/IndividualWatchlistCode'
+        name:
+          $ref: '#/components/schemas/IndividualWatchlistScreeningProgramName'
+        name_sensitivity:
+          $ref: '#/components/schemas/ProgramNameSensitivity'
+        audit_trail:
+          $ref: '#/components/schemas/WatchlistScreeningAuditTrail'
+        is_archived:
+          $ref: '#/components/schemas/ProgramArchived'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
       required:
-      - watchlist_programs
+      - id
+      - created_at
+      - is_rescanning_enabled
+      - lists_enabled
+      - name
+      - name_sensitivity
+      - audit_trail
+      - is_archived
+      - request_id
+      type: object
     IndividualWatchlistScreeningProgramName:
       type: string
       title: IndividualWatchlistScreeningProgramName
@@ -25889,15 +26218,6 @@ components:
           $ref: '#/components/schemas/Cursor'
       required:
       - watchlist_program_id
-    ListPagination:
-      type: object
-      description: A response that contains 0-20 records and, optionally, links for the next and/or previous page.
-      properties:
-        next_cursor:
-          $ref: '#/components/schemas/Cursor'
-      required:
-      - next_cursor
-      title: ListPagination
     ListWatchlistScreeningEntityHistoryRequest:
       description: Request input for listing changes to entity watchlist screenings
       type: object
@@ -26041,56 +26361,186 @@ components:
       - "no"
       - no_data
       example: "yes"
-    PaginatedDashboardUserList:
+    PaginatedDashboardUserListResponse:
       description: Paginated list of dashboard users
-      allOf:
-      - $ref: '#/components/schemas/DashboardUserList'
-      - $ref: '#/components/schemas/ListPagination'
-    PaginatedEntityWatchlistProgramList:
+      additionalProperties: true
+      properties:
+        dashboard_users:
+          description: List of dashboard users
+          type: array
+          items:
+            $ref: '#/components/schemas/DashboardUser'
+        next_cursor:
+          $ref: '#/components/schemas/Cursor'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - dashboard_users
+      - next_cursor
+      - request_id
+      type: object
+    PaginatedEntityWatchlistProgramListResponse:
       description: Paginated list of entity watchlist screening programs
-      allOf:
-      - $ref: '#/components/schemas/EntityWatchlistScreeningProgramList'
-      - $ref: '#/components/schemas/ListPagination'
-    PaginatedEntityWatchlistScreeningHitList:
+      additionalProperties: true
+      properties:
+        entity_watchlist_programs:
+          description: List of entity watchlist screening programs
+          type: array
+          items:
+            $ref: '#/components/schemas/EntityWatchlistProgram'
+        next_cursor:
+          $ref: '#/components/schemas/Cursor'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - entity_watchlist_programs
+      - next_cursor
+      - request_id
+      type: object
+    PaginatedEntityWatchlistScreeningHitListResponse:
       description: Paginated list of entity watchlist screening hits
-      allOf:
-      - $ref: '#/components/schemas/EntityWatchlistScreeningHitList'
-      - $ref: '#/components/schemas/ListPagination'
-    PaginatedEntityWatchlistScreeningList:
+      additionalProperties: true
+      properties:
+        entity_watchlist_screening_hits:
+          description: List of entity watchlist screening hits
+          type: array
+          items:
+            $ref: '#/components/schemas/EntityWatchlistScreeningHit'
+        next_cursor:
+          $ref: '#/components/schemas/Cursor'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - entity_watchlist_screening_hits
+      - next_cursor
+      - request_id
+      type: object
+    PaginatedEntityWatchlistScreeningListResponse:
       description: Paginated list of entity watchlist screenings
-      allOf:
-      - $ref: '#/components/schemas/EntityWatchlistScreeningList'
-      - $ref: '#/components/schemas/ListPagination'
-    PaginatedEntityWatchlistScreeningReviewList:
+      additionalProperties: true
+      properties:
+        entity_watchlist_screenings:
+          description: List of entity watchlist screening
+          type: array
+          items:
+            $ref: '#/components/schemas/EntityWatchlistScreening'
+        next_cursor:
+          $ref: '#/components/schemas/Cursor'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - entity_watchlist_screenings
+      - next_cursor
+      - request_id
+      type: object
+    PaginatedEntityWatchlistScreeningReviewListResponse:
       description: Paginated list of entity watchlist screening reviews
-      allOf:
-      - $ref: '#/components/schemas/WatchlistScreeningEntityReviewList'
-      - $ref: '#/components/schemas/ListPagination'
-    PaginatedIdentityVerificationPaginatedList:
+      additionalProperties: true
+      properties:
+        entity_watchlist_screening_reviews:
+          description: List of entity watchlist screening reviews
+          type: array
+          items:
+            $ref: '#/components/schemas/EntityWatchlistScreeningReview'
+        next_cursor:
+          $ref: '#/components/schemas/Cursor'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - entity_watchlist_screening_reviews
+      - next_cursor
+      - request_id
+      type: object
+    PaginatedIdentityVerificationListResponse:
       description: Paginated list of Plaid sessions.
-      allOf:
-      - $ref: '#/components/schemas/IdentityVerificationList'
-      - $ref: '#/components/schemas/ListPagination'
-    PaginatedIndividualWatchlistProgramList:
+      additionalProperties: true
+      properties:
+        identity_verifications:
+          description: List of Plaid sessions
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentityVerification'
+        next_cursor:
+          $ref: '#/components/schemas/Cursor'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - identity_verifications
+      - next_cursor
+      - request_id
+      type: object
+    PaginatedIndividualWatchlistProgramListResponse:
       description: Paginated list of individual watchlist screening programs
-      allOf:
-      - $ref: '#/components/schemas/IndividualWatchlistProgramList'
-      - $ref: '#/components/schemas/ListPagination'
-    PaginatedIndividualWatchlistScreeningHitList:
+      additionalProperties: true
+      properties:
+        watchlist_programs:
+          description: List of individual watchlist screening programs
+          type: array
+          items:
+            $ref: '#/components/schemas/IndividualWatchlistProgram'
+        next_cursor:
+          $ref: '#/components/schemas/Cursor'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - watchlist_programs
+      - next_cursor
+      - request_id
+      type: object
+    PaginatedIndividualWatchlistScreeningHitListResponse:
       description: Paginated list of individual watchlist screening hits
-      allOf:
-      - $ref: '#/components/schemas/WatchlistScreeningHitList'
-      - $ref: '#/components/schemas/ListPagination'
-    PaginatedIndividualWatchlistScreeningList:
+      additionalProperties: true
+      properties:
+        watchlist_screening_hits:
+          description: List of individual watchlist screening hits
+          type: array
+          items:
+            $ref: '#/components/schemas/WatchlistScreeningHit'
+        next_cursor:
+          $ref: '#/components/schemas/Cursor'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - watchlist_screening_hits
+      - next_cursor
+      - request_id
+      type: object
+    PaginatedIndividualWatchlistScreeningListResponse:
       description: Paginated list of individual watchlist screenings.
-      allOf:
-      - $ref: '#/components/schemas/WatchlistScreeningList'
-      - $ref: '#/components/schemas/ListPagination'
-    PaginatedIndividualWatchlistScreeningReviewList:
+      additionalProperties: true
+      properties:
+        watchlist_screenings:
+          description: List of individual watchlist screenings
+          type: array
+          items:
+            $ref: '#/components/schemas/WatchlistScreeningIndividual'
+        next_cursor:
+          $ref: '#/components/schemas/Cursor'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - watchlist_screenings
+      - next_cursor
+      - request_id
+      type: object
+    PaginatedIndividualWatchlistScreeningReviewListResponse:
       description: Paginated list of screening reviews
-      allOf:
-      - $ref: '#/components/schemas/WatchlistScreeningReviewList'
-      - $ref: '#/components/schemas/ListPagination'
+      additionalProperties: true
+      properties:
+        watchlist_screening_reviews:
+          description: List of screening reviews
+          type: array
+          items:
+            $ref: '#/components/schemas/WatchlistScreeningReview'
+        next_cursor:
+          $ref: '#/components/schemas/Cursor'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - watchlist_screening_reviews
+      - next_cursor
+      - request_id
+      type: object
     PhoneType:
       description: An enum indicating whether a phone number is a phone line or a fax line.
       type: string
@@ -26324,7 +26774,7 @@ components:
 
         `incomplete` - Start the new session at the step that the user failed in the previous session, skipping steps that have already been successfully completed.
 
-        `infer` - If the most recent Identity Verification attempt associated with the given `customer_reference` has a status of `failed` or `expired`, retry using the `incomplete` strategy. Otherwise, use the `reset` strategy.
+        `infer` - If the most recent Identity Verification attempt associated with the given `client_user_id` has a status of `failed` or `expired`, retry using the `incomplete` strategy. Otherwise, use the `reset` strategy.
 
         `custom` - Start the new session with a custom configuration, specified by the value of the `steps` field
 
@@ -26356,14 +26806,12 @@ components:
       format: date-time
       title: Timestamp
       example: "2020-07-24T03:26:02Z"
-      x-private-visibility: false
     TimestampNullable:
       description: An ISO8601 formatted timestamp.
       type: string
       format: date-time
       title: Timestamp
       example: "2020-07-24T03:26:02Z"
-      x-private-visibility: false
       nullable: true
     URL:
       type: string
@@ -26549,7 +26997,7 @@ components:
       - type
       nullable: true
     UserName:
-      description: The first and last name provided by the user. If the user has not submitted their name, this field will be null. Otherwise, both fields are guaranteed to be filled.
+      description: The full name provided by the user. If the user has not submitted their name, this field will be null. Otherwise, both fields are guaranteed to be filled.
       type: object
       properties:
         given_name:
@@ -26649,7 +27097,7 @@ components:
 
         `ssn` - United States Social Security Number
 
-        `student_id` - Identification issued by a educational institution
+        `student_id` - Identification issued by an educational institution
 
         `tax_id` - Identification issued for the purpose of collecting taxes
 
@@ -26663,20 +27111,6 @@ components:
       pattern: ^\S+(\s+\S+)*$
       example: C31195855
       description: The numeric or alphanumeric identifier associated with this document.
-    WatchlistScreeningEntityReviewList:
-      type: object
-      description: List of entity watchlist screening reviews
-      properties:
-        entity_watchlist_screening_reviews:
-          description: List of entity watchlist screening reviews
-          type: array
-          items:
-            $ref: '#/components/schemas/EntityWatchlistScreeningReview'
-        request_id:
-          $ref: '#/components/schemas/RequestID'
-      required:
-      - entity_watchlist_screening_reviews
-      - request_id
     WatchlistScreeningHit:
       type: object
       description: Data from a government watchlist or PEP list that has been attached to the screening.
@@ -26716,20 +27150,6 @@ components:
       example: scrhit_52xR9LKo77r1Np
       title: WatchlistScreeningHitID
       description: ID of the associated screening hit.
-    WatchlistScreeningHitList:
-      type: object
-      description: List of individual watchlist screening hits
-      properties:
-        watchlist_screening_hits:
-          description: List of individual watchlist screening hits
-          type: array
-          items:
-            $ref: '#/components/schemas/WatchlistScreeningHit'
-        request_id:
-          $ref: '#/components/schemas/RequestID'
-      required:
-      - watchlist_screening_hits
-      - request_id
     WatchlistScreeningHitLocations:
       type: object
       description: Location information for the associated individual watchlist hit
@@ -26792,20 +27212,37 @@ components:
       pattern: ^\S+(\s+\S+)*$
       example: Aleksey Potemkin
       description: The legal name of the individual being screened.
-    WatchlistScreeningList:
-      type: object
-      description: List of individual watchlist screenings
+    WatchlistScreeningIndividualResponse:
+      description: 'The screening object allows you to represent a customer in your system, update their profile, and search for them on various watchlists. Note: Rejected customers will not receive new hits, regardless of program configuration.'
+      additionalProperties: true
       properties:
-        watchlist_screenings:
-          description: List of individual watchlist screenings
-          type: array
-          items:
-            $ref: '#/components/schemas/WatchlistScreeningIndividual'
+        id:
+          $ref: '#/components/schemas/WatchlistScreeningIndividualID'
+        search_terms:
+          $ref: '#/components/schemas/WatchlistScreeningSearchTerms'
+        assignee:
+          nullable: true
+          allOf:
+          - $ref: '#/components/schemas/DashboardUserID'
+        status:
+          $ref: '#/components/schemas/WatchlistScreeningStatus'
+        client_user_id:
+          nullable: true
+          allOf:
+          - $ref: '#/components/schemas/ClientUserID'
+        audit_trail:
+          $ref: '#/components/schemas/WatchlistScreeningAuditTrail'
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
-      - watchlist_screenings
+      - id
+      - search_terms
+      - assignee
+      - status
+      - client_user_id
+      - audit_trail
       - request_id
+      type: object
     WatchlistScreeningPhoneNumber:
       type: string
       pattern: ^\+[1-9]\d{6,14}$
@@ -26869,20 +27306,38 @@ components:
       title: WatchlistScreeningReviewID
       example: rev_aCLNRxK3UVzn2r
       description: ID of the associated review.
-    WatchlistScreeningReviewList:
-      type: object
-      description: List of screening reviews
+    WatchlistScreeningReviewResponse:
+      description: |-
+        A review submitted by a team member for an individual watchlist screening. A review can be either a comment on the current screening state, actions taken
+        against hits attached to the watchlist screening, or both.
+      additionalProperties: true
       properties:
-        watchlist_screening_reviews:
-          description: List of screening reviews
+        id:
+          $ref: '#/components/schemas/WatchlistScreeningReviewID'
+        confirmed_hits:
           type: array
+          description: Hits marked as a true positive after thorough manual review. These hits will never recur or be updated once dismissed. In most cases, confirmed hits indicate that the customer should be rejected.
           items:
-            $ref: '#/components/schemas/WatchlistScreeningReview'
+            $ref: '#/components/schemas/WatchlistScreeningHitID'
+        dismissed_hits:
+          type: array
+          description: Hits marked as a false positive after thorough manual review. These hits will never recur or be updated once dismissed.
+          items:
+            $ref: '#/components/schemas/WatchlistScreeningHitID'
+        comment:
+          $ref: '#/components/schemas/ReviewComment'
+        audit_trail:
+          $ref: '#/components/schemas/WatchlistScreeningAuditTrail'
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
-      - watchlist_screening_reviews
+      - id
+      - confirmed_hits
+      - dismissed_hits
+      - comment
+      - audit_trail
       - request_id
+      type: object
     WatchlistScreeningSearchTerms:
       type: object
       description: Search terms for creating an individual watchlist screening
