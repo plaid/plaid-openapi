@@ -1,3 +1,17 @@
+### 2020-09-14_1.128.4
+- Add `identity_verification` as a new optional parameter for `/link/token/create`
+
+### 2020-09-14_1.128.3
+- Add category rules beta to `personal_finance_category` field description
+in `/transactions/get`
+
+### 2020-09-14_1.128.2
+- Update description of `/investments/transactions/get` endpoint
+- Update description of `cost_basis` field
+
+### 2020-09-14_1.128.1
+- Add `merchant_website` and `merchant_logo_url` to `/beta/transactions/v1/enhance` response
+
 ### 2020-09-14_1.128.0
 - Add `auth_type_select_enabled`, `automated_microdeposits_enabled`, `instant_match_enabled`, and `same_day_microdeposits_enabled` to `/link/token/create`
 - Marked `flow_type` parameter as deprecated

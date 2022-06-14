@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.128.0
+  version: 2020-09-14_1.128.4
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -5129,7 +5129,7 @@ paths:
                     total_investment_transactions: 3
       operationId: investmentsTransactionsGet
       description: |-
-        The `/investments/transactions/get` endpoint allows developers to retrieve user-authorized transaction data for investment accounts.
+        The `/investments/transactions/get` endpoint allows developers to retrieve up to 24 months of user-authorized transaction data for investment accounts.
 
         Transactions are returned in reverse-chronological order, and the sequence of transaction ordering is stable and will not shift.
 
@@ -8260,6 +8260,8 @@ paths:
                           lon: -74.001761
                           store_number: "1235"
                         merchant_name: Apple
+                        merchant_website: apple.com
+                        merchant_logo_url: https://plaid-merchant-logos.plaid.com/apple.png
                         payment_channel: in store
                         personal_finance_category:
                           primary: GENERAL_MERCHANDISE
@@ -11250,6 +11252,8 @@ components:
           $ref: '#/components/schemas/LinkTokenCreateRequestTransfer'
         update:
           $ref: '#/components/schemas/LinkTokenCreateRequestUpdate'
+        identity_verification:
+          $ref: '#/components/schemas/LinkTokenCreateRequestIdentityVerification'
         user_token:
           type: string
           description: A user token generated using /user/create. Any item created during the link session will be associated with the user.
@@ -11334,6 +11338,16 @@ components:
           - FLEXIBLE_AUTH
           description: This field has been deprecated in favor of `auth_type_select_enabled`.
           deprecated: true
+    LinkTokenCreateRequestIdentityVerification:
+      type: object
+      description: Specifies option for initializing Link for use with the Identity Verification product.
+      properties:
+        template_id:
+          $ref: '#/components/schemas/IdentityVerificationTemplateID'
+        consent:
+          $ref: '#/components/schemas/IdentityVerificationConsent'
+      required:
+      - template_id
     LinkTokenCreateInstitutionData:
       type: object
       description: A map containing data used to highlight institutions in Link.
@@ -12712,6 +12726,9 @@ components:
         Information describing the intent of the transaction. Most relevant for personal finance use cases, but not limited to such use cases.
 
         See the [`taxonomy csv file`](https://plaid.com/documents/transactions-personal-finance-category-taxonomy.csv) for a full list of personal finance categories.
+
+        We’re introducing Category Rules - a new beta endpoint that will enable you to change the personal_finance_category for a transaction based on your users’ needs.
+        When rules are set, the selected category will override the Plaid provided category. To learn more, send a note to transactions-feedback@plaid.com.
       properties:
         primary:
           type: string
@@ -16063,7 +16080,7 @@ components:
         cost_basis:
           type: number
           format: double
-          description: The cost basis of the holding.
+          description: The original total value or the purchase price per share of the holding. This field is an aggregate on a per holding basis and dependent on the information provided by the institution.
           nullable: true
         quantity:
           description: The total quantity of the asset held, as reported by the financial institution. If the security is an option, `quantity` will reflect the total number of options (typically the number of contracts multiplied by 100), not the number of contracts.
@@ -24455,6 +24472,14 @@ components:
         merchant_name:
           type: string
           description: The merchant name, as extracted by Plaid from the raw description.
+          nullable: true
+        merchant_website:
+          type: string
+          description: The merchant website.
+          nullable: true
+        merchant_logo_url:
+          type: string
+          description: A link to the merchant logo. The logo will always be 100x100 resolution.
           nullable: true
         check_number:
           type: string
