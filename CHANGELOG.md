@@ -1,6 +1,3 @@
-### 2020-09-14_1.131.3
-- Update external URL for `/transfer/migrate_account` endpoint
-
 ### 2020-09-14_1.131.2
 - Add `TRANSFER_LIMIT_REACHED` to enum `TransferAuthorizationDecisionRationaleCode`
 

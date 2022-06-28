@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.131.3
+  version: 2020-09-14_1.131.2
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -6363,7 +6363,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transfermigrate_account
+        url: /api/products/transfer/#transfermigrateaccount
       operationId: transferMigrateAccount
       responses:
         "200":
@@ -23621,35 +23621,27 @@ components:
         unauthorized_transactions_count_7d:
           type: integer
           description: We parse and analyze historical transaction metadata to identify the number of possible past returns due to unauthorized transactions over the past 7 days from the account that will be debited.
-          nullable: true
         unauthorized_transactions_count_30d:
           type: integer
           description: We parse and analyze historical transaction metadata to identify the number of possible past returns due to unauthorized transactions over the past 30 days from the account that will be debited.
-          nullable: true
         unauthorized_transactions_count_60d:
           type: integer
           description: We parse and analyze historical transaction metadata to identify the number of possible past returns due to unauthorized transactions over the past 60 days from the account that will be debited.
-          nullable: true
         unauthorized_transactions_count_90d:
           type: integer
           description: We parse and analyze historical transaction metadata to identify the number of possible past returns due to unauthorized transactions over the past 90 days from the account that will be debited.
-          nullable: true
         nsf_overdraft_transactions_count_7d:
           type: integer
           description: We parse and analyze historical transaction metadata to identify the number of possible past returns due to non-sufficient funds/overdrafts over the past 7 days from the account that will be debited.
-          nullable: true
         nsf_overdraft_transactions_count_30d:
           type: integer
           description: We parse and analyze historical transaction metadata to identify the number of possible past returns due to non-sufficient funds/overdrafts over the past 30 days from the account that will be debited.
-          nullable: true
         nsf_overdraft_transactions_count_60d:
           type: integer
           description: We parse and analyze historical transaction metadata to identify the number of possible past returns due to non-sufficient funds/overdrafts over the past 60 days from the account that will be debited.
-          nullable: true
         nsf_overdraft_transactions_count_90d:
           type: integer
           description: We parse and analyze historical transaction metadata to identify the number of possible past returns due to non-sufficient funds/overdrafts over the past 90 days from the account that will be debited.
-          nullable: true
         days_since_first_plaid_connection:
           type: integer
           description: The number of days since the first time the Item was connected to an application via Plaid
@@ -23673,12 +23665,10 @@ components:
           type: number
           format: double
           description: The total credit (inflow) transaction amount over the past 10 days from the account that will be debited
-          nullable: true
         total_debit_transactions_amount_10d:
           type: number
           format: double
           description: The total debit (outflow) transaction amount over the past 10 days from the account that will be debited
-          nullable: true
         p50_credit_transactions_amount_28d:
           type: number
           format: double
