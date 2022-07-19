@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.131.3
+  version: 2020-09-14_1.144.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -1500,6 +1500,36 @@ paths:
             schema:
               $ref: '#/components/schemas/IdentityGetRequest'
         description: ""
+  /identity/match:
+    post:
+      tags:
+      - plaid
+      summary: Retrieve identity match score
+      externalDocs:
+        url: /api/products/identity/#identitymatch
+      operationId: identityMatch
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityMatchResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: 3nARps6TOYtbACO
+      description: |-
+        The `/identity/match` endpoint generates a match score, which indicates how well the provided identity data matches the identity information on file with the account holder's financial institution.
+
+        This request may take some time to complete if Identity was not specified as an initial product when creating the Item. This is because Plaid must communicate directly with the institution to retrieve the data.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentityMatchRequest'
+        description: ""
   /dashboard_user/get:
     post:
       summary: Retrieve a dashboard user
@@ -1529,7 +1559,7 @@ paths:
               $ref: '#/components/schemas/GetDashboardUserRequest'
         required: true
       externalDocs:
-        url: /api/products/monitor/dashboard_userget
+        url: /api/products/monitor/#dashboard_userget
   /dashboard_user/list:
     post:
       summary: List dashboard users
@@ -3871,7 +3901,7 @@ paths:
       description: |-
         This endpoint should be called for each of your end users before they begin a Plaid income flow. This provides you a single token to access all income data associated with the user. You should only create one per end user.
 
-        If you call the endpoint multiple times with the same client_user_id, the first creation call will succeed and the rest will fail with an error message indicating that the user has been created for the given client_user_id.
+        If you call the endpoint multiple times with the same `client_user_id`, the first creation call will succeed and the rest will fail with an error message indicating that the user has been created for the given `client_user_id`.
       requestBody:
         required: true
         content:
@@ -4790,11 +4820,24 @@ paths:
                       official_name: null
                       subtype: 401k
                       type: investment
+                    - account_id: ax0xgOBYRAIqOOjeLZr0iZBb8r6K88HZXpvmq
+                      balances:
+                        available: 48200.03
+                        current: 48200.03
+                        iso_currency_code: USD
+                        limit: null
+                        unofficial_currency_code: null
+                      mask: "4092"
+                      name: Plaid Crypto Exchange Account
+                      official_name: null
+                      subtype: crypto exchange
+                      type: investment
                     holdings:
                     - account_id: JqMLm4rJwpF6gMPJwBqdh9ZjjPvvpDcb7kDK1
                       cost_basis: 1
                       institution_price: 1
                       institution_price_as_of: "2021-04-13"
+                      institution_price_datetime: null
                       institution_value: 0.01
                       iso_currency_code: USD
                       quantity: 0.01
@@ -4804,6 +4847,7 @@ paths:
                       cost_basis: 1.5
                       institution_price: 2.11
                       institution_price_as_of: null
+                      institution_price_datetime: null
                       institution_value: 2.11
                       iso_currency_code: USD
                       quantity: 1
@@ -4813,6 +4857,7 @@ paths:
                       cost_basis: 10
                       institution_price: 10.42
                       institution_price_as_of: null
+                      institution_price_datetime: null
                       institution_value: 20.84
                       iso_currency_code: USD
                       quantity: 2
@@ -4822,6 +4867,7 @@ paths:
                       cost_basis: 0.01
                       institution_price: 0.011
                       institution_price_as_of: null
+                      institution_price_datetime: null
                       institution_value: 110
                       iso_currency_code: USD
                       quantity: 10000
@@ -4831,6 +4877,7 @@ paths:
                       cost_basis: 23
                       institution_price: 27
                       institution_price_as_of: null
+                      institution_price_datetime: null
                       institution_value: 636.309
                       iso_currency_code: USD
                       quantity: 23.567
@@ -4840,6 +4887,7 @@ paths:
                       cost_basis: 15
                       institution_price: 13.73
                       institution_price_as_of: null
+                      institution_price_datetime: null
                       institution_value: 1373.6865
                       iso_currency_code: USD
                       quantity: 100.05
@@ -4849,10 +4897,21 @@ paths:
                       cost_basis: 1
                       institution_price: 1
                       institution_price_as_of: null
+                      institution_price_datetime: null
                       institution_value: 12345.67
                       iso_currency_code: USD
                       quantity: 12345.67
                       security_id: d6ePmbPxgWCWmMVv66q9iPV94n91vMtov5Are
+                      unofficial_currency_code: null
+                    - account_id: ax0xgOBYRAIqOOjeLZr0iZBb8r6K88HZXpvmq
+                      cost_basis: 92.47
+                      institution_price: 0.177494362
+                      institution_price_as_of: "2022-01-14"
+                      institution_price_datetime: "2022-06-07T23:01:00Z"
+                      institution_value: 4437.35905
+                      iso_currency_code: USD
+                      quantity: 25000
+                      security_id: vLRMV3MvY1FYNP91on35CJD5QN5rw9Fpa9qOL
                       unofficial_currency_code: null
                     item:
                       available_products:
@@ -4887,6 +4946,7 @@ paths:
                       ticker_symbol: NFLX180201C00355000
                       type: derivative
                       unofficial_currency_code: null
+                      update_datetime: null
                     - close_price: 27
                       close_price_as_of: null
                       cusip: "577130834"
@@ -4902,6 +4962,7 @@ paths:
                       ticker_symbol: MIPTX
                       type: mutual fund
                       unofficial_currency_code: null
+                      update_datetime: null
                     - close_price: 2.11
                       close_price_as_of: null
                       cusip: 00448Q201
@@ -4917,6 +4978,7 @@ paths:
                       ticker_symbol: ACHN
                       type: equity
                       unofficial_currency_code: null
+                      update_datetime: null
                     - close_price: 10.42
                       close_price_as_of: null
                       cusip: "258620103"
@@ -4932,6 +4994,7 @@ paths:
                       ticker_symbol: DBLTX
                       type: mutual fund
                       unofficial_currency_code: null
+                      update_datetime: null
                     - close_price: 1
                       close_price_as_of: null
                       cusip: null
@@ -4947,6 +5010,7 @@ paths:
                       ticker_symbol: USD
                       type: cash
                       unofficial_currency_code: null
+                      update_datetime: null
                     - close_price: 13.73
                       close_price_as_of: null
                       cusip: null
@@ -4962,6 +5026,23 @@ paths:
                       ticker_symbol: NHX105509
                       type: etf
                       unofficial_currency_code: null
+                      update_datetime: null
+                    - close_price: 0.140034616
+                      close_price_as_of: "2022-01-24"
+                      cusip: null
+                      institution_id: ins_3
+                      institution_security_id: null
+                      is_cash_equivalent: true
+                      isin: null
+                      iso_currency_code: USD
+                      name: Dogecoin
+                      proxy_security_id: null
+                      security_id: vLRMV3MvY1FYNP91on35CJD5QN5rw9Fpa9qOL
+                      sedol: null
+                      ticker_symbol: DOGE
+                      type: cryptocurrency
+                      unofficial_currency_code: null
+                      update_datetime: "2022-06-07T23:01:00Z"
       operationId: investmentsHoldingsGet
       description: The `/investments/holdings/get` endpoint allows developers to receive user-authorized stock position data for `investment`-type accounts.
       requestBody:
@@ -5099,6 +5180,7 @@ paths:
                       ticker_symbol: MIPTX
                       type: mutual fund
                       unofficial_currency_code: null
+                      update_datetime: null
                     - close_price: 10.42
                       close_price_as_of: null
                       cusip: "258620103"
@@ -5114,6 +5196,7 @@ paths:
                       ticker_symbol: DBLTX
                       type: mutual fund
                       unofficial_currency_code: null
+                      update_datetime: null
                     - close_price: 34.73
                       close_price_as_of: null
                       cusip: 84470P109
@@ -5129,6 +5212,7 @@ paths:
                       ticker_symbol: SBSI
                       type: equity
                       unofficial_currency_code: null
+                      update_datetime: null
                     total_investment_transactions: 3
       operationId: investmentsTransactionsGet
       description: |-
@@ -7241,6 +7325,34 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreditAuditCopyTokenCreateRequest'
+  /credit/audit_copy_token/remove:
+    post:
+      tags:
+      - plaid
+      summary: Remove an Audit Copy token
+      externalDocs:
+        url: /api/products/income/#creditaudit_copy_tokenremove
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditAuditCopyTokenRemoveResponse'
+              examples:
+                example-1:
+                  value:
+                    removed: true
+                    request_id: m8MDnv9okwxFNBV
+      operationId: creditReportAuditCopyRemove
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditAuditCopyTokenRemoveRequest'
+        description: ""
+      description: The `/credit/audit_copy_token/remove` endpoint allows you to remove an Audit Copy. Removing an Audit Copy invalidates the `audit_copy_token` associated with it, meaning both you and any third parties holding the token will no longer be able to use it to access Report data. Items associated with the Report data and other Audit Copies of it are not affected and will remain accessible after removing the given Audit Copy.
   /credit/bank_income/get:
     post:
       summary: Retrieve information from the bank accounts used for income verification
@@ -7486,6 +7598,7 @@ paths:
                   value:
                     items:
                     - item_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBFL9DrE6
+                      pull_id: pull-sandbox-6f12f5bb-22dd-4855-b918-f47ec439198a
                       accounts:
                       - account_id: GeooLPBGDEunl54q7N3ZcyD5aLPLEai1nkzM9
                         rate_of_pay:
@@ -7641,7 +7754,6 @@ paths:
                       status:
                         processing_status: PROCESSING_COMPLETE
                     request_id: 2pxQ59buGdsHRef
-                    income_report_token: income-sandbox-6f12f5bb-22dd-4855-b918-f47ec439198a
   /credit/payroll_income/precheck:
     post:
       summary: Check income verification eligibility and optimize conversion
@@ -7692,6 +7804,7 @@ paths:
                   value:
                     items:
                     - item_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBFL9DrE6
+                      pull_id: pull-sandbox-6f12f5bb-22dd-4855-b918-f47ec439198a
                       employments:
                       - account_id: GeooLPBGDEunl54q7N3ZcyD5aLPLEai1nkzM9
                         status: ACTIVE
@@ -8036,7 +8149,7 @@ paths:
                     request_id: 4zlKapIkTm8p5KM
                     numbers:
                       bacs:
-                        account: "1234567890"
+                        account: "12345678"
                         sort_code: "123456"
       description: Create an e-wallet. The response is the newly created e-wallet object.
       requestBody:
@@ -8070,8 +8183,33 @@ paths:
                     request_id: 4zlKapIkTm8p5KM
                     numbers:
                       bacs:
-                        account: "1234567890"
+                        account: "12345678"
                         sort_code: "123456"
+                example-2:
+                  value:
+                    wallet_id: wallet-id-production-53e58b32-fc1c-46fe-bbd6-e584b27a88
+                    balance:
+                      iso_currency_code: EUR
+                      current: 123.12
+                    request_id: 4zlKapIkTm8p5KM
+                    numbers:
+                      international:
+                        iban: NL91ABNA0417164300
+                        bic: ABNANL2A
+                example-3:
+                  value:
+                    wallet_id: wallet-id-production-53e58b32-fc1c-46fe-bbd6-e584b27a88
+                    balance:
+                      iso_currency_code: GBP
+                      current: 123.12
+                    request_id: 4zlKapIkTm8p5KM
+                    numbers:
+                      bacs:
+                        account: "12345678"
+                        sort_code: "123456"
+                      international:
+                        iban: GB33BUKB20201555555555
+                        bic: BUKBGB22
       description: Fetch an e-wallet. The response includes the current balance.
       requestBody:
         required: true
@@ -8104,8 +8242,16 @@ paths:
                         current: 123.12
                       numbers:
                         bacs:
-                          account: "1234567890"
+                          account: "12345678"
                           sort_code: "123456"
+                    - wallet_id: wallet-id-production-53e58b32-fc1c-46fe-bbd6-e584b27a999
+                      balance:
+                        iso_currency_code: GBP
+                        current: 456.78
+                      numbers:
+                        international:
+                          iban: GB22HBUK40221241555626
+                          bic: HBUKGB4B
                     request_id: 4zlKapIkTm8p5KM
       description: This endpoint lists all e-wallets in descending order of creation.
       requestBody:
@@ -8177,6 +8323,22 @@ paths:
                           sort_code: "601613"
                       name: John Smith
                     request_id: 4zlKapIkTm8p5KM
+                example-2:
+                  value:
+                    transaction_id: wallet-transaction-id-sandbox-feca8a7a-5591-4aef-9297-f3062bb735d3
+                    type: PAYOUT
+                    reference: Payout 99744
+                    amount:
+                      iso_currency_code: EUR
+                      value: 456.78
+                    status: EXECUTED
+                    created_at: "2020-12-02T21:14:54Z"
+                    counterparty:
+                      numbers:
+                        international:
+                          iban: GB33BUKB20201555555555
+                      name: John Smith
+                    request_id: 4zlKapIkTm8p5KM
       description: Fetch a specific e-wallet transaction
       requestBody:
         required: true
@@ -8217,6 +8379,19 @@ paths:
                           bacs:
                             account: "31926819"
                             sort_code: "601613"
+                        name: John Smith
+                    - transaction_id: wallet-transaction-id-sandbox-feca8a7a-5591-4aef-9297-f3062bb735d3
+                      type: PAYOUT
+                      reference: Payout 99744
+                      amount:
+                        iso_currency_code: EUR
+                        value: 456.78
+                      status: EXECUTED
+                      created_at: "2020-12-02T21:14:54Z"
+                      counterparty:
+                        numbers:
+                          international:
+                            iban: GB33BUKB20201555555555
                         name: John Smith
                     request_id: 4zlKapIkTm8p5KM
       description: This endpoint lists the latest transactions of the specified e-wallet. Transactions are returned in descending order by the `created_at` time.
@@ -8263,8 +8438,8 @@ paths:
                           lon: -74.001761
                           store_number: "1235"
                         merchant_name: Apple
-                        merchant_website: apple.com
-                        merchant_logo_url: https://plaid-merchant-logos.plaid.com/apple.png
+                        website: apple.com
+                        logo_url: https://plaid-merchant-logos.plaid.com/apple.png
                         payment_channel: in store
                         personal_finance_category:
                           primary: GENERAL_MERCHANDISE
@@ -8430,6 +8605,106 @@ paths:
                   secret: 79g03eoofwl8240v776r2h667442119
                   access_token: access-sandbox-71e02f71-0960-4a27-abd2-5631e04f2175
                   rule_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBF
+  /payment_profile/create:
+    post:
+      tags:
+      - plaid
+      summary: Create payment profile
+      externalDocs:
+        url: /api/products/transfer/#payment_profilecreate
+      operationId: paymentProfileCreate
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentProfileCreateResponse'
+              examples:
+                example-1:
+                  value:
+                    payment_profile_id: eda0b25e-8ef3-4ebb-9ef7-1ef3db3c5ee8
+                    request_id: 4ciYmmesdqSiUAB
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      description: Use `/payment_profile/create` endpoint to create a new payment profile, the return value is a Payment Profile ID. Attach it to the link token create request and the link workflow will then "activate" this Payment Profile if the linkage is successful. It can then be used to create Transfers using `/transfer/authorization/create` and /transfer/create`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentProfileCreateRequest'
+  /payment_profile/get:
+    post:
+      tags:
+      - plaid
+      summary: Get payment profile
+      externalDocs:
+        url: /api/products/transfer/#payment_profileget
+      operationId: paymentProfileGet
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentProfileGetResponse'
+              examples:
+                example-1:
+                  value:
+                    status: READY
+                    updated_at: "2022-07-07T12:48:37Z"
+                    created_at: "2022-07-05T12:48:37Z"
+                    request_id: 4ciYmmesdqSiUAB
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      description: Use the `/payment_profile/get` endpoint to get the status of a given Payment Profile.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentProfileGetRequest'
+  /payment_profile/remove:
+    post:
+      tags:
+      - plaid
+      summary: Remove payment profile
+      externalDocs:
+        url: /api/products/transfer/#payment_profileremove
+      operationId: paymentProfileRemove
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentProfileRemoveResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: 4ciYmmesdqSiUAB
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      description: Use the `/payment_profile/remove` endpoint to remove a given Payment Profile. Once it’s removed, it can no longer be used to create transfers.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentProfileRemoveRequest'
 components:
   securitySchemes:
     clientId:
@@ -8829,9 +9104,11 @@ components:
           type: boolean
           default: false
           description: |-
-            Include the [`personal_finance_category`](https://plaid.com/docs/api/products/transactions/#transactions-sync-response-transactions-personal-finance-category) object in the response.
+            Include the [`personal_finance_category`](https://plaid.com/docs/api/products/transactions/#transactions-sync-response-added-personal-finance-category) object in the response.
 
             See the [`taxonomy csv file`](https://plaid.com/documents/transactions-personal-finance-category-taxonomy.csv) for a full list of personal finance categories.
+
+            We’re introducing Category Rules - a new beta endpoint that will enable you to change the `personal_finance_category` for a transaction based on your users’ needs. When rules are set, the selected category will override the Plaid provided category. To learn more, send a note to transactions-feedback@plaid.com.
     TransactionsSyncResponse:
       type: object
       additionalProperties: true
@@ -8917,6 +9194,7 @@ components:
           - employment
           - identity
           - income_verification
+          - identity_verification
           - investments
           - liabilities
           - payment_initiation
@@ -8994,6 +9272,7 @@ components:
           - income_verification
           - investments
           - liabilities
+          - identity_verification
           - payment_initiation
           - standing_orders
           - transactions
@@ -9253,6 +9532,7 @@ components:
           - employment
           - identity
           - income_verification
+          - identity_verification
           - investments
           - liabilities
           - payment_initiation
@@ -9431,6 +9711,58 @@ components:
       - accounts
       - item
       - request_id
+    IdentityMatchRequest:
+      type: object
+      description: IdentityMatchRequest defines the request schema for `/identity/match`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+        user:
+          $ref: '#/components/schemas/IdentityMatchUser'
+        options:
+          $ref: '#/components/schemas/IdentityMatchRequestOptions'
+      required:
+      - access_token
+    IdentityMatchRequestOptions:
+      type: object
+      description: An optional object to filter /identity/match results
+      properties:
+        account_ids:
+          type: array
+          description: An array of `account_ids` to perform fuzzy match
+          items:
+            type: string
+    IdentityMatchUser:
+      title: IdentityMatchUser
+      type: object
+      additionalProperties: true
+      description: The user's legal name, phone number, email address and address used to perform fuzzy match.
+      properties:
+        legal_name:
+          type: string
+          description: The user's full legal name.
+          nullable: true
+        phone_number:
+          type: string
+          nullable: true
+          description: 'The user''s phone number, in E.164 format: +{countrycode}{number}. For example: "+14151234567". Phone numbers provided in other formats will be parsed on a best-effort basis.'
+        email_address:
+          type: string
+          description: The user's email address.
+          nullable: true
+        address:
+          $ref: '#/components/schemas/AddressDataNullable'
+    IdentityMatchResponse:
+      type: object
+      additionalProperties: true
+      description: IdentityMatchResponse defines the response schema for `/identity/match`
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
     ProcessorAuthGetRequest:
       type: object
       description: ProcessorAuthGetRequest defines the request schema for `/processor/auth/get`
@@ -9715,7 +10047,7 @@ components:
           $ref: '#/components/schemas/APISecret'
         name:
           type: string
-          description: The name of the recipient
+          description: The name of the recipient. We recommend using strings of length 18 or less and avoid special characters to ensure compatibility with all institutions.
           minLength: 1
         iban:
           type: string
@@ -10461,6 +10793,12 @@ components:
           description: true to return balance and identity earlier as a fast report. Defaults to false if omitted.
           nullable: true
           x-hidden-from-docs: true
+        products:
+          type: array
+          description: 'Additional information that can be included in the asset report. Possible values: `"investments"`'
+          x-hidden-from-docs: true
+          items:
+            type: string
         user:
           $ref: '#/components/schemas/AssetReportUser'
     AssetReportCreateResponse:
@@ -11185,7 +11523,7 @@ components:
 
             `balance` is *not* a valid value, the Balance product does not require explicit initialization and will automatically be initialized when any other product is initialized.
 
-            Only institutions that support *all* requested products will be shown in Link; to maximize the number of institutions listed, it is recommended to initialize Link with the minimal product set required for your use case. Additional products can be added after Link initialization by calling the relevant endpoints. For details and exceptions, see [Choosing when to initialize products](https://plaid.com/docs/link/best-practices/#choosing-when-to-initialize-products).
+            The products specified here will determine which institutions will be available to your users in Link. Only institutions that support *all* requested products can be selected; a if a user attempts to select an institution that does not support a listed product, a "Connectivity not supported" error message will appear in Link. To maximize the number of institutions available, initialize Link with the minimal product set required for your use case. Additional products can be added after Link initialization by calling the relevant endpoints. For details and exceptions, see [Choosing when to initialize products](https://plaid.com/docs/link/best-practices/#choosing-when-to-initialize-products).
 
             Note that, unless you have opted to disable Instant Match support, institutions that support Instant Match will also be shown in Link if `auth` is specified as a product, even though these institutions do not contain `auth` in their product array.
 
@@ -11198,6 +11536,7 @@ components:
           - employment
           - identity
           - income_verification
+          - identity_verification
           - investments
           - liabilities
           - payment_initiation
@@ -11261,7 +11600,7 @@ components:
           $ref: '#/components/schemas/LinkTokenCreateRequestIdentityVerification'
         user_token:
           type: string
-          description: A user token generated using /user/create. Any item created during the link session will be associated with the user.
+          description: A user token generated using `/user/create`. Any item created during the link session will be associated with the user.
       required:
       - client_name
       - language
@@ -11320,6 +11659,58 @@ components:
         intent_id:
           type: string
           description: The `id` returned by the `/transfer/intent/create` endpoint.
+    LinkTokenCreateRequestUserStatedIncomeSource:
+      type: object
+      description: Specifies user stated income sources for the Income product
+      properties:
+        employer:
+          type: string
+          description: The employer corresponding to an income source specified by the user
+        category:
+          $ref: '#/components/schemas/UserStatedIncomeSourceCategory'
+        pay_per_cycle:
+          type: number
+          format: double
+          description: The income amount paid per cycle for a specified income source
+        pay_annual:
+          type: number
+          format: double
+          description: The income amount paid annually for a specified income source
+        pay_type:
+          $ref: '#/components/schemas/UserStatedIncomeSourcePayType'
+        pay_frequency:
+          $ref: '#/components/schemas/UserStatedIncomeSourceFrequency'
+    UserStatedIncomeSourceCategory:
+      type: string
+      description: The income category for a specified income source
+      enum:
+      - OTHER
+      - SALARY
+      - UNEMPLOYMENT
+      - CASH
+      - GIG_ECONOMY
+      - RENTAL
+      - CHILD_SUPPORT
+      - MILITARY
+      - RETIREMENT
+      - LONG_TERM_DISABILITY
+      - BANK_INTEREST
+    UserStatedIncomeSourceFrequency:
+      type: string
+      description: The pay frequency of a specified income source
+      enum:
+      - UNKNOWN
+      - WEEKLY
+      - BIWEEKLY
+      - SEMI_MONTHLY
+      - MONTHLY
+    UserStatedIncomeSourcePayType:
+      type: string
+      description: The pay type - `GROSS`, `NET`, or `UNKNOWN` for a specified income source
+      enum:
+      - UNKNOWN
+      - GROSS
+      - NET
     LinkTokenCreateRequestAuth:
       type: object
       description: Specifies options for initializing Link for use with the Auth product. This field can be used to enable or disable extended Auth flows for the resulting Link session. Omitting any field will result in a default that can be configured by your account manager.
@@ -11800,6 +12191,7 @@ components:
       - "529"
       - brokerage
       - cash isa
+      - crypto exchange
       - education savings account
       - ebt
       - fixed annuity
@@ -11981,19 +12373,33 @@ components:
       - $ref: '#/components/schemas/NumbersBACS'
       - type: object
         additionalProperties: true
+    NumbersInternationalIBAN:
+      type: object
+      additionalProperties: true
+      description: Account numbers using the International Bank Account Number and BIC/SWIFT code format.
+      nullable: true
+      properties:
+        iban:
+          $ref: '#/components/schemas/NumbersIBAN'
+        bic:
+          type: string
+          description: The Business Identifier Code, also known as SWIFT code, for this bank account.
+          minLength: 8
+          maxLength: 11
+      required:
+      - iban
+      - bic
     NumbersIBAN:
       type: string
       description: International Bank Account Number (IBAN).
       minLength: 15
       maxLength: 34
     NumbersIBANNullable:
-      description: International Bank Account Number (IBAN).
       type: string
+      description: International Bank Account Number (IBAN).
       nullable: true
       allOf:
       - $ref: '#/components/schemas/NumbersIBAN'
-      - type: string
-        additionalProperties: true
     RecipientBACS:
       title: RecipientBACS
       type: object
@@ -12034,6 +12440,10 @@ components:
       - $ref: '#/components/schemas/RecipientBACS'
       - type: object
         additionalProperties: true
+    CreditPullID:
+      title: CreditPullID
+      type: string
+      description: A reference id to reference what payroll data was returned from this endpoint
     RemovedTransaction:
       title: RemovedTransaction
       type: object
@@ -12175,7 +12585,7 @@ components:
         amount:
           type: number
           format: double
-          description: The settled value of the transaction, denominated in the account's currency, as stated in `iso_currency_code` or `unofficial_currency_code`. Positive values when money moves out of the account; negative values when money moves in. For example, debit card purchases are positive; credit card payments, direct deposits, and refunds are negative.
+          description: The settled value of the transaction, denominated in the transactions's currency, as stated in `iso_currency_code` or `unofficial_currency_code`. Positive values when money moves out of the account; negative values when money moves in. For example, debit card purchases are positive; credit card payments, direct deposits, and refunds are negative.
         iso_currency_code:
           type: string
           description: The ISO-4217 currency code of the transaction. Always `null` if `unofficial_currency_code` is non-null.
@@ -14201,6 +14611,7 @@ components:
       - investments
       - liabilities
       - payment_initiation
+      - identity_verification
       - transactions
       - credit_details
       - income
@@ -14315,7 +14726,6 @@ components:
             `"MFA_NOT_SUPPORTED"`
             `"NO_ACCOUNTS"`
             `"PLAID_ERROR"`
-            `"PRODUCTS_NOT_SUPPORTED"`
             `"USER_SETUP_REQUIRED"`
       required:
       - seed
@@ -15768,6 +16178,9 @@ components:
         cash isa:
           type: string
           description: Individual Savings Account (ISA) that pays interest tax-free (UK)
+        crypto exchange:
+          type: string
+          description: Standard cryptocurrency exchange account
         education savings account:
           type: string
           description: Tax-advantaged Coverdell Education Savings Account (ESA) (US)
@@ -15899,6 +16312,7 @@ components:
       - 457b
       - brokerage
       - cash isa
+      - crypto exchange
       - education savings account
       - fixed annuity
       - gic
@@ -16088,6 +16502,14 @@ components:
           format: date
           description: The date at which `institution_price` was current.
           nullable: true
+        institution_price_datetime:
+          type: string
+          format: date-time
+          description: |
+            Date and time at which `institution_price` was current, in ISO 8601 format (YYYY-MM-DDTHH:mm:ssZ).
+
+            This field is returned for select financial institutions and comes as provided by the institution. It may contain default time values (such as 00:00:00).
+          nullable: true
         institution_value:
           type: number
           format: double
@@ -16175,6 +16597,8 @@ components:
 
             `cash`: Cash, currency, and money market funds
 
+            `cryptocurrency`: Digital or virtual currencies
+
             `derivative`: Options, warrants, and other derivative instruments
 
             `equity`: Domestic and foreign equities
@@ -16183,21 +16607,26 @@ components:
 
             `fixed income`: Bonds and certificates of deposit (CDs)
 
-            `loan`: Loans and loan receivables.
+            `loan`: Loans and loan receivables
 
-            `mutual fund`: Open- and closed-end vehicles pooling funds of multiple investors.
+            `mutual fund`: Open- and closed-end vehicles pooling funds of multiple investors
 
             `other`: Unknown or other investment types
         close_price:
           type: number
           format: double
           nullable: true
-          description: Price of the security at the close of the previous trading session. `null` for non-public securities. If the security is a foreign currency or a cryptocurrency this field will be updated daily and will be priced in USD.
+          description: "Price of the security at the close of the previous trading session. Null for non-public securities. \n\nIf the security is a foreign currency this field will be updated daily and will be priced in USD. \n\nIf the security is a cryptocurrency, this field will be updated multiple times a day. As crypto prices can fluctuate quickly and data may become stale sooner than other asset classes, please refer to update_datetime with the time when the price was last updated.\n"
         close_price_as_of:
           type: string
           nullable: true
           format: date
           description: Date for which `close_price` is accurate. Always `null` if `close_price` is `null`.
+        update_datetime:
+          type: string
+          nullable: true
+          format: date-time
+          description: Date and time at which close_price is accurate, in ISO 8601 format (YYYY-MM-DDTHH:mm:ssZ). Always null if close_price is null.
         iso_currency_code:
           type: string
           nullable: true
@@ -16279,8 +16708,10 @@ components:
       - qualified dividend
       - rebalance
       - return of principal
+      - request
       - sell
       - sell short
+      - send
       - short-term capital gain
       - short-term capital gain reinvestment
       - spin off
@@ -16595,6 +17026,12 @@ components:
         merger:
           type: string
           description: Stock exchanged at a pre-defined ratio as part of a merger between companies
+        request:
+          type: string
+          description: Request fiat or cryptocurrency to an address or email
+        send:
+          type: string
+          description: Inflow or outflow of fiat or cryptocurrency to an address or email
         spin off:
           type: string
           description: Inflow of stock from spin-off transaction of an existing holding
@@ -17072,7 +17509,7 @@ components:
       description: |-
         The direction of the flow of transfer funds.
 
-        - `PAYMENT` – Transfers funds from an end user's account to your business account.
+        - `PAYMENT` – Transfers funds from an end user's account to your business account.
 
         - `DISBURSEMENT` – Transfers funds from your business account to an end user's account.
     BankTransferAmount:
@@ -18797,7 +19234,7 @@ components:
       description: |-
         The status of the transfer intent.
 
-        - `PENDING` – The transfer intent is pending.
+        - `PENDING` – The transfer intent is pending.
         - `SUCCEEDED` – The transfer intent was successfully created.
         - `FAILED` – The transfer intent was unable to be created.
     TransferIntentCreate:
@@ -19291,6 +19728,7 @@ components:
       - 457b
       - brokerage
       - cash isa
+      - crypto exchange
       - education savings account
       - fixed annuity
       - gic
@@ -19611,6 +20049,11 @@ components:
           $ref: '#/components/schemas/LinkTokenCreateRequestIncomeVerificationBankIncome'
         payroll_income:
           $ref: '#/components/schemas/LinkTokenCreateRequestIncomeVerificationPayrollIncome'
+        stated_income_sources:
+          type: array
+          description: A list of user stated income sources
+          items:
+            $ref: '#/components/schemas/LinkTokenCreateRequestUserStatedIncomeSource'
     IncomeVerificationSourceType:
       title: IncomeVerificationSourceType
       enum:
@@ -21472,7 +21915,7 @@ components:
         amount:
           type: number
           description: |-
-            The settled value of the transaction, denominated in the account's currency as stated in `iso_currency_code` or `unofficial_currency_code`.
+            The settled value of the transaction, denominated in the transactions's currency as stated in `iso_currency_code` or `unofficial_currency_code`.
             Positive values when money moves out of the account; negative values when money moves in.
             For example, credit card purchases are positive; credit card payment, direct deposits, and refunds are negative.
         date:
@@ -21691,6 +22134,32 @@ components:
       required:
       - audit_copy_token
       - request_id
+    CreditAuditCopyTokenRemoveRequest:
+      type: object
+      description: CreditAuditCopyTokenRemoveRequest defines the request schema for `/credit/audit_copy_token/remove`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        audit_copy_token:
+          type: string
+          description: The `audit_copy_token` granting access to the Audit Copy you would like to revoke.
+      required:
+      - audit_copy_token
+    CreditAuditCopyTokenRemoveResponse:
+      type: object
+      additionalProperties: true
+      description: CreditAuditCopyTokenRemoveResponse defines the response schema for `/credit/audit_copy_token/remove`
+      properties:
+        removed:
+          type: boolean
+          description: '`true` if the Audit Copy was successfully removed.'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - removed
+      - request_id
     CreditPayrollIncomeGetRequest:
       title: CreditPayrollIncomeGetRequest
       type: object
@@ -21717,13 +22186,9 @@ components:
           $ref: '#/components/schemas/PlaidError'
         request_id:
           $ref: '#/components/schemas/RequestID'
-        income_report_token:
-          description: A token to reference what payroll data was returned from this endpoint
-          type: string
       required:
       - items
       - request_id
-      - income_report_token
     CreditDocumentMetadata:
       title: CreditDocumentMetadata
       type: object
@@ -21799,11 +22264,14 @@ components:
             $ref: '#/components/schemas/PayrollIncomeObject'
         status:
           $ref: '#/components/schemas/PayrollItemStatus'
+        pull_id:
+          $ref: '#/components/schemas/CreditPullID'
       required:
       - item_id
       - payroll_income
       - status
       - accounts
+      - pull_id
     PayrollIncomeAccountData:
       title: PayrollIncomeAccountData
       type: object
@@ -22738,9 +23206,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CreditEmploymentVerification'
+        pull_id:
+          $ref: '#/components/schemas/CreditPullID'
       required:
       - item_id
       - employments
+      - pull_id
     CreditEmploymentVerification:
       title: CreditEmploymentVerification
       type: object
@@ -24148,6 +24619,8 @@ components:
       properties:
         bacs:
           $ref: '#/components/schemas/RecipientBACS'
+        international:
+          $ref: '#/components/schemas/NumbersInternationalIBAN'
     WalletBalance:
       title: WalletBalance
       type: object
@@ -24169,7 +24642,8 @@ components:
       title: ISO Currency Code
       enum:
       - GBP
-      description: An ISO-4217 currency code, used with e-wallets and transactions. Currently, only `"GBP"` is supported.
+      - EUR
+      description: An ISO-4217 currency code, used with e-wallets and transactions.
       minLength: 3
       maxLength: 3
     WalletTransactionExecuteRequest:
@@ -24227,19 +24701,28 @@ components:
       - numbers
     WalletTransactionCounterpartyNumbers:
       title: WalletTransactionCounterpartyNumbers
+      additionalProperties: true
       type: object
       description: The counterparty's bank account numbers. Exactly one of IBAN or BACS data is required.
       properties:
         bacs:
           $ref: '#/components/schemas/WalletTransactionCounterpartyBACS'
-        iban:
-          $ref: '#/components/schemas/NumbersIBANNullable'
+        international:
+          $ref: '#/components/schemas/WalletTransactionCounterpartyInternational'
     WalletTransactionCounterpartyBACS:
       description: The account number and sort code of the counterparty's account
       allOf:
       - $ref: '#/components/schemas/RecipientBACS'
       - type: object
         additionalProperties: true
+    WalletTransactionCounterpartyInternational:
+      description: International Bank Account Number for a Wallet Transaction
+      type: object
+      nullable: true
+      additionalProperties: true
+      properties:
+        iban:
+          $ref: '#/components/schemas/NumbersIBAN'
     WalletTransactionAmount:
       title: WalletTransactionAmount
       type: object
@@ -24519,13 +25002,13 @@ components:
           type: string
           description: The merchant name, as extracted by Plaid from the raw description.
           nullable: true
-        merchant_website:
+        website:
           type: string
-          description: The merchant website.
+          description: The website associated with this transaction.
           nullable: true
-        merchant_logo_url:
+        logo_url:
           type: string
-          description: A link to the merchant logo. The logo will always be 100x100 resolution.
+          description: A link to the logo associated with this transaction. The logo will always be 100x100 resolution.
           nullable: true
         check_number:
           type: string
@@ -24551,6 +25034,99 @@ components:
       - location
       - category
       - category_id
+    PaymentProfileCreateRequest:
+      type: object
+      description: PaymentProfileCreateRequest defines the request schema for `/payment_profile/create`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+    PaymentProfileCreateResponse:
+      type: object
+      additionalProperties: true
+      description: PaymentProfileCreateResponse defines the response schema for `/payment_profile/create`
+      properties:
+        payment_profile_id:
+          $ref: '#/components/schemas/PaymentProfileID'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - payment_profile_id
+      - request_id
+    PaymentProfileID:
+      type: string
+      title: PaymentProfileID
+      description: Plaid’s unique identifier for a payment profile.
+    PaymentProfileGetRequest:
+      type: object
+      description: PaymentProfileGetRequest defines the request schema for `/payment_profile/get`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        payment_profile_id:
+          $ref: '#/components/schemas/PaymentProfileID'
+      required:
+      - payment_profile_id
+    PaymentProfileGetResponse:
+      type: object
+      additionalProperties: true
+      description: PaymentProfileGetResponse defines the response schema for `/payment_profile/get`
+      properties:
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (`YYYY-MM-DDTHH:mm:ssZ`) indicating the last time the given Payment Profile was updated at
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (`YYYY-MM-DDTHH:mm:ssZ`) indicating the time the given Payment Profile was created at
+        status:
+          $ref: '#/components/schemas/PaymentProfileStatus'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
+      - status
+      - created_at
+      - updated_at
+    PaymentProfileStatus:
+      type: string
+      enum:
+      - PENDING
+      - READY
+      - REMOVED
+      description: |-
+        The status of the given Payment Profile.
+
+        `READY`: This Payment Profile is ready to be used to create transfers using `/transfer/authorization/create` and /transfer/create`.
+
+        `PENDING`: This Payment Profile is not ready to be used. You’ll need to call `/link/token/create` and provide the Payment Profile ID in the `transfer.payment_profile_id` field and go through the account linking flow to activate it.
+
+        `REMOVED`: This Payment Profile has been removed.
+    PaymentProfileRemoveRequest:
+      type: object
+      description: PaymentProfileRemoveRequest defines the request schema for `/payment_profile/remove`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        payment_profile_id:
+          $ref: '#/components/schemas/PaymentProfileID'
+      required:
+      - payment_profile_id
+    PaymentProfileRemoveResponse:
+      type: object
+      additionalProperties: true
+      description: PaymentProfileRemoveResponse defines the response schema for `/payment_profile/remove`
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
     AddressPurposeLabel:
       description: |-
         Field describing whether the associated address is being used for commercial or residential purposes.
@@ -25618,7 +26194,7 @@ components:
     IdentityVerificationConsent:
       type: boolean
       example: true
-      default: true
+      default: false
       title: IdentityVerificationConsent
       description: |-
         A flag specifying whether the end user has already agreed to a privacy policy specifying that their data will be shared with Plaid for verification purposes.
