@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.146.0
+  version: 2020-09-14_1.161.5
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -613,7 +613,7 @@ paths:
 
         Returned transactions data is grouped into three types of update, indicating whether the transaction was added, removed, or modified since the last call to the API.
 
-        In the first call to `/transactions/sync` for an Item, the endpoint will return all historical transactions data associated with that Item up until the time of the API call (as "adds"), which then generates a `latest_cursor` for that Item. In subsequent calls, send the `latest_cursor` to receive only the changes that have occurred since the previous call.
+        In the first call to `/transactions/sync` for an Item, the endpoint will return all historical transactions data associated with that Item up until the time of the API call (as "adds"), which then generates a `next_cursor` for that Item. In subsequent calls, send the `next_cursor` to receive only the changes that have occurred since the previous call.
 
         Due to the potentially large number of transactions associated with an Item, results are paginated. The `has_more` field specifies if additional calls are necessary to fetch all available transaction updates.
 
@@ -1237,7 +1237,9 @@ paths:
 
         `AUTH_DATA_UPDATE`: Webhook to be fired for a given Sandbox Item created with Auth as an enabled product.
 
-        Note that this endpoint is provided for developer ease-of-use and is not required for testing webhooks; webhooks will also fire in Sandbox under the same conditions that they would in Production or Development'
+        `RECURRING_TRANSACTIONS_UPDATE`: Recurring Transactions webhook to be fired for a given Sandbox Item. If the Item does not support Recurring Transactions, a `SANDBOX_PRODUCT_NOT_ENABLED` error will result.
+
+        Note that this endpoint is provided for developer ease-of-use and is not required for testing webhooks; webhooks will also fire in Sandbox under the same conditions that they would in Production or Development.
       responses:
         "200":
           description: success
@@ -5722,6 +5724,8 @@ paths:
           - To decline a transfer with the rationale code `NSF`, the available balance on the account must be less than the authorization `amount`. See [Create Sandbox test data](https://plaid.com/docs/sandbox/user-custom/) for details on how to customize data in Sandbox.
 
           - To decline a transfer with the rationale code `RISK`, the available balance on the account must be exactly $0. See [Create Sandbox test data](https://plaid.com/docs/sandbox/user-custom/) for details on how to customize data in Sandbox.
+
+        For guaranteed ACH customers, the following fields are required : `user.phone_number` (optional if `email_address` provided), `user.email_address` (optional if `phone_number` provided), `device.ip_address`, `device.user_agent`, and `user_present`.
       requestBody:
         required: true
         content:
@@ -7545,6 +7549,28 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreditBankIncomeGetRequest'
+  /credit/bank_income/pdf/get:
+    post:
+      summary: Retrieve information from the bank accounts used for income verification in PDF format
+      tags:
+      - plaid
+      responses:
+        "200":
+          description: A PDF of the Bank Income Report
+          content:
+            application/pdf:
+              schema:
+                $ref: '#/components/schemas/CreditBankIncomePDFGetResponse'
+      externalDocs:
+        url: /api/products/income/#creditbank_incomepdfget
+      operationId: creditBankIncomePdfGet
+      description: '`/credit/bank_income/pdf/get` returns the most recent bank income report for a specified user in PDF format.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditBankIncomePDFGetRequest'
   /credit/bank_income/refresh:
     post:
       summary: Refresh a user's bank income information
@@ -7751,6 +7777,92 @@ paths:
                           tax_year: "2020"
                           third_party_sick_pay: CHECKED
                           wages_tips_other_comp: "1000"
+                        form1099s:
+                        - april_amount: null
+                          august_amount: null
+                          card_not_present_transaction: null
+                          crop_insurance_proceeds: 1000
+                          december_amount: null
+                          document_id: mvMZ59Z2a5
+                          document_metadata:
+                            document_type: US_TAX_1099_MISC
+                            download_url: null
+                            name: form_1099_misc.pdf
+                            status: PROCESSING_COMPLETE
+                          excess_golden_parachute_payments: 1000
+                          feburary_amount: null
+                          federal_income_tax_withheld: 1000
+                          filer:
+                            address:
+                              city: null
+                              country: null
+                              postal_code: null
+                              region: null
+                              street: null
+                            name: null
+                            tin: null
+                            type: null
+                          fishing_boat_proceeds: 1000
+                          form_1099_type: FORM_1099_TYPE_MISC
+                          gross_amount: 1000
+                          gross_proceeds_paid_to_an_attorney: 1000
+                          january_amount: null
+                          july_amount: null
+                          june_amount: null
+                          march_amount: null
+                          may_amount: null
+                          medical_and_healthcare_payments: 1000
+                          merchant_category_code: null
+                          nonemployee_compensation: 1000
+                          november_amount: null
+                          number_of_payment_transactions: null
+                          october_amount: null
+                          other_income: 1000
+                          payer:
+                            address:
+                              city: SAN FRANCISCO
+                              country: US
+                              postal_code: "94111"
+                              region: CA
+                              street: 1098 HARRISON ST
+                            name: PLAID INC
+                            telephone_number: (123)456-7890
+                            tin: 12-3456789
+                          payer_made_direct_sales_of_500_or_more_of_consumer_products_to_buyer: null
+                          payer_state_number: CA 12345
+                          payer_state_number_lower: null
+                          primary_state: null
+                          primary_state_id: CA 12345
+                          primary_state_income_tax: 1000
+                          pse_name: null
+                          pse_telephone_number: null
+                          recipient:
+                            account_number: "45678"
+                            address:
+                              city: SAN FRANCISCO
+                              country: US
+                              postal_code: "94133"
+                              region: CA
+                              street: 2140 TAYLOR ST
+                            facta_filing_requirement: CHECKED
+                            name: Josie Georgia Harrison
+                            second_tin_exists: NOT CHECKED
+                            tin: 12-3456789
+                          rents: 1000
+                          royalties: 1000
+                          secondary_state: null
+                          secondary_state_id: null
+                          secondary_state_income_tax: null
+                          section_409a_deferrals: 1000
+                          section_409a_income: 1000
+                          september_amount: null
+                          state_income: 1000
+                          state_income_lower: null
+                          state_tax_withheld: 1000
+                          state_tax_withheld_lower: null
+                          substitute_payments_in_lieu_of_dividens_or_interest: null
+                          tax_year: "2022"
+                          transactions_reported: null
                       status:
                         processing_status: PROCESSING_COMPLETE
                     request_id: 2pxQ59buGdsHRef
@@ -7890,6 +8002,295 @@ paths:
         Plaid can share an Asset Report directly with a participating third party on your behalf. The shared Asset Report is the exact same Asset Report originally created in `/asset_report/create`.
 
         To grant access to an Asset Report to a third party, use the `/credit/relay/create` endpoint to create a `relay_token` and then pass that token to the third party who needs access. Each third party has its own `secondary_client_id`, for example `ce5bd328dcd34123456`. You'll need to create a separate `relay_token` for each third party to whom you want to grant access to the Report.
+  /credit/relay/get:
+    post:
+      summary: Retrieve the reports associated with a Relay token that was shared with you
+      tags:
+      - plaid
+      operationId: creditRelayGet
+      externalDocs:
+        url: /none/
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditRelayGetRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetReportGetResponse'
+              examples:
+                example-1:
+                  value:
+                    report:
+                      asset_report_id: bf3a0490-344c-4620-a219-2693162e4b1d
+                      client_report_id: 123abc
+                      date_generated: "2020-06-05T22:47:53Z"
+                      days_requested: 3
+                      items:
+                      - accounts:
+                        - account_id: 3gE5gnRzNyfXpBK5wEEKcymJ5albGVUqg77gr
+                          balances:
+                            available: 200
+                            current: 210
+                            iso_currency_code: USD
+                            limit: null
+                            unofficial_currency_code: null
+                          days_available: 3
+                          historical_balances:
+                          - current: 210
+                            date: "2020-06-04"
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
+                          - current: 210
+                            date: "2020-06-03"
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
+                          - current: 210
+                            date: "2020-06-02"
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
+                          mask: "1111"
+                          name: Plaid Saving
+                          official_name: Plaid Silver Standard 0.1% Interest Saving
+                          owners:
+                          - addresses:
+                            - data:
+                                city: Malakoff
+                                country: US
+                                postal_code: "14236"
+                                region: NY
+                                street: 2992 Cameron Road
+                              primary: true
+                            - data:
+                                city: San Matias
+                                country: US
+                                postal_code: 93405-2255
+                                region: CA
+                                street: 2493 Leisure Lane
+                              primary: false
+                            emails:
+                            - data: accountholder0@example.com
+                              primary: true
+                              type: primary
+                            - data: accountholder1@example.com
+                              primary: false
+                              type: secondary
+                            - data: extraordinarily.long.email.username.123456@reallylonghostname.com
+                              primary: false
+                              type: other
+                            names:
+                            - Alberta Bobbeth Charleson
+                            phone_numbers:
+                            - data: "1112223333"
+                              primary: false
+                              type: home
+                            - data: "1112224444"
+                              primary: false
+                              type: work
+                            - data: "1112225555"
+                              primary: false
+                              type: mobile
+                          ownership_type: null
+                          subtype: savings
+                          transactions: []
+                          type: depository
+                        - account_id: BxBXxLj1m4HMXBm9WZJyUg9XLd4rKEhw8Pb1J
+                          balances:
+                            available: null
+                            current: 56302.06
+                            iso_currency_code: USD
+                            limit: null
+                            unofficial_currency_code: null
+                          days_available: 3
+                          historical_balances: []
+                          mask: "8888"
+                          name: Plaid Mortgage
+                          official_name: null
+                          owners:
+                          - addresses:
+                            - data:
+                                city: Malakoff
+                                country: US
+                                postal_code: "14236"
+                                region: NY
+                                street: 2992 Cameron Road
+                              primary: true
+                            - data:
+                                city: San Matias
+                                country: US
+                                postal_code: 93405-2255
+                                region: CA
+                                street: 2493 Leisure Lane
+                              primary: false
+                            emails:
+                            - data: accountholder0@example.com
+                              primary: true
+                              type: primary
+                            - data: accountholder1@example.com
+                              primary: false
+                              type: secondary
+                            - data: extraordinarily.long.email.username.123456@reallylonghostname.com
+                              primary: false
+                              type: other
+                            names:
+                            - Alberta Bobbeth Charleson
+                            phone_numbers:
+                            - data: "1112223333"
+                              primary: false
+                              type: home
+                            - data: "1112224444"
+                              primary: false
+                              type: work
+                            - data: "1112225555"
+                              primary: false
+                              type: mobile
+                          ownership_type: null
+                          subtype: mortgage
+                          transactions: []
+                          type: loan
+                        - account_id: dVzbVMLjrxTnLjX4G66XUp5GLklm4oiZy88yK
+                          balances:
+                            available: null
+                            current: 410
+                            iso_currency_code: USD
+                            limit: null
+                            unofficial_currency_code: null
+                          days_available: 3
+                          historical_balances:
+                          - current: 410
+                            date: "2020-06-04"
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
+                          - current: 410
+                            date: "2020-06-03"
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
+                          - current: 410
+                            date: "2020-06-02"
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
+                          mask: "3333"
+                          name: Plaid Credit Card
+                          official_name: Plaid Diamond 12.5% APR Interest Credit Card
+                          owners:
+                          - addresses:
+                            - data:
+                                city: Malakoff
+                                country: US
+                                postal_code: "14236"
+                                region: NY
+                                street: 2992 Cameron Road
+                              primary: true
+                            - data:
+                                city: San Matias
+                                country: US
+                                postal_code: 93405-2255
+                                region: CA
+                                street: 2493 Leisure Lane
+                              primary: false
+                            emails:
+                            - data: accountholder0@example.com
+                              primary: true
+                              type: primary
+                            - data: accountholder1@example.com
+                              primary: false
+                              type: secondary
+                            - data: extraordinarily.long.email.username.123456@reallylonghostname.com
+                              primary: false
+                              type: other
+                            names:
+                            - Alberta Bobbeth Charleson
+                            phone_numbers:
+                            - data: "1112223333"
+                              primary: false
+                              type: home
+                            - data: "1112224444"
+                              primary: false
+                              type: work
+                            - data: "1112225555"
+                              primary: false
+                              type: mobile
+                          ownership_type: null
+                          subtype: credit card
+                          transactions: []
+                          type: credit
+                        date_last_updated: "2020-06-05T22:47:52Z"
+                        institution_id: ins_3
+                        institution_name: Chase
+                        item_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBFL9DrE6
+                      user:
+                        client_user_id: "123456789"
+                        email: accountholder0@example.com
+                        first_name: Alberta
+                        last_name: Charleson
+                        middle_name: Bobbeth
+                        phone_number: 111-222-3333
+                        ssn: 123-45-6789
+                    request_id: eYupqX1mZkEuQRx
+                    warnings: []
+      description: '`/credit/relay/get` allows third parties to get a report that was shared with them, using an `relay_token` that was created by the report owner.'
+  /credit/relay/refresh:
+    post:
+      tags:
+      - plaid
+      summary: Refresh a report of a Relay Token
+      externalDocs:
+        url: /api/products/#creditrelayrefresh
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditRelayRefreshResponse'
+              examples:
+                example-1:
+                  value:
+                    relay_token: credit-relay-sandbox-8218d5f8-6d6d-403d-92f5-13a9afaa4398
+                    request_id: NBZaq
+                    asset_report_id: bf3a0490-344c-4620-a219-2693162e4b1d
+      operationId: creditRelayRefresh
+      description: The `/credit/relay/refresh` endpoint allows third parties to refresh an report that was relayed to them, using a `relay_token` that was created by the report owner. A new report will be created based on the old one, but with the most recent data available.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditRelayRefreshRequest'
+        description: ""
+  /credit/relay/remove:
+    post:
+      tags:
+      - plaid
+      summary: Remove Credit Relay Token
+      externalDocs:
+        url: /none/
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditRelayRemoveResponse'
+              examples:
+                example-1:
+                  value:
+                    removed: true
+                    request_id: m8MDnv9okwxFNBV
+      operationId: creditRelayRemove
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditRelayRemoveRequest'
+        description: ""
+      description: The `/credit/relay/remove` endpoint allows you to invalidate a `relay_token`, meaning the third party holding the token will no longer be able to use it to access the reports to which the `relay_token` gives access to. The report, items associated with it, and other Relay tokens that provide access to the same report are not affected and will remain accessible after removing the given `relay_token.
   /sandbox/bank_transfer/fire_webhook:
     post:
       summary: Manually fire a Bank Transfer webhook
@@ -8444,6 +8845,7 @@ paths:
                         personal_finance_category:
                           primary: GENERAL_MERCHANDISE
                           detailed: ELECTRONICS
+                        personal_finance_category_icon_url: https://plaid-category-icons.plaid.com/PFC_GENERAL_MERCHANDISE.png
         default:
           content:
             application/json:
@@ -8705,6 +9107,51 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PaymentProfileRemoveRequest'
+  /beta/partner/v1/customers/create:
+    post:
+      tags:
+      - plaid
+      summary: Creates a new client for a reseller partner end customer.
+      description: The `/partner/v1/customers/create` endpoint is used by reseller partners to create an end customer client.
+      operationId: partnerCustomersCreate
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerCustomersCreateResponse'
+              examples:
+                example-1:
+                  value:
+                    end_customer:
+                      client_id: 7f57eb3d2a9j6480121fx361
+                      company_name: Plaid
+                    production_secret: 79g03eoofwl8240v776r2h667442119
+                    request_id: 4zlKapIkTm8p5KM
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartnerCustomersCreateRequest'
+            examples:
+              example-1:
+                value:
+                  client_id: 7f57eb3d2a9j6480121fx361
+                  secret: 79g03eoofwl8240v776r2h667442119
+                  company_name: Plaid
+                  is_diligence_attested: true
+                  products:
+                  - auth
+                  - identity
+                  create_link_customization: true
 components:
   securitySchemes:
     clientId:
@@ -9603,6 +10050,7 @@ components:
           - DEFAULT_UPDATE
           - NEW_ACCOUNTS_AVAILABLE
           - AUTH_DATA_UPDATE
+          - RECURRING_TRANSACTIONS_UPDATE
           description: The webhook codes that can be fired by this test endpoint.
       required:
       - access_token
@@ -11659,6 +12107,9 @@ components:
         intent_id:
           type: string
           description: The `id` returned by the `/transfer/intent/create` endpoint.
+        payment_profile_id:
+          type: string
+          description: The `payment_profile_id` returned by the `/payment_profile/create` endpoint.
     LinkTokenCreateRequestUserStatedIncomeSource:
       type: object
       description: Specifies user stated income sources for the Income product
@@ -11741,6 +12192,10 @@ components:
         template_id:
           $ref: '#/components/schemas/IdentityVerificationTemplateID'
         consent:
+          x-hidden-from-docs: true
+          allOf:
+          - $ref: '#/components/schemas/IdentityVerificationConsent'
+        gave_consent:
           $ref: '#/components/schemas/IdentityVerificationConsent'
       required:
       - template_id
@@ -11760,7 +12215,12 @@ components:
           description: A unique ID representing the end user. Typically this will be a user ID number from your application. Personally identifiable information, such as an email address or phone number, should not be used in the `client_user_id`. It is currently used as a means of searching logs for the given user in the Plaid Dashboard.
         legal_name:
           type: string
-          description: The user's full legal name. This is an optional field used in the [returning user experience](https://plaid.com/docs/link/returning-user) to associate Items to the user.
+          deprecated: true
+          description: The user's full legal name. Currently used only to support certain legacy flows.
+        name:
+          description: The user's full name. Optional if using the [Identity Verification](https://plaid.com/docs/api/products/identity-verification) product; if not using Identity Verification, this field is not allowed. Users will not be asked for their name when this field is provided.
+          allOf:
+          - $ref: '#/components/schemas/UserName'
         phone_number:
           type: string
           description: The user's phone number in [E.164](https://en.wikipedia.org/wiki/E.164) format. This field is optional, but required to enable the [returning user experience](https://plaid.com/docs/link/returning-user).
@@ -11787,11 +12247,17 @@ components:
              Example: `2020-01-01T00:00:00Z`
         ssn:
           type: string
-          description: To be provided in the format "ddd-dd-dddd". This field is optional and will support not-yet-implemented functionality for new products.
+          deprecated: true
+          description: To be provided in the format "ddd-dd-dddd". Not currently used.
         date_of_birth:
           type: string
           format: date
-          description: To be provided in the format "yyyy-mm-dd". This field is optional and will support not-yet-implemented functionality for new products.
+          deprecated: true
+          description: To be provided in the format "yyyy-mm-dd". Not currently used.
+        address:
+          $ref: '#/components/schemas/UserAddress'
+        id_number:
+          $ref: '#/components/schemas/UserIDNumber'
       required:
       - client_user_id
     LinkTokenCreateRequestUpdate:
@@ -11885,6 +12351,19 @@ components:
           description: The `products` specified in the `/link/token/create` call.
           items:
             $ref: '#/components/schemas/Products'
+          x-override-enum-values-shown:
+          - assets
+          - auth
+          - employment
+          - identity
+          - income_verification
+          - identity_verification
+          - investments
+          - liabilities
+          - payment_initiation
+          - standing_orders
+          - transactions
+          - transfer
         webhook:
           type: string
           description: The `webhook` specified in the `/link/token/create` call.
@@ -11936,6 +12415,7 @@ components:
       - expiration
       - request_id
     PlaidError:
+      nullable: true
       description: We use standard HTTP response codes for success and failure notifications, and our errors are further classified by `error_type`. In general, 200 HTTP codes correspond to success, 40X codes are for developer- or user-related failures, and 50X codes are for Plaid-related issues.  Error fields will be `null` if no error has occurred.
       allOf:
       - $ref: '#/components/schemas/Error'
@@ -12072,15 +12552,15 @@ components:
           $ref: '#/components/schemas/AccountBalance'
         mask:
           type: string
-          description: The last 2-4 alphanumeric characters of an account's official account number. Note that the mask may be non-unique between an Item's accounts, and it may also not match the mask that the bank displays to the user.
           nullable: true
+          description: The last 2-4 alphanumeric characters of an account's official account number. Note that the mask may be non-unique between an Item's accounts, and it may also not match the mask that the bank displays to the user.
         name:
           type: string
           description: The name of the account, either assigned by the user or by the financial institution itself
         official_name:
           type: string
-          description: The official name of the account as given by the financial institution
           nullable: true
+          description: The official name of the account as given by the financial institution
         type:
           $ref: '#/components/schemas/AccountType'
         subtype:
@@ -13374,7 +13854,9 @@ components:
     SyncUpdatesAvailableWebhook:
       title: SyncUpdatesAvailableWebhook
       description: |-
-        Fired when an Item's transactions change. This can be due to any event resulting in new changes, such as an initial, historical, or default pull. After receipt of this webhook, the new changes can be fetched for the Item from `/transactions/sync`.
+        Fired when an Item's transactions change. This can be due to any event resulting in new changes, such as an initial 30-day transactions fetch upon the initialization of an Item with transactions, the backfill of historical transactions that occurs shortly after, or when changes are populated from a regularly-scheduled transactions update job. It is recommended to listen for the `SYNC_UPDATES_AVAILABLE` webhook when using the `/transactions/sync` endpoint. Note that when using `/transactions/sync` the older webhooks `INITIAL_UPDATE`, `HISTORICAL_UPDATE`, or `DEFAULT_UPDATE`, which are intended for use with `/transactions/get`, will also continue to be sent in order to maintain backwards compatibility.
+
+        After receipt of this webhook, the new changes can be fetched for the Item from `/transactions/sync`.
 
         Note that to receive this webhook for an Item, `/transactions/sync` must have been called at least once on that Item.
       type: object
@@ -13407,6 +13889,38 @@ components:
           item_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
           initial_update_complete: true
           historical_update_complete: false
+    RecurringTransactionsUpdateWebhook:
+      title: RecurringTransactionsUpdateWebhook
+      description: Fired when an Item's recurring transactions data is updated. After receipt of this webhook, the updated data can be fetched from `/transactions/recurring/get`.
+      type: object
+      additionalProperties: true
+      properties:
+        webhook_type:
+          type: string
+          description: '`TRANSACTIONS`'
+        webhook_code:
+          type: string
+          description: '`RECURRING_TRANSACTIONS_UPDATE`'
+        item_id:
+          $ref: '#/components/schemas/ItemId'
+        account_ids:
+          type: array
+          description: A list of `account_ids` for accounts that have new or updated recurring transactions data.
+          items:
+            type: string
+      required:
+      - webhook_type
+      - webhook_code
+      - item_id
+      - account_ids
+      x-examples:
+        example-1:
+          webhook_type: TRANSACTIONS
+          webhook_code: RECURRING_TRANSACTIONS_UPDATE
+          item_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
+          account_ids:
+          - lPNjeW1nR6CDn5okmGQ6hEpMo4lLNoSrzqDje
+          - lPNjeW1nR6CDn5okmGQ6hEpMo4lLNoSrzqDff
     IdentityDefaultUpdateWebhook:
       x-examples:
         example-1:
@@ -17049,7 +17563,7 @@ components:
       title: UserPermissionRevokedWebhook
       type: object
       additionalProperties: true
-      description: The `USER_PERMISSION_REVOKED` webhook is fired to when an end user has used the [my.plaid.com portal](https://my.plaid.com) to revoke the permission that they previously granted to access an Item. Once access to an Item has been revoked, it cannot be restored. If the user subsequently returns to your application, a new Item must be created for the user.
+      description: The `USER_PERMISSION_REVOKED` webhook is fired when an end user has used either the [my.plaid.com portal](https://my.plaid.com) or the financial institution’s consent portal to revoke the permission that they previously granted to access an Item. Once access to an Item has been revoked, it cannot be restored. If the user subsequently returns to your application, a new Item must be created for the user.
       x-examples:
         example-1:
           webhook_type: ITEM
@@ -17533,6 +18047,25 @@ components:
         A random key provided by the client, per unique bank transfer. Maximum of 50 characters.
 
         The API supports idempotency for safely retrying requests without accidentally performing the same operation twice. For example, if a request to create a bank transfer fails due to a network connection error, you can retry the request with the same idempotency key to guarantee that only a single bank transfer is created.
+    TransferAuthorizationUserInRequest:
+      title: TransferAuthorizationUserInRequest
+      type: object
+      additionalProperties: true
+      description: The legal name and other information for the account holder.
+      properties:
+        legal_name:
+          type: string
+          description: The user's legal name.
+        phone_number:
+          type: string
+          description: The user's phone number. In order to qualify for a guaranteed transfer, at least one of `phone_number` or `email_address` must be provided.
+        email_address:
+          type: string
+          description: The user's email address. In order to qualify for a guaranteed transfer, at least one of `phone_number` or `email_address` must be provided.
+        address:
+          $ref: '#/components/schemas/TransferUserAddressInRequest'
+      required:
+      - legal_name
     TransferUserInRequest:
       title: TransferUserInRequest
       type: object
@@ -17580,7 +18113,7 @@ components:
       title: TransferUserAddressInRequest
       type: object
       additionalProperties: true
-      description: The address associated with the account holder.
+      description: The address associated with the account holder. Providing this data will improve the likelihood that Plaid will be able to guarantee the transfer, if applicable.
       properties:
         street:
           type: string
@@ -17707,11 +18240,14 @@ components:
         `GUARANTEE_LIMIT_REACHED`: This transfer is low-risk, but Guaranteed ACH has exhausted an internal limit on the number or rate of guarantees that applies to this transfer.
 
         `RISK_ESTIMATE_UNAVAILABLE`: A risk estimate is unavailable for this Item.
+
+        `REQUIRED_PARAM_MISSING`: Required fields are missing.
       enum:
       - RETURN_BANK
       - RETURN_CUSTOMER
       - GUARANTEE_LIMIT_REACHED
       - RISK_ESTIMATE_UNAVAILABLE
+      - REQUIRED_PARAM_MISSING
     TransferAuthorizationGuaranteeDecisionRationale:
       title: TransferAuthorizationGuaranteeDecisionRationale
       type: object
@@ -17770,10 +18306,10 @@ components:
       properties:
         ip_address:
           type: string
-          description: The IP address of the device being used to initiate the authorization.
+          description: The IP address of the device being used to initiate the authorization. Required for guaranteed ACH customers.
         user_agent:
           type: string
-          description: The user agent of the device being used to initiate the authorization.
+          description: The user agent of the device being used to initiate the authorization. Required for guaranteed ACH customers.
     TransferMetadata:
       type: object
       additionalProperties:
@@ -17825,13 +18361,6 @@ components:
       - posted
       - cancelled
       - failed
-      - reversed
-      - returned
-      x-override-enum-values-shown:
-      - pending
-      - posted
-      - cancelled
-      - failed
       - returned
     TransferSweepStatus:
       type: string
@@ -17867,7 +18396,7 @@ components:
     TransferNetwork:
       type: string
       title: TransferNetwork
-      description: The network or rails used for the transfer. Valid options are `ach` or `same-day-ach`.
+      description: The network or rails used for the transfer. Valid options are `ach` or `same-day-ach`. The cutoff for same-day transfers is 7:45 AM Pacific Time and the cutoff for next-day transfers is 5:45 PM Pacific Time. It is recommended to submit a transfer at least 15 minutes before the cutoff time in order to ensure that it will be processed before the cutoff. Any transfer that is indicated as `same-day-ach` and that misses the same-day cutoff, but is submitted in time for the next-day cutoff, will be sent over next-day rails and will not incur same-day charges. Note that both legs of the transfer will be downgraded if applicable.
       enum:
       - ach
       - same-day-ach
@@ -17930,7 +18459,7 @@ components:
         ach_class:
           $ref: '#/components/schemas/ACHClass'
         user:
-          $ref: '#/components/schemas/TransferUserInRequest'
+          $ref: '#/components/schemas/TransferAuthorizationUserInRequest'
         device:
           $ref: '#/components/schemas/TransferAuthorizationDevice'
         origination_account_id:
@@ -17939,9 +18468,13 @@ components:
         iso_currency_code:
           type: string
           description: The currency of the transfer amount. The default value is "USD".
+        user_present:
+          type: boolean
+          nullable: true
+          description: Required for guaranteed ACH customers. If the end user is initiating the specific transfer themselves via an interactive UI, this should be `true`; for automatic recurring payments where the end user is not actually initiating each individual transfer, it should be `false`.
+        payment_profile_id:
+          $ref: '#/components/schemas/PaymentProfileID'
       required:
-      - access_token
-      - account_id
       - type
       - network
       - amount
@@ -17989,9 +18522,9 @@ components:
         iso_currency_code:
           type: string
           description: The currency of the transfer amount. The default value is "USD".
+        payment_profile_id:
+          $ref: '#/components/schemas/PaymentProfileID'
       required:
-      - access_token
-      - account_id
       - authorization_id
       - type
       - network
@@ -18459,18 +18992,9 @@ components:
       - cancelled
       - failed
       - posted
-      - reversed
       - returned
       - swept
       - reverse_swept
-      - return_swept
-      x-override-enum-values-shown:
-      - pending
-      - cancelled
-      - failed
-      - posted
-      - returned
-      - swept
       - return_swept
     BankTransferEventType:
       type: string
@@ -19609,11 +20133,11 @@ components:
             description: Calculated data about the historical balances on the account. Only returned by Assets endpoints and currently not supported by `brokerage` or `investment` accounts.
             items:
               $ref: '#/components/schemas/HistoricalBalance'
-        required:
-        - days_available
-        - transactions
-        - owners
-        - historical_balances
+      required:
+      - days_available
+      - transactions
+      - owners
+      - historical_balances
     DepositoryFilter:
       title: DepositoryFilter
       description: A filter to apply to `depository`-type accounts
@@ -19719,7 +20243,7 @@ components:
       type: string
       description: Valid account subtypes for investment accounts. For a list containing descriptions of each subtype, see [Account schemas](https://plaid.com/docs/api/accounts/#StandaloneAccountType-investment).
       enum:
-      - 529
+      - "529"
       - 401a
       - 401k
       - 403B
@@ -20440,6 +20964,7 @@ components:
       - DOCUMENT_TYPE_GIG
       - DOCUMENT_TYPE_NONE
       - DOCUMENT_TYPE_US_TAX_1099_MISC
+      - DOCUMENT_TYPE_US_TAX_1099_K
     Paystub:
       title: Paystub
       type: object
@@ -21472,8 +21997,8 @@ components:
             type: string
             nullable: true
             description: The date on which the transaction took place, in IS0 8601 format.
-        required:
-        - original_description
+      required:
+      - original_description
     HealthIncident:
       title: HealthIncident
       description: A status health incident
@@ -21682,6 +22207,24 @@ components:
           $ref: '#/components/schemas/RequestID'
       required:
       - request_id
+    CreditBankIncomePDFGetRequest:
+      title: CreditBankIncomePDFGetRequest
+      type: object
+      description: CreditBankIncomePDFGetRequest defines the request schema for `/credit/bank_income/pdf/get`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        user_token:
+          $ref: '#/components/schemas/UserToken'
+      required:
+      - user_token
+    CreditBankIncomePDFGetResponse:
+      title: CreditBankIncomePDFGetResponse
+      format: binary
+      type: string
+      description: CreditBankIncomePDFGetResponse defines the response schema for `/credit/bank_income/pdf/get`
     CreditBankIncome:
       type: object
       description: The report of the Bank Income data for an end user.
@@ -22323,10 +22866,344 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CreditW2'
+        form1099s:
+          description: Array of tax form 1099s.
+          type: array
+          items:
+            $ref: '#/components/schemas/Credit1099'
       required:
       - account_id
       - pay_stubs
       - w2s
+      - form1099s
+    Credit1099:
+      title: Credit1099
+      type: object
+      additionalProperties: true
+      description: An object representing an end user's 1099 tax form
+      properties:
+        document_id:
+          type: string
+          description: An identifier of the document referenced by the document metadata.
+          nullable: true
+        document_metadata:
+          $ref: '#/components/schemas/CreditDocumentMetadata'
+        form_1099_type:
+          $ref: '#/components/schemas/Form1099Type'
+        recipient:
+          $ref: '#/components/schemas/Credit1099Recipient'
+        payer:
+          $ref: '#/components/schemas/Credit1099Payer'
+        filer:
+          $ref: '#/components/schemas/Credit1099Filer'
+        tax_year:
+          type: string
+          description: Tax year of the tax form.
+          nullable: true
+        rents:
+          type: number
+          format: double
+          description: Amount in rent by payer.
+          nullable: true
+        royalties:
+          type: number
+          format: double
+          description: Amount in royalties by payer.
+          nullable: true
+        other_income:
+          type: number
+          format: double
+          description: Amount in other income by payer.
+          nullable: true
+        federal_income_tax_withheld:
+          type: number
+          format: double
+          description: Amount of federal income tax withheld from payer.
+          nullable: true
+        fishing_boat_proceeds:
+          type: number
+          format: double
+          description: Amount of fishing boat proceeds from payer.
+          nullable: true
+        medical_and_healthcare_payments:
+          type: number
+          format: double
+          description: Amount of medical and healthcare payments from payer.
+          nullable: true
+        nonemployee_compensation:
+          type: number
+          format: double
+          description: Amount of nonemployee compensation from payer.
+          nullable: true
+        substitute_payments_in_lieu_of_dividends_or_interest:
+          type: number
+          format: double
+          description: Amount of substitute payments made by payer.
+          nullable: true
+        payer_made_direct_sales_of_5000_or_more_of_consumer_products_to_buyer:
+          type: string
+          description: Whether or not payer made direct sales over $5000 of consumer products.
+          nullable: true
+        crop_insurance_proceeds:
+          type: number
+          format: double
+          description: Amount of crop insurance proceeds.
+          nullable: true
+        excess_golden_parachute_payments:
+          type: number
+          format: double
+          description: Amount of golden parachute payments made by payer.
+          nullable: true
+        gross_proceeds_paid_to_an_attorney:
+          type: number
+          format: double
+          description: Amount of gross proceeds paid to an attorney by payer.
+          nullable: true
+        section_409a_deferrals:
+          type: number
+          format: double
+          description: Amount of 409A deferrals earned by payer.
+          nullable: true
+        section_409a_income:
+          type: number
+          format: double
+          description: Amount of 409A income earned by payer.
+          nullable: true
+        state_tax_withheld:
+          type: number
+          format: double
+          description: Amount of state tax withheld of payer for primary state.
+          nullable: true
+        state_tax_withheld_lower:
+          type: number
+          format: double
+          description: Amount of state tax withheld of payer for secondary state.
+          nullable: true
+        payer_state_number:
+          type: string
+          description: Primary state ID.
+          nullable: true
+        payer_state_number_lower:
+          type: string
+          description: Secondary state ID.
+          nullable: true
+        state_income:
+          type: number
+          format: double
+          description: State income reported for primary state.
+          nullable: true
+        state_income_lower:
+          type: number
+          format: double
+          description: State income reported for secondary state.
+          nullable: true
+        transactions_reported:
+          type: string
+          description: One of the values will be provided Payment card Third party network
+          nullable: true
+          x-override-enum-values-shown:
+          - Payment card
+          - Third party network
+        pse_name:
+          type: string
+          description: Name of the PSE (Payment Settlement Entity).
+          nullable: true
+        pse_telephone_number:
+          type: string
+          description: Formatted (XXX) XXX-XXXX. Phone number of the PSE (Payment Settlement Entity).
+          nullable: true
+        gross_amount:
+          type: number
+          format: double
+          description: Gross amount reported.
+          nullable: true
+        card_not_present_transaction:
+          type: number
+          format: double
+          description: Amount in card not present transactions.
+          nullable: true
+        merchant_category_code:
+          type: string
+          description: Merchant category of filer.
+          nullable: true
+        number_of_payment_transactions:
+          type: string
+          description: Number of payment transactions made.
+          nullable: true
+        january_amount:
+          type: number
+          format: double
+          description: Amount reported for January.
+          nullable: true
+        february_amount:
+          type: number
+          format: double
+          description: Amount reported for February.
+          nullable: true
+        march_amount:
+          type: number
+          format: double
+          description: Amount reported for March.
+          nullable: true
+        april_amount:
+          type: number
+          format: double
+          description: Amount reported for April.
+          nullable: true
+        may_amount:
+          type: number
+          format: double
+          description: Amount reported for May.
+          nullable: true
+        june_amount:
+          type: number
+          format: double
+          description: Amount reported for June.
+          nullable: true
+        july_amount:
+          type: number
+          format: double
+          description: Amount reported for July.
+          nullable: true
+        august_amount:
+          type: number
+          format: double
+          description: Amount reported for August.
+          nullable: true
+        september_amount:
+          type: number
+          format: double
+          description: Amount reported for September.
+          nullable: true
+        october_amount:
+          type: number
+          format: double
+          description: Amount reported for October.
+          nullable: true
+        november_amount:
+          type: number
+          format: double
+          description: Amount reported for November.
+          nullable: true
+        december_amount:
+          type: number
+          format: double
+          description: Amount reported for December.
+          nullable: true
+        primary_state:
+          type: string
+          description: Primary state of business.
+          nullable: true
+        secondary_state:
+          type: string
+          description: Secondary state of business.
+          nullable: true
+        primary_state_id:
+          type: string
+          description: Primary state ID.
+          nullable: true
+        secondary_state_id:
+          type: string
+          description: Secondary state ID.
+          nullable: true
+        primary_state_income_tax:
+          type: number
+          format: double
+          description: State income tax reported for primary state.
+          nullable: true
+        secondary_state_income_tax:
+          type: number
+          format: double
+          description: State income tax reported for secondary state.
+          nullable: true
+      required:
+      - document_id
+    Form1099Type:
+      title: Form1099Type
+      type: string
+      description: Form 1099 Type
+      enum:
+      - FORM_1099_TYPE_UNKNOWN
+      - FORM_1099_TYPE_MISC
+      - FORM_1099_TYPE_K
+    Credit1099Payer:
+      title: Credit1099Payer
+      type: object
+      additionalProperties: true
+      description: An object representing a payer used by 1099-MISC tax documents.
+      properties:
+        address:
+          $ref: '#/components/schemas/CreditPayStubAddress'
+        name:
+          type: string
+          description: Name of payer.
+          nullable: true
+        tin:
+          type: string
+          description: Tax identification number of payer.
+          nullable: true
+        telephone_number:
+          type: string
+          description: Telephone number of payer.
+          nullable: true
+    Credit1099Recipient:
+      title: Credit1099Recipient
+      type: object
+      additionalProperties: true
+      description: An object representing a recipient used in both 1099-K and 1099-MISC tax documents.
+      properties:
+        address:
+          $ref: '#/components/schemas/CreditPayStubAddress'
+        name:
+          type: string
+          description: Name of recipient.
+          nullable: true
+        tin:
+          type: string
+          description: Tax identification number of recipient.
+          nullable: true
+        account_number:
+          type: string
+          description: Account number number of recipient.
+          nullable: true
+        facta_filing_requirement:
+          type: string
+          description: Checked if FACTA is a filing requirement.
+          nullable: true
+          x-override-enum-values-shown:
+          - CHECKED
+          - NOT CHECKED
+        second_tin_exists:
+          type: string
+          description: Checked if 2nd TIN exists.
+          nullable: true
+          x-override-enum-values-shown:
+          - CHECKED
+          - NOT CHECKED
+    Credit1099Filer:
+      title: Credit1099Filer
+      type: object
+      additionalProperties: true
+      description: An object representing a filer used by 1099-K tax documents.
+      properties:
+        address:
+          $ref: '#/components/schemas/CreditPayStubAddress'
+        name:
+          type: string
+          description: Name of filer.
+          nullable: true
+        tin:
+          type: string
+          description: Tax identification number of filer.
+          nullable: true
+        type:
+          type: string
+          description: 'One of the following values will be provided: Payment Settlement Entity (PSE), Electronic Payment Fecilitator (EPF), Other Third Party'
+          nullable: true
+          x-override-enum-values-shown:
+          - Payment Settlement Entity (PSE)
+          - Electronic Payment Fecilitator (EPF)
+          - Other Third Party
     CreditPayStub:
       title: CreditPayStub
       type: object
@@ -22810,10 +23687,11 @@ components:
       - unofficial_currency_code
     CreditPayStubVerification:
       title: CreditPayStubVerification
-      description: An object containing details on the paystub's verification status. This object will only be populated if the [`income_verification.access_tokens`](/docs/api/tokens/#link-token-create-request-income-verification-access-tokens) parameter was provided during the `/link/token/create` call or if a problem was detected with the information supplied by the user; otherwise it will be `null`.
+      description: (To be deprecated) Verification info will be moved to a separate endpoint in the future. An object containing details on the paystub's verification status. This object will only be populated if the [`income_verification.access_tokens`](/docs/api/tokens/#link-token-create-request-income-verification-access-tokens) parameter was provided during the `/link/token/create` call or if a problem was detected with the information supplied by the user; otherwise it will be `null`.
       type: object
       additionalProperties: true
       nullable: true
+      deprecated: true
       properties:
         verification_status:
           $ref: '#/components/schemas/CreditPayStubVerificationStatus'
@@ -22868,15 +23746,20 @@ components:
       additionalProperties: true
       properties:
         report_type:
-          title: ReportType
-          type: string
-          description: The report type. It can be `assets` or `income`.
-          nullable: false
+          $ref: '#/components/schemas/ReportType'
         token:
           title: Token
           type: string
           description: The report token. It can be an asset report token or an income report token.
           nullable: false
+    ReportType:
+      title: ReportType
+      type: string
+      description: The report type. It can be `assets` or `income`.
+      enum:
+      - assets
+      - income
+      nullable: false
     DocumentRiskSignal:
       title: DocumentRiskSignal
       description: Details about a certain reason as to why a document could potentially be fraudulent.
@@ -23421,6 +24304,83 @@ components:
           $ref: '#/components/schemas/RequestID'
       required:
       - relay_token
+      - request_id
+    CreditRelayGetRequest:
+      title: CreditRelayGetRequest
+      type: object
+      description: CreditRelayGetRequest defines the request schema for `/credit/relay/get`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        relay_token:
+          type: string
+          description: The `relay_token` granting access to the report you would like to get.
+        report_type:
+          $ref: '#/components/schemas/ReportType'
+      required:
+      - relay_token
+      - report_type
+    CreditRelayRefreshRequest:
+      type: object
+      description: CreditRelayRefreshRequest defines the request schema for `/credit/relay/refresh`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        relay_token:
+          type: string
+          description: The `relay_token` granting access to the report you would like to refresh.
+        report_type:
+          $ref: '#/components/schemas/ReportType'
+        webhook:
+          type: string
+          description: The URL registered to receive webhooks when the report of a Relay Token has been refreshed.
+          nullable: true
+      required:
+      - relay_token
+      - report_type
+    CreditRelayRefreshResponse:
+      type: object
+      additionalProperties: true
+      description: CreditRelayRefreshResponse defines the response schema for `/credit/relay/refresh`
+      properties:
+        relay_token:
+          type: string
+        asset_report_id:
+          $ref: '#/components/schemas/AssetReportId'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - relay_token
+      - request_id
+    CreditRelayRemoveRequest:
+      type: object
+      description: CreditRelayRemoveRequest defines the request schema for `/credit/relay/remove`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        relay_token:
+          type: string
+          description: The `relay_token` you would like to revoke.
+      required:
+      - relay_token
+    CreditRelayRemoveResponse:
+      type: object
+      additionalProperties: true
+      description: CreditRelayRemoveResponse defines the response schema for `/credit/relay/remove`
+      properties:
+        removed:
+          type: boolean
+          description: '`true` if the Relay token was successfully removed.'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - removed
       - request_id
     SandboxBankTransferFireWebhookRequest:
       title: SandboxBankTransferFireWebhookRequest
@@ -25027,6 +25987,9 @@ components:
           $ref: '#/components/schemas/Location'
         personal_finance_category:
           $ref: '#/components/schemas/PersonalFinanceCategory'
+        personal_finance_category_icon_url:
+          type: string
+          description: A link to the icon associated with the primary personal finance category. The logo will always be 100x100 resolution.
       required:
       - payment_channel
       - location
@@ -25125,6 +26088,50 @@ components:
           $ref: '#/components/schemas/RequestID'
       required:
       - request_id
+    PartnerCustomersCreateRequest:
+      description: Request schema for `/partner/v1/customers/create`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        company_name:
+          description: The company name of the end customer being created.
+          type: string
+        is_diligence_attested:
+          description: Denotes whether or not the partner has completed attestation of diligence for the end customer to be created.
+          type: boolean
+        products:
+          description: The products to be enabled on for the end customer.
+          type: array
+          items:
+            $ref: '#/components/schemas/Products'
+        create_link_customization:
+          description: If true, sets end customer's link customization to match partner's link customization.
+          type: boolean
+      required:
+      - company_name
+      - is_diligence_attested
+      - products
+    PartnerCustomersCreateResponse:
+      type: object
+      additionalProperties: true
+      description: Response schema for `/partner/v1/customers/create`.
+      properties:
+        end_customer:
+          $ref: '#/components/schemas/PartnerEndCustomerClient'
+        production_secret:
+          type: string
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+    PartnerEndCustomerClient:
+      description: The end customer details for the newly-created customer client.
+      type: object
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        company_name:
+          type: string
     AddressPurposeLabel:
       description: |-
         Field describing whether the associated address is being used for commercial or residential purposes.
@@ -27627,7 +28634,7 @@ components:
       - region
       - postal_code
       - country
-      description: Home address for user supplied to `/identity_verification/create`
+      description: Home address for the user.
       nullable: true
     UserIDNumber:
       description: ID number submitted by the user, currently used only for the Identity Verification product. If the user has not submitted this data yet, this field will be `null`. Otherwise, both fields are guaranteed to be filled.
@@ -28272,7 +29279,7 @@ components:
           type: string
           nullable: true
         error:
-          $ref: '#/components/schemas/Error'
+          $ref: '#/components/schemas/PlaidError'
         available_products:
           description: A list of products available for the Item that have not yet been accessed. The contents of this array will be mutually exclusive with `billed_products`.
           type: array
