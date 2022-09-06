@@ -1,3 +1,63 @@
+### 2020-09-14_1.164.8
+
+- Add documentation for credit categories in the `/asset_report/get` endpoint
+
+### 2020-09-14_1.164.7
+
+- Remove redundant parameters from the `/transfer/create` endpoint from docs and mark them as deprecated
+
+### 2020-09-14_1.164.6
+
+- Add the following new currencies for the `/payment_initiation` API route group: PLN, SEK, DKK, NOK, CHF, CZK
+
+### 2020-09-14_1.164.5
+
+- Update description for `/payment_initiation/payment/reverse` to indicate that this endpoint only works with virtual accounts
+- Update description for `/wallet/transaction/execute` to indicate that settlement will take seconds to days
+
+### 2020-09-14_1.164.4
+
+- Remove verification fields from `/credit/payroll_income/get` and `/income/verification/paystubs/get`
+
+### 2020-09-14_1.164.3
+
+- Remove pull_id field from `/credit/payroll_income/get`
+
+### 2020-09-14_1.164.2
+
+- Update external documentation links for the `/wallet/` API route group
+- Update `/payment_initiation/payment/reverse` description to cover which payments are eligible for refunds
+- Update `/payment_initiation/payment/create` reference field description to indicate that references should be unique and will be adjusted automatically
+- Update `PaymentInitiationPaymentStatus` description to indicate that payments may take seconds to days to settle depending on the payment rail used
+- Update `WalletTransactionStatus` description to indicate that transactions may take seconds to days to settle depending on the payment rail used
+
+### 2020-09-14_1.164.1
+
+- Make `is_savings_or_money_market_account` field in `SignalEvaluateCoreAttributes` nullable
+
+### 2020-09-14_1.164.0
+
+- Add new endpoint `/credit/asset_report/freddie_mac`
+
+### 2020-09-14_1.163.0
+
+- Add `/link_delivery/create` endpoint
+- Add `/link_delivery/get` endpoint
+
+### 2020-09-14_1.162.2
+
+- Fix minimum and maximum values in `/signal/evaluate` scores
+
+### 2020-09-14_1.162.1
+
+- Make holdings `institution_price_as_of` non-nullable
+
+### 2020-09-14_1.162.0
+
+- Add `WalletTransactionStatusUpdateWebhook` object
+- Update `WalletTransactionStatus` to include an additional `SETTLED` enum
+- Update `PaymentInitiationPaymentStatus` to include an additional `PAYMENT_STATUS_SETTLED` enum
+
 ### 2020-09-14_1.161.5
 
 - Reverts the changes made in 2020-09-14_1.157.0
@@ -7,7 +67,7 @@
 - Update description for webhook `USER_PERMISSION_REVOKED`
 
 ### 2020-09-14_1.161.3
- 
+
 - Bug fix: Put quotes around the '529' account type to prevent generated client libraries from treating it as an integer.
 - Add `RECURRING_TRANSACTIONS_UPDATE` to description of sandbox webhook testing endpoint
 
@@ -20,6 +80,7 @@
 - Add required fields back to AssetReport schema
 
 ### 2020-09-14_1.161.0
+
 - Remove `access_token` request parameter from `/beta/partner/v1/customers/create`
 
 ### 2020-09-14_1.160.0
@@ -57,25 +118,32 @@
 - Create `/credit/bank_income/pdf/get` to allow customers to retrieve the bank income product as a PDF
 
 ### 2020-09-14_1.153.1
+
 -- Add `personal_finance_category_icon_url` to `/beta/transactions/v1/enhance` response
 
 ### 2020-09-14_1.153.0
+
 -- Add new endpoint `/beta/partner/v1/customers/create`
 
 ### 2020-09-14_1.152.0
+
 - Add `form1099s` as part of the `credit/payroll_income/get` response.
 - Add `Credit1099` object and corresponding subtypes.
 
 ### 2020-09-14_1.151.1
+
 - Update required fields list for guaranteed ACH customers
 
 ### 2020-09-14_1.151.0
+
 - Mark `verification` field under `paystubs` object in `/credit/payroll_income/get` as deprecated
 
 ### 2020-09-14_1.150.0
+
 - Make `user_present` under `/transfer/authorization/create` nullable
 
 ### 2020-09-14_1.149.1
+
 - Update fields description for guaranteed ACH customers
 
 ### 2020-09-14_1.149.0
