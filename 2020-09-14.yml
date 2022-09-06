@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.161.5
+  version: 2020-09-14_1.164.8
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -3473,9 +3473,14 @@ paths:
                     request_id: HtlKzBX0fMeF7mU
                     status: INITIATED
       description: |
-        Reverse a previously initiated payment.
+        Reverse a previously settled payment from a Plaid virtual account.
 
-        A payment can only be reversed once and will be refunded to the original sender's account.
+        The original payment must be in a settled state to be refunded and only full payment refunds are currently supported.
+        To power partial refunds, use `/wallet/transaction/execute`, where you can specify the exact amount for a payout to an end user.
+
+        A payment can only be reversed once and will be refunded back to the same source account that initiated the payment.
+        The original payment must have been initiated to a Plaid virtual account.
+        The refund will be initiated from the same virtual account that the payment was paid into.
       requestBody:
         required: true
         content:
@@ -4848,7 +4853,7 @@ paths:
                     - account_id: k67E4xKvMlhmleEa4pg9hlwGGNnnEeixPolGm
                       cost_basis: 1.5
                       institution_price: 2.11
-                      institution_price_as_of: null
+                      institution_price_as_of: "2021-04-13"
                       institution_price_datetime: null
                       institution_value: 2.11
                       iso_currency_code: USD
@@ -4858,7 +4863,7 @@ paths:
                     - account_id: k67E4xKvMlhmleEa4pg9hlwGGNnnEeixPolGm
                       cost_basis: 10
                       institution_price: 10.42
-                      institution_price_as_of: null
+                      institution_price_as_of: "2021-04-13"
                       institution_price_datetime: null
                       institution_value: 20.84
                       iso_currency_code: USD
@@ -4868,7 +4873,7 @@ paths:
                     - account_id: JqMLm4rJwpF6gMPJwBqdh9ZjjPvvpDcb7kDK1
                       cost_basis: 0.01
                       institution_price: 0.011
-                      institution_price_as_of: null
+                      institution_price_as_of: "2021-04-13"
                       institution_price_datetime: null
                       institution_value: 110
                       iso_currency_code: USD
@@ -4878,7 +4883,7 @@ paths:
                     - account_id: k67E4xKvMlhmleEa4pg9hlwGGNnnEeixPolGm
                       cost_basis: 23
                       institution_price: 27
-                      institution_price_as_of: null
+                      institution_price_as_of: "2021-04-13"
                       institution_price_datetime: null
                       institution_value: 636.309
                       iso_currency_code: USD
@@ -4888,7 +4893,7 @@ paths:
                     - account_id: k67E4xKvMlhmleEa4pg9hlwGGNnnEeixPolGm
                       cost_basis: 15
                       institution_price: 13.73
-                      institution_price_as_of: null
+                      institution_price_as_of: "2021-04-13"
                       institution_price_datetime: null
                       institution_value: 1373.6865
                       iso_currency_code: USD
@@ -4898,7 +4903,7 @@ paths:
                     - account_id: k67E4xKvMlhmleEa4pg9hlwGGNnnEeixPolGm
                       cost_basis: 1
                       institution_price: 1
-                      institution_price_as_of: null
+                      institution_price_as_of: "2021-04-13"
                       institution_price_datetime: null
                       institution_value: 12345.67
                       iso_currency_code: USD
@@ -7021,9 +7026,6 @@ paths:
                         pay_date: "2020-12-15"
                         start_date: "2020-12-01"
                         pay_frequency: PAY_FREQUENCY_BIWEEKLY
-                      verification:
-                        verification_status: PAYSTUB_VERIFICATION_STATUS_VERIFIED
-                        verification_attributes: []
                     request_id: 2pxQ59buGdsHRef
       requestBody:
         required: true
@@ -7357,6 +7359,105 @@ paths:
               $ref: '#/components/schemas/CreditAuditCopyTokenRemoveRequest'
         description: ""
       description: The `/credit/audit_copy_token/remove` endpoint allows you to remove an Audit Copy. Removing an Audit Copy invalidates the `audit_copy_token` associated with it, meaning both you and any third parties holding the token will no longer be able to use it to access Report data. Items associated with the Report data and other Audit Copies of it are not affected and will remain accessible after removing the given Audit Copy.
+  /credit/asset_report/freddie_mac/get:
+    post:
+      tags:
+      - plaid
+      summary: Retrieve an Asset Report with Freddie Mac format. Only Freddie Mac can use this endpoint.
+      externalDocs:
+        url: /none/
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetReportFreddieGetResponse'
+              examples:
+                example-1:
+                  value:
+                    DEAL:
+                      LOANS:
+                        LOAN:
+                          LoanRoleType: SubjectLoan
+                          LOAN_IDENTIFIERS:
+                            LOAN_IDENTIFIER:
+                              LoanIdentifier: "100016746"
+                              LoanIdentifierType: LenderLoan
+                      PARTIES:
+                        PARTY:
+                        - INDIVIDUAL:
+                            NAME:
+                              FirstName: John
+                              MiddleName: Doe
+                              LastName: Deere
+                          ROLES:
+                            ROLE:
+                              ROLE_DETAIL:
+                                PartyRoleType: Borrower
+                          TAXPAYER_IDENTIFIERS:
+                            TAXPAYER_IDENTIFIER:
+                              TaxpayerIdentifierType: SocialSecurityNumber
+                              TaxpayerIdentifierValue: 123-45-789
+                      SERVICES:
+                        SERVICE:
+                          VERIFICATION_OF_ASSET:
+                            REPORTING_INFORMATION:
+                              ReportIdentifierType: ReportID
+                              ReportingInformationIdentifier: PLAD
+                              ReportDateTime: "2022-07-27T20:31:28Z"
+                            SERVICE_PRODUCT_FULFILLMENT:
+                              SERVICE_PRODUCT_FULFILLMENT_DETAIL:
+                                VendorOrderIdentifier: PLAD_12345
+                                ServiceProductFulfillmentIdentifier: VOA
+                            VERIFICATION_OF_ASSET_RESPONSE:
+                              ASSETS:
+                                ASSET:
+                                - ASSET_DETAIL:
+                                    AssetAccountIdentifier: "3847"
+                                    AssetUniqueIdentifier: c251a55e-c503-471b-a3b1-11a9243bc189
+                                    AssetAsOfDate: "2022-07-27"
+                                    AssetDescription: Unlimited Cash Rewards Visa Signature
+                                    AssetAvailableBalanceAmount: 2073.99
+                                    AssetCurrentBalanceAmount: 2007.09
+                                    AssetType: Other
+                                    AssetTypeAdditionalDescription: credit card
+                                    AssetDaysRequestedCount: 61
+                                    AssetOwnershipType: null
+                                  ASSET_OWNERS:
+                                    ASSET_OWNER:
+                                    - AssetOwnerText: Alberta Bobbeth Charleson
+                                  ASSET_HOLDER:
+                                    NAME:
+                                      FullName: Wells Fargo
+                                  ASSET_TRANSACTIONS:
+                                    ASSET_TRANSACTION:
+                                    - ASSET_TRANSACTION_DETAIL:
+                                        AssetTransactionUniqueIdentifier: 7jagxo9Eq6cXPKM8eMNJUgeeNnbgQdSDw6zgN
+                                        AssetTransactionAmount: 34.43
+                                        AssetTransactionDate: "2022-07-19"
+                                        AssetTransactionPostDate: "2022-07-19"
+                                        AssetTransactionType: Debit
+                                        AssetTransactionPaidByName: null
+                                        AssetTransactionTypeAdditionalDescription: null
+                                        AssetTransactionCategoryType: FoodDining
+                                        FinancialInstitutionTransactionIdentifier: null
+                                      ASSET_TRANSACTION_DESCRIPTION:
+                                      - AssetTransactionDescription: TONYS PIZZA NAPOLETANA SAN FRANCISCOCA
+                          STATUSES:
+                            STATUS:
+                              StatusCode: success
+                              StatusDescription: null
+                    request_id: eYupqX1mZkEuQRx
+      operationId: creditAssetReportFreddieMacGet
+      description: The `credit/asset_report/freddie_mac/get` endpoint retrieves the Asset Report in Freddie Mac's JSON format.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssetReportFreddieGetRequest'
+        description: ""
   /credit/bank_income/get:
     post:
       summary: Retrieve information from the bank accounts used for income verification
@@ -7624,7 +7725,6 @@ paths:
                   value:
                     items:
                     - item_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBFL9DrE6
-                      pull_id: pull-sandbox-6f12f5bb-22dd-4855-b918-f47ec439198a
                       accounts:
                       - account_id: GeooLPBGDEunl54q7N3ZcyD5aLPLEai1nkzM9
                         rate_of_pay:
@@ -7719,9 +7819,6 @@ paths:
                             pay_frequency: BIWEEKLY
                             start_date: "2020-12-01"
                             unofficial_currency_code: null
-                          verification:
-                            verification_status: VERIFIED
-                            verification_attributes: []
                         w2s:
                         - allocated_tips: "1000"
                           box_12:
@@ -7916,7 +8013,7 @@ paths:
                   value:
                     items:
                     - item_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBFL9DrE6
-                      pull_id: pull-sandbox-6f12f5bb-22dd-4855-b918-f47ec439198a
+                      employment_report_token: pull-sandbox-6f12f5bb-22dd-4855-b918-f47ec439198a
                       employments:
                       - account_id: GeooLPBGDEunl54q7N3ZcyD5aLPLEai1nkzM9
                         status: ACTIVE
@@ -8531,7 +8628,7 @@ paths:
       - plaid
       summary: Create an e-wallet
       externalDocs:
-        url: /api/products/#walletcreate
+        url: /api/products/virtual-accounts/#walletcreate
       operationId: walletCreate
       responses:
         "200":
@@ -8565,7 +8662,7 @@ paths:
       - plaid
       summary: Fetch an e-wallet
       externalDocs:
-        url: /api/products/#walletget
+        url: /api/products/virtual-accounts/#walletget
       operationId: walletGet
       responses:
         "200":
@@ -8586,6 +8683,9 @@ paths:
                       bacs:
                         account: "12345678"
                         sort_code: "123456"
+                      international:
+                        iban: GB33BUKB20201555555555
+                        bic: BUKBGB22
                 example-2:
                   value:
                     wallet_id: wallet-id-production-53e58b32-fc1c-46fe-bbd6-e584b27a88
@@ -8597,20 +8697,6 @@ paths:
                       international:
                         iban: NL91ABNA0417164300
                         bic: ABNANL2A
-                example-3:
-                  value:
-                    wallet_id: wallet-id-production-53e58b32-fc1c-46fe-bbd6-e584b27a88
-                    balance:
-                      iso_currency_code: GBP
-                      current: 123.12
-                    request_id: 4zlKapIkTm8p5KM
-                    numbers:
-                      bacs:
-                        account: "12345678"
-                        sort_code: "123456"
-                      international:
-                        iban: GB33BUKB20201555555555
-                        bic: BUKBGB22
       description: Fetch an e-wallet. The response includes the current balance.
       requestBody:
         required: true
@@ -8624,7 +8710,7 @@ paths:
       - plaid
       summary: Fetch a list of e-wallets
       externalDocs:
-        url: /api/products/#walletlist
+        url: /api/products/virtual-accounts/#walletlist
       operationId: walletList
       responses:
         "200":
@@ -8667,7 +8753,7 @@ paths:
       - plaid
       summary: Execute a transaction using an e-wallet
       externalDocs:
-        url: /api/products/#wallettransactionexecute
+        url: /api/products/virtual-accounts/#wallettransactionexecute
       operationId: walletTransactionExecute
       responses:
         "200":
@@ -8684,8 +8770,8 @@ paths:
                     request_id: 4zlKapIkTm8p5KM
       description: |-
         Execute a transaction using the specified e-wallet.
-        Specify the e-wallet to debit from, the counterparty to credit to, the idempotency key to prevent duplicate payouts, the amount and reference for the payout.
-        The payouts are executed over the Faster Payment rails, where settlement usually only takes a few seconds.
+        Specify the e-wallet to debit from, the counterparty to credit to, the idempotency key to prevent duplicate transactions, the amount and reference for the transaction.
+        Transactions will settle in seconds to several days, depending on the underlying payment rail.
       requestBody:
         required: true
         content:
@@ -8696,8 +8782,9 @@ paths:
     post:
       tags:
       - plaid
+      summary: Fetch an e-wallet transaction
       externalDocs:
-        url: /api/products/#wallettransactionget
+        url: /api/products/virtual-accounts/#wallettransactionget
       operationId: walletTransactionGet
       responses:
         "200":
@@ -8753,7 +8840,7 @@ paths:
       - plaid
       summary: List e-wallet transactions
       externalDocs:
-        url: /api/products/#wallettransactionslist
+        url: /api/products/virtual-accounts/#wallettransactionslist
       operationId: walletTransactionsList
       responses:
         "200":
@@ -9152,6 +9239,77 @@ paths:
                   - auth
                   - identity
                   create_link_customization: true
+  /link_delivery/create:
+    post:
+      tags:
+      - plaid
+      summary: Create link delivery session
+      externalDocs:
+        url: /api/link_delivery/#create
+      operationId: linkDeliveryCreate
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LinkDeliveryCreateResponse'
+              examples:
+                example-1:
+                  value:
+                    link_delivery_url: http://hosted.plaid.com/99ace160-3cf7-4e51-a083-403633425815
+                    link_delivery_session_id: 99ace160-3cf7-4e51-a083-403633425815
+                    request_id: 4ciYmmesdqSiUAB
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      description: Use the `/link_delivery/create` endpoint to create a Link Delivery session.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LinkDeliveryCreateRequest'
+  /link_delivery/get:
+    post:
+      tags:
+      - plaid
+      summary: Get link delivery session
+      externalDocs:
+        url: /api/link_delivery/#get
+      operationId: linkDeliveryGet
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LinkDeliveryGetResponse'
+              examples:
+                example-1:
+                  value:
+                    status: COMPLETED
+                    created_at: "2019-10-12T07:20:50.52Z"
+                    public_tokens:
+                    - public-sandbox-b0e2c4ee-a763-4df5-bfe9-46a46bce993d
+                    completed_at: "2019-10-12T07:21:50.52Z"
+                    request_id: 4ciYmmesdqSiUAB
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      description: Use the `/link_delivery/get` endpoint to get the status of a Link Delivery session.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LinkDeliveryGetRequest'
 components:
   securitySchemes:
     clientId:
@@ -10642,7 +10800,10 @@ components:
           minLength: 1
         reference:
           type: string
-          description: A reference for the payment. This must be an alphanumeric string with at most 18 characters and must not contain any special characters (since not all institutions support them).
+          description: |-
+            A reference for the payment. This must be an alphanumeric string with at most 18 characters and must not contain any special characters (since not all institutions support them).
+            In order to track settlement via Payment Confirmation, each payment must have a unique reference. If the reference provided through the API is not unique, Plaid will adjust it.
+            Both the originally provided and automatically adjusted references (if any) can be found in the `reference` and `adjusted_reference` fields, respectively.
           minLength: 1
           maxLength: 18
         amount:
@@ -10832,6 +10993,7 @@ components:
       - PAYMENT_STATUS_BLOCKED
       - PAYMENT_STATUS_UNKNOWN
       - PAYMENT_STATUS_EXECUTED
+      - PAYMENT_STATUS_SETTLED
       - PAYMENT_STATUS_AUTHORISING
       - PAYMENT_STATUS_CANCELLED
       - PAYMENT_STATUS_ESTABLISHED
@@ -10853,7 +11015,9 @@ components:
 
         `PAYMENT_STATUS_CANCELLED`: The payment was cancelled during authorisation.
 
-        `PAYMENT_STATUS_EXECUTED`: The payment has been successfully initiated and is considered complete.
+        `PAYMENT_STATUS_EXECUTED`: The payment has been successfully executed and is considered complete.
+
+        `PAYMENT_STATUS_SETTLED`: The payment has settled and funds are available for use. Payment settlement can only be guaranteed by using Plaid virtual accounts. A payment will typically settle within seconds to several days, depending on which payment rail is used.
 
         `PAYMENT_STATUS_ESTABLISHED`: Indicates that the standing order has been successfully established. This state is only used for standing orders.
 
@@ -12920,10 +13084,6 @@ components:
       - $ref: '#/components/schemas/RecipientBACS'
       - type: object
         additionalProperties: true
-    CreditPullID:
-      title: CreditPullID
-      type: string
-      description: A reference id to reference what payroll data was returned from this endpoint
     RemovedTransaction:
       title: RemovedTransaction
       type: object
@@ -16296,6 +16456,12 @@ components:
       enum:
       - GBP
       - EUR
+      - PLN
+      - SEK
+      - DKK
+      - NOK
+      - CHF
+      - CZK
       description: The ISO-4217 currency code of the payment. For standing orders and payment consents, `"GBP"` must be used.
       minLength: 3
       maxLength: 3
@@ -16993,6 +17159,44 @@ components:
       - original_start_date
       - adjusted_start_date
       - timestamp
+    WalletTransactionStatusUpdateWebhook:
+      title: WalletTransactionStatusUpdateWebhook
+      type: object
+      additionalProperties: true
+      description: Fired when the status of a wallet transaction has changed.
+      x-examples:
+        example-1:
+          webhook_type: WALLET
+          webhook_code: WALLET_TRANSACTION_STATUS_UPDATE
+          transaction_id: wallet-transaction-id-production-2ba30780-d549-4335-b1fe-c2a938aa39d2
+          new_status: SETTLED
+          old_status: INITIATED
+          timestamp: "2017-09-14T14:42:19.350Z"
+      properties:
+        webhook_type:
+          type: string
+          description: '`WALLET`'
+        webhook_code:
+          type: string
+          description: '`WALLET_TRANSACTION_STATUS_UPDATE`'
+        transaction_id:
+          type: string
+          description: The `transaction_id` for the wallet transaction being updated
+        new_status:
+          $ref: '#/components/schemas/WalletTransactionStatus'
+        old_status:
+          $ref: '#/components/schemas/WalletTransactionStatus'
+        timestamp:
+          type: string
+          format: date-time
+          description: The timestamp of the update, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format, e.g. `"2017-09-14T14:42:19.350Z"`
+      required:
+      - webhook_type
+      - webhook_code
+      - transaction_id
+      - new_status
+      - old_status
+      - timestamp
     Holding:
       title: Holding
       type: object
@@ -17013,7 +17217,6 @@ components:
           type: string
           format: date
           description: The date at which `institution_price` was current.
-          nullable: true
         institution_price_datetime:
           type: string
           format: date-time
@@ -17128,7 +17331,12 @@ components:
           type: number
           format: double
           nullable: true
-          description: "Price of the security at the close of the previous trading session. Null for non-public securities. \n\nIf the security is a foreign currency this field will be updated daily and will be priced in USD. \n\nIf the security is a cryptocurrency, this field will be updated multiple times a day. As crypto prices can fluctuate quickly and data may become stale sooner than other asset classes, please refer to update_datetime with the time when the price was last updated.\n"
+          description: |
+            Price of the security at the close of the previous trading session. Null for non-public securities.
+
+            If the security is a foreign currency this field will be updated daily and will be priced in USD.
+
+            If the security is a cryptocurrency, this field will be updated multiple times a day. As crypto prices can fluctuate quickly and data may become stale sooner than other asset classes, please refer to update_datetime with the time when the price was last updated.
         close_price_as_of:
           type: string
           nullable: true
@@ -18032,6 +18240,7 @@ components:
       title: TransferCreateIdempotencyKey
       type: string
       deprecated: true
+      x-hidden-from-docs: true
       maxLength: 50
       description: |-
         Deprecated. `authorization_id` is now used as idempotency instead.
@@ -18085,6 +18294,14 @@ components:
           $ref: '#/components/schemas/TransferUserAddressInRequest'
       required:
       - legal_name
+    TransferUserInRequestDeprecated:
+      title: TransferUserInRequest
+      type: object
+      description: The legal name and other information for the account holder.
+      deprecated: true
+      x-hidden-from-docs: true
+      allOf:
+      - $ref: '#/components/schemas/TransferUserInRequest'
     TransferUserInResponse:
       title: TransferUserInResponse
       type: object
@@ -18500,9 +18717,15 @@ components:
           type: string
           description: Plaid’s unique identifier for a transfer authorization. This parameter also serves the purpose of acting as an idempotency identifier.
         type:
-          $ref: '#/components/schemas/TransferType'
+          x-hidden-from-docs: true
+          deprecated: true
+          allOf:
+          - $ref: '#/components/schemas/TransferType'
         network:
-          $ref: '#/components/schemas/TransferNetwork'
+          x-hidden-from-docs: true
+          deprecated: true
+          allOf:
+          - $ref: '#/components/schemas/TransferNetwork'
         amount:
           $ref: '#/components/schemas/TransferAmount'
         description:
@@ -18510,28 +18733,30 @@ components:
           description: The transfer description. Maximum of 10 characters.
           maxLength: 10
         ach_class:
-          $ref: '#/components/schemas/ACHClass'
+          x-hidden-from-docs: true
+          deprecated: true
+          allOf:
+          - $ref: '#/components/schemas/ACHClass'
         user:
-          $ref: '#/components/schemas/TransferUserInRequest'
+          $ref: '#/components/schemas/TransferUserInRequestDeprecated'
         metadata:
           $ref: '#/components/schemas/TransferMetadata'
         origination_account_id:
           type: string
+          x-hidden-from-docs: true
+          deprecated: true
           nullable: true
           description: Plaid’s unique identifier for the origination account for this transfer. If you have more than one origination account, this value must be specified. Otherwise, this field should be left blank.
         iso_currency_code:
           type: string
+          x-hidden-from-docs: true
+          deprecated: true
           description: The currency of the transfer amount. The default value is "USD".
         payment_profile_id:
           $ref: '#/components/schemas/PaymentProfileID'
       required:
       - authorization_id
-      - type
-      - network
-      - amount
       - description
-      - ach_class
-      - user
     BankTransferCreateRequest:
       title: BankTransferCreateRequest
       type: object
@@ -20997,8 +21222,6 @@ components:
             $ref: '#/components/schemas/IncomeBreakdown'
         ytd_earnings:
           $ref: '#/components/schemas/PaystubYTDDetails'
-        verification:
-          $ref: '#/components/schemas/PaystubVerification'
       required:
       - deductions
       - doc_id
@@ -21007,7 +21230,6 @@ components:
       - employer
       - net_pay
       - pay_period_details
-      - verification
     Deductions:
       title: Deductions
       type: object
@@ -21622,59 +21844,6 @@ components:
           description: Year-to-date net (take home) earnings.
           nullable: true
       description: The amount of income earned year to date, as based on paystub data.
-    PaystubVerification:
-      title: PaystubVerification
-      description: An object containing details on the paystub's verification status. This object will only be populated if the [`income_verification.access_tokens`](/docs/api/tokens/#link-token-create-request-income-verification-access-tokens) parameter was provided during the `/link/token/create` call or if a problem was detected with the information supplied by the user; otherwise it will be `null`.
-      type: object
-      additionalProperties: true
-      nullable: true
-      properties:
-        verification_status:
-          $ref: '#/components/schemas/PaystubVerificationStatus'
-        verification_attributes:
-          type: array
-          items:
-            $ref: '#/components/schemas/VerificationAttribute'
-      required:
-      - verification_status
-      - verification_attributes
-    PaystubVerificationStatus:
-      type: string
-      title: PaystubVerificationStatus
-      description: Derived verification status.
-      nullable: true
-      enum:
-      - PAYSTUB_VERIFICATION_STATUS_UNKNOWN
-      - PAYSTUB_VERIFICATION_STATUS_VERIFIED
-      - PAYSTUB_VERIFICATION_STATUS_FRAUDULENT
-      - null
-    VerificationAttribute:
-      title: VerificationAttribute
-      description: Details about a certain reason as to why a document could potentially be fraudulent
-      type: object
-      additionalProperties: true
-      nullable: true
-      properties:
-        type:
-          title: VerificationAttributeType
-          type: string
-          description: Message indicating the reason as to why the verification failed
-          nullable: true
-          enum:
-          - VERIFICATION_ATTRIBUTE_TYPE_UNKNOWN
-          - VERIFICATION_ATTRIBUTE_TYPE_AMOUNT_MATCH
-          - VERIFICATION_ATTRIBUTE_TYPE_DATE_MATCH
-          - VERIFICATION_ATTRIBUTE_TYPE_DATE_MISMATCH
-          - VERIFICATION_ATTRIBUTE_TYPE_FILE_TAMPERING
-          - VERIFICATION_ATTRIBUTE_TYPE_DESCRIPTION_MATCH
-          - VERIFICATION_ATTRIBUTE_TYPE_DESCRIPTION_MISMATCH
-          - VERIFICATION_ATTRIBUTE_TYPE_FIRST_NAME_MATCH
-          - VERIFICATION_ATTRIBUTE_TYPE_FIRST_NAME_MISMATCH
-          - VERIFICATION_ATTRIBUTE_TYPE_LAST_NAME_MATCH
-          - VERIFICATION_ATTRIBUTE_TYPE_LAST_NAME_MISMATCH
-          - null
-      required:
-      - type
     IncomeVerificationDocumentsDownloadRequest:
       title: IncomeVerificationDocumentsDownloadRequest
       type: object
@@ -21997,6 +22166,8 @@ components:
             type: string
             nullable: true
             description: The date on which the transaction took place, in IS0 8601 format.
+          credit_category:
+            $ref: '#/components/schemas/CreditCategory'
       required:
       - original_description
     HealthIncident:
@@ -22805,14 +22976,11 @@ components:
             $ref: '#/components/schemas/PayrollIncomeObject'
         status:
           $ref: '#/components/schemas/PayrollItemStatus'
-        pull_id:
-          $ref: '#/components/schemas/CreditPullID'
       required:
       - item_id
       - payroll_income
       - status
       - accounts
-      - pull_id
     PayrollIncomeAccountData:
       title: PayrollIncomeAccountData
       type: object
@@ -23228,8 +23396,6 @@ components:
           $ref: '#/components/schemas/CreditPayStubNetPay'
         pay_period_details:
           $ref: '#/components/schemas/PayStubPayPeriodDetails'
-        verification:
-          $ref: '#/components/schemas/CreditPayStubVerification'
       required:
       - deductions
       - document_id
@@ -23239,7 +23405,6 @@ components:
       - employer
       - net_pay
       - pay_period_details
-      - verification
     CreditPayStubDeductions:
       title: CreditPayStubDeductions
       type: object
@@ -23685,60 +23850,6 @@ components:
       - mask
       - type
       - unofficial_currency_code
-    CreditPayStubVerification:
-      title: CreditPayStubVerification
-      description: (To be deprecated) Verification info will be moved to a separate endpoint in the future. An object containing details on the paystub's verification status. This object will only be populated if the [`income_verification.access_tokens`](/docs/api/tokens/#link-token-create-request-income-verification-access-tokens) parameter was provided during the `/link/token/create` call or if a problem was detected with the information supplied by the user; otherwise it will be `null`.
-      type: object
-      additionalProperties: true
-      nullable: true
-      deprecated: true
-      properties:
-        verification_status:
-          $ref: '#/components/schemas/CreditPayStubVerificationStatus'
-        verification_attributes:
-          type: array
-          items:
-            $ref: '#/components/schemas/PayStubVerificationAttribute'
-      required:
-      - verification_status
-      - verification_attributes
-    CreditPayStubVerificationStatus:
-      type: string
-      title: CreditPayStubVerificationStatus
-      description: Derived verification status.
-      nullable: true
-      x-override-enum-values-shown:
-      - UNKNOWN
-      - VERIFIED
-      - FRAUDULENT
-      - null
-    PayStubVerificationAttribute:
-      title: PayStubVerificationAttribute
-      description: Details about a certain reason as to why a document could potentially be fraudulent.
-      type: object
-      additionalProperties: true
-      nullable: true
-      properties:
-        type:
-          title: PayStubVerificationAttributeType
-          type: string
-          description: Message indicating the reason as to why the verification failed.
-          nullable: true
-          x-override-enum-values-shown:
-          - UNKNOWN
-          - AMOUNT_MATCH
-          - DATE_MATCH
-          - DATE_MISMATCH
-          - FILE_TAMPERING
-          - DESCRIPTION_MATCH
-          - DESCRIPTION_MISMATCH
-          - FIRST_NAME_MATCH
-          - FIRST_NAME_MISMATCH
-          - LAST_NAME_MATCH
-          - LAST_NAME_MISMATCH
-          - null
-      required:
-      - type
     ReportToken:
       title: ReportToken
       description: ReportToken is a representation of a token that has a `report_type` field that can be one of `assets` or `income` and a `token` field which is the associated token with the `report_type`. The `token` can be an Asset Report token or Income Report token.
@@ -24087,12 +24198,15 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CreditEmploymentVerification'
-        pull_id:
-          $ref: '#/components/schemas/CreditPullID'
+        employment_report_token:
+          title: EmploymentReportToken
+          type: string
+          description: Token to represent the underlying Employment data
+          x-hidden-from-docs: true
       required:
       - item_id
       - employments
-      - pull_id
+      - employment_report_token
     CreditEmploymentVerification:
       title: CreditEmploymentVerification
       type: object
@@ -24978,10 +25092,10 @@ components:
         bank_initiated_return_risk:
           $ref: '#/components/schemas/BankInitiatedReturnRisk'
     SignalScore:
-      description: 'A score from 0-99 that indicates the transaction return risk: a higher risk score suggests a higher return likelihood.'
+      description: 'A score from 1-99 that indicates the transaction return risk: a higher risk score suggests a higher return likelihood.'
       type: integer
-      minimum: 0
-      maximum: 100
+      minimum: 1
+      maximum: 99
     CustomerInitiatedRiskTier:
       description: |
         A tier corresponding to the projected likelihood that the transaction, if initiated, will be subject to a return.
@@ -25098,6 +25212,7 @@ components:
         is_savings_or_money_market_account:
           type: boolean
           description: Indicates if the ACH transaction funding account is a savings/money market account
+          nullable: true
         total_credit_transactions_amount_10d:
           type: number
           format: double
@@ -25626,7 +25741,9 @@ components:
           type: string
           maxLength: 18
           minLength: 1
-          description: A reference for the transaction. This must be an alphanumeric string with at most 18 characters and must not contain any special characters or spaces.
+          description: |-
+            A reference for the transaction. This must be an alphanumeric string with at most 18 characters and must not contain any special characters or spaces.
+            Ensure that the `reference` field is unique for each transaction.
       required:
       - idempotency_key
       - wallet_id
@@ -25718,6 +25835,7 @@ components:
       enum:
       - INITIATED
       - EXECUTED
+      - SETTLED
       - BLOCKED
       - FAILED
       description: |-
@@ -25725,7 +25843,9 @@ components:
 
         `INITIATED`: This is the initial state of all transactions. It indicates that the transaction has been initiated and is currently being processed.
 
-        `EXECUTED`: The transaction has been successfully executed.
+        `EXECUTED`: The transaction has been successfully executed and is considered complete. This is only applicable for debit transactions.
+
+        `SETTLED`: The transaction has settled and funds are available for use. This is only applicable for credit transactions. A transaction will typically settle within seconds to several days, depending on which payment rail is used.
 
         `FAILED`: The transaction failed to process successfully. This is a terminal status.
 
@@ -26132,6 +26252,128 @@ components:
           $ref: '#/components/schemas/APIClientID'
         company_name:
           type: string
+    LinkDeliverySessionStatus:
+      type: string
+      enum:
+      - CREATED
+      - OPENED
+      - COMPLETED
+      - EXPIRED
+      description: |-
+        The status of the given Link Delivery Session.
+
+        `CREATED`: The session is created but not yet accessed by the user
+
+        `OPENED`: The session is opened by the user but not yet completed
+
+        `COMPLETED`: The session has been completed by the user
+
+        `EXPIRED`: The session has expired
+    LinkDeliveryDeliveryMethod:
+      type: string
+      enum:
+      - SMS
+      - EMAIL
+      description: |-
+        The delivery method to be used to deliver the Link Delivery URL.
+
+        `SMS`: The URL will be delivered through SMS
+
+        `EMAIL`: The URL will be delivered through email
+    LinkDeliveryCreateRequest:
+      type: object
+      description: LinkDeliveryCreateRequest defines the request schema for `/link_delivery/create`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        link_token:
+          type: string
+          description: A `link_token` from a previous invocation of `/link/token/create` with Link Delivery enabled
+        delivery_method:
+          $ref: '#/components/schemas/LinkDeliveryDeliveryMethod'
+        delivery_destination:
+          type: string
+          description: The email or phone number to be used to delivery the URL of the Link Delivery session
+      required:
+      - link_token
+      - delivery_method
+      - delivery_destination
+    LinkDeliveryCreateResponse:
+      type: object
+      additionalProperties: true
+      description: LinkDeliveryCreateResponse defines the response schema for `/link_delivery/create`
+      properties:
+        link_delivery_url:
+          type: string
+          description: The URL to the Link Delivery session, which will be delivered by the specified delivery method.
+        link_delivery_session_id:
+          type: string
+          description: The ID for the link delivery session. Same as the link token string excluding the "link-{env}-" prefix
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - link_delivery_url
+      - link_delivery_session_id
+      - request_id
+    LinkDeliveryGetRequest:
+      type: object
+      description: LinkDeliveryGetRequest defines the request schema for `/link_delivery/get`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        link_delivery_session_id:
+          type: string
+          description: The ID for the link delivery session from a previous invocation of `/link_delivery/create`
+      required:
+      - link_delivery_session_id
+    LinkDeliveryGetResponse:
+      type: object
+      additionalProperties: true
+      description: LinkDeliveryGetRequest defines the response schema for `/link_delivery/get`
+      properties:
+        status:
+          $ref: '#/components/schemas/LinkDeliverySessionStatus'
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (`YYYY-MM-DDTHH:mm:ssZ`) indicating the time the given Link Delivery Session was created at
+        public_tokens:
+          type: array
+          items:
+            type: string
+          description: The public tokens returned by the Link session upon completion
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (`YYYY-MM-DDTHH:mm:ssZ`) indicating the time the given Link Delivery Session was completed at
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - status
+      - created_at
+      - request_id
+    CreditCategory:
+      title: CreditCategory
+      nullable: true
+      type: object
+      x-hidden-from-docs: true
+      additionalProperties: true
+      description: Information describing the intent of the transaction. Most relevant for credit use cases, but not limited to such use cases.
+      properties:
+        primary:
+          type: string
+          description: A high level category that communicates the broad category of the transaction.
+        detailed:
+          type: string
+          description: A granular category conveying the transaction's intent. This field can also be used as a unique identifier for the category.
+      required:
+      - primary
+      - detailed
     AddressPurposeLabel:
       description: |-
         Field describing whether the associated address is being used for commercial or residential purposes.
@@ -29039,6 +29281,715 @@ components:
       example: none
       description: Names that are explicitly marked as low quality either by their `source` list, or by `plaid` by a series of additional checks done by Plaid. Plaid does not ever surface a hit as a result of a weak name alone. If a name has no quality issues, this value will be `none`.
       title: WeakAliasDetermination
+    AssetReportFreddieGetRequest:
+      title: AssetReportFreddieGetRequest
+      type: object
+      additionalProperties: true
+      description: AssetReportFreddieGetResponse defines the request schema for `credit/asset_report/freddie_mac/get`
+      properties:
+        audit_copy_token:
+          type: string
+          description: A token that can be shared with a third party auditor to allow them to obtain access to the Asset Report. This token should be stored securely.
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        report_identifier:
+          type: string
+          description: A string ID provided by Freddie Mac which will be added to the Asset Report to help them identify the report (PLAD_.*)
+        report_type:
+          $ref: '#/components/schemas/ReportType'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        vendor_identifier:
+          type: string
+          description: A string ID provided by Freddie Mac which will be added to the Asset Report with Plaid's vendor ID. Will always be "PLAD"
+      required:
+      - audit_copy_token
+      - report_identifier
+      - report_type
+      - vendor_identifier
+    AssetReportFreddieGetResponse:
+      title: AssetReportFreddieGetResponse
+      type: object
+      additionalProperties: true
+      description: AssetReportFreddieGetResponse defines the response schema for `/asset_report/get`
+      properties:
+        DEAL:
+          $ref: '#/components/schemas/AssetReportFreddie'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - DEAL
+      - request_id
+    AssetReportFreddie:
+      title: AssetReportFreddie
+      type: object
+      additionalProperties: true
+      description: An object representing an Asset Report with Freddie Mac schema
+      properties:
+        LOANS:
+          $ref: '#/components/schemas/Loans'
+        PARTIES:
+          $ref: '#/components/schemas/Parties'
+        SERVICES:
+          $ref: '#/components/schemas/Services'
+      required:
+      - LOANS
+      - PARTIES
+      - SERVICES
+    Loans:
+      title: Loans
+      type: object
+      additionalProperties: true
+      description: A collection of loans that are part of a single deal.
+      properties:
+        LOAN:
+          $ref: '#/components/schemas/Loan'
+      required:
+      - LOAN
+    Loan:
+      title: Loan
+      type: object
+      additionalProperties: true
+      description: Information specific to a mortgage loan agreement between one or more borrowers and a mortgage lender.
+      properties:
+        LoanRoleType:
+          type: string
+          description: An attribute of LOAN used to identify the role the associated LOAN plays in the transaction.
+        LOAN_IDENTIFIERS:
+          $ref: '#/components/schemas/LoanIdentifiers'
+      required:
+      - LoanRoleType
+      - LOAN_IDENTIFIERS
+    LoanIdentifiers:
+      title: LoanIdentifiers
+      type: object
+      additionalProperties: true
+      description: Collection of current and previous identifiers for this loan.
+      properties:
+        LOAN_IDENTIFIER:
+          $ref: '#/components/schemas/LoanIdentifier'
+      required:
+      - LOAN_IDENTIFIER
+    LoanIdentifier:
+      title: LoanIdentifier
+      type: object
+      additionalProperties: true
+      description: The information used to identify this loan by various parties to the transaction or other organizations.
+      properties:
+        LoanIdentifier:
+          type: string
+          nullable: true
+          description: The value of the identifier for the specified type.
+        LoanIdentifierType:
+          $ref: '#/components/schemas/LoanIdentifierType'
+      required:
+      - LoanIdentifier
+      - LoanIdentifierType
+    LoanIdentifierType:
+      title: LoanIdentifierType
+      type: string
+      nullable: true
+      description: A value from a MISMO prescribed list that specifies the type of loan identifier.
+      enum:
+      - LenderLoan
+      - UniversalLoan
+    Parties:
+      title: Parties
+      type: object
+      additionalProperties: true
+      description: A collection of objects that define specific parties to a deal. This includes the direct participating parties, such as borrower and seller and the indirect parties such as the credit report provider.
+      properties:
+        PARTY:
+          type: array
+          items:
+            $ref: '#/components/schemas/Party'
+      required:
+      - PARTY
+    Party:
+      title: Party
+      type: object
+      additionalProperties: true
+      description: A collection of information about a single party to a transaction. Included direct participants like the borrower and seller as well as indirect participants such as the flood certificate provider.
+      properties:
+        INDIVIDUAL:
+          $ref: '#/components/schemas/PartyIndividual'
+        ROLES:
+          $ref: '#/components/schemas/Roles'
+        TAXPAYER_IDENTIFIERS:
+          $ref: '#/components/schemas/TaxpayerIdentifiers'
+      required:
+      - INDIVIDUAL
+      - ROLES
+      - TAXPAYER_IDENTIFIERS
+    PartyIndividual:
+      title: INDIVIDUAL
+      type: object
+      additionalProperties: true
+      description: No documentation available
+      properties:
+        NAME:
+          $ref: '#/components/schemas/IndividualName'
+      required:
+      - NAME
+    IndividualName:
+      title: NAME
+      type: object
+      additionalProperties: true
+      description: Parent container for name that allows for choice group between parsed and unparsed containers.Parent container for name that allows for choice group between parsed and unparsed containers.
+      properties:
+        FirstName:
+          type: string
+          description: The first name of the individual represented by the parent object.
+        MiddleName:
+          type: string
+          nullable: true
+          description: The middle name of the individual represented by the parent object.
+        LastName:
+          type: string
+          description: The last name of the individual represented by the parent object.
+      required:
+      - FirstName
+      - MiddleName
+      - LastName
+    Roles:
+      title: Roles
+      type: object
+      additionalProperties: true
+      description: No documentation available
+      properties:
+        ROLE:
+          $ref: '#/components/schemas/Role'
+      required:
+      - ROLE
+    Role:
+      title: Role
+      type: object
+      additionalProperties: true
+      description: ANo documentation available
+      properties:
+        ROLE_DETAIL:
+          $ref: '#/components/schemas/RoleDetail'
+      required:
+      - ROLE_DETAIL
+    RoleDetail:
+      title: RoleDetail
+      type: object
+      additionalProperties: true
+      description: No documentation available
+      properties:
+        PartyRoleType:
+          $ref: '#/components/schemas/PartyRoleType'
+      required:
+      - PartyRoleType
+    PartyRoleType:
+      title: PartyRoleType
+      type: string
+      description: A value from a MISMO defined list that identifies the role that the party plays in the transaction. Parties may be either a person or legal entity. A party may play multiple roles in a transaction.A value from a MISMO defined list that identifies the role that the party plays in the transaction. Parties may be either a person or legal entity. A party may play multiple roles in a transaction.
+      enum:
+      - Borrower
+    TaxpayerIdentifiers:
+      title: TaxpayerIdentifiers
+      type: object
+      additionalProperties: true
+      description: The collection of TAXPAYER_IDENTIFICATION elements
+      properties:
+        TAXPAYER_IDENTIFIER:
+          $ref: '#/components/schemas/TaxpayerIdentifier'
+      required:
+      - TAXPAYER_IDENTIFIER
+    TaxpayerIdentifier:
+      title: TaxpayerIdentifier
+      type: object
+      additionalProperties: true
+      description: Information about the Taxpayer identification values assigned to the individual or legal entity.Information about the Taxpayer identification values assigned to the individual or legal entity.
+      properties:
+        TaxpayerIdentifierType:
+          $ref: '#/components/schemas/TaxpayerIdentifierType'
+        TaxpayerIdentifierValue:
+          type: string
+          nullable: true
+          description: The value of the taxpayer identifier as assigned by the IRS to the individual or legal entity.
+      required:
+      - TaxpayerIdentifierType
+      - TaxpayerIdentifierValue
+    TaxpayerIdentifierType:
+      title: TaxpayerIdentifierType
+      type: string
+      nullable: true
+      description: A value from a MISMO prescribed list that classifies identification numbers used by the Internal Revenue Service (IRS) in the administration of tax laws. A Social Security number (SSN) is issued by the SSA; all other taxpayer identification numbers are issued by the IRS.
+      enum:
+      - IndividualTaxpayerIdentificationNumber
+      - SocialSecurityNumber
+    Services:
+      title: Services
+      type: object
+      additionalProperties: true
+      description: A collection of objects that describe requests and responses for services.
+      properties:
+        SERVICE:
+          $ref: '#/components/schemas/Service'
+      required:
+      - SERVICE
+    Service:
+      title: Service
+      type: object
+      additionalProperties: true
+      description: A collection of details related to a fulfillment service or product in terms of request, process and result.
+      properties:
+        VERIFICATION_OF_ASSET:
+          $ref: '#/components/schemas/VerificationOfAsset'
+        STATUSES:
+          $ref: '#/components/schemas/Statuses'
+      required:
+      - VERIFICATION_OF_ASSET
+      - STATUSES
+    VerificationOfAsset:
+      title: VerificationOfAsset
+      type: object
+      additionalProperties: true
+      description: No documentation available
+      properties:
+        REPORTING_INFORMATION:
+          $ref: '#/components/schemas/ReportingInformation'
+        SERVICE_PRODUCT_FULFILLMENT:
+          $ref: '#/components/schemas/ServiceProductFulfillment'
+        VERIFICATION_OF_ASSET_RESPONSE:
+          $ref: '#/components/schemas/VerificationOfAssetResponse'
+      required:
+      - REPORTING_INFORMATION
+      - SERVICE_PRODUCT_FULFILLMENT
+      - VERIFICATION_OF_ASSET_RESPONSE
+    ReportingInformation:
+      title: ReportingInformation
+      type: object
+      additionalProperties: true
+      description: Information about an report identifier and a report name.
+      properties:
+        ReportIdentifierType:
+          type: string
+          description: No documentation available
+        ReportingInformationIdentifier:
+          type: string
+          description: No documentation available
+        ReportDateTime:
+          type: string
+          description: No documentation available
+      required:
+      - ReportIdentifierType
+      - ReportingInformationIdentifier
+      - ReportDateTime
+    ServiceProductFulfillment:
+      title: ServiceProductFulfillment
+      type: object
+      additionalProperties: true
+      description: A collection of details related to a fulfillment service or product in terms of request, process and result.
+      properties:
+        SERVICE_PRODUCT_FULFILLMENT_DETAIL:
+          $ref: '#/components/schemas/ServiceProductFulfillmentDetail'
+      required:
+      - SERVICE_PRODUCT_FULFILLMENT_DETAIL
+    ServiceProductFulfillmentDetail:
+      title: ServiceProductFulfillmentDetail
+      type: object
+      additionalProperties: true
+      description: No documentation available
+      properties:
+        VendorOrderIdentifier:
+          type: string
+          nullable: true
+          description: A string that uniquely identifies a type of order Verification of Asset.
+        ServiceProductFulfillmentIdentifier:
+          $ref: '#/components/schemas/ServiceProductFulfillmentIdentifier'
+      required:
+      - VendorOrderIdentifier
+      - ServiceProductFulfillmentIdentifier
+    ServiceProductFulfillmentIdentifier:
+      title: ServiceProductFulfillmentIdentifier
+      type: string
+      description: No documentation available
+      enum:
+      - VOA
+    VerificationOfAssetResponse:
+      title: VerificationOfAssetResponse
+      type: object
+      additionalProperties: true
+      description: No documentation available
+      properties:
+        ASSETS:
+          $ref: '#/components/schemas/Assets'
+      required:
+      - ASSETS
+    Assets:
+      title: Assets
+      type: object
+      additionalProperties: true
+      description: No documentation available
+      properties:
+        ASSET:
+          type: array
+          items:
+            $ref: '#/components/schemas/Asset'
+          description: No documentation available
+      required:
+      - ASSET
+    Asset:
+      title: Asset
+      type: object
+      additionalProperties: true
+      description: No documentation available
+      properties:
+        ASSET_DETAIL:
+          $ref: '#/components/schemas/AssetDetail'
+        ASSET_OWNERS:
+          $ref: '#/components/schemas/AssetOwners'
+        ASSET_HOLDER:
+          $ref: '#/components/schemas/AssetHolder'
+        ASSET_TRANSACTIONS:
+          $ref: '#/components/schemas/AssetTransactions'
+      required:
+      - ASSET_DETAIL
+      - ASSET_OWNERS
+      - ASSET_HOLDER
+      - ASSET_TRANSACTIONS
+    AssetDetail:
+      title: AssetDetail
+      type: object
+      additionalProperties: true
+      description: Details about an asset.
+      properties:
+        AssetUniqueIdentifier:
+          type: string
+          description: A vendor creadted unique Identifier.
+        AssetAccountIdentifier:
+          type: string
+          description: A unique alphanumeric string identifying an asset.
+        AssetAsOfDate:
+          type: string
+          description: Account Report As of Date / Create Date. Format YYYY-MM-DD
+        AssetDescription:
+          type: string
+          nullable: true
+          description: A text description that further defines the Asset. This could be used to describe the shares associated with the stocks, bonds or mutual funds, retirement funds or business owned that the borrower has disclosed (named) as an asset.
+        AssetAvailableBalanceAmount:
+          type: number
+          format: double
+          description: Asset Account Available Balance.
+        AssetCurrentBalanceAmount:
+          type: number
+          format: double
+          description: A vendor creadted unique Identifier
+        AssetType:
+          $ref: '#/components/schemas/AssetType'
+        AssetTypeAdditionalDescription:
+          type: string
+          nullable: true
+          description: Additional Asset Decription some examples are Investment Tax-Deferred , Loan, 401K, 403B, Checking, Money Market, Credit Card,ROTH,529,Biller,ROLLOVER,CD,Savings,Investment Taxable, IRA, Mortgage, Line Of Credit.
+        AssetDaysRequestedCount:
+          type: integer
+          description: The Number of days requested made to the Financial Institution. Example When looking for 3 months of data from the FI, pass in 90 days.
+        AssetOwnershipType:
+          type: string
+          nullable: true
+          description: Ownership type of the asset account.
+      required:
+      - AssetUniqueIdentifier
+      - AssetAccountIdentifier
+      - AssetAsOfDate
+      - AssetDescription
+      - AssetAvailableBalanceAmount
+      - AssetCurrentBalanceAmount
+      - AssetType
+      - AssetTypeAdditionalDescription
+      - AssetDaysRequestedCount
+      - AssetOwnershipType
+    AssetType:
+      title: AssetType
+      type: string
+      description: A value from a MISMO prescribed list that specifies financial assets in a mortgage loan transaction. Assets may be either liquid or fixed and are associated with a corresponding asset amount.
+      enum:
+      - CheckingAccount
+      - SavingsAccount
+      - Investment
+      - MoneyMarketFund
+      - Other
+    AssetOwners:
+      title: AssetOwners
+      type: object
+      additionalProperties: true
+      description: No documentation available
+      properties:
+        ASSET_OWNER:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetOwner'
+          description: Multiple Occurances of Account Owners Full Name up to 4.
+      required:
+      - ASSET_OWNER
+    AssetOwner:
+      title: AssetOwner
+      type: object
+      additionalProperties: true
+      description: No documentation available
+      properties:
+        AssetOwnerText:
+          type: string
+          nullable: true
+          description: Account Owner Full Name.
+      required:
+      - AssetOwnerText
+    AssetHolder:
+      title: AssetHolder
+      type: object
+      additionalProperties: true
+      description: No documentation available
+      properties:
+        NAME:
+          $ref: '#/components/schemas/AssetHolderName'
+      required:
+      - NAME
+    AssetHolderName:
+      title: NAME
+      type: object
+      additionalProperties: true
+      description: No documentation available
+      properties:
+        FullName:
+          type: string
+          description: The unparsed name of either an individual or a legal entity.
+      required:
+      - FullName
+    AssetTransactions:
+      title: AssetTransactions
+      type: object
+      additionalProperties: true
+      description: No documentation available
+      properties:
+        ASSET_TRANSACTION:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetTransaction'
+      required:
+      - ASSET_TRANSACTION
+    AssetTransaction:
+      title: AssetTransaction
+      type: object
+      additionalProperties: true
+      description: An object representing...
+      properties:
+        ASSET_TRANSACTION_DETAIL:
+          $ref: '#/components/schemas/AssetTransactionDetail'
+        ASSET_TRANSACTION_DESCRIPTION:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetTransactionDescription'
+          description: No documentation available
+      required:
+      - ASSET_TRANSACTION_DETAIL
+      - ASSET_TRANSACTION_DESCRIPTION
+    AssetTransactionDetail:
+      title: AssetTransactionDetail
+      type: object
+      additionalProperties: true
+      description: No documentation available
+      properties:
+        AssetTransactionUniqueIdentifier:
+          type: string
+          description: A vendor creadted unique Identifier.
+        AssetTransactionAmount:
+          type: number
+          description: AssetTransactionAmountName.
+        AssetTransactionDate:
+          type: string
+          format: date
+          description: Asset Transaction Date.
+        AssetTransactionPostDate:
+          type: string
+          format: date
+          description: Asset Transaction Post Date.
+        AssetTransactionType:
+          $ref: '#/components/schemas/AssetTransactionType'
+        AssetTransactionPaidByName:
+          type: string
+          nullable: true
+          description: Populate with who did the transaction.
+        AssetTransactionTypeAdditionalDescription:
+          type: string
+          nullable: true
+          description: FI Provided - examples are atm, cash, check, credit, debit, deposit, directDebit, directDeposit, dividend, fee, interest, other, payment, pointOfSale, repeatPayment, serviceCharge, transfer.
+        AssetTransactionCategoryType:
+          $ref: '#/components/schemas/AssetTransactionCategoryType'
+        FinancialInstitutionTransactionIdentifier:
+          type: string
+          nullable: true
+          description: FI provided Transaction Identifier.
+      required:
+      - AssetTransactionUniqueIdentifier
+      - AssetTransactionAmount
+      - AssetTransactionDate
+      - AssetTransactionPostDate
+      - AssetTransactionType
+      - AssetTransactionPaidByName
+      - AssetTransactionTypeAdditionalDescription
+      - AssetTransactionCategoryType
+      - FinancialInstitutionTransactionIdentifier
+    AssetTransactionType:
+      title: AssetTransactionType
+      type: string
+      description: Asset Transaction Type.
+      enum:
+      - Credit
+      - Debit
+    AssetTransactionCategoryType:
+      title: AssetTransactionCategoryType
+      type: string
+      nullable: true
+      description: Asset Transaction Category Type Enumerated derived by Vendor.
+      enum:
+      - ATMFee
+      - Advertising
+      - AirTravel
+      - AlcoholBars
+      - Allowance
+      - Amusement
+      - Arts
+      - AutoTransport
+      - AutoInsurance
+      - AutoPayment
+      - BabySupplies
+      - BabysitterDaycare
+      - BankFee
+      - BillsUtilities
+      - Bonus
+      - BooksSupplies
+      - Business Services
+      - Buy
+      - CashATM
+      - Charity
+      - Check
+      - ChildSupport
+      - Clothing
+      - CoffeeShops
+      - CreditCardPayment
+      - Dentist
+      - Doctor
+      - Education
+      - ElectronicsSoftware
+      - Entertainment
+      - Eyecare
+      - FastFood
+      - FederalTax
+      - FeesCharges
+      - FinanceCharge
+      - Financial
+      - FinancialAdvisor
+      - FoodDining
+      - Furnishings
+      - GasFuel
+      - GiftsDonations
+      - Groceries
+      - Gym
+      - Hair
+      - HealthFitness
+      - HealthInsurance
+      - Hobbies
+      - Home
+      - HomeImprovement
+      - HomeInsurance
+      - HomePhone
+      - HomeServices
+      - HomeSupplies
+      - Hotel
+      - Income
+      - InterestIncome
+      - Internet
+      - Investments
+      - Kids
+      - KidsActivities
+      - LateFee
+      - Laundry
+      - LawnGarden
+      - Legal
+      - LifeInsurance
+      - LoanInsurance
+      - LoanPayment
+      - Loans
+      - MobilePhone
+      - MortgageRent
+      - MoviesDVDs
+      - Music
+      - NewspapersMagazines
+      - OfficeSupplies
+      - Parking
+      - Paycheck
+      - PersonalCare
+      - PetFoodSupplies
+      - PetGrooming
+      - Pets
+      - Pharmacy
+      - Printing
+      - Property Tax
+      - Public Transportation
+      - Reimbursement
+      - RentalCarTaxi
+      - Restaurants
+      - SalesTax
+      - ServiceParts
+      - ServiceFee
+      - Shipping
+      - Shopping
+      - SpaMassage
+      - SportingGoods
+      - Sports
+      - StateTax
+      - Student Loan
+      - Taxes
+      - Television
+      - Toys
+      - Transfer
+      - Travel
+      - Tuition
+      - Uncategorized
+      - Utilities
+      - Vacation
+      - Veterinary
+    AssetTransactionDescription:
+      title: AssetTransactionDescription
+      type: object
+      additionalProperties: true
+      description: No documentation available
+      properties:
+        AssetTransactionDescription:
+          type: string
+          description: Asset Transaction Description String up to 3 occurances 1 required.
+      required:
+      - AssetTransactionDescription
+    Statuses:
+      title: Statuses
+      type: object
+      additionalProperties: true
+      description: A collection of STATUS containers.
+      properties:
+        STATUS:
+          $ref: '#/components/schemas/Status'
+      required:
+      - STATUS
+    Status:
+      title: Status
+      type: object
+      additionalProperties: true
+      description: No documentation available
+      properties:
+        StatusCode:
+          type: string
+          nullable: true
+          description: Satus Code.
+        StatusDescription:
+          type: string
+          nullable: true
+          description: Status Description.
+      required:
+      - StatusCode
+      - StatusDescription
     ItemGetRequest:
       description: ItemGetRequest defines the request schema for `/item/get`
       type: object
