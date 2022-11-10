@@ -1,3 +1,67 @@
+### 2020-09-14_1.202.5
+- Add `/partner/customer/remove` endpoint
+
+### 2020-09-14_1.202.4
+- Internal changes
+
+### 2020-09-14_1.202.3
+- New Transfer API routes for hosted onboarding of TPS end-customers
+
+### 2020-09-14_1.202.0
+- Add `refunds` field to `Transfer` object
+- Add `refund_id` field to `TransferEvent` object
+- Fix typo for `transfer/get` and `transfer/refund/get`
+
+### 2020-09-14_1.201.0
+- Add support for partial refunds
+- Add `amount` field to `/payment_initiation/payment/reverse` request
+- Add `amount_refunded` field to `/payment_initiation/payment/get` and `/payment_initiation/payment/list` responses
+
+### 2020-09-14_1.200.0
+- Add `risk_summary` and `page_number` to `/beta/credit/payroll_income/risk_signals/get`
+
+### 2020-09-14_1.199.0
+- Renamed `/wallet/transactions/list` into `/wallet/transaction/list` as endpoint
+
+### 2020-09-14_1.198.8
+- `/transfer/authorization/create` and `/transfer/create` may not return `account_id` in response.
+
+### 2020-09-14_1.198.7
+- Add `SYNC_UPDATES_AVAILABLE` support to `/sandbox/item/fire_webhook`
+
+### 2020-09-14_1.198.6
+- Make `ProductStatus` object nullable to reflect Sandbox-specific behavior.
+- Clarify documentation for `SYNC_UPDATES_AVAILABLE` webhook.
+
+### 2020-09-14_1.198.5
+- Internal changes
+
+### 2020-09-14_1.198.4
+- Add `deleted_at` to `/payment_profile/get` response.
+
+### 2020-09-14_1.198.3
+- Change `start_date` to `start_time` for `/wallet/transaction/list` response.
+
+### 2020-09-14_1.198.2
+- Update list of available products for `/partner/customer/create`.
+
+### 2020-09-14_1.198.1
+- Add `institution_name` and `institution_id` fields to `/credit/payroll_income/get` response.
+
+### 2020-09-14_1.198.0
+- Add `options.start_date` and `options.end_date` to `/wallet/transaction/list` endpoint.
+- Add `last_status_update` and `payment_id` field to `WalletTransaction`.
+- Add `transaction_id` field to `PaymentInitiationPayment`
+
+### 2020-09-14_1.197.6
+- Add `originator_client_id` to Transfer API endpoints
+
+### 2020-09-14_1.197.5
+- Deprecate `origination_account_id` from `/transfer/authorization/create` endpoint.
+
+### 2020-09-14_1.197.4
+- Add `asset_under_management` field to `PartnerCustomerCreateRequest`.
+
 ### 2020-09-14_1.197.3
 - Update supported `CountryCode`'s in `link/token/create` docs.
 
@@ -24,7 +88,7 @@
 - Add a note in the description of `/transfer/authorization/create`
 
 ### 2020-09-14_1.196.0
-- Added endpoint `/sandbox/payment_profile/reset_login` 
+- Added endpoint `/sandbox/payment_profile/reset_login`
 
 ### 2020-09-14_1.195.0
 - Consolidate usages of `Error` into `PlaidError`
