@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.210.4
+  version: 2020-09-14_1.214.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -500,6 +500,63 @@ paths:
               $ref: '#/components/schemas/AssetReportAuditCopyRemoveRequest'
         description: ""
       description: The `/asset_report/audit_copy/remove` endpoint allows you to remove an Audit Copy. Removing an Audit Copy invalidates the `audit_copy_token` associated with it, meaning both you and any third parties holding the token will no longer be able to use it to access Report data. Items associated with the Asset Report, the Asset Report itself and other Audit Copies of it are not affected and will remain accessible after removing the given Audit Copy.
+  /credit/audit_copy_token/update:
+    post:
+      tags:
+      - plaid
+      summary: Update an Audit Copy Token
+      externalDocs:
+        url: /none/
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditAuditCopyTokenUpdateResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: eYupqX1mZkEuQRx
+      operationId: creditAuditCopyTokenUpdate
+      description: The `/credit/audit_copy_token/update` endpoint updates the Audit Copy Token by adding the report tokens in the `report_tokens` field to the `audit_copy_token`. If the Audit Copy Token already contains a report of a certain type, it will be replaced with the token provided in the `report_tokens` field.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditAuditCopyTokenUpdateRequest'
+  /item/activity/list:
+    post:
+      tags:
+      - plaid
+      summary: List a historical log of user consent events
+      operationId: itemActivityList
+      description: List a historical log of user consent events
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemActivityListResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: m8MDnv9okwxFNBV
+                    activities: []
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemActivityListRequest'
   /item/application/list:
     post:
       tags:
@@ -5152,6 +5209,8 @@ paths:
         Transactions are returned in reverse-chronological order, and the sequence of transaction ordering is stable and will not shift.
 
         Due to the potentially large number of investment transactions associated with an Item, results are paginated. Manipulate the count and offset parameters in conjunction with the `total_investment_transactions` response body field to fetch all available investment transactions.
+
+        Note that Investments does not have a webhook to indicate when initial transaction data has loaded. Instead, if transactions data is not ready when `/investments/transactions/get` is first called, Plaid will wait for the data. For this reason, calling `/investments/transactions/get` immediately after Link may take up to one to two minutes to return.
       requestBody:
         required: true
         content:
@@ -6311,7 +6370,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /bank-transfers/reference#bank_transfereventlist
+        url: /api/products/auth#bank_transfereventlist
       operationId: bankTransferEventList
       responses:
         "200":
@@ -6342,7 +6401,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
-      description: Use the `/bank_transfer/event/list` endpoint to get a list of bank transfer events based on specified filter criteria.
+      description: Use the `/bank_transfer/event/list` endpoint to get a list of ACH or bank transfer events based on specified filter criteria.
       requestBody:
         required: true
         content:
@@ -6394,14 +6453,14 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/TransferEventSyncRequest'
-      description: '`/transfer/event/sync` allows you to request up to the next 25 transfer events that happened after a specific `event_id`. Use the `/transfer/event/sync` endpoint to guarantee you have seen all transfer events.'
+      description: '`/transfer/event/sync` allows you to request up to the next 25 transfer events that happened after a specific `event_id`. Use the `/transfer/event/sync` endpoint to guarantee you have seen all transfer events. When using Auth with micro-deposit verification enabled, this endpoint can be used to fetch status updates on ACH micro-deposits. For more details, see [micro-deposit events](https://www.plaid.com/docs/auth/coverage/microdeposit-events/).'
   /bank_transfer/event/sync:
     post:
       summary: Sync bank transfer events
       tags:
       - plaid
       externalDocs:
-        url: /bank-transfers/reference#bank_transfereventsync
+        url: /api/products/auth/#bank_transfereventsync
       operationId: bankTransferEventSync
       responses:
         "200":
@@ -6438,7 +6497,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/BankTransferEventSyncRequest'
-      description: '`/bank_transfer/event/sync` allows you to request up to the next 25 bank transfer events that happened after a specific `event_id`. Use the `/bank_transfer/event/sync` endpoint to guarantee you have seen all bank transfer events.'
+      description: '`/bank_transfer/event/sync` allows you to request up to the next 25 bank transfer events that happened after a specific `event_id`. When using Auth with micro-deposit verification enabled, this endpoint can be used to fetch status updates on ACH micro-deposits. For more details, see [micro-deposit events](https://www.plaid.com/docs/auth/coverage/microdeposit-events/).'
   /transfer/sweep/get:
     post:
       summary: Retrieve a sweep
@@ -7012,6 +7071,7 @@ paths:
                     originator:
                       client_id: 6a65dh3d1h0d1027121ak184
                       transfer_diligence_status: approved
+                      company_name: Plaid
                     request_id: saKrIBuEB9qJZno
         default:
           description: Error response
@@ -7962,7 +8022,7 @@ paths:
               examples:
                 example-1:
                   value:
-                    audit_copy_token: a-sandbox-3TAU2CWVYBDVRHUCAAAI27ULU4
+                    audit_copy_token: a-production-3tau2cwvybdvrhucaaai27ulu4
                     request_id: Iam3b
       operationId: creditAuditCopyTokenCreate
       description: |-
@@ -8041,7 +8101,7 @@ paths:
                           TAXPAYER_IDENTIFIERS:
                             TAXPAYER_IDENTIFIER:
                               TaxpayerIdentifierType: SocialSecurityNumber
-                              TaxpayerIdentifierValue: 123-45-789
+                              TaxpayerIdentifierValue: 123-45-6789
                       SERVICES:
                         SERVICE:
                           VERIFICATION_OF_ASSET:
@@ -8102,6 +8162,182 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/AssetReportFreddieGetRequest'
+        description: ""
+  /credit/freddie_mac/reports/get:
+    post:
+      tags:
+      - plaid
+      summary: Retrieve an Asset Report with Freddie Mac format (aka VOA - Verification Of Assets), and a Verification Of Employment (VOE) report if this one is available. Only Freddie Mac can use this endpoint.
+      externalDocs:
+        url: /none/
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditFreddieMacReportsGetResponse'
+              examples:
+                example-1:
+                  value:
+                    VOA:
+                      SchemaVersion: 2.4
+                      DEAL:
+                        LOANS:
+                          LOAN:
+                            LoanRoleType: SubjectLoan
+                            LOAN_IDENTIFIERS:
+                              LOAN_IDENTIFIER:
+                              - LoanIdentifier: "100016746"
+                                LoanIdentifierType: LenderLoan
+                        PARTIES:
+                          PARTY:
+                          - INDIVIDUAL:
+                              NAME:
+                                FirstName: John
+                                LastName: Deere
+                            ROLES:
+                              ROLE:
+                                ROLE_DETAIL:
+                                  PartyRoleType: Borrower
+                            TAXPAYER_IDENTIFIERS:
+                              TAXPAYER_IDENTIFIER:
+                                TaxpayerIdentifierType: SocialSecurityNumber
+                                TaxpayerIdentifierValue: 123-45-6789
+                        SERVICES:
+                          SERVICE:
+                            VERIFICATION_OF_ASSET:
+                            - REPORTING_INFORMATION:
+                                ReportDateTime: ""
+                                ReportingInformationIdentifier: a-prod-kol4xb5y4nf2zecqalb2d55mze
+                                ReportIdentifierType: ReportID
+                              SERVICE_PRODUCT_FULFILLMENT:
+                                SERVICE_PRODUCT_FULFILLMENT_DETAIL:
+                                  VendorOrderIdentifier: PLAD
+                                  ServiceProductFulfillmentIdentifier: VOA
+                              VERIFICATION_OF_ASSET_RESPONSE:
+                                ASSETS:
+                                  ASSET:
+                                  - ASSET_DETAIL:
+                                      AssetAccountIdentifier: "3847"
+                                      AssetUniqueIdentifier: c251a55e-c503-471b-a3b1-11a9243bc189
+                                      AssetAsOfDate: "2022-07-27"
+                                      AssetDescription: Unlimited Cash Rewards Visa Signature
+                                      AssetAvailableBalanceAmount: 2073.99
+                                      AssetCurrentBalanceAmount: 2007.09
+                                      AssetType: Other
+                                      AssetTypeAdditionalDescription: credit card
+                                      AssetDaysRequestedCount: 61
+                                      AssetOwnershipType: null
+                                    ASSET_OWNERS:
+                                      ASSET_OWNER:
+                                      - AssetOwnerText: Alberta Bobbeth Charleson
+                                    ASSET_HOLDER:
+                                      NAME:
+                                        FullName: Wells Fargo
+                                    ASSET_TRANSACTIONS:
+                                      ASSET_TRANSACTION:
+                                      - ASSET_TRANSACTION_DETAIL:
+                                          AssetTransactionUniqueIdentifier: 7jagxo9Eq6cXPKM8eMNJUgeeNnbgQdSDw6zgN
+                                          AssetTransactionAmount: 34.43
+                                          AssetTransactionDate: "2022-07-19"
+                                          AssetTransactionPostDate: "2022-07-19"
+                                          AssetTransactionType: Debit
+                                          AssetTransactionPaidByName: null
+                                          AssetTransactionTypeAdditionalDescription: null
+                                          AssetTransactionCategoryType: FoodDining
+                                          FinancialInstitutionTransactionIdentifier: null
+                                        ASSET_TRANSACTION_DESCRIPTION:
+                                        - AssetTransactionDescription: TONYS PIZZA NAPOLETANA SAN FRANCISCOCA
+                                    VALIDATION_SOURCES:
+                                      VALIDATION_SOURCE:
+                                      - ValidationSourceName: ""
+                                        ValidationSourceReferenceIdentifier: ""
+                            STATUSES:
+                              STATUS:
+                                StatusCode: success
+                                StatusDescription: null
+                    VOE:
+                      SchemaVersion: 2.5
+                      DEAL:
+                        LOANS:
+                          LOAN:
+                            LoanRoleType: SubjectLoan
+                            LOAN_IDENTIFIERS:
+                              LOAN_IDENTIFIER:
+                              - LoanIdentifier: "100016746"
+                                LoanIdentifierType: LenderLoan
+                        PARTIES:
+                          PARTY:
+                          - INDIVIDUAL:
+                              NAME:
+                                FirstName: John
+                                MiddleName: S
+                                LastName: Freddie
+                            ROLES:
+                              ROLE:
+                                ROLE_DETAIL:
+                                  PartyRoleType: Borrower
+                            TAXPAYER_IDENTIFIERS:
+                              TAXPAYER_IDENTIFIER:
+                                TaxpayerIdentifierType: SocialSecurityNumber
+                                TaxpayerIdentifierValue: 123-45-6789
+                        SERVICES:
+                          SERVICE:
+                            VERIFICATION_OF_ASSET:
+                            - REPORTING_INFORMATION:
+                                ReportIdentifierType": ReportID
+                                ReportingInformationIdentifier: a-prod-kol4xb5y4nf2zecqalb2d55mze
+                                ReportDateTime: ""
+                              SERVICE_PRODUCT_FULFILLMENT:
+                                SERVICE_PRODUCT_FULFILLMENT_DETAIL:
+                                  VendorOrderIdentifier: PLAD
+                                  ServiceProductFulfillmentIdentifier: VOETRANSACTIONS
+                              VERIFICATION_OF_ASSET_RESPONSE:
+                                ASSETS:
+                                  ASSET:
+                                  - ASSET_DETAIL:
+                                      AssetAccountIdentifier: "3847"
+                                      AssetUniqueIdentifier: c251a55e-c503-471b-a3b1-11a9243bc189
+                                      AssetAsOfDate: "2022-07-27"
+                                      AssetDescription: Unlimited Cash Rewards Visa Signature
+                                      AssetType: Other
+                                      AssetTypeAdditionalDescription: credit card
+                                      AssetDaysRequestedCount: 61
+                                      AssetOwnershipType: null
+                                    ASSET_OWNERS:
+                                      ASSET_OWNER:
+                                      - AssetOwnerText: Alberta Bobbeth Charleson
+                                    ASSET_HOLDER:
+                                      NAME:
+                                        FullName: Wells Fargo
+                                    ASSET_TRANSACTIONS:
+                                      ASSET_TRANSACTION:
+                                      - ASSET_TRANSACTION_DETAIL:
+                                          AssetTransactionCategoryType: FoodDining
+                                          AssetTransactionDate: "2022-07-19"
+                                          AssetTransactionPaidByName: null
+                                          AssetTransactionPaidToName: null
+                                          AssetTransactionPostDate: "2022-07-19"
+                                          AssetTransactionType: Debit
+                                          AssetTransactionTypeAdditionalDescription: null
+                                          AssetTransactionUniqueIdentifier: 7jagxo9Eq6cXPKM8eMNJUgeeNnbgQdSDw6zgN
+                                          FinancialInstitutionTransactionIdentifier: null
+                                        ASSET_TRANSACTION_DESCRIPTION:
+                                        - AssetTransactionDescription: TONYS PIZZA NAPOLETANA SAN FRANCISCOCA
+                            STATUSES:
+                              STATUS:
+                                StatusCode: success
+                                StatusDescription: null
+                    request_id: eYupqX1mZkEuQRx
+      operationId: creditFreddieMacReportsGet
+      description: The `credit/asset_report/freddie_mac/get` endpoint retrieves the Verification of Assets and Verification of Employment reports.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditFreddieMacReportsGetRequest'
         description: ""
   /credit/bank_income/get:
     post:
@@ -8189,6 +8425,10 @@ paths:
                             total_amount: 100
                             iso_currency_code: USD
                             unofficial_currency_code: null
+                            total_amounts:
+                            - amount: 100
+                              iso_currency_code: USD
+                              unofficial_currency_code: null
                             transactions:
                             - amount: -100
                               date: "2021-11-15"
@@ -8204,6 +8444,10 @@ paths:
                             total_amount: 100
                             iso_currency_code: USD
                             unofficial_currency_code: null
+                            total_amounts:
+                            - amount: 100
+                              iso_currency_code: USD
+                              unofficial_currency_code: null
                             transactions:
                             - amount: -100
                               date: "2021-12-15"
@@ -8219,6 +8463,10 @@ paths:
                             total_amount: 100
                             iso_currency_code: USD
                             unofficial_currency_code: null
+                            total_amounts:
+                            - amount: 100
+                              iso_currency_code: USD
+                              unofficial_currency_code: null
                             transactions:
                             - amount: -100
                               date: "2022-01-31"
@@ -8233,6 +8481,10 @@ paths:
                         total_amount: 300
                         iso_currency_code: USD
                         unofficial_currency_code: null
+                        total_amounts:
+                        - amount: 300
+                          iso_currency_code: USD
+                          unofficial_currency_code: null
                         start_date: "2021-11-15"
                         end_date: "2022-01-15"
                         income_sources_count: 1
@@ -8244,6 +8496,10 @@ paths:
                           total_amount: 100
                           iso_currency_code: USD
                           unofficial_currency_code: null
+                          total_amounts:
+                          - amount: 100
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
                           transactions:
                           - amount: -100
                             date: "2021-11-15"
@@ -8259,6 +8515,10 @@ paths:
                           total_amount: 100
                           iso_currency_code: USD
                           unofficial_currency_code: null
+                          total_amounts:
+                          - amount: 100
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
                           transactions:
                           - amount: -100
                             date: "2021-12-15"
@@ -8274,6 +8534,10 @@ paths:
                           total_amount: 100
                           iso_currency_code: USD
                           unofficial_currency_code: null
+                          total_amounts:
+                          - amount: 100
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
                           transactions:
                           - amount: -100
                             date: "2022-01-31"
@@ -10112,6 +10376,61 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PartnerCustomerRemoveRequest'
+            examples:
+              example-1:
+                value:
+                  client_id: 7f57eb3d2a9j6480121fx361
+                  secret: 79g03eoofwl8240v776r2h667442119
+                  end_customer_client_id: 7f57eb3d2a9j6480121fx361
+  /partner/customer/oauth_institutions/get:
+    post:
+      tags:
+      - plaid
+      summary: Returns OAuth-institution registration information for a given end customer.
+      externalDocs:
+        url: /api/partner/#partnercustomeroauth_institutionsget
+      description: The `/partner/customer/oauth_institutions/get` endpoint is used by reseller partners to retrieve OAuth-institution registration information about a single end customer.
+      operationId: partnerCustomerOauthInstitutionsGet
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerCustomerOAuthInstitutionsGetResponse'
+              examples:
+                example-1:
+                  value:
+                    flowdown_status: COMPLETE
+                    questionnaire_status: COMPLETE
+                    institutions:
+                    - name: Chase
+                      institution_id: ins_56
+                      environments:
+                        production: PROCESSING
+                        development: PROCESSING
+                      production_enablement_date: null
+                      classic_disablement_date: "2022-06-30"
+                    - name: Capital One
+                      institution_id: ins_128026
+                      environments:
+                        production: ENABLED
+                        development: ENABLED
+                      production_enablement_date: "2022-12-19"
+                      classic_disablement_date: null
+                    request_id: 4zlKapIkTm8p5KM
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartnerCustomerOAuthInstitutionsGetRequest'
             examples:
               example-1:
                 value:
@@ -12664,6 +12983,8 @@ components:
           - adyen
           - atomic
           - i2c
+          - wepay
+          - riskified
           description: The processor you are integrating with.
       required:
       - access_token
@@ -17122,6 +17443,29 @@ components:
       - webhook_type
       - webhook_code
       - environment
+    BankTransfersEventsUpdateWebhookForAuth:
+      title: BankTransfersEventsUpdateWebhookForAuth
+      type: object
+      additionalProperties: true
+      description: Fired when new ACH events are available. To begin receiving this webhook, you must first register your webhook listener endpoint via the [webhooks page in the Dashboard](https://dashboard.plaid.com/team/webhooks). The `BANK_TRANSFERS_EVENTS_UPDATE` webhook can be used to track the progress of ACH transfers used in [micro-deposit verification](/docs/auth/coverage/microdeposit-events/). Receiving this webhook indicates you should fetch the new events from `/bank_transfer/event/sync`. Note that [Transfer](https://plaid.com/docs/transfer) customers should use Transfer webhooks instead of using `BANK_TRANSFERS_EVENTS_UPDATE`; see [micro-deposit events documentation](https://plaid.com/docs/auth/coverage/microdeposit-events/) for more details.
+      x-examples:
+        example-1:
+          webhook_type: BANK_TRANSFERS
+          webhook_code: BANK_TRANSFERS_EVENTS_UPDATE
+          environment: production
+      properties:
+        webhook_type:
+          type: string
+          description: '`BANK_TRANSFERS`'
+        webhook_code:
+          type: string
+          description: '`BANK_TRANSFERS_EVENTS_UPDATE`'
+        environment:
+          $ref: '#/components/schemas/WebhookEnvironmentValues'
+      required:
+      - webhook_type
+      - webhook_code
+      - environment
     TransferEventsUpdateWebhook:
       title: TransferEventsUpdateWebhook
       type: object
@@ -18081,7 +18425,7 @@ components:
           description: The Plaid `account_id` associated with the holding.
         security_id:
           type: string
-          description: The Plaid `security_id` associated with the holding. The `security_id` may change if inherent details of the security change due to a corporate action, for example, in the event of a ticker symbol change or CUSIP change.
+          description: The Plaid `security_id` associated with the holding. Security data is not specific to a user's account; any user who held the same security at the same financial institution at the same time would have identical security data. The `security_id` for the same security will typically be the same across different institutions, but this is not guaranteed. The `security_id` does not typically change, but may change if inherent details of the security change due to a corporate action, for example, in the event of a ticker symbol change or CUSIP change.
         institution_price:
           type: number
           format: double
@@ -19207,6 +19551,23 @@ components:
       - metadata
       - origination_account_id
       - direction
+    DetailedOriginator:
+      type: object
+      title: Originator
+      additionalProperties: true
+      description: Originator and their status.
+      properties:
+        client_id:
+          type: string
+          description: Originator’s client ID.
+        transfer_diligence_status:
+          $ref: '#/components/schemas/TransferDiligenceStatus'
+        company_name:
+          type: string
+      required:
+      - client_id
+      - transfer_diligence_status
+      - company_name
     Originator:
       type: object
       title: Originator
@@ -21326,7 +21687,6 @@ components:
         redirect_uri:
           type: string
           description: URL the end customer will be redirected to after completing questions in Plaid-hosted onboarding flow.
-          minLength: 1
       required:
       - originator_client_id
       - redirect_uri
@@ -21368,7 +21728,7 @@ components:
       description: Defines the response schema for `/transfer/originator/get`
       properties:
         originator:
-          $ref: '#/components/schemas/Originator'
+          $ref: '#/components/schemas/DetailedOriginator'
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
@@ -22730,20 +23090,23 @@ components:
           nullable: true
           default: false
           description: Whether to enable multiple items to be added in the link session
+      required:
+      - days_requested
     LinkTokenCreateRequestIncomeVerificationPayrollIncome:
       title: LinkTokenCreateRequestIncomeVerificationPayrollIncome
       type: object
-      description: Specifies options for initializing Link for use with Payroll Income. This field is required if `income_verification` is included in the `products` array and `payroll` is specified in `income_source_types`.
+      description: Specifies options for initializing Link for use with Payroll Income.
       properties:
         flow_types:
           type: array
           nullable: true
-          description: The types of payroll income verification to enable for the link session. If none are specified, then users will see both document and digital payroll income.
+          description: The types of payroll income verification to enable for the Link session. If none are specified, then users will see both document and digital payroll income.
           items:
             $ref: '#/components/schemas/IncomeVerificationPayrollFlowType'
         is_update_mode:
           type: boolean
-          description: An identifier to indicate whether the income verification link token will be used for an update or not
+          description: An identifier to indicate whether the income verification Link token will be used for an update or not
+          default: false
     IncomeVerificationPayrollFlowType:
       title: IncomeVerificationPayrollFlowType
       enum:
@@ -26848,6 +27211,93 @@ components:
       items:
         type: string
         description: List of account subtypes.
+    ItemActivityListRequest:
+      description: Request to list a historical log of user consent events.
+      type: object
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+        cursor:
+          type: string
+          description: Cursor used for pagination.
+        count:
+          type: integer
+          minimum: 1
+          maximum: 50
+          default: 50
+    ItemActivityListResponse:
+      description: Describes a historical log of user consent events.
+      additionalProperties: true
+      type: object
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+        activities:
+          type: array
+          description: A list of activities.
+          items:
+            $ref: '#/components/schemas/Activity'
+        cursor:
+          type: string
+          description: Cursor used for pagination.
+      required:
+      - activities
+    Activity:
+      description: Describes a consent activity.
+      type: object
+      properties:
+        activity:
+          $ref: '#/components/schemas/ActivityType'
+        initiated_date:
+          type: string
+          format: datetime
+          description: The date and time this activity was initiated [ISO 8601](https://wikipedia.org/wiki/ISO_8601) (YYYY-MM-DD) format in UTC.
+          example: "2020-01-01"
+        id:
+          type: string
+          description: A unique identifier for the activity
+        initiator:
+          type: string
+          description: Application ID of the client who initiated the activity.
+        state:
+          $ref: '#/components/schemas/ActionState'
+        target_application_id:
+          $ref: '#/components/schemas/ApplicationID'
+        scopes:
+          $ref: '#/components/schemas/ScopesNullable'
+      required:
+      - activity
+      - initiated_date
+      - id
+      - initiator
+      - state
+    ActivityType:
+      type: string
+      description: Types of consent activities
+      enum:
+      - UNKNOWN
+      - ITEM_CREATE
+      - ITEM_IMPORT
+      - ITEM_UPDATE
+      - ITEM_UNLINK
+      - PORTAL_UNLINK
+      - PORTAL_ITEMS_DELETE
+      - ITEM_REMOVE
+      - INVARIANT_CHECKER_DELETION
+      - SCOPES_UPDATE
+    ActionState:
+      type: string
+      description: Enum representing the state of the action/activity.
+      enum:
+      - UNKNOWN
+      - ATTEMPT
+      - SUCCESS
+      - FAILURE
+      - SKIPPED
     SandboxIncomeFireWebhookRequest:
       title: SandboxIncomeFireWebhookRequest
       type: object
@@ -28634,6 +29084,85 @@ components:
       properties:
         request_id:
           $ref: '#/components/schemas/RequestID'
+    PartnerCustomerOAuthInstitutionsGetRequest:
+      description: Request schema for `/partner/customer/oauth_institutions/get`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        end_customer_client_id:
+          type: string
+      required:
+      - end_customer_client_id
+    PartnerCustomerOAuthInstitutionsGetResponse:
+      description: Response schema for `/partner/customer/oauth_institutions/get`.
+      type: object
+      additionalProperties: true
+      properties:
+        flowdown_status:
+          $ref: '#/components/schemas/PartnerEndCustomerFlowdownStatus'
+        questionnaire_status:
+          $ref: '#/components/schemas/PartnerEndCustomerQuestionnaireStatus'
+        institutions:
+          type: array
+          description: The OAuth institutions with which the end customer's application is being registered.
+          items:
+            $ref: '#/components/schemas/PartnerEndCustomerOAuthInstitution'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+    PartnerEndCustomerFlowdownStatus:
+      type: string
+      enum:
+      - NOT_STARTED
+      - IN_REVIEW
+      - NEGOTIATION
+      - COMPLETE
+      description: The status of the addendum to the Plaid MSA ("flowdown") for the end customer.
+    PartnerEndCustomerQuestionnaireStatus:
+      type: string
+      enum:
+      - NOT_STARTED
+      - RECEIVED
+      - COMPLETE
+      description: The status of the end customer's security questionnaire.
+    PartnerEndCustomerOAuthInstitution:
+      description: The OAuth registration information for an institution.
+      type: object
+      additionalProperties: true
+      properties:
+        name:
+          type: string
+        institution_id:
+          type: string
+        environments:
+          $ref: '#/components/schemas/PartnerEndCustomerOAuthInstitutionEnvironments'
+        production_enablement_date:
+          type: string
+          description: The date on which the end customer's application was approved by the institution, or an empty string if their application has not yet been approved.
+          nullable: true
+        classic_disablement_date:
+          type: string
+          description: The date on which non-OAuth Item adds will no longer be supported for this institution, or an empty string if no such date has been set by the institution.
+          nullable: true
+    PartnerEndCustomerOAuthInstitutionEnvironments:
+      description: Registration statuses by environment.
+      type: object
+      additionalProperties: true
+      properties:
+        development:
+          $ref: '#/components/schemas/PartnerEndCustomerOAuthInstitutionApplicationStatus'
+        production:
+          $ref: '#/components/schemas/PartnerEndCustomerOAuthInstitutionApplicationStatus'
+    PartnerEndCustomerOAuthInstitutionApplicationStatus:
+      type: string
+      enum:
+      - NOT_STARTED
+      - PROCESSING
+      - APPROVED
+      - ENABLED
+      - ATTENTION_REQUIRED
+      description: The registration status for the end customer's application.
     PartnerEndCustomer:
       description: The details for an end customer.
       type: object
@@ -28658,16 +29187,16 @@ components:
     PartnerEndCustomerStatus:
       type: string
       enum:
-      - UNDER REVIEW
-      - READY FOR ENABLEMENT
+      - UNDER_REVIEW
+      - PENDING_ENABLEMENT
       - ACTIVE
       - DENIED
       description: |-
         The status of the given end customer.
 
-        `UNDER REVIEW`: The end customer has been created and enabled in the non-Production environments. The end customer must be manually reviewed by the Plaid team before it can be enabled in production, at which point its status will automatically transition to `READY FOR ENABLEMENT` or `DENIED`.
+        `UNDER_REVIEW`: The end customer has been created and enabled in the non-Production environments. The end customer must be manually reviewed by the Plaid team before it can be enabled in production, at which point its status will automatically transition to `PENDING_ENABLEMENT` or `DENIED`.
 
-        `READY FOR ENABLEMENT`: The end customer is ready to be enabled in the Production environment. Call the `/partner/customer/enable` endpoint to enable the end customer in Production.
+        `PENDING_ENABLEMENT`: The end customer is ready to be enabled in the Production environment. Call the `/partner/customer/enable` endpoint to enable the end customer in Production.
 
         `ACTIVE`: The end customer has been enabled in all environments.
 
@@ -28894,6 +29423,8 @@ components:
             An Asset Report requested with "Additional History" (that is, with more than 61 days of transaction history) will incur an Additional History fee.
         options:
           $ref: '#/components/schemas/AssetReportCreateRequestOptions'
+        report_type:
+          $ref: '#/components/schemas/FreddieReportType'
       required:
       - access_tokens
       - days_requested
@@ -29475,6 +30006,12 @@ components:
       - joint
       - association
       - trust
+    FreddieReportType:
+      type: string
+      description: When set to VERIFICATION_OF_EMPLOYMENT and the Asset Report is added to an Audit Copy Token, the Asset Report will be retrieved by Freddie Mac in the Verification Of Employment (VOE) version instead of the default Verification Of Assets (VOA) version.
+      x-hidden-from-docs: true
+      enum:
+      - VERIFICATION_OF_EMPLOYMENT
     AssetReportTransaction:
       title: AssetReportTransaction
       description: A transaction on the asset report
@@ -29974,6 +30511,7 @@ components:
       - EU_CON
       - IZ_SOE
       - IZ_UNC
+      - IZ_WBK
       - US_CAP
       - US_FSE
       - US_MBS
@@ -30891,13 +31429,14 @@ components:
       - IZ_IPL
       - IZ_PEP
       - IZ_UNC
+      - IZ_WBK
       - UK_HMC
       - US_DPL
       - US_DTC
       - US_FBI
       - US_FSE
       - US_ISN
-      - US_MBC
+      - US_MBS
       - US_PLC
       - US_SDN
       - US_SSI
@@ -30906,6 +31445,7 @@ components:
       - TR_DFD
       - TR_FOR
       - TR_WMD
+      - TR_CMB
       example: US_SDN
       description: Shorthand identifier for a specific screening list for individuals.
       title: IndividualWatchlistCode
@@ -32594,11 +33134,39 @@ components:
       example: none
       description: Names that are explicitly marked as low quality either by their `source` list, or by `plaid` by a series of additional checks done by Plaid. Plaid does not ever surface a hit as a result of a weak name alone. If a name has no quality issues, this value will be `none`.
       title: WeakAliasDetermination
+    CreditAuditCopyTokenUpdateRequest:
+      type: object
+      description: CreditAuditCopyTokenUpdateRequest defines the request schema for `/credit/audit_copy_token/update`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        audit_copy_token:
+          type: string
+          description: The `audit_copy_token` you would like to update.
+        report_tokens:
+          type: array
+          description: Array of tokens which the specified Audit Copy Token will be updated with. The types of token supported are asset report token and employment report token. There can be at most 1 of each type can be in the array.
+          items:
+            $ref: '#/components/schemas/AssetReportToken'
+      required:
+      - audit_copy_token
+      - report_tokens
+    CreditAuditCopyTokenUpdateResponse:
+      type: object
+      additionalProperties: true
+      description: CreditAuditCopyTokenUpdateResponse defines the response schema for `/credit/audit_copy_token/update`
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
     AssetReportFreddieGetRequest:
       title: AssetReportFreddieGetRequest
       type: object
       additionalProperties: true
-      description: AssetReportFreddieGetResponse defines the request schema for `credit/asset_report/freddie_mac/get`
+      description: AssetReportFreddieGetRequest defines the request schema for `credit/asset_report/freddie_mac/get`
       properties:
         audit_copy_token:
           type: string
@@ -32727,7 +33295,7 @@ components:
       title: INDIVIDUAL
       type: object
       additionalProperties: true
-      description: No documentation available
+      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
       properties:
         NAME:
           $ref: '#/components/schemas/IndividualName'
@@ -32752,7 +33320,7 @@ components:
       title: Roles
       type: object
       additionalProperties: true
-      description: No documentation available
+      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
       properties:
         ROLE:
           $ref: '#/components/schemas/Role'
@@ -32762,7 +33330,7 @@ components:
       title: Role
       type: object
       additionalProperties: true
-      description: ANo documentation available
+      description: ADocumentation not found in the MISMO model viewer and not provided by Freddie Mac.
       properties:
         ROLE_DETAIL:
           $ref: '#/components/schemas/RoleDetail'
@@ -32772,7 +33340,7 @@ components:
       title: RoleDetail
       type: object
       additionalProperties: true
-      description: No documentation available
+      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
       properties:
         PartyRoleType:
           $ref: '#/components/schemas/PartyRoleType'
@@ -32844,7 +33412,7 @@ components:
       title: VerificationOfAsset
       type: object
       additionalProperties: true
-      description: No documentation available
+      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
       properties:
         REPORTING_INFORMATION:
           $ref: '#/components/schemas/ReportingInformation'
@@ -32864,7 +33432,7 @@ components:
       properties:
         ReportingInformationIdentifier:
           type: string
-          description: No documentation available
+          description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
       required:
       - ReportingInformationIdentifier
     ServiceProductFulfillment:
@@ -32881,7 +33449,7 @@ components:
       title: ServiceProductFulfillmentDetail
       type: object
       additionalProperties: true
-      description: No documentation available
+      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
       properties:
         VendorOrderIdentifier:
           type: string
@@ -32895,14 +33463,15 @@ components:
     ServiceProductFulfillmentIdentifier:
       title: ServiceProductFulfillmentIdentifier
       type: string
-      description: No documentation available
+      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
       enum:
       - VOA
+      - VOETRANSACTIONS
     VerificationOfAssetResponse:
       title: VerificationOfAssetResponse
       type: object
       additionalProperties: true
-      description: No documentation available
+      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
       properties:
         ASSETS:
           $ref: '#/components/schemas/Assets'
@@ -32912,20 +33481,20 @@ components:
       title: Assets
       type: object
       additionalProperties: true
-      description: No documentation available
+      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
       properties:
         ASSET:
           type: array
           items:
             $ref: '#/components/schemas/Asset'
-          description: No documentation available
+          description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
       required:
       - ASSET
     Asset:
       title: Asset
       type: object
       additionalProperties: true
-      description: No documentation available
+      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
       properties:
         ASSET_DETAIL:
           $ref: '#/components/schemas/AssetDetail'
@@ -32951,7 +33520,7 @@ components:
       properties:
         AssetUniqueIdentifier:
           type: string
-          description: A vendor creadted unique Identifier.
+          description: A vendor created unique Identifier.
         AssetAccountIdentifier:
           type: string
           description: A unique alphanumeric string identifying an asset.
@@ -32969,7 +33538,7 @@ components:
         AssetCurrentBalanceAmount:
           type: number
           format: double
-          description: A vendor creadted unique Identifier
+          description: A vendor created unique Identifier
         AssetType:
           $ref: '#/components/schemas/AssetType'
         AssetTypeAdditionalDescription:
@@ -33008,7 +33577,7 @@ components:
       title: AssetOwners
       type: object
       additionalProperties: true
-      description: No documentation available
+      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
       properties:
         ASSET_OWNER:
           type: array
@@ -33021,7 +33590,7 @@ components:
       title: AssetOwner
       type: object
       additionalProperties: true
-      description: No documentation available
+      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
       properties:
         AssetOwnerText:
           type: string
@@ -33033,7 +33602,7 @@ components:
       title: AssetHolder
       type: object
       additionalProperties: true
-      description: No documentation available
+      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
       properties:
         NAME:
           $ref: '#/components/schemas/AssetHolderName'
@@ -33043,7 +33612,7 @@ components:
       title: NAME
       type: object
       additionalProperties: true
-      description: No documentation available
+      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
       properties:
         FullName:
           type: string
@@ -33054,7 +33623,7 @@ components:
       title: AssetTransactions
       type: object
       additionalProperties: true
-      description: No documentation available
+      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
       properties:
         ASSET_TRANSACTION:
           type: array
@@ -33074,7 +33643,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AssetTransactionDescription'
-          description: No documentation available
+          description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
       required:
       - ASSET_TRANSACTION_DETAIL
       - ASSET_TRANSACTION_DESCRIPTON
@@ -33082,14 +33651,14 @@ components:
       title: AssetTransactionDetail
       type: object
       additionalProperties: true
-      description: No documentation available
+      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
       properties:
         AssetTransactionUniqueIdentifier:
           type: string
-          description: A vendor creadted unique Identifier.
+          description: A vendor created unique Identifier.
         AssetTransactionAmount:
           type: number
-          description: AssetTransactionAmountName.
+          description: Asset Transaction Amount.
         AssetTransactionDate:
           type: string
           format: date
@@ -33248,7 +33817,7 @@ components:
       title: AssetTransactionDescription
       type: object
       additionalProperties: true
-      description: No documentation available
+      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
       properties:
         AssetTransactionDescription:
           type: string
@@ -33259,29 +33828,29 @@ components:
       title: ValidationSources
       type: object
       additionalProperties: true
-      description: No documentation available.
+      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
       properties:
         VALIDATION_SOURCE:
           type: array
           items:
             $ref: '#/components/schemas/ValidationSource'
-          description: No documentation available.
+          description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
       required:
       - VALIDATION_SOURCE
     ValidationSource:
       title: ValidationSource
       type: object
       additionalProperties: true
-      description: No documentation available.
+      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
       properties:
         ValidationSourceName:
           type: string
           nullable: true
-          description: No documentation available.
+          description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
         ValidationSourceReferenceIdentifier:
           type: string
           nullable: true
-          description: No documentation available.
+          description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
       required:
       - ValidationSourceName
       - ValidationSourceReferenceIdentifier
@@ -33299,7 +33868,7 @@ components:
       title: Status
       type: object
       additionalProperties: true
-      description: No documentation available
+      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
       properties:
         StatusCode:
           type: string
@@ -33312,6 +33881,507 @@ components:
       required:
       - StatusCode
       - StatusDescription
+    CreditFreddieMacReportsGetRequest:
+      title: CreditFreddieMacReportsGetRequest
+      type: object
+      additionalProperties: true
+      description: CreditFreddieMacReportsGetRequest defines the request schema for `credit/asset_report/freddie_mac/get`
+      properties:
+        audit_copy_token:
+          type: string
+          description: A token that can be shared with a third party auditor to allow them to obtain access to the Asset Report. This token should be stored securely.
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+      required:
+      - audit_copy_token
+    CreditFreddieMacReportsGetResponse:
+      title: CreditFreddieMacReportsGetResponse
+      type: object
+      additionalProperties: true
+      description: CreditFreddieMacReportsGetResponse defines the response schema for `/credit/freddie_mac/reports/get`
+      properties:
+        VOA:
+          $ref: '#/components/schemas/CreditFreddieMacVerificationOfAssets_VOA_2_4'
+        VOE:
+          $ref: '#/components/schemas/CreditFreddieVerificationOfEmployment_VOE_2_5'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - VOA
+      - VOE
+      - request_id
+    CreditFreddieMacVerificationOfAssets_VOA_2_4:
+      title: CreditFreddieMacVerificationOfAssets_VOA_2_4
+      type: object
+      additionalProperties: true
+      description: Verification of Assets Report
+      properties:
+        DEAL:
+          $ref: '#/components/schemas/CreditFreddieMacVerificationOfAssetsDeal_VOA_2_4'
+    CreditFreddieVerificationOfEmployment_VOE_2_5:
+      title: CreditFreddieVerificationOfEmployment_VOE_2_5
+      type: object
+      additionalProperties: true
+      description: Verification of Employment Report
+      properties:
+        DEAL:
+          $ref: '#/components/schemas/CreditFreddieVerificationOfEmploymentDeal_VOE_2_5'
+    CreditFreddieMacVerificationOfAssetsDeal_VOA_2_4:
+      title: CreditFreddieMacVerificationOfAssetsDeal_VOA_2_4
+      type: object
+      additionalProperties: true
+      description: An object representing an Asset Report with Freddie Mac schema.
+      properties:
+        LOANS:
+          $ref: '#/components/schemas/CreditFreddieMacLoans_VOA_2_4'
+        PARTIES:
+          $ref: '#/components/schemas/CreditFreddieMacParties_VOA_2_4'
+        SERVICES:
+          $ref: '#/components/schemas/CreditFreddieMacServices_VOA_2_4'
+      required:
+      - LOANS
+      - PARTIES
+      - SERVICES
+    CreditFreddieMacLoans_VOA_2_4:
+      title: CreditFreddieMacLoans_VOA_2_4
+      type: object
+      additionalProperties: true
+      description: A collection of loans that are part of a single deal.
+      properties:
+        LOAN:
+          $ref: '#/components/schemas/CreditFreddieMacLoan_VOA_2_4'
+      required:
+      - LOAN
+    CreditFreddieMacLoan_VOA_2_4:
+      title: CreditFreddieMacLoan_VOA_2_4
+      type: object
+      additionalProperties: true
+      description: Information specific to a mortgage loan agreement between one or more borrowers and a mortgage lender.
+      properties:
+        LOAN_IDENTIFIERS:
+          $ref: '#/components/schemas/CreditFreddieMacLoanIdentifiers_VOA_2_4'
+        LoanRoleType:
+          type: string
+          description: Type of loan. The value can only be "SubjectLoan"
+      required:
+      - LOAN_IDENTIFIERS
+      - LoanRoleType
+    CreditFreddieMacLoanIdentifiers_VOA_2_4:
+      title: CreditFreddieMacLoanIdentifiers_VOA_2_4
+      type: object
+      additionalProperties: true
+      description: Collection of current and previous identifiers for this loan.
+      properties:
+        LOAN_IDENTIFIER:
+          type: array
+          items:
+            $ref: '#/components/schemas/LoanIdentifier'
+      required:
+      - LOAN_IDENTIFIER
+    CreditFreddieMacServices_VOA_2_4:
+      title: CreditFreddieMacServices_VOA_2_4
+      type: object
+      additionalProperties: true
+      description: A collection of objects that describe requests and responses for services.
+      properties:
+        SERVICE:
+          $ref: '#/components/schemas/CreditFreddieMacService_VOA_2_4'
+      required:
+      - SERVICE
+    CreditFreddieMacService_VOA_2_4:
+      title: CreditFreddieMacService_VOA_2_4
+      type: object
+      additionalProperties: true
+      description: A collection of details related to a fulfillment service or product in terms of request, process and result.
+      properties:
+        VERIFICATION_OF_ASSET:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreditFreddieMacVerificationOfAsset_VOA_2_4'
+        STATUSES:
+          $ref: '#/components/schemas/Statuses'
+      required:
+      - VERIFICATION_OF_ASSET
+      - STATUSES
+    CreditFreddieMacVerificationOfAsset_VOA_2_4:
+      title: CreditFreddieMacVerificationOfAsset_VOA_2_4
+      type: object
+      additionalProperties: true
+      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
+      properties:
+        REPORTING_INFORMATION:
+          $ref: '#/components/schemas/CreditFreddieMacReportingInformation_VOA_2_4'
+        SERVICE_PRODUCT_FULFILLMENT:
+          $ref: '#/components/schemas/ServiceProductFulfillment'
+        VERIFICATION_OF_ASSET_RESPONSE:
+          $ref: '#/components/schemas/CreditFreddieMacVerificationOfAssetResponse_VOA_2_4'
+      required:
+      - REPORTING_INFORMATION
+      - SERVICE_PRODUCT_FULFILLMENT
+      - VERIFICATION_OF_ASSET_RESPONSE
+    CreditFreddieMacReportingInformation_VOA_2_4:
+      title: CreditFreddieMacReportingInformation_VOA_2_4
+      type: object
+      additionalProperties: true
+      description: Information about an report identifier and a report name.
+      properties:
+        ReportDateTime:
+          type: string
+          description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
+        ReportIdentifierType:
+          type: string
+          description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac. The value can only be "ReportID"
+        ReportingInformationIdentifier:
+          type: string
+          description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
+      required:
+      - ReportingInformationIdentifier
+    CreditFreddieMacVerificationOfAssetResponse_VOA_2_4:
+      title: VerificationOfAssetResponse
+      type: object
+      additionalProperties: true
+      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
+      properties:
+        ASSETS:
+          $ref: '#/components/schemas/CreditFreddieMacAssets_VOA_2_4'
+      required:
+      - ASSETS
+    CreditFreddieMacAssets_VOA_2_4:
+      title: CreditFreddieMacAssets_VOA_2_4
+      type: object
+      additionalProperties: true
+      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
+      properties:
+        ASSET:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreditFreddieMacAsset_VOA_2_4'
+          description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
+      required:
+      - ASSET
+    CreditFreddieMacAsset_VOA_2_4:
+      title: CreditFreddieMacAsset_VOA_2_4
+      type: object
+      additionalProperties: true
+      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
+      properties:
+        ASSET_DETAIL:
+          $ref: '#/components/schemas/AssetDetail'
+        ASSET_OWNERS:
+          $ref: '#/components/schemas/AssetOwners'
+        ASSET_HOLDER:
+          $ref: '#/components/schemas/AssetHolder'
+        ASSET_TRANSACTIONS:
+          $ref: '#/components/schemas/CreditFreddieMacAssetTransactions_VOA_2_4'
+        VALIDATION_SOURCES:
+          $ref: '#/components/schemas/ValidationSources'
+      required:
+      - ASSET_DETAIL
+      - ASSET_OWNERS
+      - ASSET_HOLDER
+      - ASSET_TRANSACTIONS
+      - VALIDATION_SOURCES
+    CreditFreddieMacAssetTransactions_VOA_2_4:
+      title: CreditFreddieMacAssetTransactions_VOA_2_4
+      type: object
+      additionalProperties: true
+      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
+      properties:
+        ASSET_TRANSACTION:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreditFreddieMacAssetTransaction_VOA_2_4'
+      required:
+      - ASSET_TRANSACTION
+    CreditFreddieMacAssetTransaction_VOA_2_4:
+      title: CreditFreddieMacAssetTransaction_VOA_2_4
+      type: object
+      additionalProperties: true
+      description: An object representing...
+      properties:
+        ASSET_TRANSACTION_DETAIL:
+          $ref: '#/components/schemas/AssetTransactionDetail'
+        ASSET_TRANSACTION_DESCRIPTION:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetTransactionDescription'
+          description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
+      required:
+      - ASSET_TRANSACTION_DETAIL
+      - ASSET_TRANSACTION_DESCRIPTION
+    CreditFreddieMacParties_VOA_2_4:
+      title: CreditFreddieMacParties_VOA_2_4
+      type: object
+      additionalProperties: true
+      description: A collection of objects that define specific parties to a deal. This includes the direct participating parties, such as borrower and seller and the indirect parties such as the credit report provider.
+      properties:
+        PARTY:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreditFreddieMacParty_VOA_2_4'
+      required:
+      - PARTY
+    CreditFreddieMacParty_VOA_2_4:
+      title: CreditFreddieMacParty_VOA_2_4
+      type: object
+      additionalProperties: true
+      description: A collection of information about a single party to a transaction. Included direct participants like the borrower and seller as well as indirect participants such as the flood certificate provider.
+      properties:
+        INDIVIDUAL:
+          $ref: '#/components/schemas/CreditFreddieMacPartyIndividual_VOA_2_4'
+        ROLES:
+          $ref: '#/components/schemas/Roles'
+        TAXPAYER_IDENTIFIERS:
+          $ref: '#/components/schemas/TaxpayerIdentifiers'
+      required:
+      - INDIVIDUAL
+      - ROLES
+      - TAXPAYER_IDENTIFIERS
+    CreditFreddieMacPartyIndividual_VOA_2_4:
+      title: CreditFreddieMacPartyIndividual_VOA_2_4
+      type: object
+      additionalProperties: true
+      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
+      properties:
+        NAME:
+          $ref: '#/components/schemas/CreditFreddieMacIndividualName_VOA_2_4'
+      required:
+      - NAME
+    CreditFreddieMacIndividualName_VOA_2_4:
+      title: CreditFreddieMacIndividualName_VOA_2_4
+      type: object
+      additionalProperties: true
+      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
+      properties:
+        FirstName:
+          type: string
+          description: The first name of the individual represented by the parent object.
+        LastName:
+          type: string
+          description: The last name of the individual represented by the parent object.
+        MiddleName:
+          type: string
+          description: The middle name of the individual represented by the parent object.
+      required:
+      - FirstName
+      - LastName
+    CreditFreddieVerificationOfEmploymentDeal_VOE_2_5:
+      title: CreditFreddieVerificationOfEmploymentDeal_VOE_2_5
+      type: object
+      additionalProperties: true
+      description: An object representing a Verification of Employment report.
+      properties:
+        LOANS:
+          $ref: '#/components/schemas/CreditFreddieMacLoans_VOA_2_4'
+        PARTIES:
+          $ref: '#/components/schemas/CreditFreddieMacParties_VOA_2_4'
+        SERVICES:
+          $ref: '#/components/schemas/CreditFreddieMacServices_VOE_2_5'
+      required:
+      - LOANS
+      - PARTIES
+      - SERVICES
+    CreditFreddieMacServices_VOE_2_5:
+      title: CreditFreddieMacServices_VOE_2_5
+      type: object
+      additionalProperties: true
+      description: A collection of objects that describe requests and responses for services.
+      properties:
+        SERVICE:
+          $ref: '#/components/schemas/CreditFreddieMacService_VOE_2_5'
+      required:
+      - SERVICE
+    CreditFreddieMacService_VOE_2_5:
+      title: CreditFreddieMacService_VOE_2_5
+      type: object
+      additionalProperties: true
+      description: A collection of details related to a fulfillment service or product in terms of request, process and result.
+      properties:
+        VERIFICATION_OF_ASSET:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreditFreddieMacVerificationOfAsset_VOE_2_5'
+        STATUSES:
+          $ref: '#/components/schemas/Statuses'
+      required:
+      - VERIFICATION_OF_ASSET
+      - STATUSES
+    CreditFreddieMacVerificationOfAsset_VOE_2_5:
+      title: CreditFreddieMacVerificationOfAsset_VOE_2_5
+      type: object
+      additionalProperties: true
+      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
+      properties:
+        REPORTING_INFORMATION:
+          $ref: '#/components/schemas/CreditFreddieMacReportingInformation_VOA_2_4'
+        SERVICE_PRODUCT_FULFILLMENT:
+          $ref: '#/components/schemas/ServiceProductFulfillment'
+        VERIFICATION_OF_ASSET_RESPONSE:
+          $ref: '#/components/schemas/CreditFreddieMacVerificationOfAssetResponse_VOE_2_5'
+      required:
+      - REPORTING_INFORMATION
+      - SERVICE_PRODUCT_FULFILLMENT
+      - VERIFICATION_OF_ASSET_RESPONSE
+    CreditFreddieMacVerificationOfAssetResponse_VOE_2_5:
+      title: CreditFreddieMacVerificationOfAssetResponse_VOE_2_5
+      type: object
+      additionalProperties: true
+      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
+      properties:
+        ASSETS:
+          $ref: '#/components/schemas/CreditFreddieMacAssets_VOE_2_5'
+      required:
+      - ASSETS
+    CreditFreddieMacAssets_VOE_2_5:
+      title: CreditFreddieMacAssets_VOE_2_5
+      type: object
+      additionalProperties: true
+      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
+      properties:
+        ASSET:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreditFreddieMacAsset_VOE_2_5'
+          description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
+      required:
+      - ASSET
+    CreditFreddieMacAsset_VOE_2_5:
+      title: CreditFreddieMacAsset_VOE_2_5
+      type: object
+      additionalProperties: true
+      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
+      properties:
+        ASSET_DETAIL:
+          $ref: '#/components/schemas/CreditFreddieMacAssetDetail_VOE_2_5'
+        ASSET_OWNERS:
+          $ref: '#/components/schemas/AssetOwners'
+        ASSET_HOLDER:
+          $ref: '#/components/schemas/AssetHolder'
+        ASSET_TRANSACTIONS:
+          $ref: '#/components/schemas/CreditFreddieMacAssetTransactions_VOE_2_5'
+      required:
+      - ASSET_DETAIL
+      - ASSET_OWNERS
+      - ASSET_HOLDER
+      - ASSET_TRANSACTIONS
+    CreditFreddieMacAssetTransactions_VOE_2_5:
+      title: CreditFreddieMacAssetTransactions_VOE_2_5
+      type: object
+      additionalProperties: true
+      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
+      properties:
+        ASSET_TRANSACTION:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreditFreddieMacAssetTransaction_VOE_2_5'
+      required:
+      - ASSET_TRANSACTION
+    CreditFreddieMacAssetTransaction_VOE_2_5:
+      title: CreditFreddieMacAssetTransaction_VOE_2_5
+      type: object
+      additionalProperties: true
+      description: An object representing...
+      properties:
+        ASSET_TRANSACTION_DETAIL:
+          $ref: '#/components/schemas/CreditFreddieMacAssetTransactionDetail_VOE_2_5'
+        ASSET_TRANSACTION_DESCRIPTION:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetTransactionDescription'
+          description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
+      required:
+      - ASSET_TRANSACTION_DETAIL
+      - ASSET_TRANSACTION_DESCRIPTION
+    CreditFreddieMacAssetDetail_VOE_2_5:
+      title: CreditFreddieMacAssetDetail_VOE_2_5
+      type: object
+      additionalProperties: true
+      description: Details about an asset.
+      properties:
+        AssetUniqueIdentifier:
+          type: string
+          description: A vendor created unique Identifier.
+        AssetAccountIdentifier:
+          type: string
+          description: A unique alphanumeric string identifying an asset.
+        AssetAsOfDate:
+          type: string
+          description: Account Report As of Date / Create Date. Format YYYY-MM-DD
+        AssetDescription:
+          type: string
+          nullable: true
+          description: A text description that further defines the Asset. This could be used to describe the shares associated with the stocks, bonds or mutual funds, retirement funds or business owned that the borrower has disclosed (named) as an asset.
+        AssetType:
+          $ref: '#/components/schemas/AssetType'
+        AssetTypeAdditionalDescription:
+          type: string
+          nullable: true
+          description: Additional Asset Decription some examples are Investment Tax-Deferred , Loan, 401K, 403B, Checking, Money Market, Credit Card,ROTH,529,Biller,ROLLOVER,CD,Savings,Investment Taxable, IRA, Mortgage, Line Of Credit.
+        AssetDaysRequestedCount:
+          type: integer
+          description: The Number of days requested made to the Financial Institution. Example When looking for 3 months of data from the FI, pass in 90 days.
+        AssetOwnershipType:
+          type: string
+          nullable: true
+          description: Ownership type of the asset account.
+      required:
+      - AssetUniqueIdentifier
+      - AssetAccountIdentifier
+      - AssetAsOfDate
+      - AssetDescription
+      - AssetType
+      - AssetTypeAdditionalDescription
+      - AssetDaysRequestedCount
+      - AssetOwnershipType
+    CreditFreddieMacAssetTransactionDetail_VOE_2_5:
+      title: CreditFreddieMacAssetTransactionDetail_VOE_2_5
+      type: object
+      additionalProperties: true
+      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
+      properties:
+        AssetTransactionUniqueIdentifier:
+          type: string
+          description: A vendor created unique Identifier.
+        AssetTransactionDate:
+          type: string
+          format: date
+          description: Asset Transaction Date.
+        AssetTransactionPostDate:
+          type: string
+          format: date
+          description: Asset Transaction Post Date.
+        AssetTransactionType:
+          $ref: '#/components/schemas/AssetTransactionType'
+        AssetTransactionPaidByName:
+          type: string
+          nullable: true
+          description: Populate with who did the transaction.
+        AssetTransactionPaidToName:
+          type: string
+          nullable: true
+          description: Populate with for whom the transaction is done.
+        AssetTransactionTypeAdditionalDescription:
+          type: string
+          nullable: true
+          description: FI Provided - examples are atm, cash, check, credit, debit, deposit, directDebit, directDeposit, dividend, fee, interest, other, payment, pointOfSale, repeatPayment, serviceCharge, transfer.
+        AssetTransactionCategoryType:
+          $ref: '#/components/schemas/AssetTransactionCategoryType'
+        FinancialInstitutionTransactionIdentifier:
+          type: string
+          nullable: true
+          description: FI provided Transaction Identifier.
+      required:
+      - AssetTransactionUniqueIdentifier
+      - AssetTransactionDate
+      - AssetTransactionPostDate
+      - AssetTransactionType
+      - AssetTransactionPaidByName
+      - AssetTransactionPaidToName
+      - AssetTransactionTypeAdditionalDescription
+      - AssetTransactionCategoryType
+      - FinancialInstitutionTransactionIdentifier
     ItemGetRequest:
       description: ItemGetRequest defines the request schema for `/item/get`
       type: object
