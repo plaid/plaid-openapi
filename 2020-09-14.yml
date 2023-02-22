@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.229.2
+  version: 2020-09-14_1.334.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -1192,6 +1192,8 @@ paths:
                           type: merchant
                           logo_url: https://plaid-merchant-logos.plaid.com/walmart_1100.png
                           website: walmart.com
+                          entity_id: plaid_6f2d35f96f1b2ec4af99222c23f70c35
+                        entity_id: plaid_6f2d35f96f1b2ec4af99222c23f70c35
                         location:
                           address: 13425 Community Rd
                           city: Poway
@@ -1216,14 +1218,16 @@ paths:
                       iso_currency_code: USD
                       enrichments:
                         counterparties:
-                        - name: Doordash
+                        - name: DoorDash
                           type: marketplace
                           logo_url: https://plaid-counterparty-logos.plaid.com/doordash_1.png
                           website: doordash.com
+                          entity_id: plaid_3fefe2ae8fc45d84d9038b6bb5cd1094
                         - name: Burger King
                           type: merchant
                           logo_url: https://plaid-merchant-logos.plaid.com/burger_king_155.png
                           website: burgerking.com
+                          entity_id: plaid_086ef08062de7018e3c74c28a82cb812
                         location:
                           address: null
                           city: null
@@ -1233,6 +1237,7 @@ paths:
                           store_number: null
                           lat: null
                           lon: null
+                        entity_id: plaid_086ef08062de7018e3c74c28a82cb812
                         logo_url: https://plaid-merchant-logos.plaid.com/burger_king_155.png
                         merchant_name: Burger King
                         payment_channel: online
@@ -3650,6 +3655,120 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ProcessorAuthGetRequest'
+  /processor/signal/evaluate:
+    post:
+      tags:
+      - plaid
+      summary: Evaluate a planned ACH transaction
+      externalDocs:
+        url: /api/processors/#processorsignalevaluate
+      operationId: processorSignalEvaluate
+      description: |-
+        Use `/processor/signal/evaluate` to evaluate a planned ACH transaction as a processor to get a return risk assessment (such as a risk score and risk tier) and additional risk signals.
+
+        In order to obtain a valid score for an ACH transaction, Plaid must have an access token for the account, and the Item must be healthy (receiving product updates) or have recently been in a healthy state. If the transaction does not meet eligibility requirements, an error will be returned corresponding to the underlying cause. If `/processor/signal/evaluate` is called on the same transaction multiple times within a 24-hour period, cached results may be returned. For more information please refer to our error documentation on [item errors](/docs/errors/item/) and [Link in Update Mode](/docs/link/update-mode/).
+
+        Note: This request may take some time to complete if Signal is being added to an existing Item. This is because Plaid must communicate directly with the institution when retrieving the data for the first time.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessorSignalEvaluateResponse'
+              examples:
+                example-1:
+                  value:
+                    scores:
+                      customer_initiated_return_risk:
+                        score: 9
+                        risk_tier: 1
+                      bank_initiated_return_risk:
+                        score: 72
+                        risk_tier: 7
+                    core_attributes:
+                      days_since_first_plaid_connection: 510
+                      plaid_connections_count_7d: 6
+                      plaid_connections_count_30d: 7
+                      total_plaid_connections_count: 15
+                      is_savings_or_money_market_account: false
+                    request_id: mdqfuVxeoza6mhu
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcessorSignalEvaluateRequest'
+  /processor/signal/decision/report:
+    post:
+      tags:
+      - plaid
+      summary: Report whether you initiated an ACH transaction
+      externalDocs:
+        url: /api/processors/#processorsignaldecisionreport
+      operationId: processorSignalDecisionReport
+      description: After calling `/processor/signal/evaluate`, call `/processor/signal/decision/report` to report whether the transaction was initiated. This endpoint will return an [`INVALID_FIELD`](/docs/errors/invalid-request/#invalid_field) error if called a second time with a different value for `initiated`.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessorSignalDecisionReportResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: mdqfuVxeoza6mhu
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcessorSignalDecisionReportRequest'
+  /processor/signal/return/report:
+    post:
+      tags:
+      - plaid
+      summary: Report a return for an ACH transaction
+      externalDocs:
+        url: /api/processors/#processorsignalreturnreport
+      operationId: processorSignalReturnReport
+      description: Call the `/processor/signal/return/report` endpoint to report a returned transaction that was previously sent to the `/processor/signal/evaluate` endpoint. Your feedback will be used by the model to incorporate the latest risk trend in your portfolio.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessorSignalReturnReportResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: mdqfuVxeoza6mhu
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcessorSignalReturnReportRequest'
   /processor/bank_transfer/create:
     post:
       tags:
@@ -3904,7 +4023,7 @@ paths:
       - plaid
       summary: Get webhook verification key
       externalDocs:
-        url: /docs/api/webhooks/webhook-verification/#get-webhook-verification-key
+        url: /api/webhooks/webhook-verification/#get-webhook-verification-key
       operationId: webhookVerificationKeyGet
       responses:
         "200":
@@ -8219,6 +8338,7 @@ paths:
                               NAME:
                                 FirstName: John
                                 LastName: Deere
+                                MiddleName: S
                             ROLES:
                               ROLE:
                                 ROLE_DETAIL:
@@ -8295,8 +8415,8 @@ paths:
                           - INDIVIDUAL:
                               NAME:
                                 FirstName: John
-                                MiddleName: S
                                 LastName: Freddie
+                                MiddleName: S
                             ROLES:
                               ROLE:
                                 ROLE_DETAIL:
@@ -9514,7 +9634,7 @@ paths:
       description: |-
         Use `/signal/evaluate` to evaluate a planned ACH transaction to get a return risk assessment (such as a risk score and risk tier) and additional risk signals.
 
-        In order to obtain a valid score for an ACH transaction, Plaid must have an access token for the account, and the Item must be healthy (receiving product updates) or have recently been in a healthy state. If the transaction does not meet eligibility requirements, an error will be returned corresponding to the underlying cause. If `/signal/evaluate` is called on the same transaction multiple times within a 24-hour period, cached results may be returned. For more information please refer to our error documentation on [item errors](/docs/errors/item/) and [Link in Update Mode](/docs/link/update-mode/).
+        In order to obtain a valid score for an ACH transaction, Plaid must have an access token for the account, and the Item must be healthy (receiving product updates) or have recently been in a healthy state. If the transaction does not meet eligibility requirements, an error will be returned corresponding to the underlying cause. If `/signal/evaluate` is called on the same transaction multiple times within a 24-hour period, cached results may be returned. For more information please refer to the error documentation on [Item errors](/docs/errors/item/) and [Link in Update Mode](/docs/link/update-mode/).
 
         Note: This request may take some time to complete if Signal is being added to an existing Item. This is because Plaid must communicate directly with the institution when retrieving the data for the first time.
       responses:
@@ -9939,66 +10059,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/WalletTransactionListRequest'
-  /wallet/transactions/list:
-    x-hidden-from-docs: true
-    post:
-      tags:
-      - plaid
-      summary: List e-wallet transactions
-      externalDocs:
-        url: /api/products/virtual-accounts/#wallettransactionlist
-      operationId: walletTransactionsList
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/WalletTransactionListResponse'
-              examples:
-                example-1:
-                  value:
-                    next_cursor: YWJjMTIzIT8kKiYoKSctPUB
-                    transactions:
-                    - transaction_id: wallet-transaction-id-sandbox-feca8a7a-5591-4aef-9297-f3062bb735d3
-                      wallet_id: wallet-id-production-53e58b32-fc1c-46fe-bbd6-e584b27a88
-                      type: PAYOUT
-                      reference: Payout 99744
-                      amount:
-                        iso_currency_code: GBP
-                        value: 123.12
-                      status: EXECUTED
-                      created_at: "2020-12-02T21:14:54Z"
-                      last_status_update: "2020-12-02T21:15:01Z"
-                      counterparty:
-                        numbers:
-                          bacs:
-                            account: "31926819"
-                            sort_code: "601613"
-                        name: John Smith
-                    - transaction_id: wallet-transaction-id-sandbox-feca8a7a-5591-4aef-9297-f3062bb735d3
-                      wallet_id: wallet-id-production-53e58b32-fc1c-46fe-bbd6-e584b27a88
-                      type: PAYOUT
-                      reference: Payout 99744
-                      amount:
-                        iso_currency_code: EUR
-                        value: 456.78
-                      status: EXECUTED
-                      created_at: "2020-12-02T21:14:54Z"
-                      last_status_update: "2020-12-02T21:15:01Z"
-                      counterparty:
-                        numbers:
-                          international:
-                            iban: GB33BUKB20201555555555
-                        name: John Smith
-                    request_id: 4zlKapIkTm8p5KM
-      description: This endpoint lists the latest transactions of the specified e-wallet. Transactions are returned in descending order by the `created_at` time.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/WalletTransactionsListRequest'
   /beta/transactions/v1/enhance:
     post:
       tags:
@@ -10568,7 +10628,7 @@ paths:
     post:
       tags:
       - plaid
-      summary: Create link delivery session
+      summary: Create Link Delivery session
       externalDocs:
         url: /docs/assets/waitlist/link-delivery/
       operationId: linkDeliveryCreate
@@ -10602,7 +10662,7 @@ paths:
     post:
       tags:
       - plaid
-      summary: Get link delivery session
+      summary: Get Link Delivery session
       externalDocs:
         url: /docs/assets/waitlist/link-delivery/
       operationId: linkDeliveryGet
@@ -11093,17 +11153,17 @@ components:
       properties:
         added:
           type: array
-          description: Transactions that have been added to the item since `cursor` ordered by ascending last modified time.
+          description: Transactions that have been added to the Item since `cursor` ordered by ascending last modified time.
           items:
             $ref: '#/components/schemas/Transaction'
         modified:
           type: array
-          description: Transactions that have been modified on the item since `cursor` ordered by ascending last modified time.
+          description: Transactions that have been modified on the Item since `cursor` ordered by ascending last modified time.
           items:
             $ref: '#/components/schemas/Transaction'
         removed:
           type: array
-          description: Transactions that have been removed from the item since `cursor` ordered by ascending last modified time.
+          description: Transactions that have been removed from the Item since `cursor` ordered by ascending last modified time.
           items:
             $ref: '#/components/schemas/RemovedTransaction'
         next_cursor:
@@ -11800,6 +11860,167 @@ components:
       - request_id
       - numbers
       - account
+    ProcessorSignalEvaluateRequest:
+      title: ProcessorSignalEvaluateRequest
+      description: ProcessorSignalEvaluateRequest defines the request schema for `/processor/signal/evaluate`
+      type: object
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        processor_token:
+          $ref: '#/components/schemas/ProcessorToken'
+        client_transaction_id:
+          type: string
+          description: The unique ID that you would like to use to refer to this transaction. For your convenience mapping your internal data, you could use your internal ID/identifier for this transaction. The max length for this field is 36 characters.
+          minLength: 1
+          maxLength: 36
+        amount:
+          type: number
+          format: double
+          description: The transaction amount, in USD (e.g. `102.05`)
+        user_present:
+          type: boolean
+          description: '`true` if the end user is present while initiating the ACH transfer and the endpoint is being called; `false` otherwise (for example, when the ACH transfer is scheduled and the end user is not present, or you call this endpoint after the ACH transfer but before submitting the Nacha file for ACH processing).'
+          nullable: true
+        client_user_id:
+          type: string
+          description: A unique ID that identifies the end user in your system. This ID is used to correlate requests by a user with multiple Items. The max length for this field is 36 characters. Personally identifiable information, such as an email address or phone number, should not be used in the `client_user_id`.
+          maxLength: 36
+        is_recurring:
+          type: boolean
+          description: '**true** if the ACH transaction is a recurring transaction; **false** otherwise '
+          nullable: true
+        default_payment_method:
+          type: string
+          description: |-
+            The default ACH or non-ACH payment method to complete the transaction.
+            `SAME_DAY_ACH`: Same Day ACH by NACHA. The debit transaction is processed and settled on the same day
+            `NEXT_DAY_ACH`: Next Day ACH settlement for debit transactions, offered by some payment processors
+            `STANDARD_ACH`: standard ACH by NACHA
+            `REAL_TIME_PAYMENTS`: real-time payments such as RTP and FedNow
+            `DEBIT_CARD`: if the default payment is over debit card networks
+            `MULTIPLE_PAYMENT_METHODS`: if there is no default debit rail or there are multiple payment methods
+            Possible values:  `SAME_DAY_ACH`, `NEXT_DAY_ACH`, `STANDARD_ACH`, `REAL_TIME_PAYMENTS`, `DEBIT_CARD`, `MULTIPLE_PAYMENT_METHODS`
+          nullable: true
+        user:
+          $ref: '#/components/schemas/SignalUser'
+        device:
+          $ref: '#/components/schemas/SignalDevice'
+      required:
+      - processor_token
+      - client_transaction_id
+      - amount
+    ProcessorSignalEvaluateResponse:
+      title: ProcessorSignalEvaluateResponse
+      description: ProcessorSignalEvaluateResponse defines the response schema for `/processor/signal/evaluate`
+      type: object
+      additionalProperties: true
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+        scores:
+          $ref: '#/components/schemas/SignalScores'
+        core_attributes:
+          $ref: '#/components/schemas/SignalEvaluateCoreAttributes'
+      required:
+      - request_id
+      - scores
+    ProcessorSignalDecisionReportRequest:
+      title: ProcessorSignalDecisionReportRequest
+      description: ProcessorSignalDecisionReportRequest defines the request schema for `/processor/signal/decision/report`
+      type: object
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        processor_token:
+          $ref: '#/components/schemas/ProcessorToken'
+        client_transaction_id:
+          type: string
+          description: Must be the same as the `client_transaction_id` supplied when calling `/signal/evaluate`
+          minLength: 1
+          maxLength: 36
+        initiated:
+          type: boolean
+          description: |-
+            `true` if the ACH transaction was initiated, `false` otherwise.
+
+            This field must be returned as a boolean. If formatted incorrectly, this will result in an [`INVALID_FIELD`](/docs/errors/invalid-request/#invalid_field) error.
+        days_funds_on_hold:
+          type: integer
+          description: |-
+            The actual number of days (hold time) since the ACH debit transaction that you wait before making funds available to your customers. The holding time could affect the ACH return rate.
+
+            For example, use 0 if you make funds available to your customers instantly or the same day following the debit transaction, or 1 if you make funds available the next day following the debit initialization.
+          minimum: 0
+          nullable: true
+        decision_outcome:
+          $ref: '#/components/schemas/SignalDecisionOutcome'
+        payment_method:
+          $ref: '#/components/schemas/SignalPaymentMethod'
+        amount_instantly_available:
+          type: number
+          format: double
+          description: 'The amount (in USD) made available to your customers instantly following the debit transaction. It could be a partial amount of the requested transaction (example: 102.05).'
+          nullable: true
+      required:
+      - processor_token
+      - client_transaction_id
+      - initiated
+    ProcessorSignalDecisionReportResponse:
+      title: ProcessorSignalDecisionReportResponse
+      description: ProcessorSignalDecisionReportResponse defines the response schema for `/processor/signal/decision/report`
+      additionalProperties: true
+      type: object
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
+    ProcessorSignalReturnReportRequest:
+      title: ProcessorSignalReturnReportRequest
+      description: ProcessorSignalReturnReportRequest defines the request schema for `/processor/signal/return/report`
+      type: object
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        processor_token:
+          $ref: '#/components/schemas/ProcessorToken'
+        client_transaction_id:
+          type: string
+          description: Must be the same as the `client_transaction_id` supplied when calling `/processor/signal/evaluate`
+          minLength: 1
+          maxLength: 36
+        return_code:
+          type: string
+          description: |-
+            Must be a valid ACH return code (e.g. "R01")
+
+            If formatted incorrectly, this will result in an [`INVALID_FIELD`](/docs/errors/invalid-request/#invalid_field) error.
+        returned_at:
+          type: string
+          format: date-time
+          description: Date and time when you receive the returns from your payment processors, in ISO 8601 format (`YYYY-MM-DDTHH:mm:ssZ`).
+          nullable: true
+      required:
+      - processor_token
+      - client_transaction_id
+      - return_code
+    ProcessorSignalReturnReportResponse:
+      title: ProcessorSignalReturnReportResponse
+      description: ProcessorSignalReturnReportResponse defines the response schema for `/processor/signal/return/report`
+      additionalProperties: true
+      type: object
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
     ProcessorBankTransferCreateRequest:
       title: ProcessorBankTransferCreateRequest
       type: object
@@ -12411,7 +12632,7 @@ components:
       properties:
         item_add_results:
           type: array
-          description: The set of item adds for the Link session.
+          description: The set of Item adds for the Link session.
           items:
             $ref: '#/components/schemas/CreditSessionItemAddResult'
         bank_income_results:
@@ -12428,7 +12649,7 @@ components:
           $ref: '#/components/schemas/CreditSessionDocumentIncomeResult'
     CreditSessionItemAddResult:
       type: object
-      description: The details of an item add in Link
+      description: The details of an Item add in Link.
       properties:
         public_token:
           description: Returned once a user has successfully linked their Item.
@@ -13410,7 +13631,7 @@ components:
           $ref: '#/components/schemas/LinkTokenCreateRequestIdentityVerification'
         user_token:
           type: string
-          description: A user token generated using `/user/create`. Any item created during the link session will be associated with the user.
+          description: A user token generated using `/user/create`. Any Item created during the Link session will be associated with the user.
         investments:
           $ref: '#/components/schemas/LinkTokenInvestments'
       required:
@@ -14136,6 +14357,108 @@ components:
       - sarsep
       - payroll
       - null
+    LinkDeliveryWebhookCommunicationMethod:
+      title: LinkDeliveryWebhookCommunicationMethod
+      description: The communication method used to deliver the hosted link session
+      type: string
+      enum:
+      - sms
+      - email
+    LinkDeliveryWebhookDeliveryStatus:
+      title: LinkDeliveryWebhookDeliveryStatus
+      description: The status of the delivery of the hosted link to the user
+      type: string
+      enum:
+      - succeeded
+      - failed
+    LinkDeliveryInstitution:
+      title: LinkDeliveryInstitution
+      type: object
+      additionalProperties: true
+      description: Information related to the financial institution.
+      x-hidden-from-docs: true
+      properties:
+        name:
+          type: string
+          description: The full institution name, such as 'Wells Fargo'
+        institution_id:
+          type: string
+          description: The Plaid institution identifier
+    LinkDeliveryVerificationStatus:
+      title: LinkDeliveryVerificationStatus
+      description: Indicates an Item's micro-deposit-based verification status.
+      type: string
+      enum:
+      - automatically_verified
+      - pending_automatic_verification
+      - pending_manual_verification
+      - manually_verified
+      - verification_expired
+      - verification_failed
+    LinkDeliveryAccount:
+      title: LinkDeliveryAccount
+      type: object
+      additionalProperties: true
+      description: Information related to account attached to the connected Item
+      x-hidden-from-docs: true
+      properties:
+        id:
+          type: string
+          description: The Plaid `account_id`
+        name:
+          type: string
+          description: The official account name
+        mask:
+          type: string
+          description: The last 2-4 alphanumeric characters of an account's official account number. Note that the mask may be non-unique between an Item's accounts. It may also not match the mask that the bank displays to the user.
+        type:
+          type: string
+          description: The account type. See the [Account schema](https://plaid.com/docs/api/accounts/#account-type-schema) for a full list of possible values
+        subtype:
+          type: string
+          description: The account subtype. See the [Account schema](https://plaid.com/docs/api/accounts/#account-type-schema) for a full list of possible values
+        verification_status:
+          $ref: '#/components/schemas/LinkDeliveryVerificationStatus'
+        class_type:
+          type: string
+          description: If micro-deposit verification is being used, indicates whether the account being verified is a `business` or `personal` account.
+    LinkDeliveryMetadata:
+      title: LinkDeliveryMetadata
+      type: object
+      additionalProperties: true
+      description: Information related to the related to the delivery of the link session to users
+      x-hidden-from-docs: true
+      properties:
+        communication_method:
+          $ref: '#/components/schemas/LinkDeliveryWebhookCommunicationMethod'
+        delivery_status:
+          $ref: '#/components/schemas/LinkDeliveryWebhookDeliveryStatus'
+    LinkCallbackMetadata:
+      title: LinkCallbackMetadata
+      type: object
+      additionalProperties: true
+      description: Information related to the callback from the hosted Link session.
+      x-hidden-from-docs: true
+      properties:
+        event_name:
+          type: string
+          description: Name of the Link callback e.g `onEvent`, `onExit`, `onSuccess`
+        status:
+          type: string
+          description: Indicates where in the flow the Link user exited
+        link_session_id:
+          type: string
+          description: A unique identifier associated with a user's actions and events through the Link flow. Include this identifier when opening a support ticket for faster turnaround.
+        request_id:
+          type: string
+          description: The request ID for the last request made by Link. This can be shared with Plaid Support to expedite investigation.
+        institution:
+          $ref: '#/components/schemas/LinkDeliveryInstitution'
+        accounts:
+          type: array
+          description: A list of accounts attached to the connected Item. If Account Select is enabled via the developer dashboard, accounts will only include selected accounts.
+          items:
+            $ref: '#/components/schemas/LinkDeliveryAccount'
     NumbersACH:
       title: NumbersACH
       type: object
@@ -14387,7 +14710,7 @@ components:
           description: A unique identifier of the rule created
         item_id:
           type: string
-          description: A unique identifier of the item the rule was created for
+          description: A unique identifier of the Item the rule was created for.
         created_at:
           type: string
           format: date-time
@@ -14538,7 +14861,7 @@ components:
             description: |-
               Date and time when a transaction was authorized in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ( `YYYY-MM-DDTHH:mm:ssZ` ).
 
-              This field is returned for select financial institutions and comes as provided by the institution. It may contain default time values (such as 00:00:00).
+              This field is returned for select financial institutions and comes as provided by the institution. It may contain default time values (such as 00:00:00). This field is only populated in API version 2019-05-29 and later.
             nullable: true
           datetime:
             type: string
@@ -14546,7 +14869,7 @@ components:
             description: |-
               Date and time when a transaction was posted in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ( `YYYY-MM-DDTHH:mm:ssZ` ).
 
-              This field is returned for select financial institutions and comes as provided by the institution. It may contain default time values (such as 00:00:00).
+              This field is returned for select financial institutions and comes as provided by the institution. It may contain default time values (such as 00:00:00). This field is only populated in API version 2019-05-29 and later.
             nullable: true
           payment_channel:
             type: string
@@ -15064,6 +15387,10 @@ components:
         name:
           type: string
           description: The name of the counterparty, such as the merchant or the financial institution, as extracted by Plaid from the raw description.
+        entity_id:
+          type: string
+          description: A unique, stable, Plaid-generated id that maps to the counterparty.
+          nullable: true
         type:
           $ref: '#/components/schemas/CounterpartyType'
         website:
@@ -16558,12 +16885,6 @@ components:
       additionalProperties: true
       nullable: true
       properties:
-        wallet_id:
-          x-hidden-from-docs: true
-          type: string
-          nullable: true
-          description: The EMI (E-Money Institution) wallet that this payment consent is associated with, if any. This wallet is used as an intermediary account to enable Plaid to reconcile the settlement of funds for Payment Initiation requests.
-          minLength: 1
         request_refund_details:
           type: boolean
           nullable: true
@@ -16627,12 +16948,6 @@ components:
           description: The International Bank Account Number (IBAN) for the payer's account. If provided, the end user will be able to send payments only from the specified bank account.
         bacs:
           $ref: '#/components/schemas/PaymentInitiationOptionalRestrictionBacs'
-        wallet_id:
-          x-hidden-from-docs: true
-          type: string
-          nullable: true
-          description: The EMI (E-Money Institution) wallet that this payment is associated with, if any. This wallet is used as an intermediary account to enable Plaid to reconcile the settlement of funds for Payment Initiation requests.
-          minLength: 1
         scheme:
           $ref: '#/components/schemas/PaymentScheme'
     ExternalPaymentRefundDetails:
@@ -19899,9 +20214,9 @@ components:
       description: |-
         The direction of the flow of transfer funds.
 
-        - `PAYMENT` – Transfers funds from an end user's account to your business account.
+        `PAYMENT`: Transfers funds from an end user's account to your business account.
 
-        - `DISBURSEMENT` – Transfers funds from your business account to an end user's account.
+        `DISBURSEMENT`: Transfers funds from your business account to an end user's account.
     BankTransferAmount:
       title: BankTransferAmount
       type: string
@@ -20377,11 +20692,11 @@ components:
       maxProperties: 50
       description: |
         The Metadata object is a mapping of client-provided string fields to any string value. The following limitations apply:
-        - The JSON values must be Strings (no nested JSON objects allowed)
-        - Only ASCII characters may be used
-        - Maximum of 50 key/value pairs
-        - Maximum key length of 40 characters
-        - Maximum value length of 500 characters
+        The JSON values must be Strings (no nested JSON objects allowed)
+        Only ASCII characters may be used
+        Maximum of 50 key/value pairs
+        Maximum key length of 40 characters
+        Maximum value length of 500 characters
     BankTransferMetadata:
       type: object
       additionalProperties:
@@ -20391,11 +20706,11 @@ components:
       maxProperties: 50
       description: |
         The Metadata object is a mapping of client-provided string fields to any string value. The following limitations apply:
-        - The JSON values must be Strings (no nested JSON objects allowed)
-        - Only ASCII characters may be used
-        - Maximum of 50 key/value pairs
-        - Maximum key length of 40 characters
-        - Maximum value length of 500 characters
+        The JSON values must be Strings (no nested JSON objects allowed)
+        Only ASCII characters may be used
+        Maximum of 50 key/value pairs
+        Maximum key length of 40 characters
+        Maximum value length of 500 characters
     TransferType:
       type: string
       title: TransferType
@@ -20497,9 +20812,9 @@ components:
       type: string
       title: TransferIntentCreateNetwork
       description: |-
-        The network or rails used for the transfer. Defaults to 'same-day-ach'.
+        The network or rails used for the transfer. Defaults to `same-day-ach`.
 
-        For transfers submitted as either `ach` or `same-day-ach` the cutoff for same-day is 9:30 AM Pacific Time and the cutoff for next-day transfers is 5:30 PM Pacific Time. It is recommended to submit a transfer at least 15 minutes before the cutoff time in order to ensure that it will be processed before the cutoff. Any transfer that is indicated as `same-day-ach` and that misses the same-day cutoff, but is submitted in time for the next-day cutoff, will be sent over next-day rails and will not incur same-day charges. Note that both legs of the transfer will be downgraded if applicable.'
+        For transfers submitted as either `ach` or `same-day-ach` the cutoff for same-day is 9:30 AM Pacific Time and the cutoff for next-day transfers is 5:30 PM Pacific Time. It is recommended to submit a transfer at least 15 minutes before the cutoff time in order to ensure that it will be processed before the cutoff. Any transfer that is indicated as `same-day-ach` and that misses the same-day cutoff, but is submitted in time for the next-day cutoff, will be sent over next-day rails and will not incur same-day charges. Note that both legs of the transfer will be downgraded if applicable.
       enum:
       - ach
       - same-day-ach
@@ -20510,7 +20825,7 @@ components:
       description: |-
         The network or rails used for the transfer.
 
-        For transfers submitted as either `ach` or `same-day-ach` the cutoff for same-day is 9:30 AM Pacific Time and the cutoff for next-day transfers is 5:30 PM Pacific Time. It is recommended to submit a transfer at least 15 minutes before the cutoff time in order to ensure that it will be processed before the cutoff. Any transfer that is indicated as `same-day-ach` and that misses the same-day cutoff, but is submitted in time for the next-day cutoff, will be sent over next-day rails and will not incur same-day charges. Note that both legs of the transfer will be downgraded if applicable.'
+        For transfers submitted as either `ach` or `same-day-ach` the cutoff for same-day is 9:30 AM Pacific Time and the cutoff for next-day transfers is 5:30 PM Pacific Time. It is recommended to submit a transfer at least 15 minutes before the cutoff time in order to ensure that it will be processed before the cutoff. Any transfer that is indicated as `same-day-ach` and that misses the same-day cutoff, but is submitted in time for the next-day cutoff, will be sent over next-day rails and will not incur same-day charges. Note that both legs of the transfer will be downgraded if applicable.
       enum:
       - ach
       - same-day-ach
@@ -20841,7 +21156,7 @@ components:
       title: TransferAuthorization
       type: object
       additionalProperties: true
-      description: Contains the authorization decision for a proposed transfer
+      description: Contains the authorization decision for a proposed transfer.
       properties:
         id:
           $ref: '#/components/schemas/TransferAuthorizationID'
@@ -20871,7 +21186,7 @@ components:
       title: InstitutionSupportedNetworks
       type: object
       additionalProperties: true
-      description: Contains the supported RTP network and types by the linked item's institution
+      description: Contains the RTP network and types supported by the linked Item's institution.
       properties:
         rtp:
           $ref: '#/components/schemas/TransferCapabilitiesGetRTP'
@@ -20887,7 +21202,7 @@ components:
           type: boolean
           default: false
           nullable: false
-          description: When `true`, meaning the linked item's institution supports RTP credit transfer
+          description: When `true`, the linked Item's institution supports RTP credit transfer.
     TransferCreateResponse:
       title: TransferCreateResponse
       type: object
@@ -22278,9 +22593,9 @@ components:
       description: |-
         The status of the transfer intent.
 
-        - `PENDING` – The transfer intent is pending.
-        - `SUCCEEDED` – The transfer intent was successfully created.
-        - `FAILED` – The transfer intent was unable to be created.
+        `PENDING`: The transfer intent is pending.
+        `SUCCEEDED`: The transfer intent was successfully created.
+        `FAILED`: The transfer intent was unable to be created.
     TransferIntentCreate:
       title: TransferIntentCreate
       type: object
@@ -23418,7 +23733,7 @@ components:
           type: boolean
           nullable: true
           default: false
-          description: Whether to enable multiple items to be added in the link session
+          description: Whether to enable multiple Items to be added in the Link session
       required:
       - days_requested
     LinkTokenCreateRequestIncomeVerificationPayrollIncome:
@@ -23757,7 +24072,14 @@ components:
           description: The name of the document.
         status:
           type: string
-          description: "The processing status of the document.\n\n`PROCESSING_COMPLETE`: The document was successfully processed.\n\n`DOCUMENT_ERROR`: The document could not be processed. Possible causes include: The document was an unacceptable document type such as an offer letter or bank statement, the document image was cropped or blurry, or the document was corrupted.\n\n`UNKNOWN` or `null`: An internal error occured. If this happens repeatedly, contact support or your Plaid account manager.  "
+          description: |-
+            The processing status of the document.
+
+            `PROCESSING_COMPLETE`: The document was successfully processed.
+
+            `DOCUMENT_ERROR`: The document could not be processed. Possible causes include: The document was an unacceptable document type such as an offer letter or bank statement, the document image was cropped or blurry, or the document was corrupted.
+
+            `UNKNOWN` or `null`: An internal error occured. If this happens repeatedly, contact support or your Plaid account manager.
           nullable: true
           x-override-enum-values-shown:
           - UNKNOWN
@@ -25549,12 +25871,12 @@ components:
       title: PayrollRiskSignalsItem
       type: object
       additionalProperties: true
-      description: Object containing fraud risk data pertaining to the item linked as part of the verification
+      description: Object containing fraud risk data pertaining to the Item linked as part of the verification.
       properties:
         item_id:
           $ref: '#/components/schemas/ItemId'
         verification_risk_signals:
-          description: Array of payroll income document authenticity data retrieved for each of the user's accounts
+          description: Array of payroll income document authenticity data retrieved for each of the user's accounts.
           type: array
           items:
             $ref: '#/components/schemas/DocumentRiskSignalsObject'
@@ -25565,7 +25887,7 @@ components:
       title: DocumentRiskSignalsObject
       type: object
       additionalProperties: true
-      description: Object containing fraud risk data for a set of income documents
+      description: Object containing fraud risk data for a set of income documents.
       properties:
         account_id:
           type: string
@@ -27901,7 +28223,7 @@ components:
         account_id:
           type: string
           description: |-
-            The Plaid `account_id` of the account whose verification status is to be modified. The `account_id` is returned in the `/accounts/get` endpoint as well as the [`onSuccess`](/docs/link/ios/#link-ios-onsuccess-linkSuccess-metadata-accounts-id) callback metadata.
+            The Plaid `account_id` of the account that is the funding source for the proposed transaction. The `account_id` is returned in the `/accounts/get` endpoint as well as the [`onSuccess`](/docs/link/ios/#link-ios-onsuccess-linkSuccess-metadata-accounts-id) callback metadata.
 
             This will return an [`INVALID_ACCOUNT_ID`](/docs/errors/invalid-input/#invalid_account_id) error if the account has been removed at the bank or if the `account_id` is no longer valid.
         client_transaction_id:
@@ -27923,7 +28245,7 @@ components:
           maxLength: 36
         is_recurring:
           type: boolean
-          description: '**true** if the ACH transaction is a recurring transaction; **false** otherwise '
+          description: '`true` if the ACH transaction is a recurring transaction; `false` otherwise '
           nullable: true
         default_payment_method:
           type: string
@@ -29361,6 +29683,10 @@ components:
           description: The counterparties present in the transaction. Counterparties, such as the merchant or the financial institution, are extracted by Plaid from the raw description.
           items:
             $ref: '#/components/schemas/Counterparty'
+        entity_id:
+          type: string
+          description: A unique, stable, Plaid-generated id that maps to the primary counterparty.
+          nullable: true
         legacy_category_id:
           deprecated: true
           description: |-
@@ -29883,12 +30209,12 @@ components:
           $ref: '#/components/schemas/APISecret'
         link_token:
           type: string
-          description: A `link_token` from a previous invocation of `/link/token/create` with Link Delivery enabled
+          description: A `link_token` from a previous invocation of `/link/token/create` with Link Delivery enabled.
         communication_methods:
           type: array
           items:
             $ref: '#/components/schemas/LinkDeliveryCommunicationMethod'
-          description: The list of communication methods to send the link delivery URL to.
+          description: The list of communication methods to send the Link Delivery URL to.
       required:
       - link_token
       - communication_methods
@@ -29902,7 +30228,7 @@ components:
           description: The URL to the Link Delivery session, which will be delivered by the specified delivery method.
         link_delivery_session_id:
           type: string
-          description: The ID for the link delivery session. Same as the link token string excluding the "link-{env}-" prefix
+          description: The ID for the Link Delivery session. Same as the `link_token` string excluding the "link-{env}-" prefix.
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
@@ -29919,7 +30245,7 @@ components:
           $ref: '#/components/schemas/APISecret'
         link_delivery_session_id:
           type: string
-          description: The ID for the link delivery session from a previous invocation of `/link_delivery/create`
+          description: The ID for the Link Delivery session from a previous invocation of `/link_delivery/create`.
       required:
       - link_delivery_session_id
     LinkDeliveryGetResponse:
@@ -29932,12 +30258,12 @@ components:
         created_at:
           type: string
           format: date-time
-          description: Timestamp in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (`YYYY-MM-DDTHH:mm:ssZ`) indicating the time the given Link Delivery Session was created at
+          description: Timestamp in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (`YYYY-MM-DDTHH:mm:ssZ`) indicating the time the given Link Delivery Session was created at.
         completed_at:
           type: string
           format: date-time
           nullable: true
-          description: Timestamp in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (`YYYY-MM-DDTHH:mm:ssZ`) indicating the time the given Link Delivery Session was completed at
+          description: Timestamp in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (`YYYY-MM-DDTHH:mm:ssZ`) indicating the time the given Link Delivery Session was completed at.
         request_id:
           $ref: '#/components/schemas/RequestID'
         access_tokens:
@@ -29945,17 +30271,75 @@ components:
           items:
             $ref: '#/components/schemas/AccessToken'
           nullable: true
-          description: An array of access tokens associated with the link delivery session
+          description: An array of access tokens associated with the Link Delivery session.
         item_ids:
           type: array
           items:
             $ref: '#/components/schemas/ItemId'
           nullable: true
-          description: An array of item ids associated with the link delivery session
+          description: An array of `item_id`s associated with the Link Delivery session.
       required:
       - status
       - created_at
       - request_id
+    LinkUserDeliveryStatusWebhook:
+      title: LinkUserDeliveryStatusWebhook
+      x-hidden-from-docs: true
+      description: Webhook indicating that the status of the delivery of the hosted link session to a user
+      type: object
+      additionalProperties: true
+      properties:
+        webhook_type:
+          type: string
+          description: '`LINK_DELIVERY`'
+        webhook_code:
+          type: string
+          description: '`DELIVERY_STATUS`'
+        link_delivery_session_id:
+          type: string
+          description: The ID of the link delivery session.
+        timestamp:
+          type: string
+          description: Timestamp in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format.
+        link_delivery_metadata:
+          $ref: '#/components/schemas/LinkDeliveryMetadata'
+      required:
+      - webhook_type
+      - webhook_code
+      - link_delivery_session_id
+      - timestamp
+      - link_delivery_metadata
+      x-examples: {}
+    LinkDeliveryCallbackWebhook:
+      title: LinkDeliveryCallbackWebhook
+      x-hidden-from-docs: true
+      description: Webhook containing metadata proxied over from Link callback e.g `onEvent`, `onExit`, `onSuccess`.
+      type: object
+      additionalProperties: true
+      properties:
+        webhook_type:
+          type: string
+          description: '`LINK_DELIVERY`'
+        webhook_code:
+          type: string
+          description: '`LINK_CALLBACK`'
+        link_delivery_session_id:
+          type: string
+          description: The ID of the link delivery session.
+        timestamp:
+          type: string
+          description: Timestamp in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format.
+        error:
+          $ref: '#/components/schemas/PlaidError'
+        link_callback_metadata:
+          $ref: '#/components/schemas/LinkCallbackMetadata'
+      required:
+      - webhook_type
+      - webhook_code
+      - link_delivery_session_id
+      - timestamp
+      - link_callback_metadata
+      x-examples: {}
     CreditCategory:
       title: CreditCategory
       nullable: true
@@ -30016,16 +30400,24 @@ components:
           description: URL to which Plaid will send Assets webhooks, for example when the requested Asset Report is ready.
           nullable: true
         include_fast_report:
+          deprecated: true
           type: boolean
           description: true to return balance and identity earlier as a fast report. Defaults to false if omitted.
           nullable: true
           x-hidden-from-docs: true
         products:
+          deprecated: true
           type: array
           description: 'Additional information that can be included in the asset report. Possible values: `"investments"`'
           x-hidden-from-docs: true
           items:
             type: string
+        add_ons:
+          type: array
+          description: 'Additional information that can be included in the asset report. Possible values: `"investments"`, `"fast_assets"`'
+          x-hidden-from-docs: true
+          items:
+            $ref: '#/components/schemas/AssetReportAddOns'
         user:
           $ref: '#/components/schemas/AssetReportUser'
     AssetReportCreateResponse:
@@ -30459,6 +30851,13 @@ components:
           type: string
           nullable: true
           description: The user's email address.
+    AssetReportAddOns:
+      title: AssetReportAddOns
+      enum:
+      - investments
+      - fast_assets
+      description: A list of add-ons that should be included in the Asset Report
+      type: string
     AssetReportId:
       title: AssetReportId
       description: A unique ID identifying an Asset Report. Like all Plaid identifiers, this ID is case sensitive.
@@ -30570,10 +30969,10 @@ components:
       description: |-
         How an asset is owned.
 
-        - `association`: Ownership by a corporation, partnership, or unincorporated association, including for-profit and not-for-profit organizations.
-        - `individual`: Ownership by an individual.
-        - `joint`: Joint ownership by multiple parties.
-        - `trust`: Ownership by a revocable or irrevocable trust.
+        `association`: Ownership by a corporation, partnership, or unincorporated association, including for-profit and not-for-profit organizations.
+        `individual`: Ownership by an individual.
+        `joint`: Joint ownership by multiple parties.
+        `trust`: Ownership by a revocable or irrevocable trust.
       nullable: true
       enum:
       - null
@@ -31828,7 +32227,7 @@ components:
 
         `failed` - The user failed one or more steps in the session and was told to contact support.
 
-        `expired` - The Identity Verification attempt was active for more than 48 hours without being completed and was automatically marked as expired.
+        `expired` - The Identity Verification attempt was active for a long period of time without being completed and was automatically marked as expired. Note that sessions currently do not expire. Automatic expiration is expected to be enabled in the future.
 
         `canceled` - The Identity Verification attempt was canceled, either via the dashboard by a user, or via API. The user may have completed part of the session, but has neither failed or passed.
 
@@ -34507,7 +34906,6 @@ components:
           $ref: '#/components/schemas/RequestID'
       required:
       - VOA
-      - VOE
       - request_id
     CreditFreddieMacVerificationOfAssets_VOA_2_4:
       title: CreditFreddieMacVerificationOfAssets_VOA_2_4
@@ -34526,6 +34924,7 @@ components:
     CreditFreddieVerificationOfEmployment_VOE_2_5:
       title: CreditFreddieVerificationOfEmployment_VOE_2_5
       type: object
+      nullable: true
       additionalProperties: true
       description: Verification of Employment Report
       properties:
@@ -34776,6 +35175,7 @@ components:
       required:
       - FirstName
       - LastName
+      - MiddleName
     CreditFreddieVerificationOfEmploymentDeal_VOE_2_5:
       title: CreditFreddieVerificationOfEmploymentDeal_VOE_2_5
       type: object

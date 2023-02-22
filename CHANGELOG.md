@@ -1,3 +1,20 @@
+### 2020-09-14_1.334.0
+- Add "entity_id" field to /transactions/enrich
+
+### 2020-09-14_1.333.0
+- Add "add_ons" field to asset_report/create
+
+### 2020-09-14_1.332.0
+- [Breaking] Remove `/wallet/transaction/list` endpoint
+  - [Note] Determined that `/wallet/transaction/list` is unused
+
+### 2020-09-14_1.331.0
+Add `LinkDeliveryCallbackWebhook`, `LinkUserDeliveryStatusWebhook` for Link Delivery.
+
+### 2020-09-14_1.330.0
+- [Breaking] Remove `options.wallet_id` field in `/payment_initiation/payment/create` and `/payment_initiation/consent/create` request.
+  - [Note] Determined that this field is unused.
+
 ### 2020-09-14_1.229.2
 - Undeprecated the `legal_name` field in the `/link/token/create` request.
 
