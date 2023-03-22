@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.334.0
+  version: 2020-09-14_1.343.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -914,7 +914,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/PlaidError'
           description: Error response
-      description: "`/transactions/refresh` is an optional endpoint for users of the Transactions product. It initiates an on-demand extraction to fetch the newest transactions for an Item. This on-demand extraction takes place in addition to the periodic extractions that automatically occur multiple times a day for any Transactions-enabled Item. If changes to transactions are discovered after calling `/transactions/refresh`, Plaid will fire a webhook: for `/transactions/sync` users, [`SYNC_UPDATES_AVAILABLE`](https://plaid.com/docs/api/products/transactions/#sync_updates_available) will be fired if there are any transactions updated, added, or removed. For users of both `/transactions/sync` and `/transactions/get`, [`TRANSACTIONS_REMOVED`](https://plaid.com/docs/api/products/transactions/#transactions_removed) will be fired if any removed transactions are detected, and [`DEFAULT_UPDATE`](https://plaid.com/docs/api/products/transactions/#default_update) will be fired if any new transactions are detected. New transactions can be fetched by calling `/transactions/get` or `/transactions/sync`. Note that the `/transactions/refresh` endpoint is not supported for Capital One (`ins_128026`) and will result in a `PRODUCT_NOT_SUPPORTED` error if called on an Item from that institution. \n\n`/transactions/refresh` is offered as an add-on to Transactions and has a separate [fee model](/docs/account/billing/#per-request-flat-fee). To request access to this endpoint, submit a [product access request](https://dashboard.plaid.com/team/products) or contact your Plaid account manager."
+      description: |-
+        `/transactions/refresh` is an optional endpoint for users of the Transactions product. It initiates an on-demand extraction to fetch the newest transactions for an Item. This on-demand extraction takes place in addition to the periodic extractions that automatically occur multiple times a day for any Transactions-enabled Item. If changes to transactions are discovered after calling `/transactions/refresh`, Plaid will fire a webhook: for `/transactions/sync` users, [`SYNC_UPDATES_AVAILABLE`](https://plaid.com/docs/api/products/transactions/#sync_updates_available) will be fired if there are any transactions updated, added, or removed. For users of both `/transactions/sync` and `/transactions/get`, [`TRANSACTIONS_REMOVED`](https://plaid.com/docs/api/products/transactions/#transactions_removed) will be fired if any removed transactions are detected, and [`DEFAULT_UPDATE`](https://plaid.com/docs/api/products/transactions/#default_update) will be fired if any new transactions are detected. New transactions can be fetched by calling `/transactions/get` or `/transactions/sync`. Note that the `/transactions/refresh` endpoint is not supported for Capital One (`ins_128026`) and will result in a `PRODUCT_NOT_SUPPORTED` error if called on an Item from that institution.
+
+        `/transactions/refresh` is offered as an add-on to Transactions and has a separate [fee model](/docs/account/billing/#per-request-flat-fee). To request access to this endpoint, submit a [product access request](https://dashboard.plaid.com/team/products) or contact your Plaid account manager.
       requestBody:
         required: true
         content:
@@ -1002,6 +1005,33 @@ paths:
                         unofficial_currency_code: null
                       is_active: true
                       status: MATURE
+                    - account_id: lPNjeW1nR6CDn5okmGQ6hEpMo4lLNoSrzqDff
+                      stream_id: SrBNJZDuUMweodmPmSOeOImwsWt53ZXfJQAfC
+                      category:
+                      - Shops
+                      - Warehouses and Wholesale Stores
+                      category_id: "19051000"
+                      description: Costco Annual Membership
+                      merchant_name: Costco
+                      personal_finance_category:
+                        detailed: GENERAL_MERCHANDISE_SUPERSTORES
+                        primary: GENERAL_MERCHANDISE
+                      first_date: "2022-01-23"
+                      last_date: "2023-01-22"
+                      frequency: ANNUALLY
+                      transaction_ids:
+                      - yqEBJ72cS4jFwcpxJcDuQr94oAQ1R1lMC33D4
+                      - Kz5Hm3cZCgpn4tMEKUGAGD6kAcxMBsEZDSwJJ
+                      average_amount:
+                        amount: 120
+                        iso_currency_code: USD
+                        unofficial_currency_code: null
+                      last_amount:
+                        amount: 120
+                        iso_currency_code: USD
+                        unofficial_currency_code: null
+                      is_active: true
+                      status: MATURE
                     request_id: tbFyCEqkU775ZGG
         default:
           content:
@@ -1014,7 +1044,7 @@ paths:
 
         This endpoint is offered as an add-on to Transactions. To request access to this endpoint, submit a [product access request](https://dashboard.plaid.com/team/products) or contact your Plaid account manager.
 
-        This endpoint can only be called on an Item that has already been initialized with Transactions (either during Link, by specifying it in `/link/token/create`; or after Link, by calling `/transactions/get`). After the [`HISTORICAL_UPDATE`](https://plaid.com/docs/api/products/transactions/#historical_update) webhook has fired, call `/transactions/recurring/get` to receive the Recurring Transactions streams and subscribe to the [`RECURRING_TRANSACTIONS_UPDATE`](https://plaid.com/docs/api/products/transactions/#recurring_transactions_update) webhook.
+        This endpoint can only be called on an Item that has already been initialized with Transactions (either during Link, by specifying it in `/link/token/create`; or after Link, by calling `/transactions/get` or `/transactions/sync`). Once all historical transactions have been fetched, call `/transactions/recurring/get` to receive the Recurring Transactions streams and subscribe to the [`RECURRING_TRANSACTIONS_UPDATE`](https://plaid.com/docs/api/products/transactions/#recurring_transactions_update) webhook. To know when historical transactions have been fetched, if you are using `/transactions/sync` listen for the [`SYNC_UPDATES_AVAILABLE`](https://plaid.com/docs/api/products/transactions/#SyncUpdatesAvailableWebhook-historical-update-complete) webhook and check that the `historical_update_complete` field in the payload is `true`. If using `/transactions/get`, listen for the [`HISTORICAL_UPDATE`](https://plaid.com/docs/api/products/transactions/#historical_update) webhook.
 
         After the initial call, you can call `/transactions/recurring/get` endpoint at any point in the future to retrieve the latest summary of recurring streams. Listen to the [`RECURRING_TRANSACTIONS_UPDATE`](https://plaid.com/docs/api/products/transactions/#recurring_transactions_update) webhook to be notified when new updates are available.
       requestBody:
@@ -1148,7 +1178,7 @@ paths:
 
         Due to the potentially large number of transactions associated with an Item, results are paginated. The `has_more` field specifies if additional calls are necessary to fetch all available transaction updates. Call `/transactions/sync` with the new cursor, pulling all updates, until `has_more` is `false`.
 
-        When retrieving paginated updates, track both the `next_cursor` from the latest response and the original cursor from the first call in which `has_more` was `true`; if a call to `/transactions/sync` fails when retrieving a paginated update, the entire pagination request loop must be restarted beginning with the cursor for the first page of the update, rather than retrying only the single request that failed.
+        When retrieving paginated updates, track both the `next_cursor` from the latest response and the original cursor from the first call in which `has_more` was `true`; if a call to `/transactions/sync` fails when retrieving a paginated update, which can occur as a result of the [`TRANSACTIONS_SYNC_MUTATION_DURING_PAGINATION`](https://plaid.com/docs/errors/transactions/#transactions_sync_mutation_during_pagination) error, the entire pagination request loop must be restarted beginning with the cursor for the first page of the update, rather than retrying only the single request that failed.
 
         Whenever new or updated transaction data becomes available, `/transactions/sync` will provide these updates. Plaid typically checks for new data multiple times a day, but these checks may occur less frequently, such as once a day, depending on the institution. An Item's `status.transactions.last_successful_update` field will show the timestamp of the most recent successful update. To force Plaid to check for new transactions, use the `/transactions/refresh` endpoint.
 
@@ -1192,8 +1222,8 @@ paths:
                           type: merchant
                           logo_url: https://plaid-merchant-logos.plaid.com/walmart_1100.png
                           website: walmart.com
-                          entity_id: plaid_6f2d35f96f1b2ec4af99222c23f70c35
-                        entity_id: plaid_6f2d35f96f1b2ec4af99222c23f70c35
+                          entity_id: O5W5j4dN9OR3E6ypQmjdkWZZRoXEzVMz2ByWM
+                        entity_id: O5W5j4dN9OR3E6ypQmjdkWZZRoXEzVMz2ByWM
                         location:
                           address: 13425 Community Rd
                           city: Poway
@@ -1222,12 +1252,12 @@ paths:
                           type: marketplace
                           logo_url: https://plaid-counterparty-logos.plaid.com/doordash_1.png
                           website: doordash.com
-                          entity_id: plaid_3fefe2ae8fc45d84d9038b6bb5cd1094
+                          entity_id: YNRJg5o2djJLv52nBA1Yn1KpL858egYVo4dpm
                         - name: Burger King
                           type: merchant
                           logo_url: https://plaid-merchant-logos.plaid.com/burger_king_155.png
                           website: burgerking.com
-                          entity_id: plaid_086ef08062de7018e3c74c28a82cb812
+                          entity_id: mVrw538wamwdm22mK8jqpp7qd5br0eeV9o4a1
                         location:
                           address: null
                           city: null
@@ -1237,7 +1267,7 @@ paths:
                           store_number: null
                           lat: null
                           lon: null
-                        entity_id: plaid_086ef08062de7018e3c74c28a82cb812
+                        entity_id: mVrw538wamwdm22mK8jqpp7qd5br0eeV9o4a1
                         logo_url: https://plaid-merchant-logos.plaid.com/burger_king_155.png
                         merchant_name: Burger King
                         payment_channel: online
@@ -1256,7 +1286,7 @@ paths:
       description: |-
         The `/transactions/enrich` endpoint enriches raw transaction data generated by your own banking products or retrieved from other non-Plaid sources.
 
-        The product is currently in beta. To request access, contact enrich-feedback@plaid.com
+        To request access to Enrich, reach out to your Plaid point of contact or send a note to enrich-feedback@plaid.com
       requestBody:
         required: true
         content:
@@ -1297,6 +1327,10 @@ paths:
                       - "011000138"
                       - "011200365"
                       - "011400495"
+                      dtc_numbers:
+                      - "2236"
+                      - "0955"
+                      - "1367"
                       oauth: false
                       status:
                         item_logins:
@@ -1410,6 +1444,10 @@ paths:
                       - "011000138"
                       - "011200365"
                       - "011400495"
+                      dtc_numbers:
+                      - "2236"
+                      - "0955"
+                      - "1367"
                       oauth: false
                       status:
                         item_logins:
@@ -1520,6 +1558,10 @@ paths:
                       - "011000138"
                       - "011200365"
                       - "011400495"
+                      dtc_numbers:
+                      - "2236"
+                      - "0955"
+                      - "1367"
                       oauth: false
                       status:
                         item_logins:
@@ -2387,6 +2429,31 @@ paths:
                         summary: match
                       phone_number:
                         summary: match
+                    risk_check:
+                      status: success
+                      behavior:
+                        user_interactions: risky
+                        fraud_ring_detected: "yes"
+                        bot_detected: "yes"
+                      email:
+                        is_deliverable: "yes"
+                        breach_count: 1
+                        first_breached_at: "1990-05-29"
+                        last_breached_at: "1990-05-29"
+                        domain_registered_at: "1990-05-29"
+                        domain_is_free_provider: "yes"
+                        domain_is_custom: "yes"
+                        domain_is_disposable: "yes"
+                        top_level_domain_is_suspicious: "yes"
+                        linked_services:
+                        - apple
+                      phone:
+                        linked_services:
+                        - apple
+                      devices:
+                      - ip_proxy_type: none_detected
+                        ip_spam_list_count: 1
+                        ip_timezone_offset: "+06:00:00"
                     watchlist_screening_id: scr_52xR9LKo77r1Np
                     redacted_at: "2020-07-24T03:26:02Z"
                     request_id: saKrIBuEB9qJZng
@@ -2490,6 +2557,31 @@ paths:
                         summary: match
                       phone_number:
                         summary: match
+                    risk_check:
+                      status: success
+                      behavior:
+                        user_interactions: risky
+                        fraud_ring_detected: "yes"
+                        bot_detected: "yes"
+                      email:
+                        is_deliverable: "yes"
+                        breach_count: 1
+                        first_breached_at: "1990-05-29"
+                        last_breached_at: "1990-05-29"
+                        domain_registered_at: "1990-05-29"
+                        domain_is_free_provider: "yes"
+                        domain_is_custom: "yes"
+                        domain_is_disposable: "yes"
+                        top_level_domain_is_suspicious: "yes"
+                        linked_services:
+                        - apple
+                      phone:
+                        linked_services:
+                        - apple
+                      devices:
+                      - ip_proxy_type: none_detected
+                        ip_spam_list_count: 1
+                        ip_timezone_offset: "+06:00:00"
                     watchlist_screening_id: scr_52xR9LKo77r1Np
                     redacted_at: "2020-07-24T03:26:02Z"
                     request_id: saKrIBuEB9qJZng
@@ -2595,6 +2687,31 @@ paths:
                           summary: match
                         phone_number:
                           summary: match
+                      risk_check:
+                        status: success
+                        behavior:
+                          user_interactions: risky
+                          fraud_ring_detected: "yes"
+                          bot_detected: "yes"
+                        email:
+                          is_deliverable: "yes"
+                          breach_count: 1
+                          first_breached_at: "1990-05-29"
+                          last_breached_at: "1990-05-29"
+                          domain_registered_at: "1990-05-29"
+                          domain_is_free_provider: "yes"
+                          domain_is_custom: "yes"
+                          domain_is_disposable: "yes"
+                          top_level_domain_is_suspicious: "yes"
+                          linked_services:
+                          - apple
+                        phone:
+                          linked_services:
+                          - apple
+                        devices:
+                        - ip_proxy_type: none_detected
+                          ip_spam_list_count: 1
+                          ip_timezone_offset: "+06:00:00"
                       watchlist_screening_id: scr_52xR9LKo77r1Np
                       redacted_at: "2020-07-24T03:26:02Z"
                     next_cursor: eyJkaXJlY3Rpb24iOiJuZXh0Iiwib2Zmc2V0IjoiMTU5NDM
@@ -2706,6 +2823,31 @@ paths:
                         summary: match
                       phone_number:
                         summary: match
+                    risk_check:
+                      status: success
+                      behavior:
+                        user_interactions: risky
+                        fraud_ring_detected: "yes"
+                        bot_detected: "yes"
+                      email:
+                        is_deliverable: "yes"
+                        breach_count: 1
+                        first_breached_at: "1990-05-29"
+                        last_breached_at: "1990-05-29"
+                        domain_registered_at: "1990-05-29"
+                        domain_is_free_provider: "yes"
+                        domain_is_custom: "yes"
+                        domain_is_disposable: "yes"
+                        top_level_domain_is_suspicious: "yes"
+                        linked_services:
+                        - apple
+                      phone:
+                        linked_services:
+                        - apple
+                      devices:
+                      - ip_proxy_type: none_detected
+                        ip_spam_list_count: 1
+                        ip_timezone_offset: "+06:00:00"
                     watchlist_screening_id: scr_52xR9LKo77r1Np
                     redacted_at: "2020-07-24T03:26:02Z"
                     request_id: saKrIBuEB9qJZng
@@ -4306,8 +4448,6 @@ paths:
         To refund partially, specify the amount as part of the request.
         If the amount is not specified, the refund amount will be equal to all
         of the remaining payment amount that has not been refunded yet.
-        If the remaining amount is less than one unit of currency
-        (e.g. 1 GBP or 1 EUR), the refund will fail.
 
         The refund will go back to the source account that initiated the payment.
         The original payment must have been initiated to a Plaid virtual account
@@ -5972,6 +6112,79 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/TransferCapabilitiesGetRequest'
+  /transfer/configuration/get:
+    post:
+      summary: Get transfer product configuration
+      tags:
+      - plaid
+      externalDocs:
+        url: /api/products/transfer/#transferconfigurationget
+      operationId: transferConfigurationGet
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferConfigurationGetResponse'
+              examples:
+                example-1:
+                  value:
+                    max_single_transfer_amount: "1000.00"
+                    max_daily_credit_amount: "50000.00"
+                    max_daily_debit_amount: "50000.00"
+                    max_monthly_amount: "500000.00"
+                    iso_currency_code: USD
+                    request_id: saKrIBuEB9qJZno
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      description: Use the `/transfer/configuration/get` endpoint to view your transfer product configurations.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferConfigurationGetRequest'
+  /transfer/metrics/get:
+    post:
+      summary: Get transfer product usage metrics
+      tags:
+      - plaid
+      externalDocs:
+        url: /api/products/transfer/#transfermetricsget
+      operationId: transferMetricsGet
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferMetricsGetResponse'
+              examples:
+                example-1:
+                  value:
+                    daily_debit_transfer_volume: "1234.56"
+                    daily_credit_transfer_volume: "567.89"
+                    monthly_transfer_volume: "12345.67"
+                    iso_currency_code: USD
+                    request_id: saKrIBuEB9qJZno
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      description: Use the `/transfer/metrics/get` endpoint to view your transfer product usage metrics.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferMetricsGetRequest'
   /transfer/create:
     post:
       summary: Create a transfer
@@ -12640,6 +12853,11 @@ components:
           description: The set of bank income verifications for the Link session.
           items:
             $ref: '#/components/schemas/CreditSessionBankIncomeResult'
+        bank_employment_results:
+          type: array
+          description: The set of bank employment verifications for the Link session.
+          items:
+            $ref: '#/components/schemas/CreditSessionBankEmploymentResult'
         payroll_income_results:
           type: array
           description: The set of payroll income verifications for the Link session.
@@ -12666,6 +12884,18 @@ components:
       properties:
         status:
           $ref: '#/components/schemas/CreditSessionBankIncomeStatus'
+        item_id:
+          description: The Plaid Item ID. The `item_id` is always unique; linking the same account at the same institution twice will result in two Items with different `item_id` values. Like all Plaid identifiers, the `item_id` is case-sensitive.
+          type: string
+        institution_id:
+          description: The Plaid Institution ID associated with the Item.
+          type: string
+    CreditSessionBankEmploymentResult:
+      type: object
+      description: The details of a bank employment verification in Link.
+      properties:
+        status:
+          $ref: '#/components/schemas/CreditSessionBankEmploymentStatus'
         item_id:
           description: The Plaid Item ID. The `item_id` is always unique; linking the same account at the same institution twice will result in two Items with different `item_id` values. Like all Plaid identifiers, the `item_id` is case-sensitive.
           type: string
@@ -12733,6 +12963,20 @@ components:
         `NO_DEPOSITS_FOUND`: We attempted, but were unable to find any income in the connected account.
 
         `USER_REPORTED_NO_INCOME`: The user explicitly indicated that they don't receive income in the connected account.
+    CreditSessionBankEmploymentStatus:
+      type: string
+      enum:
+      - APPROVED
+      - NO_EMPLOYERS_FOUND
+      - EMPLOYER_NOT_LISTED
+      description: |-
+        The terminal status of the bank employment verification.
+
+        `APPROVED`: User has approved and verified their employment.
+
+        `NO_EMPLOYMENTS_FOUND`: We attempted, but were unable to find any employment in the connected account.
+
+        `EMPLOYER_NOT_LISTED`: The user explicitly indicated that they did not see their current or previous employer in the list of employer names found.
     CreditPayStubPayBasisType:
       type: string
       description: The explicit pay basis on the paystub (if present).
@@ -13333,6 +13577,8 @@ components:
           - i2c
           - wepay
           - riskified
+          - utb
+          - adp_roll
           description: The processor you are integrating with.
       required:
       - access_token
@@ -13511,7 +13757,7 @@ components:
         language:
           type: string
           description: |-
-            The language that Link should be displayed in.
+            The language that Link should be displayed in. When initializing with Identity Verification, this field is not used; for more details, see [Identity Verification supported languages](https://www.plaid.com/docs/identity-verification/#supported-languages).
 
             Supported languages are:
             - Danish (`'da'`)
@@ -13524,7 +13770,8 @@ components:
             - Latvian (`'lv'`)
             - Lithuanian (`'lt'`)
             - Norwegian (`'no'`)
-            - Polish (`'po'`)
+            - Polish (`'pl'`)
+            - Portuguese (`'pt'`)
             - Romanian (`'ro'`)
             - Spanish (`'es'`)
             - Swedish (`'se'`)
@@ -13535,9 +13782,9 @@ components:
           description: |-
             Specify an array of Plaid-supported country codes using the ISO-3166-1 alpha-2 country code standard. Institutions from all listed countries will be shown. For a complete mapping of supported products by country, see https://plaid.com/global/.
 
-            If Link is launched with multiple country codes, only products that you are enabled for in all countries will be used by Link. Note that while all countries are enabled by default in Sandbox and Development, in Production only US and Canada are enabled by default. To gain access to European institutions in the Production environment, [file a product access Support ticket](https://dashboard.plaid.com/support/new/product-and-development/product-troubleshooting/request-product-access) via the Plaid dashboard. If you initialize with a European country code, your users will see the European consent panel during the Link flow.
+            If Link is launched with multiple country codes, only products that you are enabled for in all countries will be used by Link. Note that while all countries are enabled by default in Sandbox and Development, in Production only US and Canada are enabled by default. Access to European institutions requires additional compliance steps. To request access to European institutions in the Production environment, [file a product access Support ticket](https://dashboard.plaid.com/support/new/product-and-development/product-troubleshooting/request-product-access) via the Plaid dashboard. If you initialize with a European country code, your users will see the European consent panel during the Link flow.
 
-            If using a Link customization, make sure the country codes in the customization match those specified in `country_codes`. If both `country_codes` and a Link customization are used, the value in `country_codes` may override the value in the customization.
+            If using a Link customization, make sure the country codes in the customization match those specified in `country_codes`, or the customization may not be applied.
 
             If using the Auth features Instant Match, Same-day Micro-deposits, or Automated Micro-deposits, `country_codes` must be set to `['US']`.
           items:
@@ -13572,6 +13819,7 @@ components:
           - standing_orders
           - transactions
           - transfer
+          - signal
         additional_consented_products:
           type: array
           description: |-
@@ -13589,9 +13837,10 @@ components:
           - investments
           - liabilities
           - transactions
+          - signal
         webhook:
           type: string
-          description: The destination URL to which any webhooks should be sent.
+          description: The destination URL to which any webhooks should be sent. Note that webhooks for Payment Initiation, Transfer, Bank Transfer (including Auth micro-deposit notification webhooks) and Identity Verification are configured via the Dashboard instead.
         access_token:
           type: string
           description: The `access_token` associated with the Item to update or reference, used when updating, modifying, or accessing an existing `access_token`. Used when launching Link in update mode, when completing the Same-day (manual) Micro-deposit flow, or (optionally) when initializing Link for a returning user as part of the Transfer UI flow.
@@ -13807,7 +14056,7 @@ components:
           description: The user's full legal name, used for [micro-deposit based verification flows](https://plaid.com/docs/auth/coverage/). For a small number of customers on legacy flows, providing this field is required to enable micro-deposit-based flows. For all other customers, this field is optional, but providing the user's name in this field when using micro-deposit-based verification will enable certain risk checks and can reduce micro-deposit fraud.
         name:
           allOf:
-          - $ref: '#/components/schemas/UserName'
+          - $ref: '#/components/schemas/IdentityVerificationRequestUserName'
           - description: The user's full name. Optional if using the [Identity Verification](https://plaid.com/docs/api/products/identity-verification) product; if not using Identity Verification, this field is not allowed. Users will not be asked for their name when this field is provided.
         phone_number:
           type: string
@@ -14357,6 +14606,43 @@ components:
       - sarsep
       - payroll
       - null
+    LinkEventName:
+      title: LinkEventName
+      description: A string representing the event that has just occurred in the Link flow.
+      type: string
+      enum:
+      - BANK_INCOME_INSIGHTS_COMPLETED
+      - CLOSE_OAUTH
+      - ERROR
+      - EXIT
+      - FAIL_OAUTH
+      - HANDOFF
+      - OPEN
+      - OPEN_MY_PLAID
+      - OPEN_OAUTH
+      - SEARCH_INSTITUTION
+      - SELECT_AUTH_TYPE
+      - SELECT_BRAND
+      - SELECT_DEGRADED_INSTITUTION
+      - SELECT_DOWN_INSTITUTION
+      - SELECT_INSTITUTION
+      - SUBMIT_ACCOUNT_NUMBER
+      - SUBMIT_CREDENTIALS
+      - SUBMIT_DOCUMENTS
+      - SUBMIT_DOCUMENTS_ERROR
+      - SUBMIT_DOCUMENTS_SUCCESS
+      - SUBMIT_MFA
+      - SUBMIT_ROUTING_NUMBER
+      - TRANSITION_VIEW
+      - VIEW_DATA_TYPES
+    LinkDeliveryWebhookCallbackType:
+      title: LinkDeliveryWebhookCallbackType
+      description: The type of Link callback event
+      type: string
+      enum:
+      - ON_SUCCESS
+      - ON_EVENT
+      - ON_EXIT
     LinkDeliveryWebhookCommunicationMethod:
       title: LinkDeliveryWebhookCommunicationMethod
       description: The communication method used to deliver the hosted link session
@@ -14440,9 +14726,10 @@ components:
       description: Information related to the callback from the hosted Link session.
       x-hidden-from-docs: true
       properties:
+        callback_type:
+          $ref: '#/components/schemas/LinkDeliveryWebhookCallbackType'
         event_name:
-          type: string
-          description: Name of the Link callback e.g `onEvent`, `onExit`, `onSuccess`
+          $ref: '#/components/schemas/LinkEventName'
         status:
           type: string
           description: Indicates where in the flow the Link user exited
@@ -15065,6 +15352,8 @@ components:
 
         `MONTHLY`: Assigned to a transaction stream that occurs approximately every month.
 
+        `ANNUALLY`: Assigned to a transaction stream that occurs approximately every year.
+
         `UNKNOWN`: Assigned to a transaction stream that does not fit any of the pre-defined frequencies.
       title: RecurringTransactionFrequency
       enum:
@@ -15073,12 +15362,13 @@ components:
       - BIWEEKLY
       - SEMI_MONTHLY
       - MONTHLY
+      - ANNUALLY
     TransactionStreamStatus:
       type: string
       description: |-
         The current status of the transaction stream.
 
-        `MATURE`: A `MATURE` recurring stream should have at least 3 transactions and happen on a regular cadence.
+        `MATURE`: A `MATURE` recurring stream should have at least 3 transactions and happen on a regular cadence (For Annual recurring stream, we will mark it `MATURE` after 2 instances).
 
         `EARLY_DETECTION`: When a recurring transaction first appears in the transaction history and before it fulfills the requirement of a mature stream, the status will be `EARLY_DETECTION`.
 
@@ -15123,11 +15413,16 @@ components:
           nullable: true
         logo:
           type: string
-          description: Base64 encoded representation of the institution's logo
+          description: Base64 encoded representation of the institution's logo, returned as a base64 encoded 152x152 PNG. Not all institutions' logos are available.
           nullable: true
         routing_numbers:
           type: array
           description: A partial list of routing numbers associated with the institution. This list is provided for the purpose of looking up institutions by routing number. It is not comprehensive and should never be used as a complete list of routing numbers for an institution.
+          items:
+            type: string
+        dtc_numbers:
+          type: array
+          description: A partial list of DTC numbers associated with the institution.
           items:
             type: string
         oauth:
@@ -15260,6 +15555,7 @@ components:
       - EE
       - LT
       - LV
+      - PT
       description: ISO-3166-1 alpha-2 country code standard.
     PaymentMeta:
       title: PaymentMeta
@@ -15824,7 +16120,7 @@ components:
       title: IdentityDefaultUpdateWebhook
       type: object
       additionalProperties: true
-      description: Fired when a change to identity data has been detected on an Item.
+      description: Fired when a change to identity data has been detected on an Item. Items are checked for identity updates every 30-90 days. We recommend that upon receiving this webhook you make another call to `/identity/get` to fetch the user's latest identity data.
       properties:
         webhook_type:
           type: string
@@ -16762,7 +17058,7 @@ components:
       title: PaymentInitiationAddress
       type: object
       additionalProperties: true
-      description: The optional address of the payment recipient.
+      description: The optional address of the payment recipient. Required by most institutions outside of the UK.
       nullable: true
       properties:
         street:
@@ -16894,7 +17190,7 @@ components:
           nullable: true
           minLength: 15
           maxLength: 34
-          description: The International Bank Account Number (IBAN) for the payer's account. If provided, the end user will be able to set up payment consent using only the specified bank account.
+          description: The International Bank Account Number (IBAN) for the payer's account. Where possible, the end user will be able to set up payment consent using only the specified bank account if provided.
         bacs:
           $ref: '#/components/schemas/PaymentInitiationOptionalRestrictionBacs'
     PaymentInitiationConsentConstraints:
@@ -16945,7 +17241,7 @@ components:
           nullable: true
           minLength: 15
           maxLength: 34
-          description: The International Bank Account Number (IBAN) for the payer's account. If provided, the end user will be able to send payments only from the specified bank account.
+          description: The International Bank Account Number (IBAN) for the payer's account. Where possible, the end user will be able to send payments only from the specified bank account if provided.
         bacs:
           $ref: '#/components/schemas/PaymentInitiationOptionalRestrictionBacs'
         scheme:
@@ -17002,6 +17298,7 @@ components:
       - transfer
       - employment
       - recurring_transactions
+      - signal
       description: A list of products that an institution can support. All Items must be initialized with at least one product. The Balance product is always available and does not need to be specified during initialization.
       type: string
     ProductStatus:
@@ -17806,6 +18103,33 @@ components:
             error_type: ITEM_ERROR
             status: 400
           environment: production
+    ItemLoginRepairedWebhook:
+      title: ItemLoginRepairedWebhook
+      type: object
+      additionalProperties: true
+      description: Fired when an Item login is repaired and the Item no longer needs to go through update mode. This will occur when the user completed the update mode flow for the Item, either in your application or in another Plaid-connected app. If you have messaging that tells the user to complete the update mode flow (such as in-app banners or out-of-band notifications) you should silence this messaging upon receiving the `LOGIN_REPAIRED` webhook.
+      properties:
+        webhook_type:
+          type: string
+          description: '`ITEM`'
+        webhook_code:
+          type: string
+          description: '`LOGIN_REPAIRED`'
+        item_id:
+          $ref: '#/components/schemas/ItemId'
+        environment:
+          $ref: '#/components/schemas/WebhookEnvironmentValues'
+      required:
+      - webhook_type
+      - webhook_code
+      - item_id
+      - environment
+      x-examples:
+        example-1:
+          webhook_type: ITEM
+          webhook_code: LOGIN_REPAIRED
+          item_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
+          environment: production
     ItemProductReadyWebhook:
       title: ItemProductReadyWebhook
       type: object
@@ -18279,7 +18603,8 @@ components:
         value:
           type: number
           format: double
-          description: The amount of the payment. Must contain at most two digits of precision e.g. `1.23`. Minimum accepted value is `1`.
+          minimum: 0.01
+          description: The amount of the payment. Must contain at most two digits of precision e.g. `1.23`.
       required:
       - currency
       - value
@@ -18821,7 +19146,6 @@ components:
           original_start_date: "2017-09-14"
           adjusted_start_date: "2017-09-15"
           timestamp: "2017-09-14T14:42:19.350Z"
-          error: null
           environment: production
       properties:
         webhook_type:
@@ -18833,6 +19157,10 @@ components:
         payment_id:
           type: string
           description: The `payment_id` for the payment being updated
+        transaction_id:
+          type: string
+          description: The transaction ID that this payment is associated with, if any. This is present only when a payment was initiated using virtual accounts.
+          nullable: true
         new_payment_status:
           $ref: '#/components/schemas/PaymentInitiationPaymentStatus'
         old_payment_status:
@@ -18884,6 +19212,8 @@ components:
           webhook_type: WALLET
           webhook_code: WALLET_TRANSACTION_STATUS_UPDATE
           transaction_id: wallet-transaction-id-production-2ba30780-d549-4335-b1fe-c2a938aa39d2
+          payment_id: payment-id-production-feca8a7a-5591-4aef-9297-f3062bb735d3
+          wallet_id: wallet-id-production-53e58b32-fc1c-46fe-bbd6-e584b27a88
           new_status: SETTLED
           old_status: INITIATED
           timestamp: "2017-09-14T14:42:19.350Z"
@@ -18898,6 +19228,13 @@ components:
         transaction_id:
           type: string
           description: The `transaction_id` for the wallet transaction being updated
+        payment_id:
+          type: string
+          description: The `payment_id` associated with the transaction. This will be present in case of `REFUND` and `PIS_PAY_IN`
+          nullable: true
+        wallet_id:
+          type: string
+          description: The EMI (E-Money Institution) wallet that this payment is associated with. This wallet is used as an intermediary account to enable Plaid to reconcile the settlement of funds for Payment Initiation requests.
         new_status:
           $ref: '#/components/schemas/WalletTransactionStatus'
         old_status:
@@ -19756,6 +20093,10 @@ components:
           $ref: '#/components/schemas/APISecret'
         transfer_id:
           $ref: '#/components/schemas/TransferID'
+        originator_client_id:
+          type: string
+          nullable: true
+          description: The Plaid client ID of the transfer originator. Should only be present if `client_id` is a third-party sender (TPS).
       required:
       - transfer_id
     TransferRecurringGetRequest:
@@ -20942,6 +21283,32 @@ components:
           $ref: '#/components/schemas/TransferAccountID'
         payment_profile_token:
           $ref: '#/components/schemas/PaymentProfileToken'
+    TransferConfigurationGetRequest:
+      title: TransferConfigurationGetRequest
+      type: object
+      description: Defines the request schema for `/transfer/configuration/get`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        originator_client_id:
+          type: string
+          nullable: true
+          description: The Plaid client ID of the transfer originator. Should only be present if `client_id` is a third-party sender (TPS).
+    TransferMetricsGetRequest:
+      title: TransferMetricsGetRequest
+      type: object
+      description: Defines the request schema for `/transfer/metrics/get`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        originator_client_id:
+          type: string
+          nullable: true
+          description: The Plaid client ID of the transfer originator. Should only be present if `client_id` is a third-party sender (TPS).
     TransferCreateRequest:
       title: TransferCreateRequest
       type: object
@@ -20976,7 +21343,7 @@ components:
           $ref: '#/components/schemas/TransferAmount'
         description:
           type: string
-          description: The transfer description. Maximum of 10 characters.
+          description: The transfer description. Maximum of 10 characters. If reprocessing a returned transfer, please note that the `description` field must be `"Retry"` to indicate that it's a retry of a previously returned transfer. You may retry a transfer up to 2 times, within 180 days of creating the original transfer. Only transfers that were returned with code `R01` or `R09` may be retried. For a full listing of ACH return codes, see [Transfer errors](https://plaid.com/docs/errors/transfer/#ach-return-codes).
           maxLength: 10
         ach_class:
           x-hidden-from-docs: true
@@ -21140,6 +21507,62 @@ components:
       required:
       - institution_supported_networks
       - request_id
+    TransferConfigurationGetResponse:
+      title: TransferConfigurationGetResponse
+      type: object
+      additionalProperties: true
+      description: Defines the response schema for `/transfer/configuration/get`
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+        max_single_transfer_amount:
+          type: string
+          description: The max limit of dollar amount of a single transfer (decimal string with two digits of precision e.g. "10.00").
+        max_daily_credit_amount:
+          type: string
+          description: The max limit of sum of dollar amount of credit transfers in last 24 hours (decimal string with two digits of precision e.g. "10.00").
+        max_daily_debit_amount:
+          type: string
+          description: The max limit of sum of dollar amount of debit transfers in last 24 hours (decimal string with two digits of precision e.g. "10.00").
+        max_monthly_amount:
+          type: string
+          description: The max limit of sum of dollar amount of credit and debit transfers in one calendar month (decimal string with two digits of precision e.g. "10.00").
+        iso_currency_code:
+          type: string
+          description: The currency of the dollar amount, e.g. "USD".
+      required:
+      - request_id
+      - max_single_transfer_amount
+      - max_daily_credit_amount
+      - max_daily_debit_amount
+      - max_monthly_amount
+      - iso_currency_code
+    TransferMetricsGetResponse:
+      title: TransferMetricsGetResponse
+      type: object
+      additionalProperties: true
+      description: Defines the response schema for `/transfer/metrics/get`
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+        daily_debit_transfer_volume:
+          type: string
+          description: Sum of dollar amount of debit transfers in last 24 hours (decimal string with two digits of precision e.g. "10.00").
+        daily_credit_transfer_volume:
+          type: string
+          description: Sum of dollar amount of credit transfers in last 24 hours (decimal string with two digits of precision e.g. "10.00").
+        monthly_transfer_volume:
+          type: string
+          description: Sum of dollar amount of credit and debit transfers in current calendar month (decimal string with two digits of precision e.g. "10.00").
+        iso_currency_code:
+          type: string
+          description: The currency of the dollar amount, e.g. "USD".
+      required:
+      - request_id
+      - daily_debit_transfer_volume
+      - daily_credit_transfer_volume
+      - monthly_transfer_volume
+      - iso_currency_code
     TransferAuthorizationDecision:
       type: string
       description: |2-
@@ -21425,6 +21848,10 @@ components:
           $ref: '#/components/schemas/APISecret'
         transfer_id:
           $ref: '#/components/schemas/TransferID'
+        originator_client_id:
+          type: string
+          nullable: true
+          description: The Plaid client ID of the transfer originator. Should only be present if `client_id` is a third-party sender (TPS).
       required:
       - transfer_id
     TransferRecurringCancelRequest:
@@ -23217,7 +23644,7 @@ components:
         is_first_name_or_last_name_match:
           type: boolean
           nullable: true
-          description: first or last name completely matched
+          description: first or last name completely matched, likely a family member
         is_nickname_match:
           type: boolean
           nullable: true
@@ -23225,13 +23652,13 @@ components:
         is_business_name_detected:
           type: boolean
           nullable: true
-          description: If the name on either of the names that was matched for the score was a business name, with corp, llc, ltd etc in the name. While this being true confirms business name, false means it was either not a business name or Plaid could not detect it as such, since a lot of business names match owner names and are hard to detect.
+          description: Is `true` if the name on either of the names that was matched for the score contained strings indicative of a business name, such as "CORP", "LLC", "INC", or "LTD". A `true` result generally indicates the entity is a business. However, a `false` result does not mean the entity is not a business, as some businesses do not use these strings in the names used for their financial institution accounts.
     PhoneNumberMatchScore:
       title: PhoneNumberMatchScore
       type: object
       nullable: true
       additionalProperties: true
-      description: Score found by matching phone number provided by the API with the phone number on the account at the financial institution. If the account contains multiple owners, the maximum match score is filled.
+      description: Score found by matching phone number provided by the API with the phone number on the account at the financial institution. 100 is a perfect match and 0 is a no match. If the account contains multiple owners, the maximum match score is filled.
       properties:
         score:
           type: integer
@@ -23242,7 +23669,7 @@ components:
       type: object
       nullable: true
       additionalProperties: true
-      description: Score found by matching email provided by the API with the email on the account at the financial institution. If the account contains multiple owners, the maximum match score is filled.
+      description: Score found by matching email provided by the API with the email on the account at the financial institution. 100 is a perfect match and 0 is a no match. If the account contains multiple owners, the maximum match score is filled.
       properties:
         score:
           type: integer
@@ -23253,12 +23680,12 @@ components:
       type: object
       nullable: true
       additionalProperties: true
-      description: Score found by matching address provided by the API with the address on the account at the financial institution. If the account contains multiple owners, the maximum match score is filled.
+      description: Score found by matching address provided by the API with the address on the account at the financial institution. The score can range from 0 to 100 where 100 is a perfect match and 0 is a no match. If the account contains multiple owners, the maximum match score is filled.
       properties:
         score:
           type: integer
           nullable: true
-          description: Match score for address. 100 is a perfect match and 0 is a no match. If the address is missing from either the API or financial institution, this is empty.
+          description: Match score for address. The score can range from 0 to 100 where 100 is a perfect match and 0 is a no match. If the address is missing from either the API or financial institution, this is empty.
         is_postal_code_match:
           type: boolean
           nullable: true
@@ -23751,6 +24178,10 @@ components:
           type: boolean
           description: An identifier to indicate whether the income verification Link token will be used for an update or not
           default: false
+        item_id_to_update:
+          type: string
+          description: Uniquely identify a payroll income item to update with. It should only be used for update mode.
+          nullable: true
     IncomeVerificationPayrollFlowType:
       title: IncomeVerificationPayrollFlowType
       enum:
@@ -25626,6 +26057,7 @@ components:
       - BIWEEKLY
       - SEMI_MONTHLY
       - MONTHLY
+      - DAILY
       - UNKNOWN
     CreditIsoCurrencyCode:
       type: string
@@ -27316,6 +27748,23 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_token:
           $ref: '#/components/schemas/UserToken'
+        options:
+          $ref: '#/components/schemas/CreditPayrollIncomeRefreshRequestOptions'
+      required:
+      - user_token
+    CreditPayrollIncomeRefreshRequestOptions:
+      description: An optional object for `/credit/payroll_income/refresh` request options.
+      type: object
+      additionalProperties: true
+      properties:
+        item_ids:
+          type: array
+          items:
+            type: string
+          description: An array of `item_id`s to be refreshed. Each `item_id` should uniquely identify a payroll income item.
+        webhook:
+          type: string
+          description: The URL where Plaid will send the payroll income refresh webhook.
     CreditPayrollIncomeRefreshResponse:
       title: CreditPayrollIncomeRefreshResponse
       type: object
@@ -28096,11 +28545,83 @@ components:
           description: A list of activities.
           items:
             $ref: '#/components/schemas/Activity'
+        last_data_access_times:
+          type: array
+          description: An array of objects containing timestamps for the last time each data type was accessed per application.
+          items:
+            $ref: '#/components/schemas/LastDataAccessTimes'
         cursor:
           type: string
           description: Cursor used for pagination.
       required:
       - activities
+      - last_data_access_times
+    LastDataAccessTimes:
+      description: Describes the last time each datatype was accessed by an application.
+      type: object
+      additionalProperties: true
+      properties:
+        application_id:
+          type: string
+          description: ID of the application accessing data.
+        account_balance_info:
+          type: string
+          nullable: true
+          format: date-time
+          description: The last time account_balance_info was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
+          example: "2023-02-08T10:00:00Z"
+        account_routing_number:
+          type: string
+          nullable: true
+          format: date-time
+          description: The last time account_routing_number was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
+          example: "2023-02-08T10:00:00Z"
+        contact_details:
+          type: string
+          nullable: true
+          format: date-time
+          description: The last time contact_details was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
+          example: "2023-02-08T10:00:00Z"
+        transactions:
+          type: string
+          nullable: true
+          format: date-time
+          description: The last time transactions was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
+          example: "2023-02-08T10:00:00Z"
+        credit_and_loans:
+          type: string
+          nullable: true
+          format: date-time
+          description: The last time credit_and_loans was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
+          example: "2023-02-08T10:00:00Z"
+        investments:
+          type: string
+          nullable: true
+          format: date-time
+          description: The last time investments was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
+          example: "2023-02-08T10:00:00Z"
+        payroll_info:
+          type: string
+          nullable: true
+          format: date-time
+          description: The last time payroll_info was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
+          example: "2023-02-08T10:00:00Z"
+        transaction_risk_info:
+          type: string
+          nullable: true
+          format: date-time
+          description: The last time transaction_risk_info was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
+          example: "2023-02-08T10:00:00Z"
+      required:
+      - application_id
+      - account_balance_info
+      - account_routing_number
+      - contact_details
+      - transactions
+      - credit_and_loans
+      - investments
+      - payroll_info
+      - transaction_risk_info
     Activity:
       description: Describes a consent activity.
       type: object
@@ -28365,6 +28886,11 @@ components:
           $ref: '#/components/schemas/SignalScores'
         core_attributes:
           $ref: '#/components/schemas/SignalEvaluateCoreAttributes'
+        warnings:
+          type: array
+          description: If bank information was not able to be used as features into the Signal model, this array contains warnings describing why we were missing bank data
+          items:
+            $ref: '#/components/schemas/SignalWarning'
       required:
       - request_id
       - scores
@@ -28739,6 +29265,20 @@ components:
           format: date-time
           description: Timestamp in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (YYYY-MM-DDTHH:mm:ssZ) indicating the last time that the transactions for the given account have been updated.
           nullable: true
+    SignalWarning:
+      title: SignalWarning
+      type: object
+      description: Conveys information about the errors causing missing or stale bank data used to construct the /signal/evaluate scores and response
+      properties:
+        warning_type:
+          type: string
+          description: Broad categorization of the warning.
+        warning_code:
+          type: string
+          description: The particular warning code.
+        warning_message:
+          type: string
+          description: A developer-friendly representation of the warning code.
     SignalDecisionReportRequest:
       title: SignalDecisionReportRequest
       description: SignalDecisionReportRequest defines the request schema for `/signal/decision/report`
@@ -29146,7 +29686,7 @@ components:
         value:
           type: number
           format: double
-          minimum: 1
+          minimum: 0.01
           description: The amount of the transaction. Must contain at most two digits of precision e.g. `1.23`.
       required:
       - iso_currency_code
@@ -29472,7 +30012,10 @@ components:
     ClientProvidedTransactionLocation:
       title: ClientProvidedTransactionLocation
       type: object
-      description: "A representation of where a transaction took place. \n\nUse this field to pass in structured location information you may have about your transactions. Providing location data is optional but can increase result quality. If you have unstructured location information, it may be appended to the `description` field."
+      description: |-
+        A representation of where a transaction took place.
+
+        Use this field to pass in structured location information you may have about your transactions. Providing location data is optional but can increase result quality. If you have unstructured location information, it may be appended to the `description` field.
       additionalProperties: true
       properties:
         country:
@@ -29860,6 +30403,7 @@ components:
           - investments
           - liabilities
           - transactions
+          - employment
         create_link_customization:
           description: If `true`, the end customer's default Link customization will be set to match the partner's. You can always change the end customer's Link customization in the Plaid Dashboard. See the [Link Customization docs](https://plaid.com/docs/link/customization/) for more information.
           type: boolean
@@ -30136,7 +30680,7 @@ components:
       - amount
       - iso_currency_code
     PartnerEndCustomerBillingContact:
-      description: The billing contact for the end customer. Defaults to partner's technical contact if omitted.
+      description: The billing contact for the end customer. Defaults to partner's billing contact if omitted.
       type: object
       additionalProperties: true
       properties:
@@ -30192,13 +30736,31 @@ components:
         `EMAIL`: The URL will be delivered through email
     LinkDeliveryCommunicationMethod:
       type: object
+      description: The communication method containing both the type and address to send the URL.
       properties:
         method:
           $ref: '#/components/schemas/LinkDeliveryDeliveryMethod'
         address:
           type: string
-          description: The address to deliver the Link Delivery URL
-      description: The communication method containing both the type and address to send the URL.
+          description: The phone number / email address that link delivery sessions are delivered to. Phone numbers must be in E.164 format.
+    LinkDeliveryRecipient:
+      type: object
+      description: Metadata related to the recipient. If the information required to populate this field is not available, leave it blank.
+      properties:
+        communication_methods:
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkDeliveryCommunicationMethod'
+          description: The list of communication methods to send the Link Delivery URL to. If delivery is not required, leave this field blank.
+        first_name:
+          type: string
+          description: First name of the recipient. Will be used in the body of the email / text (if configured). If this information is not available, leave this field blank.
+    LinkDeliveryOptions:
+      type: object
+      description: Optional metadata related to the link delivery session
+      properties:
+        recipient:
+          $ref: '#/components/schemas/LinkDeliveryRecipient'
     LinkDeliveryCreateRequest:
       type: object
       description: LinkDeliveryCreateRequest defines the request schema for `/link_delivery/create`
@@ -30210,14 +30772,10 @@ components:
         link_token:
           type: string
           description: A `link_token` from a previous invocation of `/link/token/create` with Link Delivery enabled.
-        communication_methods:
-          type: array
-          items:
-            $ref: '#/components/schemas/LinkDeliveryCommunicationMethod'
-          description: The list of communication methods to send the Link Delivery URL to.
+        options:
+          $ref: '#/components/schemas/LinkDeliveryOptions'
       required:
       - link_token
-      - communication_methods
     LinkDeliveryCreateResponse:
       type: object
       additionalProperties: true
@@ -30344,9 +30902,11 @@ components:
       title: CreditCategory
       nullable: true
       type: object
-      x-hidden-from-docs: true
       additionalProperties: true
-      description: Information describing the intent of the transaction. Most relevant for credit use cases, but not limited to such use cases.
+      description: |-
+        Information describing the intent of the transaction. Most relevant for credit use cases, but not limited to such use cases. Please reach out to your account manager or sales representative if you would like to receive this field.
+
+        See the [`taxonomy csv file`](https://plaid.com/documents/credit-category-taxonomy.csv) for a full list of credit categories.
       properties:
         primary:
           type: string
@@ -30372,6 +30932,10 @@ components:
             $ref: '#/components/schemas/AccessToken'
           minItems: 1
           maxItems: 99
+        user_token:
+          type: string
+          description: The user token associated with the User for which to create an asset report for. All items associated with the User will be included in the report.
+          x-hidden-from-docs: true
         days_requested:
           type: integer
           maximum: 731
@@ -30385,7 +30949,6 @@ components:
         report_type:
           $ref: '#/components/schemas/FreddieReportType'
       required:
-      - access_tokens
       - days_requested
     AssetReportCreateRequestOptions:
       type: object
@@ -30414,8 +30977,7 @@ components:
             type: string
         add_ons:
           type: array
-          description: 'Additional information that can be included in the asset report. Possible values: `"investments"`, `"fast_assets"`'
-          x-hidden-from-docs: true
+          description: 'Additional information that can be included in the asset report. Possible values: `"fast_assets"`'
           items:
             $ref: '#/components/schemas/AssetReportAddOns'
         user:
@@ -30560,7 +31122,6 @@ components:
           type: boolean
           default: false
           description: '`true` to fetch "fast" version of asset report. Defaults to false if omitted.'
-          x-hidden-from-docs: true
         options:
           $ref: '#/components/schemas/AssetReportGetRequestOptions'
       required:
@@ -30571,12 +31132,11 @@ components:
       description: An optional object to filter or add data to `/asset_report/get` results. If provided, must be non-`null`.
       properties:
         days_to_include:
-          x-hidden-from-docs: true
           type: integer
           maximum: 731
           minimum: 0
           nullable: true
-          description: The maximum integer number of days of history to include in the Asset Report.
+          description: The maximum number of days of history to include in the Asset Report.
     AssetReportGetResponse:
       type: object
       additionalProperties: true
@@ -30741,6 +31301,9 @@ components:
         asset_report_id:
           type: string
           description: The `asset_report_id` corresponding to the Asset Report the webhook has fired for.
+        report_type:
+          type: string
+          description: The report type specifying whether the asset report is a `full` or `fast` report.
       required:
       - webhook_type
       - webhook_code
@@ -30796,7 +31359,9 @@ components:
           type: string
           enum:
           - OWNERS_UNAVAILABLE
-          description: The warning code identifies a specific kind of warning. Currently, the only possible warning code is `OWNERS_UNAVAILABLE`, which indicates that account-owner information is not available.
+          - INVESTMENTS_UNAVAILABLE
+          - TRANSACTIONS_UNAVAILABLE
+          description: The warning code identifies a specific kind of warning. `OWNERS_UNAVAILABLE` indicates that account-owner information is not available.`INVESTMENTS_UNAVAILABLE` indicates that Investments specific information is not available. `TRANSACTIONS_UNAVAILABLE` indicates that transactions information associated with Credit and Depository accounts are unavailable.
         cause:
           $ref: '#/components/schemas/Cause'
       required:
@@ -31060,6 +31625,7 @@ components:
       - created_at
       - email_address
       - status
+      additionalProperties: true
     DashboardUserGetRequest:
       description: Request input for fetching a dashboard user
       type: object
@@ -31155,6 +31721,7 @@ components:
       - beginning
       - ending
       title: DateRange
+      additionalProperties: true
     DocumentAnalysis:
       description: High level descriptions of how the associated document was processed. If a document fails verification, the details in the `analysis` object should help clarify why the document was rejected.
       type: object
@@ -31169,6 +31736,7 @@ components:
       - authenticity
       - image_quality
       - extracted_data
+      additionalProperties: true
     DocumentAuthenticityMatchCode:
       description: |-
         High level summary of whether the document in the provided image matches the formatting rules and security checks for the associated jurisdiction.
@@ -31266,6 +31834,7 @@ components:
       - status
       - documents
       nullable: true
+      additionalProperties: true
     DocumentaryVerificationDocument:
       type: object
       description: Images, extracted data, and analysis from a user's identity document
@@ -31317,6 +31886,7 @@ components:
       required:
       - type
       - number
+      additionalProperties: true
     EntityDocumentType:
       type: string
       enum:
@@ -31364,6 +31934,7 @@ components:
           example: 1
       required:
       - search_terms_version
+      additionalProperties: true
     EntityScreeningHitData:
       type: object
       description: Information associated with the entity watchlist hit
@@ -31398,6 +31969,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EntityScreeningHitUrlsItems'
+      additionalProperties: true
     EntityScreeningHitDocumentsItems:
       type: object
       description: Analyzed documents for the associated hit
@@ -31406,6 +31978,7 @@ components:
           $ref: '#/components/schemas/MatchSummary'
         data:
           $ref: '#/components/schemas/EntityDocument'
+      additionalProperties: true
     EntityScreeningHitEmails:
       type: object
       description: Email address information for the associated entity watchlist hit
@@ -31414,6 +31987,7 @@ components:
           $ref: '#/components/schemas/EmailAddress'
       required:
       - email_address
+      additionalProperties: true
     EntityScreeningHitEmailsItems:
       type: object
       description: Analyzed emails for the associated hit
@@ -31422,6 +31996,7 @@ components:
           $ref: '#/components/schemas/MatchSummary'
         data:
           $ref: '#/components/schemas/EntityScreeningHitEmails'
+      additionalProperties: true
     EntityScreeningHitNames:
       type: object
       description: Name information for the associated entity watchlist hit
@@ -31440,6 +32015,7 @@ components:
       - full
       - is_primary
       - weak_alias_determination
+      additionalProperties: true
     EntityScreeningHitNamesItems:
       type: object
       description: Analyzed names for the associated hit
@@ -31448,6 +32024,7 @@ components:
           $ref: '#/components/schemas/MatchSummary'
         data:
           $ref: '#/components/schemas/EntityScreeningHitNames'
+      additionalProperties: true
     EntityScreeningHitPhoneNumbers:
       type: object
       description: Phone number information associated with the entity screening hit
@@ -31459,6 +32036,7 @@ components:
       required:
       - type
       - phone_number
+      additionalProperties: true
     EntityScreeningHitUrls:
       type: object
       description: URLs associated with the entity screening hit
@@ -31467,6 +32045,7 @@ components:
           $ref: '#/components/schemas/URL'
       required:
       - url
+      additionalProperties: true
     EntityScreeningHitUrlsItems:
       type: object
       description: Analyzed URLs for the associated hit
@@ -31475,6 +32054,7 @@ components:
           $ref: '#/components/schemas/MatchSummary'
         data:
           $ref: '#/components/schemas/EntityScreeningHitUrls'
+      additionalProperties: true
     EntityScreeningHitsPhoneNumberItems:
       type: object
       description: Analyzed phone numbers for the associated hit
@@ -31483,6 +32063,7 @@ components:
           $ref: '#/components/schemas/MatchSummary'
         data:
           $ref: '#/components/schemas/EntityScreeningHitPhoneNumbers'
+      additionalProperties: true
     EntityWatchlistCode:
       type: string
       enum:
@@ -31541,6 +32122,7 @@ components:
       - name_sensitivity
       - audit_trail
       - is_archived
+      additionalProperties: true
     EntityWatchlistProgramID:
       type: string
       example: entprg_2eRPsDnL66rZ7H
@@ -31570,6 +32152,7 @@ components:
       - audit_trail
       title: EntityWatchlistScreening
       description: 'The entity screening object allows you to represent an entity in your system, update its profile, and search for it on various watchlists. Note: Rejected entity screenings will not receive new hits, regardless of entity program configuration.'
+      additionalProperties: true
     EntityWatchlistScreeningHit:
       type: object
       description: Data from a government watchlist that has been attached to the screening.
@@ -31604,6 +32187,7 @@ components:
       - list_code
       - plaid_uid
       - source_uid
+      additionalProperties: true
     EntityWatchlistScreeningHitID:
       type: string
       example: enthit_52xR9LKo77r1Np
@@ -31655,6 +32239,7 @@ components:
       - dismissed_hits
       - comment
       - audit_trail
+      additionalProperties: true
     EntityWatchlistScreeningReviewID:
       type: string
       title: EntityWatchlistScreeningReviewID
@@ -31691,6 +32276,7 @@ components:
       - phone_number
       - url
       - version
+      additionalProperties: true
     EntityWatchlistSearchTerms:
       type: object
       required:
@@ -31749,6 +32335,7 @@ components:
           $ref: '#/components/schemas/MatchSummary'
         data:
           $ref: '#/components/schemas/WatchlistScreeningHitLocations'
+      additionalProperties: true
     GivenNameField:
       type: string
       example: Leslie
@@ -31856,6 +32443,8 @@ components:
           $ref: '#/components/schemas/DocumentaryVerification'
         kyc_check:
           $ref: '#/components/schemas/KYCCheckDetails'
+        risk_check:
+          $ref: '#/components/schemas/RiskCheckDetails'
         watchlist_screening_id:
           $ref: '#/components/schemas/WatchlistScreeningIndividualIDNullable'
         redacted_at:
@@ -31873,6 +32462,7 @@ components:
       - steps
       - documentary_verification
       - kyc_check
+      - risk_check
       - watchlist_screening_id
       - redacted_at
     IdentityVerificationConsent:
@@ -31938,6 +32528,8 @@ components:
           $ref: '#/components/schemas/DocumentaryVerification'
         kyc_check:
           $ref: '#/components/schemas/KYCCheckDetails'
+        risk_check:
+          $ref: '#/components/schemas/RiskCheckDetails'
         watchlist_screening_id:
           $ref: '#/components/schemas/WatchlistScreeningIndividualIDNullable'
         redacted_at:
@@ -31957,6 +32549,7 @@ components:
       - steps
       - documentary_verification
       - kyc_check
+      - risk_check
       - watchlist_screening_id
       - redacted_at
       - request_id
@@ -32001,6 +32594,8 @@ components:
           $ref: '#/components/schemas/DocumentaryVerification'
         kyc_check:
           $ref: '#/components/schemas/KYCCheckDetails'
+        risk_check:
+          $ref: '#/components/schemas/RiskCheckDetails'
         watchlist_screening_id:
           $ref: '#/components/schemas/WatchlistScreeningIndividualIDNullable'
         redacted_at:
@@ -32020,6 +32615,7 @@ components:
       - steps
       - documentary_verification
       - kyc_check
+      - risk_check
       - watchlist_screening_id
       - redacted_at
       - request_id
@@ -32095,13 +32691,39 @@ components:
         date_of_birth:
           $ref: '#/components/schemas/ISO8601Date'
         name:
-          $ref: '#/components/schemas/UserName'
+          $ref: '#/components/schemas/IdentityVerificationRequestUserName'
         address:
           $ref: '#/components/schemas/UserAddress'
         id_number:
           $ref: '#/components/schemas/UserIDNumber'
       required:
       - client_user_id
+      additionalProperties: true
+    IdentityVerificationRequestUserName:
+      type: object
+      properties:
+        given_name:
+          $ref: '#/components/schemas/GivenNameField'
+        family_name:
+          $ref: '#/components/schemas/FamilyNameField'
+      required:
+      - given_name
+      - family_name
+      description: You can use this field to pre-populate the user's legal name; if it is provided here, they will not be prompted to enter their name in the identity verification attempt.
+      nullable: true
+    IdentityVerificationResponseUserName:
+      type: object
+      properties:
+        given_name:
+          $ref: '#/components/schemas/GivenNameField'
+        family_name:
+          $ref: '#/components/schemas/FamilyNameField'
+      required:
+      - given_name
+      - family_name
+      description: The full name provided by the user. If the user has not submitted their name, this field will be null. Otherwise, both fields are guaranteed to be filled.
+      additionalProperties: true
+      nullable: true
     IdentityVerificationRetryRequest:
       type: object
       description: Request input for retrying an identity verification attempt
@@ -32183,6 +32805,8 @@ components:
           $ref: '#/components/schemas/DocumentaryVerification'
         kyc_check:
           $ref: '#/components/schemas/KYCCheckDetails'
+        risk_check:
+          $ref: '#/components/schemas/RiskCheckDetails'
         watchlist_screening_id:
           $ref: '#/components/schemas/WatchlistScreeningIndividualIDNullable'
         redacted_at:
@@ -32202,6 +32826,7 @@ components:
       - steps
       - documentary_verification
       - kyc_check
+      - risk_check
       - watchlist_screening_id
       - redacted_at
       - request_id
@@ -32299,6 +32924,7 @@ components:
           $ref: '#/components/schemas/IdentityVerificationStepStatus'
         risk_check:
           $ref: '#/components/schemas/IdentityVerificationStepStatus'
+      additionalProperties: true
     IdentityVerificationTemplateID:
       type: string
       example: idvtmp_4FrXJvfQU3zGUR
@@ -32315,6 +32941,7 @@ components:
       - id
       - version
       description: The resource ID and version number of the template configuring the behavior of a given identity verification.
+      additionalProperties: true
     IdentityVerificationTemplateVersion:
       type: number
       example: 2
@@ -32349,6 +32976,7 @@ components:
       - postal_code
       - country
       nullable: true
+      additionalProperties: true
     IdentityVerificationUserData:
       type: object
       properties:
@@ -32361,7 +32989,7 @@ components:
         email_address:
           $ref: '#/components/schemas/EmailAddressNullable'
         name:
-          $ref: '#/components/schemas/UserName'
+          $ref: '#/components/schemas/IdentityVerificationResponseUserName'
         address:
           $ref: '#/components/schemas/IdentityVerificationUserAddress'
         id_number:
@@ -32374,6 +33002,7 @@ components:
       - address
       - id_number
       description: The identity data that was either collected from the user or provided via API in order to perform an identity verification.
+      additionalProperties: true
     IdentityVerificationUserPhoneNumber:
       type: string
       description: A phone number in E.164 format.
@@ -32411,6 +33040,7 @@ components:
       - full
       - is_primary
       - weak_alias_determination
+      additionalProperties: true
     IndividualWatchlistCode:
       type: string
       enum:
@@ -32479,6 +33109,7 @@ components:
       - name_sensitivity
       - audit_trail
       - is_archived
+      additionalProperties: true
     IndividualWatchlistScreeningProgramName:
       type: string
       title: IndividualWatchlistScreeningProgramName
@@ -32513,6 +33144,7 @@ components:
       - summary
       - po_box
       - type
+      additionalProperties: true
     KYCCheckDateOfBirthSummary:
       description: Result summary object specifying how the `date_of_birth` field matched.
       type: object
@@ -32521,6 +33153,7 @@ components:
           $ref: '#/components/schemas/MatchSummaryCode'
       required:
       - summary
+      additionalProperties: true
     KYCCheckDetails:
       type: object
       description: Additional information for the `kyc_check` step. This field will be `null` unless `steps.kyc_check` has reached a terminal state of either `success` or `failed`.
@@ -32547,6 +33180,7 @@ components:
       - date_of_birth
       - id_number
       nullable: true
+      additionalProperties: true
     KYCCheckIDNumberSummary:
       description: Result summary object specifying how the `id_number` field matched.
       type: object
@@ -32555,6 +33189,7 @@ components:
           $ref: '#/components/schemas/MatchSummaryCode'
       required:
       - summary
+      additionalProperties: true
     KYCCheckNameSummary:
       description: Result summary object specifying how the `name` field matched.
       type: object
@@ -32563,6 +33198,7 @@ components:
           $ref: '#/components/schemas/MatchSummaryCode'
       required:
       - summary
+      additionalProperties: true
     KYCCheckPhoneSummary:
       description: Result summary object specifying how the `phone` field matched.
       type: object
@@ -32571,6 +33207,7 @@ components:
           $ref: '#/components/schemas/MatchSummaryCode'
       required:
       - summary
+      additionalProperties: true
     MatchSummary:
       type: object
       description: Summary object reflecting the match result of the associated data
@@ -32579,6 +33216,7 @@ components:
           $ref: '#/components/schemas/MatchSummaryCode'
       required:
       - summary
+      additionalProperties: true
     MatchSummaryCode:
       description: |-
         An enum indicating the match type between data provided by user and data checked against an external data source.
@@ -32660,6 +33298,7 @@ components:
       - issuing_country
       - issuing_region
       nullable: true
+      additionalProperties: true
     PhysicalDocumentExtractedDataAnalysis:
       type: object
       description: Analysis of the data extracted from the submitted document.
@@ -32678,6 +33317,7 @@ components:
       - expiration_date
       - issuing_country
       nullable: true
+      additionalProperties: true
     PhysicalDocumentIDNumber:
       type: string
       description: Alpha-numeric ID number extracted via OCR from the user's document image.
@@ -32703,6 +33343,7 @@ components:
       - cropped_front
       - cropped_back
       - face
+      additionalProperties: true
     PostalCode:
       type: string
       example: "46001"
@@ -32743,6 +33384,27 @@ components:
 
         `exact` - Matches must be nearly exact. This sensitivity will only show hits with exact or nearly exact name matches with only basic correction such as extraneous symbols and capitalization. This setting is generally not recommended unless you have a very specific use case.
       title: ProgramNameSensitivity
+    ProxyType:
+      type: string
+      description: |-
+        An enum indicating whether a network proxy is present and if so what type it is.
+
+        `none_detected` indicates the user is not on a detectable proxy network.
+
+        `tor` indicates the user was using a Tor browser, which sends encrypted traffic on a decentralized network and is somewhat similar to a VPN (Virtual Private Network).
+
+        `vpn` indicates the user is on a VPN (Virtual Private Network)
+
+        `web_proxy` indicates the user is on a web proxy server, which may allow them to conceal information such as their IP address or other identifying information.
+
+        `public_proxy` indicates the user is on a public web proxy server, which is similar to a web proxy but can be shared by multiple users. This may allow multiple users to appear as if they have the same IP address for instance.
+      enum:
+      - none_detected
+      - tor
+      - vpn
+      - web_proxy
+      - public_proxy
+      nullable: true
     Region:
       type: string
       example: IN
@@ -32761,6 +33423,249 @@ components:
       minLength: 1
       example: These look like legitimate matches, rejecting the customer.
       nullable: true
+    RiskCheckBehavior:
+      type: object
+      description: Result summary object specifying values for `behavior` attributes of risk check, when available.
+      properties:
+        user_interactions:
+          $ref: '#/components/schemas/RiskCheckBehaviorUserInteractionsLabel'
+        fraud_ring_detected:
+          $ref: '#/components/schemas/RiskCheckBehaviorFraudRingDetectedLabel'
+        bot_detected:
+          $ref: '#/components/schemas/RiskCheckBehaviorBotDetectedLabel'
+      required:
+      - user_interactions
+      - fraud_ring_detected
+      - bot_detected
+      nullable: true
+      additionalProperties: true
+    RiskCheckBehaviorBotDetectedLabel:
+      description: |-
+        Field describing the outcome of a bot detection behavior risk check.
+
+        `yes` indicates that automated activity was detected.
+
+        `no` indicates that automated activity was not detected.
+
+        `no_data` indicates there was not enough information available to give an accurate signal.
+      type: string
+      enum:
+      - "yes"
+      - "no"
+      - no_data
+    RiskCheckBehaviorFraudRingDetectedLabel:
+      description: |-
+        Field describing the outcome of a fraud ring behavior risk check.
+
+        `yes` indicates that fraud ring activity was detected.
+
+        `no` indicates that fraud ring activity was not detected.
+
+        `no_data` indicates there was not enough information available to give an accurate signal.
+      type: string
+      enum:
+      - "yes"
+      - "no"
+      - no_data
+    RiskCheckBehaviorUserInteractionsLabel:
+      description: |-
+        Field describing the overall user interaction signals of a behavior risk check. This value represents how familiar the user is with the personal data they provide, based on a number of signals that are collected during their session.
+
+        `genuine` indicates the user has high familiarity with the data they are providing, and that fraud is unlikely.
+
+        `neutral` indicates some signals are present in between `risky` and `genuine`, but there are not enough clear signals to determine an outcome.
+
+        `risky` indicates the user has low familiarity with the data they are providing, and that fraud is likely.
+
+        `no_data` indicates there is not sufficient information to give an accurate signal.
+      type: string
+      enum:
+      - genuine
+      - neutral
+      - risky
+      - no_data
+      example: risky
+    RiskCheckDetails:
+      type: object
+      description: Additional information for the `risk_check` step.
+      properties:
+        status:
+          $ref: '#/components/schemas/IdentityVerificationStepStatus'
+        behavior:
+          $ref: '#/components/schemas/RiskCheckBehavior'
+        email:
+          $ref: '#/components/schemas/RiskCheckEmail'
+        phone:
+          $ref: '#/components/schemas/RiskCheckPhone'
+        devices:
+          type: array
+          description: Array of result summary objects specifying values for `device` attributes of risk check.
+          items:
+            $ref: '#/components/schemas/RiskCheckDevice'
+      required:
+      - status
+      - behavior
+      - devices
+      - email
+      - phone
+      nullable: true
+      additionalProperties: true
+    RiskCheckDevice:
+      description: Result summary object specifying values for `device` attributes of risk check.
+      type: object
+      properties:
+        ip_proxy_type:
+          $ref: '#/components/schemas/ProxyType'
+        ip_spam_list_count:
+          nullable: true
+          example: 1
+          description: Count of spam lists the IP address is associated with if known.
+          type: integer
+        ip_timezone_offset:
+          $ref: '#/components/schemas/UTCOffset'
+      required:
+      - ip_proxy_type
+      - ip_spam_list_count
+      - ip_timezone_offset
+      additionalProperties: true
+    RiskCheckEmail:
+      type: object
+      description: Result summary object specifying values for `email` attributes of risk check.
+      properties:
+        is_deliverable:
+          $ref: '#/components/schemas/RiskCheckEmailIsDeliverableStatus'
+        breach_count:
+          nullable: true
+          example: 1
+          description: Count of all known breaches of this email address if known.
+          type: integer
+        first_breached_at:
+          $ref: '#/components/schemas/ISO8601DateNullable'
+        last_breached_at:
+          $ref: '#/components/schemas/ISO8601DateNullable'
+        domain_registered_at:
+          $ref: '#/components/schemas/ISO8601DateNullable'
+        domain_is_free_provider:
+          $ref: '#/components/schemas/RiskCheckEmailDomainIsFreeProvider'
+        domain_is_custom:
+          $ref: '#/components/schemas/RiskCheckEmailDomainIsCustom'
+        domain_is_disposable:
+          $ref: '#/components/schemas/RiskCheckEmailDomainIsDisposable'
+        top_level_domain_is_suspicious:
+          $ref: '#/components/schemas/RiskCheckEmailTopLevelDomainIsSuspicious'
+        linked_services:
+          type: array
+          example:
+          - facebook
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/RiskCheckLinkedService'
+      required:
+      - is_deliverable
+      - breach_count
+      - first_breached_at
+      - last_breached_at
+      - domain_registered_at
+      - domain_is_free_provider
+      - domain_is_custom
+      - domain_is_disposable
+      - top_level_domain_is_suspicious
+      - linked_services
+      nullable: true
+      additionalProperties: true
+    RiskCheckEmailDomainIsCustom:
+      description: Indicates whether the email address domain is custom if known, i.e. a company domain and not free or disposable.
+      example: "yes"
+      type: string
+      enum:
+      - "yes"
+      - "no"
+      - no_data
+    RiskCheckEmailDomainIsDisposable:
+      description: Indicates whether the email domain is listed as disposable if known. Disposable domains are often used to create email addresses that are part of a fake set of user details.
+      example: "yes"
+      type: string
+      enum:
+      - "yes"
+      - "no"
+      - no_data
+    RiskCheckEmailDomainIsFreeProvider:
+      description: Indicates whether the email address domain is a free provider such as Gmail or Hotmail if known.
+      example: "yes"
+      type: string
+      enum:
+      - "yes"
+      - "no"
+      - no_data
+    RiskCheckEmailIsDeliverableStatus:
+      description: SMTP-MX check to confirm the email address exists if known.
+      example: "yes"
+      type: string
+      enum:
+      - "yes"
+      - "no"
+      - no_data
+    RiskCheckEmailTopLevelDomainIsSuspicious:
+      description: Indicates whether the email address top level domain, which is the last part of the domain, is fraudulent or risky if known. In most cases, a suspicious top level domain is also associated with a disposable or high-risk domain.
+      example: "yes"
+      type: string
+      enum:
+      - "yes"
+      - "no"
+      - no_data
+    RiskCheckLinkedService:
+      type: string
+      description: An enum indicating the type of a linked service.
+      enum:
+      - apple
+      - ebay
+      - facebook
+      - flickr
+      - foursquare
+      - github
+      - google
+      - gravatar
+      - instagram
+      - lastfm
+      - linkedin
+      - microsoft
+      - myspace
+      - pinterest
+      - skype
+      - spotify
+      - telegram
+      - tumblr
+      - twitter
+      - viber
+      - vimeo
+      - weibo
+      - whatsapp
+      - yahoo
+      - airbnb
+      - amazon
+      - booking
+      - discord
+      - kakao
+      - ok
+      - qzone
+      - line
+      - snapchat
+      - zalo
+    RiskCheckPhone:
+      type: object
+      description: Result summary object specifying values for `phone` attributes of risk check.
+      properties:
+        linked_services:
+          type: array
+          example:
+          - facebook
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/RiskCheckLinkedService'
+      required:
+      - linked_services
+      nullable: true
+      additionalProperties: true
     ScreeningHitAnalysis:
       description: Analysis information describing why a screening hit matched the provided user information
       type: object
@@ -32779,6 +33684,7 @@ components:
           example: 1
       required:
       - search_terms_version
+      additionalProperties: true
     ScreeningHitData:
       description: Information associated with the watchlist hit
       type: object
@@ -32803,6 +33709,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ScreeningHitNamesItems'
+      additionalProperties: true
     ScreeningHitDateOfBirthItem:
       type: object
       description: Analyzed date of birth for the associated hit
@@ -32811,6 +33718,7 @@ components:
           $ref: '#/components/schemas/MatchSummary'
         data:
           $ref: '#/components/schemas/DateRange'
+      additionalProperties: true
     ScreeningHitDocumentsItems:
       description: Analyzed document information for the associated hit
       type: object
@@ -32819,6 +33727,7 @@ components:
           $ref: '#/components/schemas/MatchSummary'
         data:
           $ref: '#/components/schemas/WatchlistScreeningDocument'
+      additionalProperties: true
     ScreeningHitNamesItems:
       type: object
       description: Analyzed name information for the associated hit
@@ -32827,6 +33736,7 @@ components:
           $ref: '#/components/schemas/MatchSummary'
         data:
           $ref: '#/components/schemas/IndividualScreeningHitNames'
+      additionalProperties: true
     ShareableURL:
       type: string
       example: https://flow.plaid.com/verify/idv_4FrXJvfQU3zGUR?key=e004115db797f7cc3083bff3167cba30644ef630fb46f5b086cde6cc3b86a36f
@@ -32913,6 +33823,11 @@ components:
       example: https://example.com
       description: An 'http' or 'https' URL (must begin with either of those).
       nullable: true
+    UTCOffset:
+      type: string
+      description: UTC offset of the timezone associated with the IP address.
+      example: "+06:00:00"
+      nullable: true
     UpdateEntityScreeningRequestSearchTerms:
       type: object
       description: Search terms for editing an entity watchlist screening
@@ -32978,6 +33893,7 @@ components:
       - country
       description: Home address for the user.
       nullable: true
+      additionalProperties: true
     UserIDNumber:
       description: ID number submitted by the user, currently used only for the Identity Verification product. If the user has not submitted this data yet, this field will be `null`. Otherwise, both fields are guaranteed to be filled.
       type: object
@@ -32990,18 +33906,7 @@ components:
       - value
       - type
       nullable: true
-    UserName:
-      description: The full name provided by the user. If the user has not submitted their name, this field will be null. Otherwise, both fields are guaranteed to be filled.
-      type: object
-      properties:
-        given_name:
-          $ref: '#/components/schemas/GivenNameField'
-        family_name:
-          $ref: '#/components/schemas/FamilyNameField'
-      required:
-      - given_name
-      - family_name
-      nullable: true
+      additionalProperties: true
     WatchlistProgramID:
       type: string
       example: prg_2eRPsDnL66rZ7H
@@ -33022,6 +33927,7 @@ components:
       - source
       - dashboard_user_id
       - timestamp
+      additionalProperties: true
     WatchlistScreeningDocument:
       title: WatchlistScreeningDocument
       type: object
@@ -33034,6 +33940,7 @@ components:
       required:
       - type
       - number
+      additionalProperties: true
     WatchlistScreeningDocumentType:
       type: string
       enum:
@@ -33540,6 +34447,7 @@ components:
       - list_code
       - plaid_uid
       - source_uid
+      additionalProperties: true
     WatchlistScreeningHitID:
       type: string
       example: scrhit_52xR9LKo77r1Np
@@ -33558,6 +34466,7 @@ components:
       required:
       - full
       - country
+      additionalProperties: true
     WatchlistScreeningHitStatus:
       type: string
       title: WatchlistScreeningHitStatus
@@ -33591,6 +34500,7 @@ components:
       - audit_trail
       title: WatchlistScreeningIndividual
       description: 'The screening object allows you to represent a customer in your system, update their profile, and search for them on various watchlists. Note: Rejected customers will not receive new hits, regardless of program configuration.'
+      additionalProperties: true
     WatchlistScreeningIndividualCreateRequest:
       type: object
       description: Request input for creating an individual watchlist screening
@@ -34078,6 +34988,7 @@ components:
       - dismissed_hits
       - comment
       - audit_trail
+      additionalProperties: true
     WatchlistScreeningReviewID:
       type: string
       title: WatchlistScreeningReviewID
@@ -34108,6 +35019,7 @@ components:
       - document_number
       - country
       - version
+      additionalProperties: true
     WatchlistScreeningStatus:
       description: A status enum indicating whether a screening is still pending review, has been rejected, or has been cleared.
       type: string
