@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.343.0
+  version: 2020-09-14_1.345.1
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -73,51 +73,56 @@ paths:
                 example-1:
                   value:
                     report:
-                      asset_report_id: bf3a0490-344c-4620-a219-2693162e4b1d
-                      client_report_id: 123abc
-                      date_generated: "2020-06-05T22:47:53Z"
-                      days_requested: 3
+                      asset_report_id: 028e8404-a013-4a45-ac9e-002482f9cafc
+                      client_report_id: client_report_id_1221
+                      date_generated: "2023-03-30T18:27:37Z"
+                      days_requested: 5
                       items:
                       - accounts:
-                        - account_id: 3gE5gnRzNyfXpBK5wEEKcymJ5albGVUqg77gr
+                        - account_id: 1qKRXQjk8xUWDJojNwPXTj8gEmR48piqRNye8
                           balances:
-                            available: 200
-                            current: 210
+                            available: 43200
+                            current: 43200
                             iso_currency_code: USD
-                            limit: null
                             unofficial_currency_code: null
-                          days_available: 3
+                          days_available: 5
                           historical_balances:
-                          - current: 210
-                            date: "2020-06-04"
+                          - current: 49050
+                            date: "2023-03-29"
                             iso_currency_code: USD
                             unofficial_currency_code: null
-                          - current: 210
-                            date: "2020-06-03"
+                          - current: 49050
+                            date: "2023-03-28"
                             iso_currency_code: USD
                             unofficial_currency_code: null
-                          - current: 210
-                            date: "2020-06-02"
+                          - current: 49050
+                            date: "2023-03-27"
                             iso_currency_code: USD
                             unofficial_currency_code: null
-                          mask: "1111"
-                          name: Plaid Saving
-                          official_name: Plaid Silver Standard 0.1% Interest Saving
+                          - current: 49050
+                            date: "2023-03-26"
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
+                          - current: 49050
+                            date: "2023-03-25"
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
+                          mask: "4444"
+                          name: Plaid Money Market
+                          official_name: Plaid Platinum Standard 1.85% Interest Money Market
                           owners:
                           - addresses:
                             - data:
                                 city: Malakoff
-                                country: US
-                                postal_code: "14236"
                                 region: NY
                                 street: 2992 Cameron Road
+                                postal_code: "14236"
                               primary: true
                             - data:
                                 city: San Matias
-                                country: US
-                                postal_code: 93405-2255
                                 region: CA
                                 street: 2493 Leisure Lane
+                                postal_code: 93405-2255
                               primary: false
                             emails:
                             - data: accountholder0@example.com
@@ -142,102 +147,61 @@ paths:
                               primary: false
                               type: mobile
                           ownership_type: null
-                          subtype: savings
-                          transactions: []
+                          subtype: money market
+                          transactions:
+                          - account_id: 1qKRXQjk8xUWDJojNwPXTj8gEmR48piqRNye8
+                            amount: 5850
+                            date: "2023-03-30"
+                            iso_currency_code: USD
+                            original_description: ACH Electronic CreditGUSTO PAY 123456
+                            pending: false
+                            transaction_id: gGQgjoeyqBF89PND6K14Sow1wddZBmtLomJ78
+                            unofficial_currency_code: null
                           type: depository
-                        - account_id: BxBXxLj1m4HMXBm9WZJyUg9XLd4rKEhw8Pb1J
+                        - account_id: eG7pNLjknrFpWvP7Dkbdf3Pq6GVBPKTaQJK5v
                           balances:
-                            available: null
-                            current: 56302.06
+                            available: 100
+                            current: 110
                             iso_currency_code: USD
-                            limit: null
                             unofficial_currency_code: null
-                          days_available: 3
-                          historical_balances: []
-                          mask: "8888"
-                          name: Plaid Mortgage
-                          official_name: null
-                          owners:
-                          - addresses:
-                            - data:
-                                city: Malakoff
-                                country: US
-                                postal_code: "14236"
-                                region: NY
-                                street: 2992 Cameron Road
-                              primary: true
-                            - data:
-                                city: San Matias
-                                country: US
-                                postal_code: 93405-2255
-                                region: CA
-                                street: 2493 Leisure Lane
-                              primary: false
-                            emails:
-                            - data: accountholder0@example.com
-                              primary: true
-                              type: primary
-                            - data: accountholder1@example.com
-                              primary: false
-                              type: secondary
-                            - data: extraordinarily.long.email.username.123456@reallylonghostname.com
-                              primary: false
-                              type: other
-                            names:
-                            - Alberta Bobbeth Charleson
-                            phone_numbers:
-                            - data: "1112223333"
-                              primary: false
-                              type: home
-                            - data: "1112224444"
-                              primary: false
-                              type: work
-                            - data: "1112225555"
-                              primary: false
-                              type: mobile
-                          ownership_type: null
-                          subtype: mortgage
-                          transactions: []
-                          type: loan
-                        - account_id: dVzbVMLjrxTnLjX4G66XUp5GLklm4oiZy88yK
-                          balances:
-                            available: null
-                            current: 410
-                            iso_currency_code: USD
-                            limit: null
-                            unofficial_currency_code: null
-                          days_available: 3
+                          days_available: 5
                           historical_balances:
-                          - current: 410
-                            date: "2020-06-04"
+                          - current: 110
+                            date: "2023-03-29"
                             iso_currency_code: USD
                             unofficial_currency_code: null
-                          - current: 410
-                            date: "2020-06-03"
+                          - current: -390
+                            date: "2023-03-28"
                             iso_currency_code: USD
                             unofficial_currency_code: null
-                          - current: 410
-                            date: "2020-06-02"
+                          - current: -373.67
+                            date: "2023-03-27"
                             iso_currency_code: USD
                             unofficial_currency_code: null
-                          mask: "3333"
-                          name: Plaid Credit Card
-                          official_name: Plaid Diamond 12.5% APR Interest Credit Card
+                          - current: -284.27
+                            date: "2023-03-26"
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
+                          - current: -284.27
+                            date: "2023-03-25"
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
+                          mask: "0000"
+                          name: Plaid Checking
+                          official_name: Plaid Gold Standard 0% Interest Checking
                           owners:
                           - addresses:
                             - data:
                                 city: Malakoff
-                                country: US
-                                postal_code: "14236"
                                 region: NY
                                 street: 2992 Cameron Road
+                                postal_code: "14236"
                               primary: true
                             - data:
                                 city: San Matias
-                                country: US
-                                postal_code: 93405-2255
                                 region: CA
                                 street: 2493 Leisure Lane
+                                postal_code: 93405-2255
                               primary: false
                             emails:
                             - data: accountholder0@example.com
@@ -262,28 +226,62 @@ paths:
                               primary: false
                               type: mobile
                           ownership_type: null
-                          subtype: credit card
-                          transactions: []
-                          type: credit
-                        date_last_updated: "2020-06-05T22:47:52Z"
-                        institution_id: ins_3
-                        institution_name: Chase
-                        item_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBFL9DrE6
+                          subtype: checking
+                          transactions:
+                          - account_id: eG7pNLjknrFpWvP7Dkbdf3Pq6GVBPKTaQJK5v
+                            amount: 89.4
+                            date: "2023-03-27"
+                            iso_currency_code: USD
+                            original_description: SparkFun
+                            pending: false
+                            transaction_id: 4zBRq1Qem4uAPnoyKjJNTRQpQddM4ztlo1PLD
+                            unofficial_currency_code: null
+                          - account_id: eG7pNLjknrFpWvP7Dkbdf3Pq6GVBPKTaQJK5v
+                            amount: 12
+                            date: "2023-03-28"
+                            iso_currency_code: USD
+                            original_description: 'McDonalds #3322'
+                            pending: false
+                            transaction_id: dkjL41PnbKsPral79jpxhMWdW55gkPfBkWpRL
+                            unofficial_currency_code: null
+                          - account_id: eG7pNLjknrFpWvP7Dkbdf3Pq6GVBPKTaQJK5v
+                            amount: 4.33
+                            date: "2023-03-28"
+                            iso_currency_code: USD
+                            original_description: Starbucks
+                            pending: false
+                            transaction_id: a84ZxQaWDAtDL3dRgmazT57K7jjN3WFkNWMDy
+                            unofficial_currency_code: null
+                          - account_id: eG7pNLjknrFpWvP7Dkbdf3Pq6GVBPKTaQJK5v
+                            amount: -500
+                            date: "2023-03-29"
+                            iso_currency_code: USD
+                            original_description: United Airlines **** REFUND ****
+                            pending: false
+                            transaction_id: xG9jbv3eMoFWepzB7wQLT3LoLggX5Duy1Gbe5
+                            unofficial_currency_code: null
+                          type: depository
+                        date_last_updated: "2023-03-30T18:25:26Z"
+                        institution_id: ins_109508
+                        institution_name: First Platypus Bank
+                        item_id: AZMP7JrGXgtPd3AQMeg7hwMKgk5E8qU1V5ME7
                       user:
-                        client_user_id: "123456789"
-                        email: accountholder0@example.com
-                        first_name: Alberta
-                        last_name: Charleson
-                        middle_name: Bobbeth
-                        phone_number: 111-222-3333
-                        ssn: 123-45-6789
-                    request_id: eYupqX1mZkEuQRx
+                        client_user_id: uid_40332
+                        email: abcharleston@example.com
+                        first_name: Anna
+                        last_name: Charleston
+                        middle_name: B
+                        phone_number: 1-415-867-5309
+                        ssn: 111-22-1234
+                    request_id: GVzMdiDd8DDAQK4
                     warnings: []
       operationId: assetReportGet
       description: |-
         The `/asset_report/get` endpoint retrieves the Asset Report in JSON format. Before calling `/asset_report/get`, you must first create the Asset Report using `/asset_report/create` (or filter an Asset Report using `/asset_report/filter`) and then wait for the [`PRODUCT_READY`](https://plaid.com/docs/api/products/assets/#product_ready) webhook to fire, indicating that the Report is ready to be retrieved.
 
         By default, an Asset Report includes transaction descriptions as returned by the bank, as opposed to parsed and categorized by Plaid. You can also receive cleaned and categorized transactions, as well as additional insights like merchant name or location information. We call this an Asset Report with Insights. An Asset Report with Insights provides transaction category, location, and merchant information in addition to the transaction strings provided in a standard Asset Report.
+
+        If report_type was set to `VERIFICATION_OF_EMPLOYMENT` when the Asset Report was created in asset_report/create, debit transactions and transaction amounts won’t be included in the report.
 
         To retrieve an Asset Report with Insights, call the `/asset_report/get` endpoint with `include_insights` set to `true`.
       requestBody:
@@ -312,6 +310,8 @@ paths:
         The `/asset_report/pdf/get` endpoint retrieves the Asset Report in PDF format. Before calling `/asset_report/pdf/get`, you must first create the Asset Report using `/asset_report/create` (or filter an Asset Report using `/asset_report/filter`) and then wait for the [`PRODUCT_READY`](https://plaid.com/docs/api/products/assets/#product_ready) webhook to fire, indicating that the Report is ready to be retrieved.
 
         The response to `/asset_report/pdf/get` is the PDF binary data. The `request_id`  is returned in the `Plaid-Request-ID` header.
+
+        If report_type was set to `VERIFICATION_OF_EMPLOYMENT` when the Asset Report was created in asset_report/create, debit transactions and transaction amounts won’t be included in the report.
 
         [View a sample PDF Asset Report](https://plaid.com/documents/sample-asset-report.pdf).
       requestBody:
@@ -520,7 +520,7 @@ paths:
                     request_id: eYupqX1mZkEuQRx
                     updated: true
       operationId: creditAuditCopyTokenUpdate
-      description: The `/credit/audit_copy_token/update` endpoint updates the Audit Copy Token by adding the report tokens in the `report_tokens` field to the `audit_copy_token`. If the Audit Copy Token already contains a report of a certain type, it will be replaced with the token provided in the `report_tokens` field.
+      description: The `/credit/audit_copy_token/update` endpoint updates an existing  Audit Copy Token by adding the report tokens in the `report_tokens` field to the `audit_copy_token`. If the Audit Copy Token already contains a report of a certain type, it will be replaced with the token provided in the `report_tokens` field.
       requestBody:
         required: true
         content:
@@ -1239,6 +1239,8 @@ paths:
                         personal_finance_category:
                           detailed: GENERAL_MERCHANDISE_SUPERSTORES
                           primary: GENERAL_MERCHANDISE
+                        recurrence:
+                          is_recurring: false
                         personal_finance_category_icon_url: https://plaid-category-icons.plaid.com/PFC_GENERAL_MERCHANDISE.png
                         website: walmart.com
                     - id: 3958434bhde9384bcmeo3401
@@ -1275,6 +1277,8 @@ paths:
                           detailed: FOOD_AND_DRINK_FAST_FOOD
                           primary: FOOD_AND_DRINK
                         personal_finance_category_icon_url: https://plaid-category-icons.plaid.com/PFC_FOOD_AND_DRINK.png
+                        recurrence:
+                          is_recurring: false
                         website: burgerking.com
                     request_id: Wvhy9PZHQLV8njG
         default:
@@ -11093,7 +11097,7 @@ components:
         include_original_description:
           type: boolean
           default: false
-          description: Include the raw unparsed transaction description from the financial institution. This field is disabled by default. If you need this information in addition to the parsed data provided, contact your Plaid Account Manager.
+          description: Include the raw unparsed transaction description from the financial institution. This field is disabled by default. If you need this information in addition to the parsed data provided, contact your Plaid Account Manager, or submit a [Support request](https://dashboard.plaid.com/support/new/product-and-development/product-troubleshooting/product-functionality) .
           nullable: true
         include_personal_finance_category_beta:
           type: boolean
@@ -11343,7 +11347,7 @@ components:
         include_original_description:
           type: boolean
           default: false
-          description: Include the raw unparsed transaction description from the financial institution. This field is disabled by default. If you need this information in addition to the parsed data provided, contact your Plaid Account Manager.
+          description: Include the raw unparsed transaction description from the financial institution. This field is disabled by default. If you need this information in addition to the parsed data provided, contact your Plaid Account Manager or submit a [Support request](https://dashboard.plaid.com/support/new/product-and-development/product-troubleshooting/product-functionality).
           nullable: true
         include_personal_finance_category:
           type: boolean
@@ -11995,6 +11999,8 @@ components:
           $ref: '#/components/schemas/AccessToken'
         user:
           $ref: '#/components/schemas/IdentityMatchUser'
+        identity_verification_id:
+          $ref: '#/components/schemas/IdentityMatchIdentityVerificationID'
         options:
           $ref: '#/components/schemas/IdentityMatchRequestOptions'
       required:
@@ -12028,6 +12034,12 @@ components:
           nullable: true
         address:
           $ref: '#/components/schemas/AddressDataNullable'
+    IdentityMatchIdentityVerificationID:
+      title: IdentityMatchIdentityVerificationID
+      type: string
+      example: idv_52xR9LKo77r1Np
+      description: ID of the associated Identity Verification attempt. This field can be used instead of `user` to perform fuzzy match against the data collected during identity verification.
+      x-hidden-from-docs: true
     IdentityMatchResponse:
       type: object
       additionalProperties: true
@@ -13579,6 +13591,7 @@ components:
           - riskified
           - utb
           - adp_roll
+          - fortress_trust
           description: The processor you are integrating with.
       required:
       - access_token
@@ -13795,7 +13808,7 @@ components:
         products:
           type: array
           description: |-
-            List of Plaid product(s) you wish to use. If launching Link in update mode, should be omitted; required otherwise.
+            List of Plaid product(s) you wish to use. If launching Link in update mode, should be omitted (unless you are using update mode to add Income or Assets to an Item); required otherwise.
 
             `balance` is *not* a valid value, the Balance product does not require explicit initialization and will automatically be initialized when any other product is initialized.
 
@@ -13840,7 +13853,7 @@ components:
           - signal
         webhook:
           type: string
-          description: The destination URL to which any webhooks should be sent. Note that webhooks for Payment Initiation, Transfer, Bank Transfer (including Auth micro-deposit notification webhooks) and Identity Verification are configured via the Dashboard instead.
+          description: The destination URL to which any webhooks should be sent. Note that webhooks for Payment Initiation (e-wallet transactions only), Transfer, Bank Transfer (including Auth micro-deposit notification webhooks) and Identity Verification are configured via the Dashboard instead.
         access_token:
           type: string
           description: The `access_token` associated with the Item to update or reference, used when updating, modifying, or accessing an existing `access_token`. Used when launching Link in update mode, when completing the Same-day (manual) Micro-deposit flow, or (optionally) when initializing Link for a returning user as part of the Transfer UI flow.
@@ -13849,10 +13862,10 @@ components:
           description: The name of the Link customization from the Plaid Dashboard to be applied to Link. If not specified, the `default` customization will be used. When using a Link customization, the language in the customization must match the language selected via the `language` parameter, and the countries in the customization should match the country codes selected via `country_codes`.
         redirect_uri:
           type: string
-          description: A URI indicating the destination where a user should be forwarded after completing the Link flow; used to support OAuth authentication flows when launching Link in the browser or via a webview. The `redirect_uri` should not contain any query parameters. When used in Production or Development, must be an https URI. To specify any subdomain, use `*` as a wildcard character, e.g. `https://*.example.com/oauth.html`. If `android_package_name` is specified, this field should be left blank.  Note that any redirect URI must also be added to the Allowed redirect URIs list in the [developer dashboard](https://dashboard.plaid.com/team/api).
+          description: A URI indicating the destination where a user should be forwarded after completing the Link flow; used to support OAuth authentication flows when launching Link in the browser or via a webview. The `redirect_uri` should not contain any query parameters. When used in Production or Development, must be an https URI. To specify any subdomain, use `*` as a wildcard character, e.g. `https://*.example.com/oauth.html`. Note that any redirect URI must also be added to the Allowed redirect URIs list in the [developer dashboard](https://dashboard.plaid.com/team/api). If initializing on Android, `android_package_name` must be specified instead and `redirect_uri` should be left blank.
         android_package_name:
           type: string
-          description: 'The name of your app''s Android package. Required if using the `link_token` to initialize Link on Android. When creating a `link_token` for initializing Link on other platforms, this field must be left blank. Any package name specified here must also be added to the Allowed Android package names setting on the [developer dashboard](https://dashboard.plaid.com/team/api). '
+          description: The name of your app's Android package. Required if using the `link_token` to initialize Link on Android. Any package name specified here must also be added to the Allowed Android package names setting on the [developer dashboard](https://dashboard.plaid.com/team/api). When creating a `link_token` for initializing Link on other platforms, `android_package_name` must be left blank and `redirect_uri` should be used instead.
         institution_data:
           $ref: '#/components/schemas/LinkTokenCreateInstitutionData'
         account_filters:
@@ -20197,6 +20210,22 @@ components:
       type: string
       title: BankTransferID
       description: Plaid’s unique identifier for a bank transfer.
+    TransferExpectedSettlementScheduleItem:
+      title: TransferExpectedSettlementScheduleItem
+      type: object
+      additionalProperties: true
+      description: Defines an expected sweep date and amount.
+      properties:
+        settlement_date:
+          type: string
+          description: The settlement date of a sweep for this transfer.
+          format: date
+        settled_amount:
+          type: string
+          description: The accumulated amount that have been swept by `settlement_date`.
+      required:
+      - settlement_date
+      - settled_amount
     Transfer:
       title: Transfer
       type: object
@@ -20262,7 +20291,7 @@ components:
           nullable: true
         expected_settlement_date:
           type: string
-          description: An estimation of the settlement date which can be useful when the transfer is `pending`. Only set for ACH transfers and is `null` for non-ACH transfers. This will be of the form YYYY-MM-DD.
+          description: The expected date when the full amount of the transfer settles at the consumers’ account, if the transfer is credit; or at the customer's business checking account, if the transfer is debit. Only set for ACH transfers and is null for non-ACH transfers. Only set for ACH transfers. This will be of the form YYYY-MM-DD.
           format: date
           nullable: true
         originator_client_id:
@@ -20278,6 +20307,15 @@ components:
           type: string
           description: The id of the recurring transfer if this transfer belongs to a recurring transfer.
           nullable: true
+        settled_amount:
+          type: string
+          description: The accumulated amount that have been swept to date. This number does not reflect `return_swept` amount if the transfer is returned. Only applies to ACH debit transfers.
+          nullable: true
+        expected_settlement_schedule:
+          type: array
+          description: The expected settlement schedule of this transfer, if posted. Only applies to ACH debit transfers.
+          items:
+            $ref: '#/components/schemas/TransferExpectedSettlementScheduleItem'
       required:
       - id
       - type
@@ -20524,7 +20562,7 @@ components:
     TransferSweepAmount:
       title: TransferSweepAmount
       type: string
-      description: A signed amount of how much was `swept` or `return_swept` (decimal string with two digits of precision e.g. "-5.50").
+      description: A signed amount of how much was `swept` or `return_swept` for this transfer (decimal string with two digits of precision e.g. "-5.50").
       nullable: true
     TransferRefundAmount:
       title: TransferRefundAmount
@@ -24156,6 +24194,8 @@ components:
         days_requested:
           type: integer
           description: The number of days of data to request for the Bank Income product
+          minimum: 1
+          maximum: 731
         enable_multiple_items:
           type: boolean
           nullable: true
@@ -25977,6 +26017,7 @@ components:
           $ref: '#/components/schemas/CreditBankIncomeAccountType'
         owners:
           type: array
+          description: Data returned by the financial institution about the account owner or owners. Identity information is optional, so field may return an empty array.
           items:
             $ref: '#/components/schemas/Owner'
       required:
@@ -26412,10 +26453,10 @@ components:
           $ref: '#/components/schemas/APISecret'
         report_tokens:
           type: array
-          description: List of report tokens; can include both Asset Report tokens and Income Report tokens.
+          description: List of report tokens; can include at most one VOA/standard Asset Report tokens and one VOE Asset Report Token.
           items:
             type: string
-            description: The report token. It can be an asset report token or an income report token.
+            description: The report token. It can be an VOA Asset Report token or a VOE Asset Report token.
             nullable: false
       required:
       - report_tokens
@@ -26426,7 +26467,7 @@ components:
       properties:
         audit_copy_token:
           type: string
-          description: A token that can be shared with a third party auditor to allow them to obtain access to the Asset or Income Report. This token should be stored securely.
+          description: A token that can be shared with a third party auditor, which allows them to fetch the Asset Reports attached to the token. This token should be stored securely.
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
@@ -27956,7 +27997,7 @@ components:
         The warning code identifies a specific kind of warning.
         `IDENTITY_UNAVAILABLE`: Unable to extract identity for the Item
         `TRANSACTIONS_UNAVAILABLE`: Unable to extract transactions for the Item
-        `ITEM_UNAPPROVED`: User did not grant permission to share data for the Item
+        `ITEM_UNAPPROVED`: User exited flow before giving permission to share data for the Item
         `REPORT_DELETED`: Report deleted due to customer or consumer request
         `DATA_UNAVAILABLE`: No relevant data was found for the Item
       enum:
@@ -30264,6 +30305,8 @@ components:
         personal_finance_category_icon_url:
           type: string
           description: A link to the icon associated with the primary personal finance category. The logo will always be 100x100 pixels.
+        recurrence:
+          $ref: '#/components/schemas/Recurrence'
         website:
           type: string
           description: The website associated with this transaction.
@@ -30277,6 +30320,22 @@ components:
       - website
       - counterparties
       - merchant_name
+    Recurrence:
+      title: Recurrence
+      nullable: true
+      type: object
+      description: |-
+        Insights relating to expenses and deposits that are predicted to occur on a scheduled basis, such as biweekly, monthly, or annually.
+
+        Common examples include loan payments, bill payments, subscriptions, and payroll income.
+
+        This is a beta field, available to all users.
+      additionalProperties: true
+      properties:
+        is_recurring:
+          type: boolean
+          description: Whether or not the transaction is periodically recurring.
+          nullable: true
     PaymentProfileCreateRequest:
       type: object
       description: PaymentProfileCreateRequest defines the request schema for `/payment_profile/create`
@@ -30946,8 +31005,6 @@ components:
             An Asset Report requested with "Additional History" (that is, with more than 61 days of transaction history) will incur an Additional History fee.
         options:
           $ref: '#/components/schemas/AssetReportCreateRequestOptions'
-        report_type:
-          $ref: '#/components/schemas/FreddieReportType'
       required:
       - days_requested
     AssetReportCreateRequestOptions:
@@ -30977,7 +31034,7 @@ components:
             type: string
         add_ons:
           type: array
-          description: 'Additional information that can be included in the asset report. Possible values: `"fast_assets"`'
+          description: 'Use this field to request a `fast_asset` report. When Fast Assets is requested, Plaid will create two versions of the Asset Report: first, the Fast Asset Report, which will contain only current identity and balance information, and later, the Full Asset Report, which will also contain historical balance information and transaction data. A `PRODUCT_READY` webhook will be fired for each Asset Report when it is ready, and the `report_type` field will indicate whether the webhook is firing for the `full` or `fast` Asset Report. To retrieve the Fast Asset Report, call `/asset_report/get` with `fast_report` set to `true`. There is no additional charge for using Fast Assets.'
           items:
             $ref: '#/components/schemas/AssetReportAddOns'
         user:
@@ -31121,13 +31178,12 @@ components:
         fast_report:
           type: boolean
           default: false
-          description: '`true` to fetch "fast" version of asset report. Defaults to false if omitted.'
+          description: '`true` to fetch "fast" version of asset report. Defaults to false if omitted. Can only be used if `/asset_report/create` was called with `options.add_ons` set to `["fast_assets"]`.'
         options:
           $ref: '#/components/schemas/AssetReportGetRequestOptions'
       required:
       - asset_report_token
     AssetReportGetRequestOptions:
-      x-hidden-from-docs: true
       type: object
       description: An optional object to filter or add data to `/asset_report/get` results. If provided, must be non-`null`.
       properties:
@@ -31170,12 +31226,10 @@ components:
       required:
       - asset_report_token
     AssetReportPDFGetRequestOptions:
-      x-hidden-from-docs: true
       type: object
       description: An optional object to filter or add data to `/asset_report/get` results. If provided, must be non-`null`.
       properties:
         days_to_include:
-          x-hidden-from-docs: true
           type: integer
           maximum: 731
           minimum: 0
@@ -31303,16 +31357,20 @@ components:
           description: The `asset_report_id` corresponding to the Asset Report the webhook has fired for.
         report_type:
           type: string
-          description: The report type specifying whether the asset report is a `full` or `fast` report.
+          description: The report type, indicating whether the Asset Report is a `full` or `fast` report.
+        environment:
+          $ref: '#/components/schemas/WebhookEnvironmentValues'
       required:
       - webhook_type
       - webhook_code
       - asset_report_id
+      - environment
       x-examples:
         example-1:
           webhook_type: ASSETS
           webhook_code: PRODUCT_READY
           asset_report_id: 47dfc92b-bba3-4583-809e-ce871b321f05
+          report_type: full
     AssetsErrorWebhook:
       title: AssetsErrorWebhook
       type: object
@@ -31341,11 +31399,14 @@ components:
         asset_report_id:
           type: string
           description: The ID associated with the Asset Report.
+        environment:
+          $ref: '#/components/schemas/WebhookEnvironmentValues'
       required:
       - webhook_type
       - webhook_code
       - error
       - asset_report_id
+      - environment
     Warning:
       title: Warning
       type: object
@@ -31421,7 +31482,7 @@ components:
       enum:
       - investments
       - fast_assets
-      description: A list of add-ons that should be included in the Asset Report
+      description: "A list of add-ons that should be included in the Asset Report. \n\n`fast_assets`: When Fast Assets is requested, Plaid will create two versions of the Asset Report: the Fast Asset Report, which will contain only Identity and Balance information, and the Full Asset Report, which will also contain Transactions information. A `PRODUCT_READY` webhook will be fired for each Asset Report when it is ready, and the `report_type` field will indicate whether the webhook is firing for the `full` or `fast` Asset Report. To retrieve the Fast Asset Report, call `/asset_report/get` with `fast_report` set to `true`. There is no additional charge for using Fast Assets.\n\n`investments`: Request an Asset Report with Investments. This add-on is in closed beta and not generally available."
       type: string
     AssetReportId:
       title: AssetReportId
@@ -31545,12 +31606,6 @@ components:
       - joint
       - association
       - trust
-    FreddieReportType:
-      type: string
-      description: When set to `VERIFICATION_OF_EMPLOYMENT` and the Asset Report is added to an Audit Copy Token, the Asset Report will be retrieved by Freddie Mac in the Verification Of Employment (VOE) version instead of the default Verification Of Assets (VOA) version.
-      x-hidden-from-docs: true
-      enum:
-      - VERIFICATION_OF_EMPLOYMENT
     AssetReportTransaction:
       title: AssetReportTransaction
       description: A transaction on the asset report
@@ -33846,14 +33901,8 @@ components:
           $ref: '#/components/schemas/WatchlistScreeningPhoneNumber'
         url:
           $ref: '#/components/schemas/URL'
-        client_id:
-          $ref: '#/components/schemas/APIClientID'
-        secret:
-          $ref: '#/components/schemas/APISecret'
       required:
       - entity_watchlist_program_id
-      - client_id
-      - secret
       nullable: true
     UpdateIndividualScreeningRequestSearchTerms:
       type: object
@@ -35051,7 +35100,7 @@ components:
           description: The `audit_copy_token` you would like to update.
         report_tokens:
           type: array
-          description: Array of tokens which the specified Audit Copy Token will be updated with. The types of token supported are asset report token and employment report token. There can be at most 1 of each type can be in the array.
+          description: Array of tokens which the specified Audit Copy Token will be updated with. The types of token supported are asset report token and employment report token. There can be at most 1 of each token type in the array.
           items:
             $ref: '#/components/schemas/AssetReportToken'
       required:
@@ -35817,11 +35866,11 @@ components:
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
-      - VOA
       - request_id
     CreditFreddieMacVerificationOfAssets_VOA_2_4:
       title: CreditFreddieMacVerificationOfAssets_VOA_2_4
       type: object
+      nullable: true
       additionalProperties: true
       description: Verification of Assets Report
       properties:
