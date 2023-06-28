@@ -1,8 +1,43 @@
+### 2020-09-14_1.385.1
+- Add expiration time description to `transfer/authorization/create` `idempotency_key` parameter
+
+### 2020-09-14_1.385.0
+- Add `user` field to `/identity_verification/retry`
+- Add `client_user_id` field to `/identity_verification/create`
+- Deprecate `user.client_user_id` field in `/identity_verification/create`
+- [Breaking] Renamed `IdentityVerificationRequestUser` object to `IdentityVerificationCreateRequestUser`
+
+### 2020-09-14_1.384.0
+- Remove `maxLength` constraint from `client_user_id` field for `/processor/signal/evaluate` and `/signal/evaluate` requests
+
+### 2020-09-14_1.383.3
+- Add `test_clock_id` to `transfer/authorization/create` request
+
+### 2020-09-14_1.383.2
+- Update `InvestmentsAuthOwner` title
+
+### 2020-09-14_1.383.1
+- Add `account_id` to `bank_accounts` and `transactions` in `/credit/bank_statements/uploads/get` response
+
+### 2020-09-14_1.383.0
+- Add `transfer/diligence/document/upload` endpoint
+
+### 2020-09-14_1.382.1
+- Add `amount` to `/transfer/sweep/list` request
+### 2020-09-14_1.382.0
+- Add `signal_insights` to `/transfer/authorization/create` request
+
+### 2020-09-14_1.381.0
+- Add definitions for `/sandbox/bank_income/fire_webhook`
+
+### 2020-09-14_1.380.0
+- Update validation `sweep_id` for `/transfers/sweep/get` to allow UUID or 8 character hexadecimal string
+
 ### 2020-09-14_1.379.0
 - Add `scheme` to `/wallet/transaction/get` and `/wallet/transaction/list`
 
 ### 2020-09-14_1.378.1
-- Fix issue in which `request_id` was erroneously not listed as required in `ItemActivityListResponse` 
+- Fix issue in which `request_id` was erroneously not listed as required in `ItemActivityListResponse`
 
 ### 2020-09-14_1.378.0
 - Add `reroute_to_credentials` to `/link/token/create` auth request

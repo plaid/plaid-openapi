@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.379.0
+  version: 2020-09-14_1.385.1
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -1810,7 +1810,10 @@ paths:
       externalDocs:
         url: /api/products/transactions/#categoriesget
       operationId: categoriesGet
-      description: "Send a request to the `/categories/get` endpoint to get detailed information on categories returned by Plaid. This endpoint does not require authentication. \n\nAll implementations are recommended to use the newer `personal_finance_category` taxonomy instead of the older `category` taxonomy supported by this endpoint. The [`personal_finance_category taxonomy` CSV file](https://plaid.com/documents/transactions-personal-finance-category-taxonomy.csv) is available for download and is not accessible via API."
+      description: |-
+        Send a request to the `/categories/get` endpoint to get detailed information on categories returned by Plaid. This endpoint does not require authentication.
+
+        All implementations are recommended to use the newer `personal_finance_category` taxonomy instead of the older `category` taxonomy supported by this endpoint. The [`personal_finance_category taxonomy` CSV file](https://plaid.com/documents/transactions-personal-finance-category-taxonomy.csv) is available for download and is not accessible via API.
       responses:
         "200":
           description: success
@@ -2524,6 +2527,11 @@ paths:
                       - ip_proxy_type: none_detected
                         ip_spam_list_count: 1
                         ip_timezone_offset: "+06:00:00"
+                      identity_abuse_signals:
+                        synthetic_identity:
+                          score: 0
+                        stolen_identity:
+                          score: 0
                     watchlist_screening_id: scr_52xR9LKo77r1Np
                     redacted_at: "2020-07-24T03:26:02Z"
                     request_id: saKrIBuEB9qJZng
@@ -2662,6 +2670,11 @@ paths:
                       - ip_proxy_type: none_detected
                         ip_spam_list_count: 1
                         ip_timezone_offset: "+06:00:00"
+                      identity_abuse_signals:
+                        synthetic_identity:
+                          score: 0
+                        stolen_identity:
+                          score: 0
                     watchlist_screening_id: scr_52xR9LKo77r1Np
                     redacted_at: "2020-07-24T03:26:02Z"
                     request_id: saKrIBuEB9qJZng
@@ -2802,6 +2815,11 @@ paths:
                         - ip_proxy_type: none_detected
                           ip_spam_list_count: 1
                           ip_timezone_offset: "+06:00:00"
+                        identity_abuse_signals:
+                          synthetic_identity:
+                            score: 0
+                          stolen_identity:
+                            score: 0
                       watchlist_screening_id: scr_52xR9LKo77r1Np
                       redacted_at: "2020-07-24T03:26:02Z"
                     next_cursor: eyJkaXJlY3Rpb24iOiJuZXh0Iiwib2Zmc2V0IjoiMTU5NDM
@@ -2948,6 +2966,11 @@ paths:
                       - ip_proxy_type: none_detected
                         ip_spam_list_count: 1
                         ip_timezone_offset: "+06:00:00"
+                      identity_abuse_signals:
+                        synthetic_identity:
+                          score: 0
+                        stolen_identity:
+                          score: 0
                     watchlist_screening_id: scr_52xR9LKo77r1Np
                     redacted_at: "2020-07-24T03:26:02Z"
                     request_id: saKrIBuEB9qJZng
@@ -4332,7 +4355,7 @@ paths:
 
         In order to obtain a valid score for an ACH transaction, Plaid must have an access token for the account, and the Item must be healthy (receiving product updates) or have recently been in a healthy state. If the transaction does not meet eligibility requirements, an error will be returned corresponding to the underlying cause. If `/processor/signal/evaluate` is called on the same transaction multiple times within a 24-hour period, cached results may be returned. For more information please refer to our error documentation on [item errors](/docs/errors/item/) and [Link in Update Mode](/docs/link/update-mode/).
 
-        Note: This request may take some time to complete if Signal is being added to an existing Item. This is because Plaid must communicate directly with the institution when retrieving the data for the first time.
+        Note: This request may take some time to complete if Signal is being added to an existing Item. This is because Plaid must communicate directly with the institution when retrieving the data for the first time. To reduce this latency, you can call `/signal/prepare` on the Item before you need to request Signal data.
       responses:
         "200":
           description: OK
@@ -7104,9 +7127,13 @@ paths:
                 example-1:
                   value:
                     max_single_transfer_amount: "1000.00"
+                    max_single_transfer_credit_amount: "1000.00"
+                    max_single_transfer_debit_amount: "1000.00"
                     max_daily_credit_amount: "50000.00"
                     max_daily_debit_amount: "50000.00"
                     max_monthly_amount: "500000.00"
+                    max_monthly_credit_amount: "500000.00"
+                    max_monthly_debit_amount: "500000.00"
                     iso_currency_code: USD
                     request_id: saKrIBuEB9qJZno
         default:
@@ -7143,6 +7170,8 @@ paths:
                     daily_debit_transfer_volume: "1234.56"
                     daily_credit_transfer_volume: "567.89"
                     monthly_transfer_volume: "12345.67"
+                    monthly_debit_transfer_volume: "10000.00"
+                    monthly_credit_transfer_volume: "2345.67"
                     iso_currency_code: USD
                     request_id: saKrIBuEB9qJZno
         default:
@@ -8410,6 +8439,42 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/TransferDiligenceSubmitRequest'
+            examples: {}
+      parameters: []
+  /transfer/diligence/document/upload:
+    post:
+      summary: This endpoint allows third-party sender customers to upload a document on behalf of its end customer (i.e. originator) to Plaid. You’ll need to send a request of type multipart/form-data.
+      tags:
+      - plaid
+      externalDocs:
+        url: /api/products/transfer/#transferdiligencedocumentupload
+      operationId: transferDiligenceDocumentUpload
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferDiligenceDocumentUploadResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: 4zlKapIkTm8p5KM
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      description: |-
+        Third-party sender customers can use `/transfer/diligence/document/upload` endpoint to upload a document on behalf of its end customer (i.e. originator) to Plaid. You’ll need to send a request of type multipart/form-data.
+        You must provide the `client_id` in the `PLAID-CLIENT-ID` header and `secret` in the `PLAID-SECRET` header.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferDiligenceDocumentUploadRequest'
             examples: {}
       parameters: []
   /transfer/originator/get:
@@ -10068,7 +10133,10 @@ paths:
       externalDocs:
         url: /api/products/income/#creditbank_incomewebhookupdate
       operationId: creditBankIncomeWebhookUpdate
-      description: "`/credit/bank_income/webhook/update` allows you to subscribe or unsubscribe a user for income webhook notifications. \n\nIf a user is subscribed, on significant changes to the user's income profile, you will receive a `BANK_INCOME_REFRESH_UPDATE` webhook, prompting you to refresh bank income data for the user."
+      description: |-
+        `/credit/bank_income/webhook/update` allows you to subscribe or unsubscribe a user for income webhook notifications.
+
+        If a user is subscribed, on significant changes to the user's income profile, you will receive a `BANK_INCOME_REFRESH_UPDATE` webhook, prompting you to refresh bank income data for the user.
       requestBody:
         required: true
         content:
@@ -10106,6 +10174,7 @@ paths:
                         - amount: -1000
                           date: "2023-01-01"
                           original_description: PAYCHECK
+                          account_id: c6778d3f-e44c-4348-874e-71507c1ac12d
                         document_metadata:
                           document_type: BANK_STATEMENT
                           name: statement_01.pdf
@@ -10118,6 +10187,7 @@ paths:
                           bank_name: CHASE
                           account_type: CHECKING
                           account_number: "000009752"
+                          account_id: c6778d3f-e44c-4348-874e-71507c1ac12d
                           owner:
                             name: JANE DOE
                             address:
@@ -10960,13 +11030,45 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
-      description: Use the `/sandbox/income/fire_webhook` endpoint to manually trigger an Income webhook in the Sandbox environment.
+      description: Use the `/sandbox/income/fire_webhook` endpoint to manually trigger a Payroll Income webhook in the Sandbox environment.
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/SandboxIncomeFireWebhookRequest'
+  /sandbox/bank_income/fire_webhook:
+    post:
+      summary: Manually fire a bank income webhook in sandbox
+      tags:
+      - plaid
+      externalDocs:
+        url: /api/sandbox/#sandboxbankincomefire_webhook
+      operationId: sandboxBankIncomeFireWebhook
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SandboxBankIncomeFireWebhookResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: mdqfuVxeoza6mhu
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      description: Use the `/sandbox/bank_income/fire_webhook` endpoint to manually trigger a Bank Income webhook in the Sandbox environment.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SandboxBankIncomeFireWebhookRequest'
   /sandbox/oauth/select_accounts:
     post:
       summary: Save the selected accounts when connecting to the Platypus Oauth institution
@@ -12262,7 +12364,14 @@ components:
         include_personal_finance_category:
           type: boolean
           default: false
-          description: "Include the [`personal_finance_category`](https://plaid.com/docs/api/products/transactions/#transactions-get-response-transactions-personal-finance-category) object in the response. \n\nAll implementations are encouraged to set this field to `true` and use the `personal_finance_category` instead of `category`. Personal finance categories are the preferred categorization system for transactions, providing higher accuracy and more meaningful categories. \n\nSee the [`taxonomy csv file`](https://plaid.com/documents/transactions-personal-finance-category-taxonomy.csv) for a full list of personal finance categories.\n\nPlaid is also introducing Category Rules - a new endpoint that will enable you to change the `personal_finance_category` for a transaction based on your users’ needs. When rules are set, the selected category will override the Plaid provided category. To learn more, send a note to transactions-feedback@plaid.com."
+          description: |-
+            Include the [`personal_finance_category`](https://plaid.com/docs/api/products/transactions/#transactions-get-response-transactions-personal-finance-category) object in the response.
+
+            All implementations are encouraged to set this field to `true` and use the `personal_finance_category` instead of `category`. Personal finance categories are the preferred categorization system for transactions, providing higher accuracy and more meaningful categories.
+
+            See the [`taxonomy csv file`](https://plaid.com/documents/transactions-personal-finance-category-taxonomy.csv) for a full list of personal finance categories.
+
+            Plaid is also introducing Category Rules - a new endpoint that will enable you to change the `personal_finance_category` for a transaction based on your users’ needs. When rules are set, the selected category will override the Plaid provided category. To learn more, send a note to transactions-feedback@plaid.com.
         include_logo_and_counterparty_beta:
           type: boolean
           default: false
@@ -12347,7 +12456,12 @@ components:
         include_personal_finance_category:
           type: boolean
           default: false
-          description: "Include the [`personal_finance_category`](https://plaid.com/docs/api/products/transactions/#transactions-get-response-transactions-personal-finance-category) object for each transaction stream in the response.\n\nAll implementations are encouraged to set this field to `true` and to use the `personal_finance_category` field instead of `category`. Personal finance categories are the preferred categorization system for transactions, providing higher accuracy and more meaningful categories. \n\nSee the [`taxonomy csv file`](https://plaid.com/documents/transactions-personal-finance-category-taxonomy.csv) for a full list of personal finance categories."
+          description: |-
+            Include the [`personal_finance_category`](https://plaid.com/docs/api/products/transactions/#transactions-get-response-transactions-personal-finance-category) object for each transaction stream in the response.
+
+            All implementations are encouraged to set this field to `true` and to use the `personal_finance_category` field instead of `category`. Personal finance categories are the preferred categorization system for transactions, providing higher accuracy and more meaningful categories.
+
+            See the [`taxonomy csv file`](https://plaid.com/documents/transactions-personal-finance-category-taxonomy.csv) for a full list of personal finance categories.
     TransactionsRecurringGetResponse:
       type: object
       additionalProperties: true
@@ -13462,8 +13576,7 @@ components:
           nullable: true
         client_user_id:
           type: string
-          description: A unique ID that identifies the end user in your system. This ID is used to correlate requests by a user with multiple Items. The max length for this field is 36 characters. Personally identifiable information, such as an email address or phone number, should not be used in the `client_user_id`.
-          maxLength: 36
+          description: A unique ID that identifies the end user in your system. This ID is used to correlate requests by a user with multiple Items. Personally identifiable information, such as an email address or phone number, should not be used in the `client_user_id`.
         is_recurring:
           type: boolean
           description: '**true** if the ACH transaction is a recurring transaction; **false** otherwise '
@@ -13502,7 +13615,7 @@ components:
           $ref: '#/components/schemas/SignalEvaluateCoreAttributes'
         warnings:
           type: array
-          description: If bank information was not able to be used as features into the Signal model, this array contains warnings describing why we were missing bank data. If you want to receive an API error instead of Signal scores in case of missing bank data, please contact sales or your Plaid account manager.
+          description: If bank information was not available to be used in the Signal model, this array contains warnings describing why bank data is missing. If you want to receive an API error instead of Signal scores in the case of missing bank data, file a support ticket or contact your Plaid account manager.
           items:
             $ref: '#/components/schemas/SignalWarning'
       required:
@@ -15349,7 +15462,7 @@ components:
 
             `balance` is *not* a valid value, the Balance product does not require explicit initialization and will automatically be initialized when any other product is initialized.
 
-            The products specified here will determine which institutions will be available to your users in Link. Only institutions that support *all* requested products can be selected; a if a user attempts to select an institution that does not support a listed product, a "Connectivity not supported" error message will appear in Link. To maximize the number of institutions available, initialize Link with the minimal product set required for your use case. Additional products can be added after Link initialization by calling the relevant endpoints. For details and exceptions, see [Choosing when to initialize products](https://plaid.com/docs/link/initializing-products/).
+            The products specified here will determine which institutions will be available to your users in Link. Only institutions that support *all* requested products can be selected; a if a user attempts to select an institution that does not support a listed product, a "Connectivity not supported" error message will appear in Link. To maximize the number of institutions available, initialize Link with the minimal product set required for your use case. Additional products can be included via the [`required_if_supported_products`](https://plaid.com/docs/api/tokens/#link-token-create-request-required-if-supported-products) field, or can be initialized by calling the endpoint after obtaining an access token. For details and exceptions, see [Choosing when to initialize products](https://plaid.com/docs/link/initializing-products/).
 
             Note that, unless you have opted to disable Instant Match support, institutions that support Instant Match will also be shown in Link if `auth` is specified as a product, even though these institutions do not contain `auth` in their product array.
 
@@ -15389,20 +15502,13 @@ components:
           - transactions
           - signal
         required_if_supported_products:
-          x-hidden-from-docs: true
           type: array
           description: |-
-            List of Plaid product(s) you wish to use only if the institution and accounts selected by the user support the product. Institutions that do not support these products will still be shown in Link. The products will only be extracted if the user selects an institution that supports them.
+            List of Plaid product(s) you wish to use only if the institution and account(s) selected by the user support the product. Institutions that do not support these products will still be shown in Link. The products will only be extracted and billed if the user selects an institution and account type that supports them.
 
-            If the institution and accounts selected by the user support a product specified in this field, but Plaid is unable to successfully fetch data for the product (for example, because the institution uses an OAuth connection and the end user does not grant the required product permission(s) in the institution's OAuth flow) the error will be presented to the user in Link and they will be prompted to fix the error.
+            There should be no overlap between `products` and `required_if_supported_products`. The `products` array must have at least one product.
 
-            There should be no overlap between `products` and `required_if_supported_products`. The `products` array must have at least one product. Valid `required_if_supported_products` are:
-
-            `transactions`, `auth`, `identity`, `investments`, `liabilities`
-
-            Example: `['identity']`
-
-            In Production, you will only be billed for required if supported products when they are supported and added to the Item. To see the full list of products added to the item during Link, call `/item/get`.
+            For more details on using this feature, see [Required if Supported Products](https://www.plaid.com/docs/link/initializing-products/#required-if-supported-products).
           items:
             $ref: '#/components/schemas/Products'
           x-override-enum-values-shown:
@@ -16691,7 +16797,7 @@ components:
         date:
           type: string
           format: date
-          description: For pending transactions, the date that the transaction occurred; for posted transactions, the date that the transaction posted. Both dates are returned in an [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ( `YYYY-MM-DD` ).
+          description: For pending transactions, the date that the transaction occurred; for posted transactions, the date that the transaction posted. Both dates are returned in an [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ( `YYYY-MM-DD` ). To receive information about the date that a posted transaction was initiated, see the `authorized_date` field.
         location:
           $ref: '#/components/schemas/Location'
         name:
@@ -16772,13 +16878,13 @@ components:
           authorized_date:
             type: string
             format: date
-            description: The date that the transaction was authorized. Dates are returned in an [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ( `YYYY-MM-DD` ).
+            description: The date that the transaction was authorized. For posted transactions, the `date` field will indicate the posted date, but `authorized_date` will indicate the day the transaction was authorized by the financial institution. If presenting transactions to the user in a UI, the `authorized_date`, when available, is generally preferable to use over the `date` field for posted transactions, as it will generally represent the date the user actually made the transaction. Dates are returned in an [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ( `YYYY-MM-DD` ).
             nullable: true
           authorized_datetime:
             type: string
             format: date-time
             description: |-
-              Date and time when a transaction was authorized in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ( `YYYY-MM-DDTHH:mm:ssZ` ).
+              Date and time when a transaction was authorized in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ( `YYYY-MM-DDTHH:mm:ssZ` ). For posted transactions, the `datetime` field will indicate the posted date, but `authorized_datetime` will indicate the day the transaction was authorized by the financial institution. If presenting transactions to the user in a UI, the `authorized_datetime`, when available, is generally preferable to use over the `datetime` field for posted transactions, as it will generally represent the date the user actually made the transaction.
 
               This field is returned for select financial institutions and comes as provided by the institution. It may contain default time values (such as 00:00:00). This field is only populated in API version 2019-05-29 and later.
             nullable: true
@@ -16786,7 +16892,7 @@ components:
             type: string
             format: date-time
             description: |-
-              Date and time when a transaction was posted in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ( `YYYY-MM-DDTHH:mm:ssZ` ).
+              Date and time when a transaction was posted in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ( `YYYY-MM-DDTHH:mm:ssZ` ). For the date that the transaction was initiated, rather than posted, see the `authorized_datetime` field.
 
               This field is returned for select financial institutions and comes as provided by the institution. It may contain default time values (such as 00:00:00). This field is only populated in API version 2019-05-29 and later.
             nullable: true
@@ -16896,7 +17002,10 @@ components:
           description: A unique id for the stream
         category:
           type: array
-          description: "A hierarchical array of the categories to which this transaction belongs. See [Categories](https://plaid.com/docs/api/products/transactions/#categoriesget). \n\nAll implementations are encouraged to use the new `personal_finance_category` instead of `category`. `personal_finance_category` provides more meaningful categorization and greater accuracy."
+          description: |-
+            A hierarchical array of the categories to which this transaction belongs. See [Categories](https://plaid.com/docs/api/products/transactions/#categoriesget).
+
+            All implementations are encouraged to use the new `personal_finance_category` instead of `category`. `personal_finance_category` provides more meaningful categorization and greater accuracy.
           items:
             type: string
         category_id:
@@ -17018,7 +17127,7 @@ components:
       - TOMBSTONED
     InvestmentsAuthOwner:
       x-hidden-from-docs: true
-      title: Investments Auth Owner
+      title: InvestmentsAuthOwner
       type: object
       description: Information on the ownership of an investments account
       additionalProperties: true
@@ -21553,7 +21662,7 @@ components:
       title: UserPermissionRevokedWebhook
       type: object
       additionalProperties: true
-      description: The `USER_PERMISSION_REVOKED` webhook is fired when an end user has used either the [my.plaid.com portal](https://my.plaid.com) or the financial institution’s consent portal to revoke the permission that they previously granted to access an Item. Once access to an Item has been revoked, it cannot be restored. If the user subsequently returns to your application, a new Item must be created for the user.
+      description: The `USER_PERMISSION_REVOKED` webhook may be fired when an end user has used either the [my.plaid.com portal](https://my.plaid.com) or the financial institution’s OAuth consent portal to revoke the permission that they previously granted to access an Item. This webhook is not guaranteed to always be fired upon consent revocation, since some institutions’ consent portals do not trigger this webhook. Once access to an Item has been revoked, it cannot be restored. If the user subsequently returns to your application, a new Item must be created for the user.
       x-examples:
         example-1:
           webhook_type: ITEM
@@ -22341,11 +22450,11 @@ components:
       nullable: true
       maxLength: 50
       description: |-
-        A random key provided by the client, per unique authorization. Maximum of 50 characters.
+        A random key provided by the client, per unique authorization, which expires after 48 hours. Maximum of 50 characters.
 
         The API supports idempotency for safely retrying requests without accidentally performing the same operation twice. For example, if a request to create an authorization fails due to a network connection error, you can retry the request with the same idempotency key to guarantee that only a single authorization is created.
 
-        Failure to provide this key may result in duplicate charges.
+        This idempotency key expires after 48 hours, after which the same key can be reused. Failure to provide this key may result in duplicate charges.
 
         Required for guaranteed ACH customers.
     TransferRecurringIdempotencyKey:
@@ -23029,6 +23138,10 @@ components:
           description: The Plaid client ID that is the originator of this transfer. Only needed if creating transfers on behalf of another client as a third-party sender (TPS).
         credit_funds_source:
           $ref: '#/components/schemas/TransferCreditFundsSource'
+        test_clock_id:
+          type: string
+          description: Plaid’s unique identifier for a test clock. This field may only be used when using `sandbox` environment. If provided, the `authorization` is created at the `virtual_time` on the provided `test_clock`.
+          nullable: true
       required:
       - type
       - network
@@ -23288,6 +23401,12 @@ components:
         max_single_transfer_amount:
           type: string
           description: The max limit of dollar amount of a single transfer (decimal string with two digits of precision e.g. "10.00").
+        max_single_transfer_credit_amount:
+          type: string
+          description: The max limit of dollar amount of a single credit transfer (decimal string with two digits of precision e.g. "10.00").
+        max_single_transfer_debit_amount:
+          type: string
+          description: The max limit of dollar amount of a single debit transfer (decimal string with two digits of precision e.g. "10.00").
         max_daily_credit_amount:
           type: string
           description: The max limit of sum of dollar amount of credit transfers in last 24 hours (decimal string with two digits of precision e.g. "10.00").
@@ -23297,15 +23416,25 @@ components:
         max_monthly_amount:
           type: string
           description: The max limit of sum of dollar amount of credit and debit transfers in one calendar month (decimal string with two digits of precision e.g. "10.00").
+        max_monthly_credit_amount:
+          type: string
+          description: The max limit of sum of dollar amount of credit transfers in one calendar month (decimal string with two digits of precision e.g. "10.00").
+        max_monthly_debit_amount:
+          type: string
+          description: The max limit of sum of dollar amount of debit transfers in one calendar month (decimal string with two digits of precision e.g. "10.00").
         iso_currency_code:
           type: string
           description: The currency of the dollar amount, e.g. "USD".
       required:
       - request_id
       - max_single_transfer_amount
+      - max_single_transfer_credit_amount
+      - max_single_transfer_debit_amount
       - max_daily_credit_amount
       - max_daily_debit_amount
       - max_monthly_amount
+      - max_monthly_credit_amount
+      - max_monthly_debit_amount
       - iso_currency_code
     TransferMetricsGetResponse:
       title: TransferMetricsGetResponse
@@ -23324,6 +23453,12 @@ components:
         monthly_transfer_volume:
           type: string
           description: Sum of dollar amount of credit and debit transfers in current calendar month (decimal string with two digits of precision e.g. "10.00").
+        monthly_debit_transfer_volume:
+          type: string
+          description: Sum of dollar amount of debit transfers in current calendar month (decimal string with two digits of precision e.g. "10.00").
+        monthly_credit_transfer_volume:
+          type: string
+          description: Sum of dollar amount of credit transfers in current calendar month (decimal string with two digits of precision e.g. "10.00").
         iso_currency_code:
           type: string
           description: The currency of the dollar amount, e.g. "USD".
@@ -23332,6 +23467,8 @@ components:
       - daily_debit_transfer_volume
       - daily_credit_transfer_volume
       - monthly_transfer_volume
+      - monthly_debit_transfer_volume
+      - monthly_credit_transfer_volume
       - iso_currency_code
     TransferAuthorizationDecision:
       type: string
@@ -23361,6 +23498,8 @@ components:
           $ref: '#/components/schemas/TransferAuthorizationDecision'
         decision_rationale:
           $ref: '#/components/schemas/TransferAuthorizationDecisionRationale'
+        signal_insights:
+          $ref: '#/components/schemas/SignalInsights'
         guarantee_decision:
           $ref: '#/components/schemas/TransferAuthorizationGuaranteeDecision'
         guarantee_decision_rationale:
@@ -24122,7 +24261,7 @@ components:
           $ref: '#/components/schemas/APISecret'
         sweep_id:
           type: string
-          description: Plaid’s unique identifier for a sweep.
+          description: Plaid's unique identifier for the sweep (UUID) or a shortened form consisting of the first 8 characters of the identifier (8-digit hexadecimal string).
       required:
       - sweep_id
     BankTransferSweepGetResponse:
@@ -24212,6 +24351,10 @@ components:
           default: 0
           minimum: 0
           description: The number of sweeps to skip before returning results.
+        amount:
+          type: string
+          nullable: true
+          description: Filter sweeps to only those with the specified amount.
         originator_client_id:
           type: string
           nullable: true
@@ -24603,6 +24746,44 @@ components:
           $ref: '#/components/schemas/RequestID'
       required:
       - request_id
+    TransferDiligenceDocumentUploadRequest:
+      title: TransferDiligenceDocumentUploadRequest
+      type: object
+      description: Defines the request schema for `/transfer/diligence/document/upload`
+      properties:
+        originator_client_id:
+          type: string
+          description: The Client ID of the originator whose document that you want to upload.
+        file:
+          type: string
+          format: binary
+          description: A file to upload.
+        purpose:
+          $ref: '#/components/schemas/TransferDocumentPurpose'
+      required:
+      - originator_client_id
+      - file
+      - purpose
+    TransferDiligenceDocumentUploadResponse:
+      title: TransferDiligenceDocumentUploadResponse
+      type: object
+      additionalProperties: true
+      description: Defines the response schema for `/transfer/diligence/document/upload`
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
+    TransferDocumentPurpose:
+      type: string
+      title: purpose
+      enum:
+      - DUE_DILIGENCE
+      description: |-
+        Specifies the purpose of the uploaded file.
+
+        `"DUE_DILIGENCE"` - The transfer due diligence document of the originator.
+        The size of the document should be less than 20MB. Supported file extension: .pdf, .docx, .doc.
     TransferOriginatorDiligence:
       description: The diligence information for the originator.
       type: object
@@ -28583,7 +28764,7 @@ components:
           $ref: '#/components/schemas/CreditDocumentType'
         download_url:
           type: string
-          description: Signed URL to retrieve the underlying file. This download URL can only be used once. To generate a new download URL, call `/credit/payroll_income/get` again.
+          description: Signed URL to retrieve the underlying file. This download URL can only be used once and expires after two minutes. To generate a new download URL, call `/credit/payroll_income/get` again.
           nullable: true
         status:
           type: string
@@ -28703,10 +28884,15 @@ components:
           type: string
           description: The raw description of the transaction as it appears on the bank statement.
           nullable: true
+        account_id:
+          type: string
+          description: The unique id of the bank account that this transaction occurs in
+          nullable: true
       required:
       - amount
       - date
       - original_description
+      - account_id
     CreditBankStatementUploadBankAccount:
       title: CreditBankStatementUploadBankAccount
       type: object
@@ -28736,6 +28922,10 @@ components:
           description: An array of period objects, containing more data on the overall period of the statement.
           items:
             $ref: '#/components/schemas/CreditBankStatementUploadBankAccountPeriod'
+        account_id:
+          type: string
+          description: The unique id of the bank account
+          nullable: true
       required:
       - name
       - bank_name
@@ -28743,6 +28933,7 @@ components:
       - account_number
       - owner
       - periods
+      - account_id
     CreditBankStatementUploadAccountOwner:
       title: CreditBankStatementUploadAccountOwner
       type: object
@@ -31018,6 +31209,52 @@ components:
           $ref: '#/components/schemas/RequestID'
       required:
       - request_id
+    SandboxBankIncomeFireWebhookRequest:
+      title: SandboxBankIncomeFireWebhookRequest
+      type: object
+      description: SandboxBankIncomeFireWebhookRequest defines the request schema for `/sandbox/bank_income/fire_webhook`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        webhook_override:
+          type: string
+          description: The URL to which the webhook should be sent. If provided, this will override the URL set in the dashboard.
+        webhook_code:
+          $ref: '#/components/schemas/SandboxBankIncomeWebhookFireRequestWebhookCode'
+        webhook_fields:
+          $ref: '#/components/schemas/SandboxBankIncomeWebhookFireRequestWebhookFields'
+      required:
+      - webhook_code
+      - webhook_fields
+    SandboxBankIncomeWebhookFireRequestWebhookCode:
+      type: string
+      enum:
+      - BANK_INCOME_REFRESH_UPDATE
+      - BANK_INCOME_REFRESH_COMPLETE
+      description: The webhook codes this endpoint can be used to test
+    SandboxBankIncomeWebhookFireRequestWebhookFields:
+      type: object
+      properties:
+        user_id:
+          type: string
+          description: The user id to be returned in INCOME webhooks
+        bank_income_refresh_complete_result:
+          $ref: '#/components/schemas/BankIncomeRefreshCompleteResult'
+      description: Optional fields which will be populated in the simulated webhook
+      required:
+      - user_id
+    SandboxBankIncomeFireWebhookResponse:
+      title: SandboxBankIncomeFireWebhookResponse
+      additionalProperties: true
+      type: object
+      description: SandboxBankIncomeFireWebhookResponse defines the response schema for `/sandbox/bank_income/fire_webhook`
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
     ItemApplicationListUserAuth:
       type: object
       nullable: true
@@ -31063,8 +31300,7 @@ components:
           nullable: true
         client_user_id:
           type: string
-          description: A unique ID that identifies the end user in your system. This ID is used to correlate requests by a user with multiple Items. The max length for this field is 36 characters. Personally identifiable information, such as an email address or phone number, should not be used in the `client_user_id`.
-          maxLength: 36
+          description: A unique ID that identifies the end user in your system. This ID is used to correlate requests by a user with multiple Items. Personally identifiable information, such as an email address or phone number, should not be used in the `client_user_id`.
         is_recurring:
           type: boolean
           description: '`true` if the ACH transaction is a recurring transaction; `false` otherwise '
@@ -31189,13 +31425,29 @@ components:
           $ref: '#/components/schemas/SignalEvaluateCoreAttributes'
         warnings:
           type: array
-          description: If bank information was not able to be used as features into the Signal model, this array contains warnings describing why we were missing bank data. If you want to receive an API error instead of Signal scores in case of missing bank data, please contact sales or your Plaid account manager.
+          description: If bank information was not available to be used in the Signal model, this array contains warnings describing why bank data is missing. If you want to receive an API error instead of Signal scores in the case of missing bank data, file a support ticket or contact your Plaid account manager.
           items:
             $ref: '#/components/schemas/SignalWarning'
       required:
       - request_id
       - scores
       - warnings
+    SignalInsights:
+      title: SignalInsights
+      description: Signal insights including scores and attributes.
+      type: object
+      additionalProperties: true
+      nullable: true
+      properties:
+        scores:
+          $ref: '#/components/schemas/SignalScores'
+        core_attributes:
+          $ref: '#/components/schemas/SignalEvaluateCoreAttributes'
+        warnings:
+          type: array
+          description: If bank information was not available to be used in the Signal model, this array contains warnings describing why bank data is missing. If you want to receive an API error instead of Signal scores in the case of missing bank data, file a support ticket or contact your Plaid account manager.
+          items:
+            $ref: '#/components/schemas/SignalWarning'
     SignalScores:
       title: SignalEvaluateScores
       description: Risk scoring details broken down by risk category.
@@ -34093,19 +34345,124 @@ components:
     AssetReportTransaction:
       title: AssetReportTransaction
       description: A transaction on the asset report
-      allOf:
-      - $ref: '#/components/schemas/TransactionBase'
-      - type: object
-        additionalProperties: true
-        properties:
-          date_transacted:
+      type: object
+      additionalProperties: true
+      properties:
+        account_id:
+          type: string
+          description: The ID of the account in which this transaction occurred.
+        amount:
+          type: number
+          format: double
+          description: The settled value of the transaction, denominated in the transactions's currency, as stated in `iso_currency_code` or `unofficial_currency_code`. Positive values when money moves out of the account; negative values when money moves in. For example, debit card purchases are positive; credit card payments, direct deposits, and refunds are negative.
+        iso_currency_code:
+          type: string
+          description: The ISO-4217 currency code of the transaction. Always `null` if `unofficial_currency_code` is non-null.
+          nullable: true
+        unofficial_currency_code:
+          type: string
+          description: |-
+            The unofficial currency code associated with the transaction. Always `null` if `iso_currency_code` is non-`null`. Unofficial currency codes are used for currencies that do not have official ISO currency codes, such as cryptocurrencies and the currencies of certain countries.
+
+            See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `iso_currency_code`s.
+          nullable: true
+        original_description:
+          type: string
+          description: The string returned by the financial institution to describe the transaction. For transactions returned by `/transactions/get`, this field is in beta and will be omitted unless the client is both enrolled in the closed beta program and has set `options.include_original_description` to `true`.
+          nullable: true
+        category:
+          type: array
+          description: |-
+            A hierarchical array of the categories to which this transaction belongs. For a full list of categories, see [`/categories/get`](https://plaid.com/docs/api/products/transactions/#categoriesget).
+
+            All Transactions implementations are recommended to use the new `personal_finance_category` instead of `category`. `personal_finance_category` provides more meaningful categorization and greater accuracy.
+
+            If the `transactions` object was returned by an Assets endpoint such as `/asset_report/get/` or `/asset_report/pdf/get`, this field will only appear in an Asset Report with Insights.
+          nullable: true
+          items:
             type: string
-            nullable: true
-            description: The date on which the transaction took place, in IS0 8601 format.
-          credit_category:
-            $ref: '#/components/schemas/CreditCategory'
+        category_id:
+          description: |-
+            The ID of the category to which this transaction belongs. For a full list of categories, see [`/categories/get`](https://plaid.com/docs/api/products/transactions/#categoriesget).
+
+            All Transactions implementations are recommended to use the new `personal_finance_category` instead of `category_id`, as it provides greater accuracy and more meaningful categorization.
+
+            If the `transactions` object was returned by an Assets endpoint such as `/asset_report/get/` or `/asset_report/pdf/get`, this field will only appear in an Asset Report with Insights.
+          type: string
+          nullable: true
+        credit_category:
+          $ref: '#/components/schemas/CreditCategory'
+        check_number:
+          type: string
+          description: The check number of the transaction. This field is only populated for check transactions.
+          nullable: true
+        date:
+          type: string
+          format: date
+          description: For pending transactions, the date that the transaction occurred; for posted transactions, the date that the transaction posted. Both dates are returned in an [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ( `YYYY-MM-DD` ).
+        date_transacted:
+          type: string
+          nullable: true
+          description: The date on which the transaction took place, in IS0 8601 format.
+        location:
+          $ref: '#/components/schemas/Location'
+        name:
+          type: string
+          description: |-
+            The merchant name or transaction description.
+
+            If the `transactions` object was returned by a Transactions endpoint such as `/transactions/get`, this field will always appear. If the `transactions` object was returned by an Assets endpoint such as `/asset_report/get/` or `/asset_report/pdf/get`, this field will only appear in an Asset Report with Insights.
+        merchant_name:
+          type: string
+          description: The merchant name, as enriched by Plaid from the `name` field. This is typically a more human-readable version of the merchant counterparty in the transaction. For some bank transactions (such as checks or account transfers) where there is no meaningful merchant name, this value will be `null`.
+          nullable: true
+        payment_meta:
+          $ref: '#/components/schemas/PaymentMeta'
+        pending:
+          type: boolean
+          description: When `true`, identifies the transaction as pending or unsettled. Pending transaction details (name, type, amount, category ID) may change before they are settled.
+        pending_transaction_id:
+          type: string
+          description: The ID of a posted transaction's associated pending transaction, where applicable.
+          nullable: true
+        account_owner:
+          type: string
+          description: The name of the account owner. This field is not typically populated and only relevant when dealing with sub-accounts.
+          nullable: true
+        transaction_id:
+          type: string
+          description: The unique ID of the transaction. Like all Plaid identifiers, the `transaction_id` is case sensitive.
+        transaction_type:
+          $ref: '#/components/schemas/AssetReportTransactionType'
+        income_source_id:
+          type: string
+          description: A unique identifier for an income source.
+          x-hidden-from-docs: true
       required:
+      - transaction_id
+      - pending
+      - date
+      - unofficial_currency_code
+      - iso_currency_code
+      - amount
+      - account_id
       - original_description
+    AssetReportTransactionType:
+      title: AssetReportTransactionType
+      type: string
+      enum:
+      - digital
+      - place
+      - special
+      - unresolved
+      description: |
+        `digital:` transactions that took place online.
+
+        `place:` transactions that were made at a physical location.
+
+        `special:` transactions that relate to banks, e.g. fees or deposits.
+
+        `unresolved:` transactions that do not fit into the other three types.
     AddressPurposeLabel:
       description: |-
         Field describing whether the associated address is being used for commercial or residential purposes.
@@ -34261,6 +34618,14 @@ components:
       - ending
       title: DateRange
       additionalProperties: true
+    DeprecatedClientUserID:
+      type: string
+      title: CustomerReference
+      deprecated: true
+      minLength: 1
+      example: your-db-id-3b24110
+      description: Specifying `user.client_user_id` is deprecated. Please provide `client_user_id` at the root level instead.
+      nullable: true
     DocumentAnalysis:
       description: High level descriptions of how the associated document was processed. If a document fails verification, the details in the `analysis` object should help clarify why the document was rejected.
       type: object
@@ -35019,6 +35384,8 @@ components:
     IdentityVerificationCreateRequest:
       type: object
       properties:
+        client_user_id:
+          $ref: '#/components/schemas/ClientUserID'
         is_shareable:
           type: boolean
           example: true
@@ -35029,7 +35396,7 @@ components:
         gave_consent:
           $ref: '#/components/schemas/IdentityVerificationConsent'
         user:
-          $ref: '#/components/schemas/IdentityVerificationRequestUser'
+          $ref: '#/components/schemas/IdentityVerificationCreateRequestUser'
         client_id:
           $ref: '#/components/schemas/APIClientID'
         secret:
@@ -35039,9 +35406,46 @@ components:
       required:
       - is_shareable
       - template_id
-      - user
       - gave_consent
       description: Request schema for '/identity_verification/create'
+    IdentityVerificationCreateRequestUser:
+      description: |-
+        User information collected outside of Link, most likely via your own onboarding process.
+
+        Each of the following identity fields are optional:
+
+        `email_address`
+
+        `phone_number`
+
+        `date_of_birth`
+
+        `name`
+
+        `address`
+
+        `id_number`
+
+        Specifically, these fields are optional in that they can either be fully provided (satisfying every required field in their subschema) or omitted from the request entirely by not providing the key or value.
+        Providing these fields via the API will result in Link skipping the data collection process for the associated user. All verification steps enabled in the associated Identity Verification Template will still be run. Verification steps will either be run immediately, or once the user completes the `accept_tos` step, depending on the value provided to the `gave_consent` field.
+        If you are not using the shareable URL feature, you can optionally provide these fields via `/link/token/create` instead; both `/identity_verification/create` and `/link/token/create` are valid ways to provide this information. Note that if you provide a non-`null` user data object via `/identity_verification/create`, any user data fields entered via `/link/token/create` for the same `client_user_id` will be ignored when prefilling Link.
+      nullable: true
+      properties:
+        email_address:
+          $ref: '#/components/schemas/EmailAddress'
+        phone_number:
+          $ref: '#/components/schemas/IdentityVerificationUserPhoneNumber'
+        date_of_birth:
+          $ref: '#/components/schemas/ISO8601Date'
+        name:
+          $ref: '#/components/schemas/IdentityVerificationRequestUserName'
+        address:
+          $ref: '#/components/schemas/UserAddress'
+        id_number:
+          $ref: '#/components/schemas/UserIDNumber'
+        client_user_id:
+          $ref: '#/components/schemas/DeprecatedClientUserID'
+      type: object
     IdentityVerificationCreateResponse:
       description: A identity verification attempt represents a customer's attempt to verify their identity, reflecting the required steps for completing the session, the results for each step, and information collected in the process.
       additionalProperties: true
@@ -35229,10 +35633,7 @@ components:
 
         Specifically, these fields are optional in that they can either be fully provided (satisfying every required field in their subschema) or omitted from the request entirely by not providing the key or value.
         Providing these fields via the API will result in Link skipping the data collection process for the associated user. All verification steps enabled in the associated Identity Verification Template will still be run. Verification steps will either be run immediately, or once the user completes the `accept_tos` step, depending on the value provided to the `gave_consent` field.
-        If you are not using the shareable URL feature, you can optionally provide these fields via `/link/token/create` instead; both `/identity_verification/create` and `/link/token/create` are valid ways to provide this information. Note that if you provide a non-`null` user data object via `/identity_verification/create`, any user data fields entered via `/link/token/create` for the same `client_user_id` will be ignored when prefilling Link.
       properties:
-        client_user_id:
-          $ref: '#/components/schemas/ClientUserID'
         email_address:
           $ref: '#/components/schemas/EmailAddress'
         phone_number:
@@ -35245,8 +35646,7 @@ components:
           $ref: '#/components/schemas/UserAddress'
         id_number:
           $ref: '#/components/schemas/UserIDNumber'
-      required:
-      - client_user_id
+      nullable: true
       additionalProperties: true
     IdentityVerificationRequestUserName:
       type: object
@@ -35283,6 +35683,8 @@ components:
           $ref: '#/components/schemas/IdentityVerificationTemplateID'
         strategy:
           $ref: '#/components/schemas/Strategy'
+        user:
+          $ref: '#/components/schemas/IdentityVerificationRequestUser'
         steps:
           $ref: '#/components/schemas/IdentityVerificationRetryRequestStepsObject'
         client_id:
@@ -36054,6 +36456,8 @@ components:
           description: Array of result summary objects specifying values for `device` attributes of risk check.
           items:
             $ref: '#/components/schemas/RiskCheckDevice'
+        identity_abuse_signals:
+          $ref: '#/components/schemas/RiskCheckIdentityAbuseSignals'
       required:
       - status
       - behavior
@@ -36166,6 +36570,19 @@ components:
       - "yes"
       - "no"
       - no_data
+    RiskCheckIdentityAbuseSignals:
+      type: object
+      description: Result summary object capturing abuse signals related to `identity abuse`, e.g. stolen and synthetic identity fraud.
+      properties:
+        synthetic_identity:
+          $ref: '#/components/schemas/RiskCheckSyntheticIdentity'
+        stolen_identity:
+          $ref: '#/components/schemas/RiskCheckStolenIdentity'
+      required:
+      - synthetic_identity
+      - stolen_identity
+      nullable: true
+      additionalProperties: true
     RiskCheckLinkedService:
       type: string
       description: An enum indicating the type of a linked service.
@@ -36218,6 +36635,36 @@ components:
             $ref: '#/components/schemas/RiskCheckLinkedService'
       required:
       - linked_services
+      nullable: true
+      additionalProperties: true
+    RiskCheckStolenIdentity:
+      description: |-
+        Field containing the data used in determining the outcome of the stolen identity risk check.
+
+        Contains the following fields:
+
+        `score` - A score from 0 to 100 indicating the likelihood that the user is a stolen identity.
+      type: object
+      properties:
+        score:
+          description: A score from 0 to 100 indicating the likelihood that the user is a stolen identity.
+          type: integer
+          example: 0
+      nullable: true
+      additionalProperties: true
+    RiskCheckSyntheticIdentity:
+      description: |-
+        Field containing the data used in determining the outcome of the synthetic identity risk check.
+
+        Contains the following fields:
+
+        `score` - A score from 0 to 100 indicating the likelihood that the user is a synthetic identity.
+      type: object
+      properties:
+        score:
+          description: A score from 0 to 100 indicating the likelihood that the user is a synthetic identity.
+          type: integer
+          example: 0
       nullable: true
       additionalProperties: true
     ScreeningHitAnalysis:
