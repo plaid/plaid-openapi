@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.391.2
+  version: 2020-09-14_1.394.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -533,6 +533,67 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreditAuditCopyTokenUpdateRequest'
+  /statements/list:
+    post:
+      tags:
+      - plaid
+      summary: Retrieve a list of all statements associated with the provided item.
+      externalDocs:
+        url: /none/
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatementsListResponse'
+              examples:
+                example-1:
+                  value:
+                    item_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBFL9DrE6
+                    institution_id: ins_3
+                    institution_name: Chase
+                    accounts:
+                    - account_id: 3gE5gnRzNyfXpBK5wEEKcymJ5albGVUqg77gr
+                      account_name: Plaid Saving
+                      account_type: depository
+                      statements:
+                      - statement_id: vzeNDwK7KQIm4yEog683uElbp9GRLEFXGK98D
+                        month: 5
+                        year: 2023
+                    request_id: eYupqX1mZkEuQRx
+      operationId: statementsList
+      description: The `/statements/list` endpoint retrieves a list of all statements associated with the provided item.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatementsListRequest'
+        description: ""
+  /statements/download:
+    post:
+      tags:
+      - plaid
+      summary: Retrieve a single statement.
+      externalDocs:
+        url: /none/
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatementsDownloadResponse'
+      operationId: statementsDownload
+      description: The `/statements/download` endpoint retrieves a single statement.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatementsDownloadRequest'
+        description: ""
   /item/activity/list:
     post:
       tags:
@@ -1241,6 +1302,7 @@ paths:
                           logo_url: https://plaid-merchant-logos.plaid.com/walmart_1100.png
                           website: walmart.com
                           entity_id: O5W5j4dN9OR3E6ypQmjdkWZZRoXEzVMz2ByWM
+                          confidence_level: very_high
                         entity_id: O5W5j4dN9OR3E6ypQmjdkWZZRoXEzVMz2ByWM
                         location:
                           address: 13425 Community Rd
@@ -1257,6 +1319,7 @@ paths:
                         personal_finance_category:
                           detailed: GENERAL_MERCHANDISE_SUPERSTORES
                           primary: GENERAL_MERCHANDISE
+                          confidence_level: very_high
                         recurrence:
                           is_recurring: false
                         personal_finance_category_icon_url: https://plaid-category-icons.plaid.com/PFC_GENERAL_MERCHANDISE.png
@@ -1273,11 +1336,13 @@ paths:
                           logo_url: https://plaid-counterparty-logos.plaid.com/doordash_1.png
                           website: doordash.com
                           entity_id: YNRJg5o2djJLv52nBA1Yn1KpL858egYVo4dpm
+                          confidence_level: very_high
                         - name: Burger King
                           type: merchant
                           logo_url: https://plaid-merchant-logos.plaid.com/burger_king_155.png
                           website: burgerking.com
                           entity_id: mVrw538wamwdm22mK8jqpp7qd5br0eeV9o4a1
+                          confidence_level: very_high
                         location:
                           address: null
                           city: null
@@ -1294,6 +1359,7 @@ paths:
                         personal_finance_category:
                           detailed: FOOD_AND_DRINK_FAST_FOOD
                           primary: FOOD_AND_DRINK
+                          confidence_level: very_high
                         personal_finance_category_icon_url: https://plaid-category-icons.plaid.com/PFC_FOOD_AND_DRINK.png
                         recurrence:
                           is_recurring: false
@@ -2469,6 +2535,13 @@ paths:
                           expiration_date: "1990-05-29"
                           issuing_country: US
                           issuing_region: IN
+                          date_of_birth: "1990-05-29"
+                          address:
+                            street: 123 Main St. Unit 42
+                            city: Pawnee
+                            region: IN
+                            postal_code: "46001"
+                            country: US
                         analysis:
                           authenticity: match
                           image_quality: high
@@ -2612,6 +2685,13 @@ paths:
                           expiration_date: "1990-05-29"
                           issuing_country: US
                           issuing_region: IN
+                          date_of_birth: "1990-05-29"
+                          address:
+                            street: 123 Main St. Unit 42
+                            city: Pawnee
+                            region: IN
+                            postal_code: "46001"
+                            country: US
                         analysis:
                           authenticity: match
                           image_quality: high
@@ -2757,6 +2837,13 @@ paths:
                             expiration_date: "1990-05-29"
                             issuing_country: US
                             issuing_region: IN
+                            date_of_birth: "1990-05-29"
+                            address:
+                              street: 123 Main St. Unit 42
+                              city: Pawnee
+                              region: IN
+                              postal_code: "46001"
+                              country: US
                           analysis:
                             authenticity: match
                             image_quality: high
@@ -2908,6 +2995,13 @@ paths:
                           expiration_date: "1990-05-29"
                           issuing_country: US
                           issuing_region: IN
+                          date_of_birth: "1990-05-29"
+                          address:
+                            street: 123 Main St. Unit 42
+                            city: Pawnee
+                            region: IN
+                            postal_code: "46001"
+                            country: US
                         analysis:
                           authenticity: match
                           image_quality: high
@@ -11594,6 +11688,7 @@ paths:
                           type: merchant
                           logo_url: https://plaid-merchant-logos.plaid.com/apple_63.png
                           website: apple.com
+                          confidence_level: very_high
                         location:
                           address: 300 Post St
                           city: San Francisco
@@ -14582,7 +14677,39 @@ components:
       - PAYMENT_STATUS_CANCELLED
       - PAYMENT_STATUS_ESTABLISHED
       - PAYMENT_STATUS_REJECTED
-      description: "The status of the payment.\n\n`PAYMENT_STATUS_INPUT_NEEDED`: This is the initial state of all payments. It indicates that the payment is waiting on user input to continue processing. A payment may re-enter this state later on if further input is needed.\n\n`PAYMENT_STATUS_INITIATED`: The payment has been successfully authorised and accepted by the financial institution. For successful payments, this is a potential terminal status. Further status transitions can be to REJECTED and, when supported by the institution, to EXECUTED.\n\n`PAYMENT_STATUS_INSUFFICIENT_FUNDS`: The payment has failed due to insufficient funds.\n\n`PAYMENT_STATUS_FAILED`: The payment has failed to be initiated. This error may be caused by transient system outages and is retryable once the root cause is resolved.\n\n`PAYMENT_STATUS_BLOCKED`: The payment has been blocked by Plaid. This can occur, for example, due to Plaid flagging the payment as potentially risky. This is a retryable error.\n\n`PAYMENT_STATUS_AUTHORISING`: The payment is currently being processed. The payment will automatically exit this state when the financial institution has authorised the transaction.\n\n`PAYMENT_STATUS_CANCELLED`: The payment was cancelled (typically by the end user) during authorisation.\n\n`PAYMENT_STATUS_EXECUTED`: The funds have successfully left the payer account and payment is considered complete. Not all institutions support this status: support is more common in the UK, and less common in the EU. For institutions where this status is not supported, the terminal status for a successful payment will be `PAYMENT_STATUS_INITIATED`.\n\n`PAYMENT_STATUS_SETTLED`: The payment has settled and funds are available for use. A payment will typically settle within seconds to several days, depending on which payment rail is used. This status is only available to customers using [Plaid Virtual Accounts](https://plaid.com/docs/virtual-accounts/). \n\n`PAYMENT_STATUS_ESTABLISHED`: Indicates that the standing order has been successfully established. This state is only used for standing orders.\n\n`PAYMENT_STATUS_REJECTED`: The payment was rejected by the financial institution.\n\nDeprecated:\nThese statuses will be removed in a future release.\n\n`PAYMENT_STATUS_UNKNOWN`: The payment status is unknown.\n\n`PAYMENT_STATUS_PROCESSING`: The payment is currently being processed. The payment will automatically exit this state when processing is complete.\n\n`PAYMENT_STATUS_COMPLETED`: Indicates that the standing order has been successfully established. This state is only used for standing orders."
+      description: |-
+        The status of the payment.
+
+        `PAYMENT_STATUS_INPUT_NEEDED`: This is the initial state of all payments. It indicates that the payment is waiting on user input to continue processing. A payment may re-enter this state later on if further input is needed.
+
+        `PAYMENT_STATUS_INITIATED`: The payment has been successfully authorised and accepted by the financial institution. For successful payments, this is a potential terminal status. Further status transitions can be to REJECTED and, when supported by the institution, to EXECUTED.
+
+        `PAYMENT_STATUS_INSUFFICIENT_FUNDS`: The payment has failed due to insufficient funds.
+
+        `PAYMENT_STATUS_FAILED`: The payment has failed to be initiated. This error may be caused by transient system outages and is retryable once the root cause is resolved.
+
+        `PAYMENT_STATUS_BLOCKED`: The payment has been blocked by Plaid. This can occur, for example, due to Plaid flagging the payment as potentially risky. This is a retryable error.
+
+        `PAYMENT_STATUS_AUTHORISING`: The payment is currently being processed. The payment will automatically exit this state when the financial institution has authorised the transaction.
+
+        `PAYMENT_STATUS_CANCELLED`: The payment was cancelled (typically by the end user) during authorisation.
+
+        `PAYMENT_STATUS_EXECUTED`: The funds have successfully left the payer account and payment is considered complete. Not all institutions support this status: support is more common in the UK, and less common in the EU. For institutions where this status is not supported, the terminal status for a successful payment will be `PAYMENT_STATUS_INITIATED`.
+
+        `PAYMENT_STATUS_SETTLED`: The payment has settled and funds are available for use. A payment will typically settle within seconds to several days, depending on which payment rail is used. This status is only available to customers using [Plaid Virtual Accounts](https://plaid.com/docs/virtual-accounts/).
+
+        `PAYMENT_STATUS_ESTABLISHED`: Indicates that the standing order has been successfully established. This state is only used for standing orders.
+
+        `PAYMENT_STATUS_REJECTED`: The payment was rejected by the financial institution.
+
+        Deprecated:
+        These statuses will be removed in a future release.
+
+        `PAYMENT_STATUS_UNKNOWN`: The payment status is unknown.
+
+        `PAYMENT_STATUS_PROCESSING`: The payment is currently being processed. The payment will automatically exit this state when processing is complete.
+
+        `PAYMENT_STATUS_COMPLETED`: Indicates that the standing order has been successfully established. This state is only used for standing orders.
     PaymentInitiationPayment:
       type: object
       additionalProperties: true
@@ -15078,7 +15205,7 @@ components:
           minimum: 0
         async_update:
           type: boolean
-          description: When `true`, any Investments extraction will happen asynchronously and Plaid will subsequently fire a `HISTORICAL_UPDATE` webhook when the extraction completes. When `false`, Plaid will wait to return a response until extraction completion and no `HISTORICAL_UPDATE` webhook will fire. Note that while the extraction is happening asynchronously, calls to `/investments/transactions/get` and `/investments/refresh` will return `PRODUCT_NOT_READY` errors until the extraction completes.
+          description: If the Item was not initialized with the investments product via the `products` array when calling `/link/token/create`, and `async_update` is set to true, the initial Investments extraction will happen asynchronously. Plaid will subsequently fire a `HISTORICAL_UPDATE` webhook when the extraction completes. When `false`, Plaid will wait to return a response until extraction completion and no `HISTORICAL_UPDATE` webhook will fire. Note that while the extraction is happening asynchronously, calls to `/investments/transactions/get` and `/investments/refresh` will return `PRODUCT_NOT_READY` errors until the extraction completes.
           default: false
     InvestmentsTransactionsGetResponse:
       type: object
@@ -15630,6 +15757,7 @@ components:
           type: boolean
           description: If `true`, allow self-custody crypto wallets to be added without requiring signature verification. Defaults to `false`.
     LinkTokenInvestmentsAuth:
+      x-hidden-from-docs: true
       description: Configuration parameters for the Investments Auth Product
       type: object
       properties:
@@ -16491,7 +16619,7 @@ components:
           description: |-
             The ACH account number for the account.
 
-            Note that when using OAuth with Chase Bank (`ins_56`), Chase will issue "tokenized" routing and account numbers, which are not the user's actual account and routing numbers. These tokenized numbers should work identically to normal account and routing numbers. The digits returned in the `mask` field will continue to reflect the actual account number, rather than the tokenized account number; for this reason, when displaying account numbers to the user to help them identify their account in your UI, always use the `mask` rather than truncating the `account` number. If a user revokes their permissions to your app, the tokenized numbers will continue to work for ACH deposits, but not withdrawals.
+            Note that when using OAuth with Chase Bank (`ins_56`), Chase will issue "tokenized" routing and account numbers, which are not the user's actual account and routing numbers. These tokenized account numbers (also known as TANs) should work identically to normal account and routing numbers. The digits returned in the `mask` field will continue to reflect the actual account number, rather than the tokenized account number; for this reason, when displaying account numbers to the user to help them identify their account in your UI, always use the `mask` rather than truncating the `account` number. If a user revokes their permissions to your app, the tokenized numbers will continue to work for ACH deposits, but not withdrawals.
         routing:
           type: string
           description: The ACH routing number for the account. If the institution is `ins_56`, this may be a tokenized routing number. For more information, see the description of the `account` field.
@@ -16834,14 +16962,14 @@ components:
           description: |-
             The merchant name or transaction description.
 
-            If the `transactions` object was returned by a Transactions endpoint such as `/transactions/get`, this field will always appear. If the `transactions` object was returned by an Assets endpoint such as `/asset_report/get/` or `/asset_report/pdf/get`, this field will only appear in an Asset Report with Insights.
+            If the `transactions` object was returned by a Transactions endpoint such as `/transactions/sync` or `/transactions/get`, this field will always appear. If the `transactions` object was returned by an Assets endpoint such as `/asset_report/get/` or `/asset_report/pdf/get`, this field will only appear in an Asset Report with Insights.
         merchant_name:
           type: string
           description: The merchant name, as enriched by Plaid from the `name` field. This is typically a more human-readable version of the merchant counterparty in the transaction. For some bank transactions (such as checks or account transfers) where there is no meaningful merchant name, this value will be `null`.
           nullable: true
         original_description:
           type: string
-          description: The string returned by the financial institution to describe the transaction. For transactions returned by `/transactions/get`, this field is in beta and will be omitted unless the client is both enrolled in the closed beta program and has set `options.include_original_description` to `true`.
+          description: The string returned by the financial institution to describe the transaction. For transactions returned by `/transactions/sync` or `/transactions/get`, this field is in beta and will be omitted unless the client is both enrolled in the closed beta program and has set `options.include_original_description` to `true`.
           nullable: true
         payment_meta:
           $ref: '#/components/schemas/PaymentMeta'
@@ -17355,7 +17483,7 @@ components:
       description: |-
         Transaction information specific to inter-bank transfers. If the transaction was not an inter-bank transfer, all fields will be `null`.
 
-        If the `transactions` object was returned by a Transactions endpoint such as `/transactions/get`, the `payment_meta` key will always appear, but no data elements are guaranteed. If the `transactions` object was returned by an Assets endpoint such as `/asset_report/get/` or `/asset_report/pdf/get`, this field will only appear in an Asset Report with Insights.
+        If the `transactions` object was returned by a Transactions endpoint such as `/transactions/sync or `/transactions/get`, the `payment_meta` key will always appear, but no data elements are guaranteed. If the `transactions` object was returned by an Assets endpoint such as `/asset_report/get/` or `/asset_report/pdf/get`, this field will only appear in an Asset Report with Insights.
       properties:
         reference_number:
           type: string
@@ -17488,6 +17616,17 @@ components:
           type: string
           description: The URL of a logo associated with the counterparty, if available. The logo is formatted as a 100x100 pixel PNG file.
           nullable: true
+        confidence_level:
+          type: string
+          description: |-
+            A description of how confident we are that the provided counterparty is involved in the transaction.
+
+            `very_high`: We recognize this counterparty and we are more than 98% confident that it is involved in this transaction.
+            `high`: We recognize this counterparty and we are more than 90% confident that it is involved in this transaction.
+            `medium`: We are moderately confident that this counterparty was involved in this transaction, but some details may differ from our records.
+            `low`: We didn’t find a matching counterparty in our records, so we are returning a cleansed name parsed out of the request description.
+            `unknown`: Error
+          nullable: true
       required:
       - name
       - type
@@ -17552,6 +17691,17 @@ components:
         detailed:
           type: string
           description: A granular category conveying the transaction's intent. This field can also be used as a unique identifier for the category.
+        confidence_level:
+          type: string
+          description: |-
+            A description of how confident we are that the provided categories accurately describe the transaction intent.
+
+            `very_high`: We are more than 98% confident that this category reflects the intent of the transaction.
+            `high`: We are more than 90% confident that this category reflects the intent of the transaction.
+            `medium`: We are moderately confident that this category reflects the intent of the transaction.
+            `low`: This category may reflect the intent, but there may be other categories that are more accurate.
+            `unknown`: Error
+          nullable: true
       required:
       - primary
       - detailed
@@ -17916,7 +18066,7 @@ components:
 
         Note that to receive this webhook for an Item, `/transactions/sync` must have been called at least once on that Item. This means that, unlike the `INITIAL_UPDATE` and `HISTORICAL_UPDATE` webhooks, it will not fire immediately upon Item creation. If `/transactions/sync` is called on an Item that was *not* initialized with Transactions, the webhook will fire twice: once the first 30 days of transactions data has been fetched, and a second time when all available historical transactions data has been fetched.
 
-        This webhook will typically not fire in the Sandbox environment, due to the lack of dynamic transactions data. To test this webhook in Sandbox, call `/sandbox/item/fire_webhook`.
+        This webhook will fire in the Sandbox environment as it would in Production. It can also be manually triggered in Sandbox by calling `/sandbox/item/fire_webhook`.
       type: object
       additionalProperties: true
       properties:
@@ -26210,7 +26360,7 @@ components:
         score:
           type: integer
           nullable: true
-          description: Represents the match score for name. 100 is a perfect score, 85-99 means a strong match, 50-84 is a partial match, less than 50 is a weak match and 0 is a complete mismatch. If the name is missing from either the API or financial institution, this is null.
+          description: Match score for name. 100 is a perfect score, 85-99 means a strong match, 84-70 is a partial match, any score less than 70 is a mismatch. Typically, the match threshold should be set to a score of 70 or higher. If the name is missing from either the API or financial institution, this is null.
         is_first_name_or_last_name_match:
           type: boolean
           nullable: true
@@ -26233,7 +26383,7 @@ components:
         score:
           type: integer
           nullable: true
-          description: Match score for normalized phone number. 100 is a perfect match and 0 is a no match. If the phone number is missing from either the API or financial institution, this is null.
+          description: Match score for normalized phone number. 100 is a perfect match, 99-70 is a partial match (matching the same phone number with extension against one without extension etc.), anything below 70 is considered a mismatch. Typically, the match threshold should be set to a score of 70 or higher. If the phone number is missing from either the API or financial institution, this is null.
     EmailAddressMatchScore:
       title: EmailAddressMatchScore
       type: object
@@ -26244,7 +26394,7 @@ components:
         score:
           type: integer
           nullable: true
-          description: Match score for normalized email. 100 is a perfect match and 0 is a no match. If the email is missing from either the API or financial institution, this is null.
+          description: Match score for normalized email. 100 is a perfect match, 99-70 is a partial match (matching the same email with different '+' extensions), anything below 70 is considered a mismatch. Typically, the match threshold should be set to a score of 70 or higher. If the email is missing from either the API or financial institution, this is null.
     AddressMatchScore:
       title: AddressMatchScore
       type: object
@@ -26255,7 +26405,7 @@ components:
         score:
           type: integer
           nullable: true
-          description: Match score for address. The score can range from 0 to 100 where 100 is a perfect match and 0 is a no match. If the address is missing from either the API or financial institution, this is null.
+          description: Match score for address. 100 is a perfect match, 99-90 is a strong match, 89-80 is a partial match, anything below 80 is considered a weak match. Typically, the match threshold should be set to a score of 80 or higher. If the address is missing from either the API or financial institution, this is null.
         is_postal_code_match:
           type: boolean
           nullable: true
@@ -26500,7 +26650,7 @@ components:
       properties:
         access_tokens:
           type: array
-          description: An array of access tokens corresponding to the Items that will be cross-referenced with the product data. Plaid will attempt to correlate transaction history from these Items with data from the user's paystub, such as date and amount. The `verification` status of the paystub as returned by `/income/verification/paystubs/get` will indicate if the verification status was successful, or, if not, why it failed. If the `transactions` product was not initialized for the Items during Link, it will be initialized after this Link session.
+          description: An array of access tokens corresponding to the Items that will be cross-referenced with the product data. Plaid will attempt to correlate transaction history from these Items with data from the user's paystub, such as date and amount. If the `transactions` product was not initialized for the Items during Link, it will be initialized after this Link session.
           items:
             $ref: '#/components/schemas/AccessToken'
     IncomeVerificationCreateResponse:
@@ -26761,6 +26911,13 @@ components:
       - payroll_document_income
       description: Flow types to retrieve payroll income data
       type: string
+    IncomeVerificationDocParsingConfig:
+      title: IncomeVerificationDocParsingConfig
+      enum:
+      - ocr
+      - fraud_risk
+      description: Analysis options to enable for document parsing
+      type: string
     IncomeVerificationStatusWebhook:
       title: IncomeVerificationStatusWebhook
       type: object
@@ -26789,7 +26946,7 @@ components:
         verification_status:
           type: string
           description: |-
-            `VERIFICATION_STATUS_PROCESSING_COMPLETE`: The income verification status processing has completed. If the user uploaded multiple documents, this webhook will fire when all documents have finished processing. Call the `/income/verification/paystubs/get` endpoint and check the document metadata to see which documents were successfully parsed.
+            `VERIFICATION_STATUS_PROCESSING_COMPLETE`: The income verification status processing has completed. If the user uploaded multiple documents, this webhook will fire when all documents have finished processing. Call the `/credit/payroll_income/get` endpoint and check the document metadata to see which documents were successfully parsed.
 
             `VERIFICATION_STATUS_PROCESSING_FAILED`: A failure occurred when attempting to process the verification documentation.
 
@@ -29153,8 +29310,20 @@ components:
           nullable: true
         status:
           type: string
-          description: The processing status of the document.
+          description: |-
+            The processing status of the document.
+
+            `PROCESSING_COMPLETE`: The document was successfully processed.
+
+            `DOCUMENT_ERROR`: The document could not be processed. Possible causes include: The document was an unacceptable document type such as an offer letter or bank statement, the document image was cropped or blurry, or the document was corrupted.
+
+            `UNKNOWN` or `null`: An internal error occurred. If this happens repeatedly, contact support or your Plaid account manager.
           nullable: true
+          x-override-enum-values-shown:
+          - UNKNOWN
+          - PROCESSING_COMPLETE
+          - DOCUMENT_ERROR
+          - null
         page_count:
           type: integer
           description: The number of pages of the uploaded document (if available).
@@ -31826,8 +31995,6 @@ components:
       properties:
         scores:
           $ref: '#/components/schemas/SignalScores'
-        core_attributes:
-          $ref: '#/components/schemas/SignalEvaluateCoreAttributes'
         warnings:
           type: array
           description: If bank information was not available to be used in the Signal model, this array contains warnings describing why bank data is missing. If you want to receive an API error instead of Signal scores in the case of missing bank data, file a support ticket or contact your Plaid account manager.
@@ -33709,6 +33876,7 @@ components:
       enum:
       - CREATED
       - OPENED
+      - EXITED
       - COMPLETED
       - EXPIRED
       description: |-
@@ -33717,6 +33885,8 @@ components:
         `CREATED`: The session is created but not yet accessed by the user
 
         `OPENED`: The session is opened by the user but not yet completed
+
+        `EXITED`: The session has been exited by the user
 
         `COMPLETED`: The session has been completed by the user
 
@@ -35894,6 +36064,72 @@ components:
       - redacted_at
       - request_id
       type: object
+    IdentityVerificationDocumentAddressResponse:
+      description: |-
+        The address extracted from the document. The address must at least contain the following fields to be a valid address: `street`, `city`, `country`. If any are missing or unable to be extracted, the address will be null.
+
+        `region`, and `postal_code` may be null based on the addressing system. For example:
+
+        Addresses from the United Kingdom will not include a region
+
+        Addresses from Hong Kong will not include postal code
+
+        Note: Optical Character Recognition (OCR) technology may sometimes extract incorrect data from a document.
+      type: object
+      properties:
+        street:
+          $ref: '#/components/schemas/IdentityVerificationDocumentStreet'
+        city:
+          $ref: '#/components/schemas/IdentityVerificationDocumentCity'
+        region:
+          $ref: '#/components/schemas/IdentityVerificationDocumentRegion'
+        postal_code:
+          $ref: '#/components/schemas/IdentityVerificationDocumentPostalCode'
+        country:
+          $ref: '#/components/schemas/IdentityVerificationDocumentCountryCode'
+      required:
+      - street
+      - city
+      - region
+      - postal_code
+      - country
+      nullable: true
+      additionalProperties: true
+    IdentityVerificationDocumentCity:
+      type: string
+      example: Pawnee
+      title: IdentityVerificationDocumentCity
+      description: City extracted from the document.
+    IdentityVerificationDocumentCountryCode:
+      type: string
+      title: IdentityVerificationDocumentCountryCode
+      minLength: 2
+      example: US
+      description: Valid, capitalized, two-letter ISO code representing the country extracted from the document. Must be in ISO 3166-1 alpha-2 form.
+    IdentityVerificationDocumentISO8601DateOfBirth:
+      type: string
+      format: date
+      title: IdentityVerificationDocumentISO8601DateOfBirth
+      example: "1990-05-29"
+      description: A date extracted from the document in the format YYYY-MM-DD (RFC 3339 Section 5.6).
+      nullable: true
+    IdentityVerificationDocumentPostalCode:
+      type: string
+      example: "46001"
+      title: IdentityVerificationDocumentPostalCode
+      description: The postal code extracted from the document. Between 2 and 10 alphanumeric characters. For US-based addresses this must be 5 numeric digits.
+      nullable: true
+    IdentityVerificationDocumentRegion:
+      type: string
+      example: IN
+      title: IdentityVerificationDocumentRegion
+      description: An ISO 3166-2 subdivision code extracted from the document. Related terms would be "state", "province", "prefecture", "zone", "subdivision", etc.
+      nullable: true
+    IdentityVerificationDocumentStreet:
+      type: string
+      example: 123 Main St. Unit 42
+      title: IdentityVerificationDocumentStreet
+      description: The full street address extracted from the document.
     IdentityVerificationGetRequest:
       description: Request input for fetching an identity verification
       type: object
@@ -36636,12 +36872,18 @@ components:
           $ref: '#/components/schemas/GenericCountryCode'
         issuing_region:
           $ref: '#/components/schemas/Region'
+        date_of_birth:
+          $ref: '#/components/schemas/IdentityVerificationDocumentISO8601DateOfBirth'
+        address:
+          $ref: '#/components/schemas/IdentityVerificationDocumentAddressResponse'
       required:
       - id_number
       - category
       - expiration_date
       - issuing_country
       - issuing_region
+      - date_of_birth
+      - address
       nullable: true
       additionalProperties: true
     PhysicalDocumentExtractedDataAnalysis:
@@ -36845,6 +37087,7 @@ components:
       - devices
       - email
       - phone
+      - identity_abuse_signals
       nullable: true
       additionalProperties: true
     RiskCheckDevice:
@@ -37031,6 +37274,8 @@ components:
           description: A score from 0 to 100 indicating the likelihood that the user is a stolen identity.
           type: integer
           example: 0
+      required:
+      - score
       nullable: true
       additionalProperties: true
     RiskCheckSyntheticIdentity:
@@ -37046,6 +37291,8 @@ components:
           description: A score from 0 to 100 indicating the likelihood that the user is a synthetic identity.
           type: integer
           example: 0
+      required:
+      - score
       nullable: true
       additionalProperties: true
     ScreeningHitAnalysis:
@@ -37143,6 +37390,9 @@ components:
           $ref: '#/components/schemas/SelfieCaptureImageURL'
         video_url:
           $ref: '#/components/schemas/SelfieCaptureVideoURL'
+      required:
+      - image_url
+      - video_url
       additionalProperties: true
     SelfieCaptureImageURL:
       type: string
@@ -40340,3 +40590,109 @@ components:
       - category
       - publisher
       - notificationPayload
+    StatementsListRequest:
+      title: StatementsListRequest
+      type: object
+      description: StatementsListRequest defines the request schema for `/statements/list`
+      properties:
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+      required:
+      - access_token
+    StatementsListResponse:
+      title: StatementsListResponse
+      type: object
+      additionalProperties: true
+      description: StatementsListResponse defines the response schema for `/statements/list`
+      properties:
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/StatementsAccount'
+        institution_id:
+          description: The Plaid Institution ID associated with the Item.
+          type: string
+        institution_name:
+          description: The name of the institution associated with the Item.
+          type: string
+        item_id:
+          description: The Plaid Item ID. The `item_id` is always unique; linking the same account at the same institution twice will result in two Items with different `item_id` values. Like all Plaid identifiers, the `item_id` is case-sensitive.
+          type: string
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - accounts
+      - institution_id
+      - institution_name
+      - item_id
+      - request_id
+    StatementsAccount:
+      title: StatementsAccount
+      type: object
+      additionalProperties: true
+      description: Account associated with the item.
+      properties:
+        account_id:
+          description: Plaid's unique identifier for the account.
+          type: string
+        account_name:
+          description: The name of the account, either assigned by the user or by the financial institution itself.
+          type: string
+        account_type:
+          description: The type of account. Possible values are investment, credit, depository, loan, brokerage, other.
+          type: string
+        statements:
+          description: The list of statements' metadata associated with this account.
+          type: array
+          items:
+            $ref: '#/components/schemas/StatementsStatement'
+      required:
+      - account_id
+      - account_name
+      - account_type
+      - statements
+    StatementsStatement:
+      title: StatementsStatement
+      type: object
+      additionalProperties: true
+      description: A statement's metadata associated with an account
+      properties:
+        statement_id:
+          description: Plaid's unique identifier for the statement.
+          type: string
+        month:
+          description: 'Month of the year. Possible values: 1 through 12 (January through December).'
+          type: integer
+        year:
+          description: 'Year. Possible values: 2010-{current_year}.'
+          type: integer
+      required:
+      - statement_id
+      - month
+      - year
+    StatementsDownloadRequest:
+      title: StatementsDownloadRequest
+      type: object
+      description: StatementsDownloadRequest defines the request schema for `/statements/download`
+      properties:
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        statement_id:
+          description: Plaid's unique identifier for the statements.
+          type: string
+      required:
+      - access_token
+      - statement_id
+    StatementsDownloadResponse:
+      title: StatementsDownloadResponse
+      format: binary
+      type: string
+      description: StatementsDownloadResponse defines the response schema for `/statements/download`. The response will contain a `Plaid-Content-Hash` header containing a SHA 256 checksum of the statement. This can be used to verify that the file being sent by Plaid is the same file that was downloaded to your systems.
