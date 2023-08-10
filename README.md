@@ -11,6 +11,7 @@ You can find examples on the official [OpenApiGenerator docs](https://github.com
 The following are approximate commands that we use to generate our 5 client libraries:
 
 #### plaid-node
+OpenAPI Generator version: 5.1.1
 
 ```bash
 openapi-generator-cli generate -g typescript-axios  \
@@ -21,6 +22,7 @@ openapi-generator-cli generate -g typescript-axios  \
 ```
 
 #### plaid-python
+OpenAPI Generator version: 6.1
 
 ```bash
 openapi-generator-cli generate -g python \
@@ -32,6 +34,7 @@ openapi-generator-cli generate -g python \
 ```
 
 #### plaid-ruby
+OpenAPI Generator version: 6.1
 
 ```bash
 openapi-generator-cli generate -g ruby  \
@@ -39,12 +42,13 @@ openapi-generator-cli generate -g ruby  \
 -o build/generated-ruby \
 --global-property=apiTests=false,modelTests=false  \
 --library=faraday \
--p gemName=plaid,gemRequiredRubyVersion=">= 2.7.1" \
+-p gemName=plaid,gemRequiredRubyVersion=">= 3.0.0" \
 -t local/templates/ruby
 
 ```
 
 #### plaid-java
+OpenAPI Generator version: 5.1.1
 
 ```bash
 openapi-generator-cli generate -g java \
@@ -58,6 +62,8 @@ openapi-generator-cli generate -g java \
 ```
 
 #### plaid-go
+OpenAPI Generator version: 5.2
+
 ```bash
 openapi-generator-cli -g go \
 -i 2020-09-14.yml \
