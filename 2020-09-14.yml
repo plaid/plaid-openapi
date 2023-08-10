@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.394.0
+  version: 2020-09-14_1.406.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -506,6 +506,218 @@ paths:
               $ref: '#/components/schemas/AssetReportAuditCopyRemoveRequest'
         description: ""
       description: The `/asset_report/audit_copy/remove` endpoint allows you to remove an Audit Copy. Removing an Audit Copy invalidates the `audit_copy_token` associated with it, meaning both you and any third parties holding the token will no longer be able to use it to access Report data. Items associated with the Asset Report, the Asset Report itself and other Audit Copies of it are not affected and will remain accessible after removing the given Audit Copy.
+  /cra/base_report/get:
+    post:
+      summary: Retrieve a Base Report
+      tags:
+      - plaid
+      operationId: baseReportGet
+      x-hidden-from-docs: true
+      externalDocs:
+        url: /none/
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BaseReportGetRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseReportGetResponse'
+              examples:
+                example-1:
+                  value:
+                    report:
+                      report_id: 028e8404-a013-4a45-ac9e-002482f9cafc
+                      date_generated: "2023-03-30T18:27:37Z"
+                      days_requested: 5
+                      items:
+                      - accounts:
+                        - balances:
+                            available: 43200
+                            current: 43200
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
+                            limit: null
+                          days_available: 5
+                          historical_balances:
+                          - current: 49050
+                            date: "2023-03-29"
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
+                          - current: 49050
+                            date: "2023-03-28"
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
+                          - current: 49050
+                            date: "2023-03-27"
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
+                          - current: 49050
+                            date: "2023-03-26"
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
+                          - current: 49050
+                            date: "2023-03-25"
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
+                          mask: "4444"
+                          name: Plaid Money Market
+                          official_name: Plaid Platinum Standard 1.85% Interest Money Market
+                          owners:
+                          - addresses:
+                            - data:
+                                city: Malakoff
+                                country: US
+                                region: NY
+                                street: 2992 Cameron Road
+                                postal_code: "14236"
+                              primary: true
+                            - data:
+                                city: San Matias
+                                country: US
+                                region: CA
+                                street: 2493 Leisure Lane
+                                postal_code: 93405-2255
+                              primary: false
+                            emails:
+                            - data: accountholder0@example.com
+                              primary: true
+                              type: primary
+                            - data: accountholder1@example.com
+                              primary: false
+                              type: secondary
+                            - data: extraordinarily.long.email.username.123456@reallylonghostname.com
+                              primary: false
+                              type: other
+                            names:
+                            - Alberta Bobbeth Charleson
+                            phone_numbers:
+                            - data: "1112223333"
+                              primary: false
+                              type: home
+                            - data: "1112224444"
+                              primary: false
+                              type: work
+                            - data: "1112225555"
+                              primary: false
+                              type: mobile
+                          ownership_type: null
+                          subtype: money market
+                          transactions:
+                          - amount: 5850
+                            date: "2023-03-30"
+                            iso_currency_code: USD
+                            original_description: ACH Electronic CreditGUSTO PAY 123456
+                            pending: false
+                            unofficial_currency_code: null
+                          type: depository
+                        - balances:
+                            available: 100
+                            current: 110
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
+                            limit: null
+                          days_available: 5
+                          historical_balances:
+                          - current: 110
+                            date: "2023-03-29"
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
+                          - current: -390
+                            date: "2023-03-28"
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
+                          - current: -373.67
+                            date: "2023-03-27"
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
+                          - current: -284.27
+                            date: "2023-03-26"
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
+                          - current: -284.27
+                            date: "2023-03-25"
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
+                          mask: "0000"
+                          name: Plaid Checking
+                          official_name: Plaid Gold Standard 0% Interest Checking
+                          owners:
+                          - addresses:
+                            - data:
+                                city: Malakoff
+                                country: US
+                                region: NY
+                                street: 2992 Cameron Road
+                                postal_code: "14236"
+                              primary: true
+                            - data:
+                                city: San Matias
+                                country: US
+                                region: CA
+                                street: 2493 Leisure Lane
+                                postal_code: 93405-2255
+                              primary: false
+                            emails:
+                            - data: accountholder0@example.com
+                              primary: true
+                              type: primary
+                            - data: accountholder1@example.com
+                              primary: false
+                              type: secondary
+                            - data: extraordinarily.long.email.username.123456@reallylonghostname.com
+                              primary: false
+                              type: other
+                            names:
+                            - Alberta Bobbeth Charleson
+                            phone_numbers:
+                            - data: "1112223333"
+                              primary: false
+                              type: home
+                            - data: "1112224444"
+                              primary: false
+                              type: work
+                            - data: "1112225555"
+                              primary: false
+                              type: mobile
+                          ownership_type: null
+                          subtype: checking
+                          transactions:
+                          - amount: 89.4
+                            date: "2023-03-27"
+                            iso_currency_code: USD
+                            original_description: SparkFun
+                            pending: false
+                            unofficial_currency_code: null
+                          - amount: 12
+                            date: "2023-03-28"
+                            iso_currency_code: USD
+                            original_description: 'McDonalds #3322'
+                            pending: false
+                            unofficial_currency_code: null
+                          - amount: 4.33
+                            date: "2023-03-28"
+                            iso_currency_code: USD
+                            original_description: Starbucks
+                            pending: false
+                            unofficial_currency_code: null
+                          - amount: -500
+                            date: "2023-03-29"
+                            iso_currency_code: USD
+                            original_description: United Airlines **** REFUND ****
+                            pending: false
+                            unofficial_currency_code: null
+                          type: depository
+                        date_last_updated: "2023-03-30T18:25:26Z"
+                        institution_id: ins_109508
+                        institution_name: First Platypus Bank
+                    request_id: GVzMdiDd8DDAQK4
+      description: This endpoint allows the customer to retrieve a Base Report. Customers should pass in the `user_token` created in `/link/token/create`.
   /credit/audit_copy_token/update:
     post:
       tags:
@@ -533,6 +745,216 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreditAuditCopyTokenUpdateRequest'
+  /cra/bank_income/get:
+    post:
+      summary: Retrieve information from the bank accounts used for income verification
+      tags:
+      - plaid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CraBankIncomeGetResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: LhQf0THi8SH1yJm
+                    bank_income:
+                    - bank_income_id: abc123
+                      generated_time: "2022-01-31T22:47:53Z"
+                      days_requested: 90
+                      items:
+                      - last_updated_time: "2022-01-31T22:47:53Z"
+                        institution_id: ins_0
+                        institution_name: Plaid Bank
+                        bank_income_accounts:
+                        - mask: "8888"
+                          name: Plaid Checking Account
+                          official_name: Plaid Checking Account
+                          type: depository
+                          subtype: checking
+                          owners:
+                          - addresses:
+                            - data:
+                                city: Malakoff
+                                country: US
+                                postal_code: "14236"
+                                region: NY
+                                street: 2992 Cameron Road
+                              primary: true
+                            - data:
+                                city: San Matias
+                                country: US
+                                postal_code: 93405-2255
+                                region: CA
+                                street: 2493 Leisure Lane
+                              primary: false
+                            emails:
+                            - data: accountholder0@example.com
+                              primary: true
+                              type: primary
+                            - data: accountholder1@example.com
+                              primary: false
+                              type: secondary
+                            - data: extraordinarily.long.email.username.123456@reallylonghostname.com
+                              primary: false
+                              type: other
+                            names:
+                            - Alberta Bobbeth Charleson
+                            phone_numbers:
+                            - data: "1112223333"
+                              primary: false
+                              type: home
+                            - data: "1112224444"
+                              primary: false
+                              type: work
+                            - data: "1112225555"
+                              primary: false
+                              type: mobile
+                        bank_income_sources:
+                        - income_source_id: “f17efbdd-caab-4278-8ece-963511cd3d51”
+                          income_description: “PLAID_INC_DIRECT_DEP_PPD”
+                          income_category: SALARY
+                          start_date: "2021-11-15"
+                          end_date: "2022-01-15"
+                          pay_frequency: MONTHLY
+                          total_amount: 300
+                          iso_currency_code: USD
+                          unofficial_currency_code: null
+                          transaction_count: 1
+                          next_payment_date: "2022-12-15"
+                          historical_average_monthly_gross_income: 390
+                          historical_average_monthly_income: 300
+                          forcasted_average_monthly_income: 300
+                          employer:
+                            name: Plaid Inc
+                          historical_summary:
+                          - start_date: "2021-11-02"
+                            end_date: "2021-11-30"
+                            total_amounts:
+                            - amount: 100
+                              iso_currency_code: USD
+                              unofficial_currency_code: null
+                            transactions:
+                            - amount: -100
+                              date: "2021-11-15"
+                              name: “PLAID_INC_DIRECT_DEP_PPD”
+                              original_description: PLAID_INC_DIRECT_DEP_PPD 123
+                              pending: false
+                              check_number: null
+                              iso_currency_code: USD
+                              unofficial_currency_code: null
+                          - start_date: "2021-12-01"
+                            end_date: "2021-12-31"
+                            total_amounts:
+                            - amount: 100
+                              iso_currency_code: USD
+                              unofficial_currency_code: null
+                            transactions:
+                            - amount: -100
+                              date: "2021-12-15"
+                              name: “PLAID_INC_DIRECT_DEP_PPD”
+                              original_description: PLAID_INC_DIRECT_DEP_PPD 123
+                              pending: false
+                              check_number: null
+                              iso_currency_code: USD
+                              unofficial_currency_code: null
+                          - start_date: "2022-01-01"
+                            end_date: "2022-01-31"
+                            total_amounts:
+                            - amount: 100
+                              iso_currency_code: USD
+                              unofficial_currency_code: null
+                            transactions:
+                            - amount: -100
+                              date: "2022-01-31"
+                              name: “PLAID_INC_DIRECT_DEP_PPD”
+                              original_description: PLAID_INC_DIRECT_DEP_PPD 123
+                              pending: false
+                              check_number: null
+                              iso_currency_code: USD
+                              unofficial_currency_code: null
+                      bank_income_summary:
+                        total_amounts:
+                        - amount: 300
+                          iso_currency_code: USD
+                          unofficial_currency_code: null
+                        start_date: "2021-11-15"
+                        end_date: "2022-01-15"
+                        income_sources_count: 1
+                        income_categories_count: 1
+                        income_transactions_count: 1
+                        historical_average_monthly_gross_income:
+                        - amount: 390
+                          iso_currency_code: USD
+                          unofficial_currency_code: null
+                        historical_average_monthly_income:
+                        - amount: 300
+                          iso_currency_code: USD
+                          unofficial_currency_code: null
+                        forcasted_average_monthly_income:
+                        - amount: 300
+                          iso_currency_code: USD
+                          unofficial_currency_code: null
+                        historical_summary:
+                        - start_date: "2021-11-02"
+                          end_date: "2021-11-30"
+                          total_amounts:
+                          - amount: 100
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
+                          transactions:
+                          - amount: -100
+                            date: "2021-11-15"
+                            name: “PLAID_INC_DIRECT_DEP_PPD”
+                            original_description: PLAID_INC_DIRECT_DEP_PPD 123
+                            pending: false
+                            check_number: null
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
+                        - start_date: "2021-12-01"
+                          end_date: "2021-12-31"
+                          total_amounts:
+                          - amount: 100
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
+                          transactions:
+                          - amount: -100
+                            date: "2021-12-15"
+                            name: “PLAID_INC_DIRECT_DEP_PPD”
+                            original_description: PLAID_INC_DIRECT_DEP_PPD 123
+                            pending: false
+                            check_number: null
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
+                        - start_date: "2022-01-01"
+                          end_date: "2022-01-31"
+                          total_amounts:
+                          - amount: 100
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
+                          transactions:
+                          - amount: -100
+                            date: "2022-01-31"
+                            name: “PLAID_INC_DIRECT_DEP_PPD”
+                            original_description: PLAID_INC_DIRECT_DEP_PPD 123
+                            pending: false
+                            check_number: null
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
+                      warnings: []
+      externalDocs:
+        url: /api/products/income/#crabank_incomeget
+      operationId: craBankIncomeGet
+      description: '`/cra/bank_income/get` returns the bank income report(s) for a specified user.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CraBankIncomeGetRequest'
   /statements/list:
     post:
       tags:
@@ -1302,7 +1724,7 @@ paths:
                           logo_url: https://plaid-merchant-logos.plaid.com/walmart_1100.png
                           website: walmart.com
                           entity_id: O5W5j4dN9OR3E6ypQmjdkWZZRoXEzVMz2ByWM
-                          confidence_level: very_high
+                          confidence_level: VERY_HIGH
                         entity_id: O5W5j4dN9OR3E6ypQmjdkWZZRoXEzVMz2ByWM
                         location:
                           address: 13425 Community Rd
@@ -1319,7 +1741,7 @@ paths:
                         personal_finance_category:
                           detailed: GENERAL_MERCHANDISE_SUPERSTORES
                           primary: GENERAL_MERCHANDISE
-                          confidence_level: very_high
+                          confidence_level: VERY_HIGH
                         recurrence:
                           is_recurring: false
                         personal_finance_category_icon_url: https://plaid-category-icons.plaid.com/PFC_GENERAL_MERCHANDISE.png
@@ -1336,13 +1758,13 @@ paths:
                           logo_url: https://plaid-counterparty-logos.plaid.com/doordash_1.png
                           website: doordash.com
                           entity_id: YNRJg5o2djJLv52nBA1Yn1KpL858egYVo4dpm
-                          confidence_level: very_high
+                          confidence_level: VERY_HIGH
                         - name: Burger King
                           type: merchant
                           logo_url: https://plaid-merchant-logos.plaid.com/burger_king_155.png
                           website: burgerking.com
                           entity_id: mVrw538wamwdm22mK8jqpp7qd5br0eeV9o4a1
-                          confidence_level: very_high
+                          confidence_level: VERY_HIGH
                         location:
                           address: null
                           city: null
@@ -1359,7 +1781,7 @@ paths:
                         personal_finance_category:
                           detailed: FOOD_AND_DRINK_FAST_FOOD
                           primary: FOOD_AND_DRINK
-                          confidence_level: very_high
+                          confidence_level: VERY_HIGH
                         personal_finance_category_icon_url: https://plaid-category-icons.plaid.com/PFC_FOOD_AND_DRINK.png
                         recurrence:
                           is_recurring: false
@@ -2575,6 +2997,7 @@ paths:
                         summary: match
                       phone_number:
                         summary: match
+                        area_code: match
                     risk_check:
                       status: success
                       behavior:
@@ -2725,6 +3148,7 @@ paths:
                         summary: match
                       phone_number:
                         summary: match
+                        area_code: match
                     risk_check:
                       status: success
                       behavior:
@@ -2877,6 +3301,7 @@ paths:
                           summary: match
                         phone_number:
                           summary: match
+                          area_code: match
                       risk_check:
                         status: success
                         behavior:
@@ -3035,6 +3460,7 @@ paths:
                         summary: match
                       phone_number:
                         summary: match
+                        area_code: match
                     risk_check:
                       status: success
                       behavior:
@@ -3953,6 +4379,164 @@ paths:
         required: true
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningindividualupdate
+  /beacon/user/create:
+    post:
+      summary: Create a Beacon User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BeaconUserCreateRequest'
+        required: true
+      tags:
+      - plaid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BeaconUserCreateResponse'
+              examples:
+                example-1:
+                  value:
+                    id: becusr_11111111111111
+                    created_at: "2020-07-24T03:26:02Z"
+                    updated_at: "2020-07-24T03:26:02Z"
+                    status: cleared
+                    program_id: becprg_11111111111111
+                    client_user_id: your-db-id-3b24110
+                    user:
+                      date_of_birth: "1990-05-29"
+                      name:
+                        given_name: Leslie
+                        family_name: Knope
+                      address:
+                        street: 123 Main St.
+                        street2: Unit 42
+                        city: Pawnee
+                        region: IN
+                        postal_code: "46001"
+                        country: US
+                      email_address: user@example.com
+                      phone_number: "+19876543212"
+                      id_number:
+                        value: "123456789"
+                        type: us_ssn
+                      ip_address: 192.0.2.42
+                    audit_trail:
+                      source: dashboard
+                      dashboard_user_id: 54350110fedcbaf01234ffee
+                    request_id: saKrIBuEB9qJZng
+      operationId: beaconUserCreate
+      description: |-
+        Create and scan a Beacon User against your Beacon Program, according to your program's settings.
+
+        When you submit a new user to `/beacon/user/create`, several checks are performed immediately:
+
+          - The user's PII (provided within the `user` object) is searched against all other users within the Beacon Program you specified. If a match is found that violates your program's "Duplicate Information Filtering" settings, the user will be returned with a status of `pending_review`.
+
+          - The user's PII is also searched against all fraud reports created by your organization across all of your Beacon Programs. If the user's data matches a fraud report that your team created, the user will be returned with a status of `rejected`.
+
+          - Finally, the user's PII is searched against all fraud report shared with the Beacon Network by other companies. If a matching fraud report is found, the user will be returned with a `pending_review` status if your program has enabled automatic flagging based on network fraud.
+      externalDocs:
+        url: /api/products/beacon/#beaconusercreate
+  /beacon/user/get:
+    post:
+      summary: Get a Beacon User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BeaconUserGetRequest'
+        required: true
+      tags:
+      - plaid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BeaconUserGetResponse'
+              examples:
+                example-1:
+                  value:
+                    id: becusr_11111111111111
+                    created_at: "2020-07-24T03:26:02Z"
+                    updated_at: "2020-07-24T03:26:02Z"
+                    status: cleared
+                    program_id: becprg_11111111111111
+                    client_user_id: your-db-id-3b24110
+                    user:
+                      date_of_birth: "1990-05-29"
+                      name:
+                        given_name: Leslie
+                        family_name: Knope
+                      address:
+                        street: 123 Main St.
+                        street2: Unit 42
+                        city: Pawnee
+                        region: IN
+                        postal_code: "46001"
+                        country: US
+                      email_address: user@example.com
+                      phone_number: "+19876543212"
+                      id_number:
+                        value: "123456789"
+                        type: us_ssn
+                      ip_address: 192.0.2.42
+                    audit_trail:
+                      source: dashboard
+                      dashboard_user_id: 54350110fedcbaf01234ffee
+                    request_id: saKrIBuEB9qJZng
+      operationId: beaconUserGet
+      description: |
+        Fetch a Beacon User.
+
+        The Beacon User is returned with all of their associated information and a `status` based on the Beacon Network duplicate record and fraud checks.
+      externalDocs:
+        url: /api/products/beacon/#beaconuserget
+  /beacon/report/create:
+    post:
+      summary: Create a Beacon Report
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BeaconReportCreateRequest'
+        required: true
+      tags:
+      - plaid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BeaconReportCreateResponse'
+              examples:
+                example-1:
+                  value:
+                    id: becrpt_11111111111111
+                    beacon_user_id: becusr_11111111111111
+                    created_at: "2020-07-24T03:26:02Z"
+                    type: first_party
+                    fraud_date: "1990-05-29"
+                    fraud_amount:
+                      iso_currency_code: USD
+                      value: 100
+                    audit_trail:
+                      source: dashboard
+                      dashboard_user_id: 54350110fedcbaf01234ffee
+                    request_id: saKrIBuEB9qJZng
+      operationId: beaconReportCreate
+      description: |-
+        Create a fraud report for a given Beacon User.
+
+        Note: If you are creating users with the express purpose of providing historical fraud data, you should use the `/beacon/user/create` endpoint instead and embed the fraud report in the request. This will ensure that the Beacon User you create will not be subject to any billing costs.
+      externalDocs:
+        url: /api/products/beacon/#beaconreportcreate
   /processor/auth/get:
     post:
       tags:
@@ -4089,22 +4673,6 @@ paths:
                       transaction_id: lPNjeW1nR6CDn5okmGQ6hEpMo4lLNoSrzqDje
                       transaction_code: null
                       transaction_type: place
-                    item:
-                      available_products:
-                      - balance
-                      - identity
-                      - investments
-                      billed_products:
-                      - assets
-                      - auth
-                      - liabilities
-                      - transactions
-                      consent_expiration_time: null
-                      error: null
-                      institution_id: ins_3
-                      item_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBFL9DrE6
-                      update_type: background
-                      webhook: https://www.genericwebhookurl.com/webhook
                     total_transactions: 1
                     request_id: 45QSn
         default:
@@ -4118,11 +4686,13 @@ paths:
 
         Transactions are returned in reverse-chronological order, and the sequence of transaction ordering is stable and will not shift.  Transactions are not immutable and can also be removed altogether by the institution; a removed transaction will no longer appear in `/processor/transactions/get`.  For more details, see [Pending and posted transactions](https://plaid.com/docs/transactions/transactions-data/#pending-and-posted-transactions).
 
-        Due to the potentially large number of transactions associated with an Item, results are paginated. Manipulate the `count` and `offset` parameters in conjunction with the `total_transactions` response body field to fetch all available transactions.
+        Due to the potentially large number of transactions associated with a processor token, results are paginated. Manipulate the `count` and `offset` parameters in conjunction with the `total_transactions` response body field to fetch all available transactions.
 
-        Data returned by `/processor/transactions/get` will be the data available for the Item as of the most recent successful check for new transactions. Plaid typically checks for new data multiple times a day, but these checks may occur less frequently, such as once a day, depending on the institution. An Item's `status.transactions.last_successful_update` field will show the timestamp of the most recent successful update. To force Plaid to check for new transactions, you can use the `/processor/transactions/refresh` endpoint.
+        Data returned by `/processor/transactions/get` will be the data available for the processor token as of the most recent successful check for new transactions. Plaid typically checks for new data multiple times a day, but these checks may occur less frequently, such as once a day, depending on the institution. To force Plaid to check for new transactions, you can use the `/processor/transactions/refresh` endpoint.
 
         Note that data may not be immediately available to `/processor/transactions/get`. Plaid will begin to prepare transactions data upon Item link, if Link was initialized with `transactions`, or upon the first call to `/processor/transactions/get`, if it wasn't. If no transaction history is ready when `/processor/transactions/get` is called, it will return a `PRODUCT_NOT_READY` error.
+
+        To receive Transactions webhooks for a processor token, set its webhook URL via the [`/processor/token/webhook/update`](https://plaid.com/docs/api/processors/#processortokenwebhookupdate) endpoint.
       requestBody:
         required: true
         content:
@@ -4134,7 +4704,7 @@ paths:
     post:
       tags:
       - plaid
-      summary: Get incremental transaction updates on an Item
+      summary: Get incremental transaction updates on a processor token
       externalDocs:
         url: /api/processors/#processortransactionssync
       operationId: processorTransactionsSync
@@ -4249,21 +4819,23 @@ paths:
       description: |-
         This endpoint replaces `/processor/transactions/get` and its associated webhooks for most common use-cases.
 
-        The `/processor/transactions/sync` endpoint allows developers to subscribe to all transactions associated with an Item and get updates synchronously in a stream-like manner, using a cursor to track which updates have already been seen. `/processor/transactions/sync` provides the same functionality as `/processor/transactions/get` and can be used instead of `/processor/transactions/get` to simplify the process of tracking transactions updates.
+        The `/processor/transactions/sync` endpoint allows developers to subscribe to all transactions associated with a processor token and get updates synchronously in a stream-like manner, using a cursor to track which updates have already been seen. `/processor/transactions/sync` provides the same functionality as `/processor/transactions/get` and can be used instead of `/processor/transactions/get` to simplify the process of tracking transactions updates.
 
         This endpoint provides user-authorized transaction data for `credit`, `depository`, and some loan-type accounts (only those with account subtype `student`; coverage may be limited). For transaction history from `investments` accounts, use `/investments/transactions/get` instead.
 
         Returned transactions data is grouped into three types of update, indicating whether the transaction was added, removed, or modified since the last call to the API.
 
-        In the first call to `/processor/transactions/sync` for an Item, the endpoint will return all historical transactions data associated with that Item up until the time of the API call (as "adds"), which then generates a `next_cursor` for that Item. In subsequent calls, send the `next_cursor` to receive only the changes that have occurred since the previous call.
+        In the first call to `/processor/transactions/sync` for a processor token, the endpoint will return all historical transactions data associated with that processor token up until the time of the API call (as "adds"), which then generates a `next_cursor` for that processor token. In subsequent calls, send the `next_cursor` to receive only the changes that have occurred since the previous call.
 
-        Due to the potentially large number of transactions associated with an Item, results are paginated. The `has_more` field specifies if additional calls are necessary to fetch all available transaction updates. Call `/processor/transactions/sync` with the new cursor, pulling all updates, until `has_more` is `false`.
+        Due to the potentially large number of transactions associated with a processor token, results are paginated. The `has_more` field specifies if additional calls are necessary to fetch all available transaction updates. Call `/processor/transactions/sync` with the new cursor, pulling all updates, until `has_more` is `false`.
 
         When retrieving paginated updates, track both the `next_cursor` from the latest response and the original cursor from the first call in which `has_more` was `true`; if a call to `/processor/transactions/sync` fails when retrieving a paginated update, which can occur as a result of the [`TRANSACTIONS_SYNC_MUTATION_DURING_PAGINATION`](https://plaid.com/docs/errors/transactions/#transactions_sync_mutation_during_pagination) error, the entire pagination request loop must be restarted beginning with the cursor for the first page of the update, rather than retrying only the single request that failed.
 
-        Whenever new or updated transaction data becomes available, `/processor/transactions/sync` will provide these updates. Plaid typically checks for new data multiple times a day, but these checks may occur less frequently, such as once a day, depending on the institution. An Item's `status.transactions.last_successful_update` field will show the timestamp of the most recent successful update. To force Plaid to check for new transactions, use the `/processor/transactions/refresh` endpoint.
+        Whenever new or updated transaction data becomes available, `/processor/transactions/sync` will provide these updates. Plaid typically checks for new data multiple times a day, but these checks may occur less frequently, such as once a day, depending on the institution. To force Plaid to check for new transactions, use the `/processor/transactions/refresh` endpoint.
 
-        Note that for newly created Items, data may not be immediately available to `/processor/transactions/sync`. Plaid begins preparing transactions data when the Item is created, but the process can take anywhere from a few seconds to several minutes to complete, depending on the number of transactions available.
+        Note that for newly created processor tokens, data may not be immediately available to `/processor/transactions/sync`. Plaid begins preparing transactions data when the corresponding Item is created, but the process can take anywhere from a few seconds to several minutes to complete, depending on the number of transactions available.
+
+        To receive Transactions webhooks for a processor token, set its webhook URL via the [`/processor/token/webhook/update`](https://plaid.com/docs/api/processors/#processortokenwebhookupdate) endpoint.
       requestBody:
         required: true
         content:
@@ -4297,7 +4869,7 @@ paths:
                 $ref: '#/components/schemas/PlaidError'
           description: Error response
       description: |-
-        `/processor/transactions/refresh` is an optional endpoint for users of the Transactions product. It initiates an on-demand extraction to fetch the newest transactions for an Item. This on-demand extraction takes place in addition to the periodic extractions that automatically occur multiple times a day for any Transactions-enabled Item. If changes to transactions are discovered after calling `/processor/transactions/refresh`, Plaid will fire a webhook: for `/transactions/sync` users, [`SYNC_UPDATES_AVAILABLE`](https://plaid.com/docs/api/products/transactions/#sync_updates_available) will be fired if there are any transactions updated, added, or removed. For users of both `/processor/transactions/sync` and `/processor/transactions/get`, [`TRANSACTIONS_REMOVED`](https://plaid.com/docs/api/products/transactions/#transactions_removed) will be fired if any removed transactions are detected, and [`DEFAULT_UPDATE`](https://plaid.com/docs/api/products/transactions/#default_update) will be fired if any new transactions are detected. New transactions can be fetched by calling `/processor/transactions/get` or `/processor/transactions/sync`. Note that the `/processor/transactions/refresh` endpoint is not supported for Capital One (`ins_128026`) and will result in a `PRODUCT_NOT_SUPPORTED` error if called on an Item from that institution.
+        `/processor/transactions/refresh` is an optional endpoint for users of the Transactions product. It initiates an on-demand extraction to fetch the newest transactions for a processor token. This on-demand extraction takes place in addition to the periodic extractions that automatically occur multiple times a day for any Transactions-enabled processor token. If changes to transactions are discovered after calling `/processor/transactions/refresh`, Plaid will fire a webhook: for `/transactions/sync` users, [`SYNC_UPDATES_AVAILABLE`](https://plaid.com/docs/api/products/transactions/#sync_updates_available) will be fired if there are any transactions updated, added, or removed. For users of both `/processor/transactions/sync` and `/processor/transactions/get`, [`TRANSACTIONS_REMOVED`](https://plaid.com/docs/api/products/transactions/#transactions_removed) will be fired if any removed transactions are detected, and [`DEFAULT_UPDATE`](https://plaid.com/docs/api/products/transactions/#default_update) will be fired if any new transactions are detected. New transactions can be fetched by calling `/processor/transactions/get` or `/processor/transactions/sync`. Note that the `/processor/transactions/refresh` endpoint is not supported for Capital One (`ins_128026`) and will result in a `PRODUCT_NOT_SUPPORTED` error if called on a processor token from that institution.
 
         `/processor/transactions/refresh` is offered as an add-on to Transactions and has a separate [fee model](/docs/account/billing/#per-request-flat-fee). To request access to this endpoint, submit a [product access request](https://dashboard.plaid.com/team/products) or contact your Plaid account manager.
       requestBody:
@@ -4426,9 +4998,11 @@ paths:
 
         This endpoint is offered as an add-on to Transactions. To request access to this endpoint, submit a [product access request](https://dashboard.plaid.com/team/products) or contact your Plaid account manager.
 
-        This endpoint can only be called on an Item that has already been initialized with Transactions (either during Link, by specifying it in `/link/token/create`; or after Link, by calling `/processor/transactions/get` or `/processor/transactions/sync`). Once all historical transactions have been fetched, call `/processor/transactions/recurring/get` to receive the Recurring Transactions streams and subscribe to the [`RECURRING_TRANSACTIONS_UPDATE`](https://plaid.com/docs/api/products/transactions/#recurring_transactions_update) webhook. To know when historical transactions have been fetched, if you are using `/transactions/sync` listen for the [`SYNC_UPDATES_AVAILABLE`](https://plaid.com/docs/api/products/transactions/#SyncUpdatesAvailableWebhook-historical-update-complete) webhook and check that the `historical_update_complete` field in the payload is `true`. If using `/transactions/get`, listen for the [`HISTORICAL_UPDATE`](https://plaid.com/docs/api/products/transactions/#historical_update) webhook.
+        This endpoint can only be called on a processor token that has already been initialized with Transactions (either during Link, by specifying it in `/link/token/create`; or after Link, by calling `/processor/transactions/get` or `/processor/transactions/sync`). Once all historical transactions have been fetched, call `/processor/transactions/recurring/get` to receive the Recurring Transactions streams and subscribe to the [`RECURRING_TRANSACTIONS_UPDATE`](https://plaid.com/docs/api/products/transactions/#recurring_transactions_update) webhook. To know when historical transactions have been fetched, if you are using `/processor/transactions/sync` listen for the [`SYNC_UPDATES_AVAILABLE`](https://plaid.com/docs/api/products/transactions/#SyncUpdatesAvailableWebhook-historical-update-complete) webhook and check that the `historical_update_complete` field in the payload is `true`. If using `/processor/transactions/get`, listen for the [`HISTORICAL_UPDATE`](https://plaid.com/docs/api/products/transactions/#historical_update) webhook.
 
         After the initial call, you can call `/processor/transactions/recurring/get` endpoint at any point in the future to retrieve the latest summary of recurring streams. Listen to the [`RECURRING_TRANSACTIONS_UPDATE`](https://plaid.com/docs/api/products/transactions/#recurring_transactions_update) webhook to be notified when new updates are available.
+
+        To receive Transactions webhooks for a processor token, set its webhook URL via the [`/processor/token/webhook/update`](https://plaid.com/docs/api/processors/#processortokenwebhookupdate) endpoint.
       requestBody:
         required: true
         content:
@@ -6367,6 +6941,7 @@ paths:
                       - account: TR6666
                         account_id: k67E4xKvMlhmleEa4pg9hlwGGNnnEeixPolGm
                         dtc_numbers: []
+                      aton: []
                     request_id: l68wb8zpS0hqmsJ
                     owners:
                     - account_id: 5Bvpj4QknlhVWk7GygpwfVKdd133GoCxB814g
@@ -6917,6 +7492,7 @@ paths:
                         ach_return_code: R13
                         description: Invalid ACH routing number
                       id: 460cbe92-2dcc-8eae-5ad6-b37d0ec90fd9
+                      authorization_id: c9f90aa1-2949-c799-e2b6-ea05c89bb586
                       metadata:
                         key1: value1
                         key2: value2
@@ -7329,6 +7905,7 @@ paths:
                   value:
                     transfer:
                       id: 460cbe92-2dcc-8eae-5ad6-b37d0ec90fd9
+                      authorization_id: c9f90aa1-2949-c799-e2b6-ea05c89bb586
                       ach_class: ppd
                       account_id: 3gE5gnRzNyfXpBK5wEEKcymJ5albGVUqg77gr
                       funding_account_id: 8945fedc-e703-463d-86b1-dc0607b55460
@@ -7531,6 +8108,7 @@ paths:
                         ach_return_code: R13
                         description: Invalid ACH routing number
                       id: 460cbe92-2dcc-8eae-5ad6-b37d0ec90fd9
+                      authorization_id: c9f90aa1-2949-c799-e2b6-ea05c89bb586
                       metadata:
                         key1: value1
                         key2: value2
@@ -8704,6 +9282,7 @@ paths:
                       amount: "12.34"
                       status: pending
                       created: "2020-08-06T17:27:15Z"
+                      failure_reason: null
                     request_id: saKrIBuEB9qJZno
         default:
           description: Error response
@@ -8747,6 +9326,7 @@ paths:
                       amount: "12.34"
                       status: pending
                       created: "2020-08-06T17:27:15Z"
+                      failure_reason: null
                     request_id: saKrIBuEB9qJZno
         default:
           description: Error response
@@ -10272,6 +10852,8 @@ paths:
           description: OK
           content:
             application/json:
+              schema:
+                $ref: '#/components/schemas/CreditBankIncomeWebhookUpdateResponse'
               examples:
                 example-1:
                   value:
@@ -11688,7 +12270,7 @@ paths:
                           type: merchant
                           logo_url: https://plaid-merchant-logos.plaid.com/apple_63.png
                           website: apple.com
-                          confidence_level: very_high
+                          confidence_level: VERY_HIGH
                         location:
                           address: 300 Post St
                           city: San Francisco
@@ -12495,8 +13077,6 @@ components:
             All implementations are encouraged to set this field to `true` and use the `personal_finance_category` instead of `category`. Personal finance categories are the preferred categorization system for transactions, providing higher accuracy and more meaningful categories.
 
             See the [`taxonomy csv file`](https://plaid.com/documents/transactions-personal-finance-category-taxonomy.csv) for a full list of personal finance categories.
-
-            Plaid is also introducing Category Rules - a new endpoint that will enable you to change the `personal_finance_category` for a transaction based on your users’ needs. When rules are set, the selected category will override the Plaid provided category. To learn more, send a note to transactions-feedback@plaid.com.
         include_logo_and_counterparty_beta:
           type: boolean
           default: false
@@ -12747,8 +13327,6 @@ components:
             All implementations are encouraged to use set this field to `true` and to use the `personal_finance_category` instead of `category` for more meaningful and accurate categorization.
 
             See the [`taxonomy csv file`](https://plaid.com/documents/transactions-personal-finance-category-taxonomy.csv) for a full list of personal finance categories.
-
-            We’re also introducing Category Rules - a new beta endpoint that will enable you to change the `personal_finance_category` for a transaction based on your users’ needs. When rules are set, the selected category will override the Plaid provided category. To learn more, send a note to transactions-feedback@plaid.com.
         include_logo_and_counterparty_beta:
           type: boolean
           default: false
@@ -13424,7 +14002,7 @@ components:
           description: The user's email address.
           nullable: true
         address:
-          $ref: '#/components/schemas/AddressDataNullable'
+          $ref: '#/components/schemas/AddressDataNullableNoRequiredFields'
     IdentityMatchResponse:
       type: object
       additionalProperties: true
@@ -13533,15 +14111,12 @@ components:
         total_transactions:
           type: integer
           description: The total number of transactions available within the date range specified. If `total_transactions` is larger than the size of the `transactions` array, more transactions are available and can be fetched via manipulating the `offset` parameter.
-        item:
-          $ref: '#/components/schemas/Item'
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
       - accounts
       - transactions
       - total_transactions
-      - item
       - request_id
     ProcessorTransactionsSyncRequest:
       type: object
@@ -15706,6 +16281,8 @@ components:
           $ref: '#/components/schemas/LinkTokenCreateRequestEmployment'
         income_verification:
           $ref: '#/components/schemas/LinkTokenCreateRequestIncomeVerification'
+        base_report:
+          $ref: '#/components/schemas/LinkTokenCreateRequestBaseReport'
         auth:
           $ref: '#/components/schemas/LinkTokenCreateRequestAuth'
         transfer:
@@ -16768,6 +17345,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/NumbersACATS'
+        aton:
+          type: array
+          items:
+            $ref: '#/components/schemas/NumbersATON'
     NumbersACATS:
       x-hidden-from-docs: true
       title: NumbersACATS
@@ -16790,6 +17371,22 @@ components:
       - account_id
       - account
       - dtc_numbers
+    NumbersATON:
+      x-hidden-from-docs: true
+      title: NumbersATON
+      type: object
+      additionalProperties: true
+      description: Identifying information for transferring holdings to an investments account via ATON.
+      properties:
+        account_id:
+          type: string
+          description: The Plaid account ID associated with the account numbers
+        account:
+          type: string
+          description: The full account number for the account
+      required:
+      - account_id
+      - account
     RecipientBACS:
       title: RecipientBACS
       type: object
@@ -17483,7 +18080,7 @@ components:
       description: |-
         Transaction information specific to inter-bank transfers. If the transaction was not an inter-bank transfer, all fields will be `null`.
 
-        If the `transactions` object was returned by a Transactions endpoint such as `/transactions/sync or `/transactions/get`, the `payment_meta` key will always appear, but no data elements are guaranteed. If the `transactions` object was returned by an Assets endpoint such as `/asset_report/get/` or `/asset_report/pdf/get`, this field will only appear in an Asset Report with Insights.
+        If the `transactions` object was returned by a Transactions endpoint such as `/transactions/sync` or `/transactions/get`, the `payment_meta` key will always appear, but no data elements are guaranteed. If the `transactions` object was returned by an Assets endpoint such as `/asset_report/get/` or `/asset_report/pdf/get`, this field will only appear in an Asset Report with Insights.
       properties:
         reference_number:
           type: string
@@ -17621,11 +18218,11 @@ components:
           description: |-
             A description of how confident we are that the provided counterparty is involved in the transaction.
 
-            `very_high`: We recognize this counterparty and we are more than 98% confident that it is involved in this transaction.
-            `high`: We recognize this counterparty and we are more than 90% confident that it is involved in this transaction.
-            `medium`: We are moderately confident that this counterparty was involved in this transaction, but some details may differ from our records.
-            `low`: We didn’t find a matching counterparty in our records, so we are returning a cleansed name parsed out of the request description.
-            `unknown`: Error
+            `VERY_HIGH`: We recognize this counterparty and we are more than 98% confident that it is involved in this transaction.
+            `HIGH`: We recognize this counterparty and we are more than 90% confident that it is involved in this transaction.
+            `MEDIUM`: We are moderately confident that this counterparty was involved in this transaction, but some details may differ from our records.
+            `LOW`: We didn’t find a matching counterparty in our records, so we are returning a cleansed name parsed out of the request description.
+            `UNKNOWN`: Error
           nullable: true
       required:
       - name
@@ -17696,11 +18293,11 @@ components:
           description: |-
             A description of how confident we are that the provided categories accurately describe the transaction intent.
 
-            `very_high`: We are more than 98% confident that this category reflects the intent of the transaction.
-            `high`: We are more than 90% confident that this category reflects the intent of the transaction.
-            `medium`: We are moderately confident that this category reflects the intent of the transaction.
-            `low`: This category may reflect the intent, but there may be other categories that are more accurate.
-            `unknown`: Error
+            `VERY_HIGH`: We are more than 98% confident that this category reflects the intent of the transaction.
+            `HIGH`: We are more than 90% confident that this category reflects the intent of the transaction.
+            `MEDIUM`: We are moderately confident that this category reflects the intent of the transaction.
+            `LOW`: This category may reflect the intent, but there may be other categories that are more accurate.
+            `UNKNOWN`: Error
           nullable: true
       required:
       - primary
@@ -18553,6 +19150,13 @@ components:
       - $ref: '#/components/schemas/AddressData'
       - type: object
         additionalProperties: true
+    AddressDataNullableNoRequiredFields:
+      description: Data about the components comprising an address.
+      nullable: true
+      allOf:
+      - $ref: '#/components/schemas/AddressDataNotRequired'
+      - type: object
+        additionalProperties: true
     AddressData:
       title: AddressData
       type: object
@@ -18588,6 +19192,35 @@ components:
       - street
       - postal_code
       - country
+    AddressDataNotRequired:
+      title: AddressData
+      type: object
+      additionalProperties: true
+      description: Data about the components comprising an address.
+      properties:
+        city:
+          type: string
+          description: The full city name
+          nullable: true
+        region:
+          type: string
+          description: |-
+            The region or state. In API versions 2018-05-22 and earlier, this field is called `state`.
+            Example: `"NC"`
+          nullable: true
+        street:
+          type: string
+          description: |-
+            The full street address
+            Example: `"564 Main Street, APT 15"`
+        postal_code:
+          type: string
+          description: The postal code. In API versions 2018-05-22 and earlier, this field is called `zip`.
+          nullable: true
+        country:
+          type: string
+          description: The ISO 3166-1 alpha-2 country code
+          nullable: true
     ProcessorToken:
       title: ProcessorToken
       type: string
@@ -21153,7 +21786,7 @@ components:
       - other
     DepositoryAccount:
       title: DepositoryAccount
-      description: 'An account type holding cash, in which funds are deposited. Supported products for `depository` accounts are: Auth (`checking` and `savings` types only), Balance, Transactions, Identity, Payment Initiation, and Assets.'
+      description: 'An account type holding cash, in which funds are deposited. Supported products for `depository` accounts are: Auth (`checking` and `savings` types only), Balance, Transactions, Identity, Payment Initiation, Assets, and Investments (`cash management` type only).'
       type: string
       properties:
         checking:
@@ -22559,6 +23192,8 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/TransferID'
+        authorization_id:
+          $ref: '#/components/schemas/TransferAuthorizationID'
         ach_class:
           $ref: '#/components/schemas/ACHClass'
         account_id:
@@ -22641,6 +23276,7 @@ components:
           $ref: '#/components/schemas/TransferCreditFundsSource'
       required:
       - id
+      - authorization_id
       - type
       - user
       - amount
@@ -23512,13 +24148,17 @@ components:
 
         `pending`: A new refund was created; it is in the pending state.
         `posted`: The refund has been successfully submitted to the payment network.
+        `settled`: Credits have been refunded to the Plaid linked account.
         `cancelled`: The refund was cancelled by the client.
-        `failed`: The refund failed or was returned.
+        `failed`: The refund has failed.
+        `returned`: The refund was returned.
       enum:
       - pending
       - posted
       - cancelled
       - failed
+      - settled
+      - returned
     BankTransferStatus:
       type: string
       title: BankTransferStatus
@@ -25957,6 +26597,20 @@ components:
       required:
       - refund
       - request_id
+    TransferRefundFailure:
+      title: TransferRefundFailure
+      type: object
+      additionalProperties: true
+      nullable: true
+      description: The failure reason if the event type for a refund is `"failed"` or `"returned"`. Null value otherwise.
+      properties:
+        ach_return_code:
+          type: string
+          nullable: true
+          description: The ACH return code, e.g. `R01`.  A return code will be provided if and only if the refund status is `returned`. For a full listing of ACH return codes, see [Transfer errors](https://plaid.com/docs/errors/transfer/#ach-return-codes).
+        description:
+          type: string
+          description: A human-readable description of the reason for the failure or reversal.
     TransferRefund:
       title: TransferRefund
       type: object
@@ -25971,6 +26625,8 @@ components:
           $ref: '#/components/schemas/TransferRefundAmount'
         status:
           $ref: '#/components/schemas/TransferRefundStatus'
+        failure_reason:
+          $ref: '#/components/schemas/TransferRefundFailure'
         created:
           type: string
           format: date-time
@@ -25981,6 +26637,7 @@ components:
       - amount
       - status
       - created
+      - failure_reason
     TransferRefundGetRequest:
       title: TransferRefundGetRequest
       type: object
@@ -26360,7 +27017,7 @@ components:
         score:
           type: integer
           nullable: true
-          description: Match score for name. 100 is a perfect score, 85-99 means a strong match, 84-70 is a partial match, any score less than 70 is a mismatch. Typically, the match threshold should be set to a score of 70 or higher. If the name is missing from either the API or financial institution, this is null.
+          description: Match score for name. 100 is a perfect score, 99-85 means a strong match, 84-70 is a partial match, any score less than 70 is a mismatch. Typically, the match threshold should be set to a score of 70 or higher. If the name is missing from either the API or financial institution, this is null.
         is_first_name_or_last_name_match:
           type: boolean
           nullable: true
@@ -26372,6 +27029,7 @@ components:
         is_business_name_detected:
           type: boolean
           nullable: true
+          deprecated: true
           description: Is `true` if the name on either of the names that was matched for the score contained strings indicative of a business name, such as "CORP", "LLC", "INC", or "LTD". A `true` result generally indicates the entity is a business. However, a `false` result does not mean the entity is not a business, as some businesses do not use these strings in the names used for their financial institution accounts.
     PhoneNumberMatchScore:
       title: PhoneNumberMatchScore
@@ -26904,6 +27562,12 @@ components:
           type: string
           description: Uniquely identify a payroll income item to update with. It should only be used for update mode.
           nullable: true
+        parsing_config:
+          type: array
+          nullable: true
+          description: The types of analysis to enable for document uploads. If none are specified, then docs will undergo OCR parsing only.
+          items:
+            $ref: '#/components/schemas/IncomeVerificationDocParsingConfig'
     IncomeVerificationPayrollFlowType:
       title: IncomeVerificationPayrollFlowType
       enum:
@@ -26995,6 +27659,15 @@ components:
       - item_id
       - status
       - environment
+    LinkTokenCreateRequestBaseReport:
+      title: LinkTokenCreateRequestBaseReport
+      type: object
+      x-hidden-from-docs: true
+      description: Specifies options for initializing Link for use with the Base Report product. This field is required if `assets` is included in the `products` array and the client is CRA-enabled.
+      properties:
+        days_requested:
+          type: integer
+          description: The maximum integer number of days of history to include in the Base Report.
     LinkTokenCreateRequestEmployment:
       title: LinkTokenCreateRequestEmployment
       type: object
@@ -29047,6 +29720,16 @@ components:
       required:
       - user_token
       - enable_webhooks
+    CreditBankIncomeWebhookUpdateResponse:
+      title: CreditBankIncomeWebhookUpdateResponse
+      type: object
+      additionalProperties: true
+      description: CreditBankIncomeWebhookUpdateResponse defines the response schema for `/credit/bank_income/webhook/update`.
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
     CreditBankStatementsUploadsGetRequest:
       title: CreditBankStatementsUploadsGetRequest
       type: object
@@ -32844,6 +33527,22 @@ components:
         `FAILED`: The transaction failed to process successfully. This is a terminal status.
 
         `BLOCKED`: The transaction has been blocked for violating compliance rules. This is a terminal status.
+    WalletTransactionFailureReason:
+      type: string
+      nullable: true
+      description: |-
+        The error code of a failed transaction. Error codes include:
+        `EXTERNAL_SYSTEM`: The transaction was declined by an external system.
+        `EXPIRED`: The transaction request has expired.
+        `CANCELLED`: The transaction request was rescinded.
+        `INVALID`: The transaction did not meet certain criteria, such as an inactive account or no valid counterparty, etc.
+        `UNKNOWN`: The transaction was unsuccessful, but the exact cause is unknown.
+      enum:
+      - EXTERNAL_SYSTEM
+      - EXPIRED
+      - CANCELLED
+      - INVALID
+      - UNKNOWN
     WalletTransactionGetRequest:
       type: object
       description: WalletTransactionGetRequest defines the request schema for `/wallet/transaction/get`
@@ -33014,6 +33713,8 @@ components:
           type: string
           nullable: true
           description: The payment id that this transaction is associated with, if any. This is present only for transaction types `PIS_PAY_IN` and `REFUND`.
+        failure_reason:
+          $ref: '#/components/schemas/WalletTransactionFailureReason'
       required:
       - transaction_id
       - wallet_id
@@ -34594,6 +35295,32 @@ components:
       required:
       - removed
       - request_id
+    BaseReportGetRequest:
+      type: object
+      x-hidden-from-docs: true
+      description: BaseReportGetRequest defines the request schema for `/cra/base_report/get`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        user_token:
+          $ref: '#/components/schemas/UserToken'
+      required:
+      - user_token
+    BaseReportGetResponse:
+      type: object
+      x-hidden-from-docs: true
+      additionalProperties: true
+      description: BaseReportGetResponse defines the response schema for `/cra/base_report/get`
+      properties:
+        report:
+          $ref: '#/components/schemas/BaseReport'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - report
+      - request_id
     HistoricalBalance:
       title: HistoricalBalance
       type: object
@@ -34620,7 +35347,7 @@ components:
           description: |-
             The unofficial currency code associated with the balance. Always `null` if `iso_currency_code` is non-`null`.
 
-            See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `iso_currency_code`s.
+            See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `unofficial_currency_code`s.
           nullable: true
       required:
       - date
@@ -34693,6 +35420,71 @@ components:
       - webhook_code
       - error
       - asset_report_id
+      - environment
+    BaseReportsProductReadyWebhook:
+      title: BaseReportsProductReadyWebhook
+      type: object
+      x-hidden-from-docs: true
+      additionalProperties: true
+      description: Fired when the Base Report has been generated and `/cra/base_report/get` is ready to be called.  If you attempt to retrieve a Base Report before this webhook has fired, you’ll receive a response with the HTTP status code 400 and a Plaid error code of `PRODUCT_NOT_READY`.
+      properties:
+        webhook_type:
+          type: string
+          description: '`BASE_REPORT`'
+        webhook_code:
+          type: string
+          description: '`PRODUCT_READY`'
+        user_id:
+          type: string
+          description: The `user_id` corresponding to the User ID the webhook has fired for.
+        environment:
+          $ref: '#/components/schemas/WebhookEnvironmentValues'
+      required:
+      - webhook_type
+      - webhook_code
+      - asset_report_id
+      - environment
+      x-examples:
+        example-1:
+          webhook_type: BASE_REPORT
+          webhook_code: PRODUCT_READY
+          user_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
+    BaseReportsErrorWebhook:
+      title: BaseReportsErrorWebhook
+      type: object
+      x-hidden-from-docs: true
+      additionalProperties: true
+      description: Fired when Base Report generation has failed. The resulting `error` will have an `error_type` of `BASE_REPORT_ERROR`.
+      x-examples:
+        example-1:
+          webhook_type: BASE_REPORT
+          webhook_code: ERROR
+          user_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
+          error:
+            display_message: null
+            error_code: PRODUCT_NOT_ENABLED
+            error_message: 'The following products are not supported by this institution: Identity'
+            error_type: BASE_REPORT_ERROR
+            request_id: m8MDnv9okwxFNBV
+      properties:
+        webhook_type:
+          type: string
+          description: '`BASE_REPORT`'
+        webhook_code:
+          type: string
+          description: '`ERROR`'
+        error:
+          $ref: '#/components/schemas/PlaidError'
+        asset_report_id:
+          type: string
+          description: The ID associated with the Asset Report.
+        environment:
+          $ref: '#/components/schemas/WebhookEnvironmentValues'
+      required:
+      - webhook_type
+      - webhook_code
+      - error
+      - user_id
       - environment
     Warning:
       title: Warning
@@ -34864,22 +35656,22 @@ components:
         properties:
           days_available:
             type: number
-            description: The duration of transaction history available for this Item, typically defined as the time since the date of the earliest transaction in that account. Only returned by Assets endpoints.
+            description: The duration of transaction history available for this Item, typically defined as the time since the date of the earliest transaction in that account.
           transactions:
             type: array
-            description: Transaction history associated with the account. Only returned by Assets endpoints. Transaction history returned by endpoints such as `/transactions/get` or `/investments/transactions/get` will be returned in the top-level `transactions` field instead.
+            description: Transaction history associated with the account.
             items:
               $ref: '#/components/schemas/AssetReportTransaction'
           owners:
             type: array
-            description: Data returned by the financial institution about the account owner or owners. Only returned by Identity or Assets endpoints. For business accounts, the name reported may be either the name of the individual or the name of the business, depending on the institution. Multiple owners on a single account will be represented in the same `owner` object, not in multiple owner objects within the array. In API versions 2018-05-22 and earlier, the `owners` object is not returned, and instead identity information is returned in the top level `identity` object. For more details, see [Plaid API versioning](https://plaid.com/docs/api/versioning/#version-2019-05-29)
+            description: Data returned by the financial institution about the account owner or owners.For business accounts, the name reported may be either the name of the individual or the name of the business, depending on the institution. Multiple owners on a single account will be represented in the same `owner` object, not in multiple owner objects within the array. In API versions 2018-05-22 and earlier, the `owners` object is not returned, and instead identity information is returned in the top level `identity` object. For more details, see [Plaid API versioning](https://plaid.com/docs/api/versioning/#version-2019-05-29)
             items:
               $ref: '#/components/schemas/Owner'
           ownership_type:
             $ref: '#/components/schemas/OwnershipType'
           historical_balances:
             type: array
-            description: Calculated data about the historical balances on the account. Only returned by Assets endpoints and currently not supported by `brokerage` or `investment` accounts.
+            description: Calculated data about the historical balances on the account.
             items:
               $ref: '#/components/schemas/HistoricalBalance'
       required:
@@ -34915,7 +35707,7 @@ components:
         amount:
           type: number
           format: double
-          description: The settled value of the transaction, denominated in the transactions's currency, as stated in `iso_currency_code` or `unofficial_currency_code`. Positive values when money moves out of the account; negative values when money moves in. For example, debit card purchases are positive; credit card payments, direct deposits, and refunds are negative.
+          description: The settled value of the transaction, denominated in the transaction's currency, as stated in `iso_currency_code` or `unofficial_currency_code`. Positive values when money moves out of the account; negative values when money moves in. For example, debit card purchases are positive; credit card payments, direct deposits, and refunds are negative.
         iso_currency_code:
           type: string
           description: The ISO-4217 currency code of the transaction. Always `null` if `unofficial_currency_code` is non-null.
@@ -34925,20 +35717,18 @@ components:
           description: |-
             The unofficial currency code associated with the transaction. Always `null` if `iso_currency_code` is non-`null`. Unofficial currency codes are used for currencies that do not have official ISO currency codes, such as cryptocurrencies and the currencies of certain countries.
 
-            See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `iso_currency_code`s.
+            See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `unofficial_currency_code`s.
           nullable: true
         original_description:
           type: string
-          description: The string returned by the financial institution to describe the transaction. For transactions returned by `/transactions/get`, this field is in beta and will be omitted unless the client is both enrolled in the closed beta program and has set `options.include_original_description` to `true`.
+          description: The string returned by the financial institution to describe the transaction.
           nullable: true
         category:
           type: array
           description: |-
             A hierarchical array of the categories to which this transaction belongs. For a full list of categories, see [`/categories/get`](https://plaid.com/docs/api/products/transactions/#categoriesget).
 
-            All Transactions implementations are recommended to use the new `personal_finance_category` instead of `category`. `personal_finance_category` provides more meaningful categorization and greater accuracy.
-
-            If the `transactions` object was returned by an Assets endpoint such as `/asset_report/get/` or `/asset_report/pdf/get`, this field will only appear in an Asset Report with Insights.
+            This field will only appear in an Asset Report with Insights.
           nullable: true
           items:
             type: string
@@ -34946,9 +35736,7 @@ components:
           description: |-
             The ID of the category to which this transaction belongs. For a full list of categories, see [`/categories/get`](https://plaid.com/docs/api/products/transactions/#categoriesget).
 
-            All Transactions implementations are recommended to use the new `personal_finance_category` instead of `category_id`, as it provides greater accuracy and more meaningful categorization.
-
-            If the `transactions` object was returned by an Assets endpoint such as `/asset_report/get/` or `/asset_report/pdf/get`, this field will only appear in an Asset Report with Insights.
+            This field will only appear in an Asset Report with Insights.
           type: string
           nullable: true
         credit_category:
@@ -34972,7 +35760,7 @@ components:
           description: |-
             The merchant name or transaction description.
 
-            If the `transactions` object was returned by a Transactions endpoint such as `/transactions/get`, this field will always appear. If the `transactions` object was returned by an Assets endpoint such as `/asset_report/get/` or `/asset_report/pdf/get`, this field will only appear in an Asset Report with Insights.
+            This field will only appear in an Asset Report with Insights.
         merchant_name:
           type: string
           description: The merchant name, as enriched by Plaid from the `name` field. This is typically a more human-readable version of the merchant counterparty in the transaction. For some bank transactions (such as checks or account transfers) where there is no meaningful merchant name, this value will be `null`.
@@ -35024,6 +35812,326 @@ components:
         `special:` transactions that relate to banks, e.g. fees or deposits.
 
         `unresolved:` transactions that do not fit into the other three types.
+    BaseReport:
+      title: BaseReport
+      type: object
+      additionalProperties: true
+      description: An object representing a Base Report
+      x-hidden-from-docs: true
+      properties:
+        report_id:
+          $ref: '#/components/schemas/BaseReportId'
+        date_generated:
+          type: string
+          format: date-time
+          description: The date and time when the Base Report was created, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (e.g. "2018-04-12T03:32:11Z").
+        days_requested:
+          type: number
+          description: The number of days of transaction history requested.
+        items:
+          type: array
+          description: Data returned by Plaid about each of the Items included in the Base Report.
+          items:
+            $ref: '#/components/schemas/BaseReportItem'
+      required:
+      - report_id
+      - date_generated
+      - days_requested
+      - items
+    BaseReportItem:
+      title: BaseReportItem
+      type: object
+      additionalProperties: true
+      description: A representation of an Item within a Base Report.
+      x-hidden-from-docs: true
+      properties:
+        institution_name:
+          type: string
+          description: The full financial institution name associated with the Item.
+        institution_id:
+          description: The id of the financial institution associated with the Item.
+          type: string
+        date_last_updated:
+          type: string
+          format: date-time
+          description: The date and time when this Item’s data was last retrieved from the financial institution, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format.
+        accounts:
+          type: array
+          description: Data about each of the accounts open on the Item.
+          items:
+            $ref: '#/components/schemas/BaseReportAccount'
+      required:
+      - institution_name
+      - institution_id
+      - date_last_updated
+      - accounts
+    BaseReportAccount:
+      title: BaseReportAccount
+      description: Base Report information about an account
+      x-hidden-from-docs: true
+      type: object
+      additionalProperties: true
+      properties:
+        balances:
+          $ref: '#/components/schemas/AccountBalance'
+        mask:
+          type: string
+          nullable: true
+          description: The last 2-4 alphanumeric characters of an account's official account number. Note that the mask may be non-unique between an Item's accounts, and it may also not match the mask that the bank displays to the user.
+        name:
+          type: string
+          description: The name of the account, either assigned by the user or by the financial institution itself
+        official_name:
+          type: string
+          nullable: true
+          description: The official name of the account as given by the financial institution
+        type:
+          $ref: '#/components/schemas/AccountType'
+        subtype:
+          $ref: '#/components/schemas/AccountSubtype'
+        days_available:
+          type: number
+          description: The duration of transaction history available for this Item, typically defined as the time since the date of the earliest transaction in that account. Only returned by Base Report endpoints.
+        transactions:
+          type: array
+          description: Transaction history associated with the account. Only returned by Base Report endpoints. Transaction history returned by endpoints such as `/transactions/get` or `/investments/transactions/get` will be returned in the top-level `transactions` field instead.
+          items:
+            $ref: '#/components/schemas/BaseReportTransaction'
+        owners:
+          type: array
+          description: Data returned by the financial institution about the account owner or owners. For business accounts, the name reported may be either the name of the individual or the name of the business, depending on the institution. Multiple owners on a single account will be represented in the same `owner` object, not in multiple owner objects within the array.
+          items:
+            $ref: '#/components/schemas/Owner'
+        ownership_type:
+          $ref: '#/components/schemas/OwnershipType'
+        historical_balances:
+          type: array
+          description: Calculated data about the historical balances on the account. Only returned by Base Report endpoints and currently not supported by `brokerage` or `investment` accounts.
+          items:
+            $ref: '#/components/schemas/HistoricalBalance'
+        account_insights:
+          $ref: '#/components/schemas/BaseReportAccountInsights'
+      required:
+      - balances
+      - mask
+      - name
+      - official_name
+      - type
+      - subtype
+      - days_available
+      - transactions
+      - owners
+      - ownership_type
+      - historical_balances
+    BaseReportId:
+      title: BaseReportId
+      x-hidden-from-docs: true
+      description: A unique ID identifying an Base Report. Like all Plaid identifiers, this ID is case sensitive.
+      type: string
+    BaseReportTransaction:
+      title: BaseReportTransaction
+      description: A transaction on the Base Report
+      x-hidden-from-docs: true
+      type: object
+      additionalProperties: true
+      properties:
+        amount:
+          type: number
+          format: double
+          description: The settled value of the transaction, denominated in the transaction's currency, as stated in `iso_currency_code` or `unofficial_currency_code`. Positive values when money moves out of the account; negative values when money moves in. For example, debit card purchases are positive; credit card payments, direct deposits, and refunds are negative.
+        iso_currency_code:
+          type: string
+          description: The ISO-4217 currency code of the transaction. Always `null` if `unofficial_currency_code` is non-null.
+          nullable: true
+        unofficial_currency_code:
+          type: string
+          description: |-
+            The unofficial currency code associated with the transaction. Always `null` if `iso_currency_code` is non-`null`. Unofficial currency codes are used for currencies that do not have official ISO currency codes, such as cryptocurrencies and the currencies of certain countries.
+
+            See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `unofficial_currency_code`s.
+          nullable: true
+        original_description:
+          type: string
+          description: The string returned by the financial institution to describe the transaction.
+          nullable: true
+        category:
+          type: array
+          description: A hierarchical array of the categories to which this transaction belongs. For a full list of categories, see [`/categories/get`](https://plaid.com/docs/api/products/transactions/#categoriesget).
+          nullable: true
+          items:
+            type: string
+        category_id:
+          description: The ID of the category to which this transaction belongs. For a full list of categories, see [`/categories/get`](https://plaid.com/docs/api/products/transactions/#categoriesget).
+          type: string
+          nullable: true
+        credit_category:
+          $ref: '#/components/schemas/CreditCategory'
+        check_number:
+          type: string
+          description: The check number of the transaction. This field is only populated for check transactions.
+          nullable: true
+        date:
+          type: string
+          format: date
+          description: For pending transactions, the date that the transaction occurred; for posted transactions, the date that the transaction posted. Both dates are returned in an [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ( `YYYY-MM-DD` ).
+        date_transacted:
+          type: string
+          nullable: true
+          description: The date on which the transaction took place, in IS0 8601 format.
+        location:
+          $ref: '#/components/schemas/Location'
+        name:
+          type: string
+          description: The merchant name or transaction description.
+        merchant_name:
+          type: string
+          description: The merchant name, as enriched by Plaid from the `name` field. This is typically a more human-readable version of the merchant counterparty in the transaction. For some bank transactions (such as checks or account transfers) where there is no meaningful merchant name, this value will be `null`.
+          nullable: true
+        payment_meta:
+          $ref: '#/components/schemas/PaymentMeta'
+        pending:
+          type: boolean
+          description: When `true`, identifies the transaction as pending or unsettled. Pending transaction details (name, type, amount, category ID) may change before they are settled.
+        account_owner:
+          type: string
+          description: The name of the account owner. This field is not typically populated and only relevant when dealing with sub-accounts.
+          nullable: true
+        transaction_type:
+          $ref: '#/components/schemas/BaseReportTransactionType'
+      required:
+      - pending
+      - date
+      - unofficial_currency_code
+      - iso_currency_code
+      - amount
+      - original_description
+    BaseReportAccountInsights:
+      title: BaseReportAccountInsights
+      description: Calculated insights derived from transaction-level data.
+      x-hidden-from-docs: true
+      type: object
+      additionalProperties: true
+      properties:
+        oldest_transaction_date:
+          type: string
+          description: Date of the earliest transaction in the base report for the account.
+        most_recent_transaction_date:
+          type: string
+          description: Date of the most recent transaction in the base report for the account.
+        days_available:
+          type: integer
+          description: Number of days days available in the base report for the account.
+        average_days_between_transactions:
+          type: number
+          description: Average number of days between sequential transactions
+        longest_gap_between_transactions:
+          type: array
+          description: Longest gap between sequential transactions
+          items:
+            $ref: '#/components/schemas/BaseReportLongestGapInsights'
+        number_of_inflows:
+          type: array
+          nullable: true
+          description: The number of debits into the account. This field will be null for non-depository accounts.
+          items:
+            $ref: '#/components/schemas/BaseReportNumberFlowInsights'
+        average_inflow_amount:
+          type: array
+          nullable: true
+          description: Average amount of debit transactions into account. This field will be null for non-depository accounts. This field only takes into account USD transactions from the account.
+          items:
+            $ref: '#/components/schemas/BaseReportAverageFlowInsights'
+        number_of_outflows:
+          type: array
+          nullable: true
+          description: The number of credit into the account. This field will be null for non-depository accounts.
+          items:
+            $ref: '#/components/schemas/BaseReportNumberFlowInsights'
+        average_outflow_amount:
+          type: array
+          nullable: true
+          description: Average amount of credit transactions into account. This field will be null for non-depository accounts. This field only takes into account USD transactions from the account.
+          items:
+            $ref: '#/components/schemas/BaseReportAverageFlowInsights'
+        number_of_days_no_transactions:
+          type: integer
+          description: Number of days with no transactions
+    BaseReportLongestGapInsights:
+      title: BaseReportLongestGapInsights
+      description: Largest number of days between sequential transactions per calendar month
+      x-hidden-from-docs: true
+      type: object
+      additionalProperties: true
+      properties:
+        start_date:
+          type: string
+          description: |-
+            The start date of this time period.
+            The date will be returned in an ISO 8601 format (YYYY-MM-DD).
+        end_date:
+          type: string
+          description: |-
+            The end date of this time period.
+            The date will be returned in an ISO 8601 format (YYYY-MM-DD).
+        days:
+          type: integer
+          description: Largest number of days between sequential transactions for this time period.
+    BaseReportNumberFlowInsights:
+      title: BaseReportNumberFlowInsights
+      description: The number of credits or debits out of the account. This field will only added for depository accounts
+      x-hidden-from-docs: true
+      type: object
+      additionalProperties: true
+      properties:
+        start_date:
+          type: string
+          description: |-
+            The start date of this time period.
+            The date will be returned in an ISO 8601 format (YYYY-MM-DD).
+        end_date:
+          type: string
+          description: |-
+            The end date of this time period.
+            The date will be returned in an ISO 8601 format (YYYY-MM-DD).
+        count:
+          type: integer
+          description: The number of credits or debits out of the account for this time period.
+    BaseReportAverageFlowInsights:
+      title: BaseReportAverageFlowInsights
+      description: Average dollar amount of credit or debit transactions out of the account. This field will only added for depository accounts
+      x-hidden-from-docs: true
+      type: object
+      additionalProperties: true
+      properties:
+        start_date:
+          type: string
+          description: |-
+            The start date of this time period.
+            The date will be returned in an ISO 8601 format (YYYY-MM-DD).
+        end_date:
+          type: string
+          description: |-
+            The end date of this time period.
+            The date will be returned in an ISO 8601 format (YYYY-MM-DD).
+        total_amount:
+          $ref: '#/components/schemas/CreditAmountWithCurrency'
+    BaseReportTransactionType:
+      title: BaseReportTransactionType
+      type: string
+      x-hidden-from-docs: true
+      enum:
+      - digital
+      - place
+      - special
+      - unresolved
+      description: |
+        `digital:` transactions that took place online.
+
+        `place:` transactions that were made at a physical location.
+
+        `special:` transactions that relate to banks, e.g. fees or deposits.
+
+        `unresolved:` transactions that do not fit into the other three types.
     AddressPurposeLabel:
       description: |-
         Field describing whether the associated address is being used for commercial or residential purposes.
@@ -35035,6 +36143,402 @@ components:
       - commercial
       - no_data
       example: residential
+    BeaconAuditTrail:
+      type: object
+      title: BeaconAuditTrail
+      description: Information about the last change made to the parent object specifying what caused the change as well as when it occurred.
+      properties:
+        source:
+          $ref: '#/components/schemas/BeaconAuditTrailSource'
+        dashboard_user_id:
+          $ref: '#/components/schemas/DashboardUserIDNullable'
+      required:
+      - source
+      - dashboard_user_id
+      additionalProperties: true
+    BeaconAuditTrailSource:
+      type: string
+      enum:
+      - dashboard
+      - api
+      - system
+      - bulk_import
+      description: |-
+        A type indicating what caused a resource to be changed or updated.
+
+
+        `dashboard` - The resource was created or updated by a member of your team via the Plaid dashboard.
+
+        `api` - The resource was created or updated via the Plaid API.
+
+        `system` - The resource was created or updated automatically by a part of the Plaid Beacon system. For example, if another business using Plaid Beacon created a fraud report that matched one of your users, your matching user's status would automatically be updated and the audit trail source would be `system`.
+
+        `bulk_import` - The resource was created or updated as part of a bulk import process. For example, if your company provided a CSV of user data as part of your initial onboarding, the audit trail source would be `bulk_import`.
+    BeaconProgramID:
+      type: string
+      title: BeaconProgramID
+      example: becprg_11111111111111
+      description: ID of the associated Beacon Program.
+    BeaconReportCreateRequest:
+      description: Request input for creating a Beacon Report
+      type: object
+      properties:
+        beacon_user_id:
+          $ref: '#/components/schemas/BeaconUserID'
+        type:
+          $ref: '#/components/schemas/BeaconReportType'
+        fraud_date:
+          $ref: '#/components/schemas/ISO8601Date'
+        fraud_amount:
+          $ref: '#/components/schemas/FraudAmount'
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+      required:
+      - beacon_user_id
+      - type
+      - fraud_date
+    BeaconReportCreateResponse:
+      description: |-
+        A Beacon Report describes the type of fraud committed by a user as well as the date the fraud was committed and the total amount of money lost due to the fraud incident.
+
+        This information is used to block similar fraud attempts on your platform as well as alert other companies who screen a user with matching identity information.
+        Other companies will not receive any new identity information, just what matched, plus information such as industry, type of fraud, and date of fraud.
+
+        You can manage your fraud reports by adding, deleting, or editing reports as you get additional information on fraudulent users.
+      additionalProperties: true
+      properties:
+        id:
+          $ref: '#/components/schemas/BeaconReportID'
+        beacon_user_id:
+          $ref: '#/components/schemas/BeaconUserID'
+        created_at:
+          $ref: '#/components/schemas/Timestamp'
+        type:
+          $ref: '#/components/schemas/BeaconReportType'
+        fraud_date:
+          $ref: '#/components/schemas/ISO8601Date'
+        fraud_amount:
+          $ref: '#/components/schemas/FraudAmount'
+        audit_trail:
+          $ref: '#/components/schemas/BeaconAuditTrail'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - id
+      - beacon_user_id
+      - created_at
+      - type
+      - fraud_date
+      - fraud_amount
+      - audit_trail
+      - request_id
+      type: object
+    BeaconReportID:
+      type: string
+      title: BeaconReportID
+      example: becrpt_11111111111111
+      description: ID of the associated Beacon Report.
+    BeaconReportType:
+      type: string
+      title: BeaconReportType
+      description: |-
+        The type of Beacon Report.
+
+        `first_party`: If this is the same individual as the one who submitted the KYC.
+
+        `third_party`: If this is a different individual from the one who submitted the KYC.
+
+        `synthetic`: If this is an individual using fabricated information.
+
+        `account_takeover`: If this individual's account was compromised.
+
+        `unknown`: If you aren't sure who committed the fraud.
+      enum:
+      - first_party
+      - third_party
+      - synthetic
+      - account_takeover
+      - unknown
+    BeaconUserAddress:
+      type: object
+      title: BeaconUserAddress
+      description: |-
+        Even if an address has been collected, some fields may be null depending on the region's addressing system. For example:
+
+
+        Addresses from the United Kingdom will not include a region
+
+
+        Addresses from Hong Kong will not include a postal code
+      properties:
+        street:
+          $ref: '#/components/schemas/Street'
+        street2:
+          $ref: '#/components/schemas/Street2'
+        city:
+          $ref: '#/components/schemas/City'
+        region:
+          $ref: '#/components/schemas/Region'
+        postal_code:
+          $ref: '#/components/schemas/PostalCode'
+        country:
+          $ref: '#/components/schemas/GenericCountryCode'
+      required:
+      - street
+      - street2
+      - city
+      - region
+      - postal_code
+      - country
+      additionalProperties: true
+    BeaconUserCreateEmbeddedReport:
+      description: Data for creating a Beacon Report as part of an initial Beacon User creation. Providing a fraud report as part of an initial Beacon User creation will omit the Beacon User from any billing charges.
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/BeaconReportType'
+        fraud_date:
+          $ref: '#/components/schemas/ISO8601Date'
+        fraud_amount:
+          $ref: '#/components/schemas/FraudAmountNullable'
+      required:
+      - type
+      - fraud_date
+      nullable: true
+      additionalProperties: true
+    BeaconUserCreateRequest:
+      description: |-
+        Request input for creating a Beacon User.
+
+        The primary use for this endpoint is to add a new end user to Beacon for fraud and duplicate scanning.
+        This endpoint can also be used to import historical fraud cases into the Beacon Network without being charged
+        for creating a Beacon User. To import historical fraud cases, embed the fraud report in the optional `report`
+        section of the request payload.
+      type: object
+      properties:
+        program_id:
+          $ref: '#/components/schemas/BeaconProgramID'
+        client_user_id:
+          $ref: '#/components/schemas/ClientUserID'
+        user:
+          $ref: '#/components/schemas/BeaconUserRequestData'
+        report:
+          $ref: '#/components/schemas/BeaconUserCreateEmbeddedReport'
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+      required:
+      - program_id
+      - client_user_id
+      - user
+    BeaconUserCreateResponse:
+      description: A Beacon User represents an end user that has been scanned against the Beacon Network.
+      additionalProperties: true
+      properties:
+        id:
+          $ref: '#/components/schemas/BeaconUserID'
+        created_at:
+          $ref: '#/components/schemas/Timestamp'
+        updated_at:
+          $ref: '#/components/schemas/UpdatedAtTimestamp'
+        status:
+          $ref: '#/components/schemas/BeaconUserStatus'
+        program_id:
+          $ref: '#/components/schemas/BeaconProgramID'
+        client_user_id:
+          $ref: '#/components/schemas/ClientUserID'
+        user:
+          $ref: '#/components/schemas/BeaconUserData'
+        audit_trail:
+          $ref: '#/components/schemas/BeaconAuditTrail'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - id
+      - created_at
+      - updated_at
+      - status
+      - program_id
+      - client_user_id
+      - user
+      - audit_trail
+      - request_id
+      type: object
+    BeaconUserData:
+      type: object
+      title: BeaconUserData
+      description: A Beacon User's data and resulting analysis when checked against duplicate records and the Beacon Fraud Network.
+      properties:
+        date_of_birth:
+          $ref: '#/components/schemas/ISO8601Date'
+        name:
+          $ref: '#/components/schemas/BeaconUserName'
+        address:
+          $ref: '#/components/schemas/BeaconUserAddress'
+        email_address:
+          $ref: '#/components/schemas/EmailAddressNullable'
+        phone_number:
+          $ref: '#/components/schemas/BeaconUserPhoneNumber'
+        id_number:
+          $ref: '#/components/schemas/BeaconUserIDNumber'
+        ip_address:
+          $ref: '#/components/schemas/IPAddress'
+      required:
+      - date_of_birth
+      - name
+      - address
+      - email_address
+      - phone_number
+      - id_number
+      - ip_address
+      additionalProperties: true
+    BeaconUserGetRequest:
+      description: Request input for fetching a Beacon User
+      type: object
+      properties:
+        beacon_user_id:
+          $ref: '#/components/schemas/BeaconUserID'
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+      required:
+      - beacon_user_id
+    BeaconUserGetResponse:
+      description: A Beacon User represents an end user that has been scanned against the Beacon Network.
+      additionalProperties: true
+      properties:
+        id:
+          $ref: '#/components/schemas/BeaconUserID'
+        created_at:
+          $ref: '#/components/schemas/Timestamp'
+        updated_at:
+          $ref: '#/components/schemas/UpdatedAtTimestamp'
+        status:
+          $ref: '#/components/schemas/BeaconUserStatus'
+        program_id:
+          $ref: '#/components/schemas/BeaconProgramID'
+        client_user_id:
+          $ref: '#/components/schemas/ClientUserID'
+        user:
+          $ref: '#/components/schemas/BeaconUserData'
+        audit_trail:
+          $ref: '#/components/schemas/BeaconAuditTrail'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - id
+      - created_at
+      - updated_at
+      - status
+      - program_id
+      - client_user_id
+      - user
+      - audit_trail
+      - request_id
+      type: object
+    BeaconUserID:
+      type: string
+      title: BeaconUserID
+      example: becusr_11111111111111
+      description: ID of the associated Beacon User.
+    BeaconUserIDNumber:
+      type: object
+      title: BeaconUserIDNumber
+      description: The ID number associated with a Beacon User.
+      properties:
+        value:
+          $ref: '#/components/schemas/IDNumberValue'
+        type:
+          $ref: '#/components/schemas/IDNumberType'
+      required:
+      - value
+      - type
+      additionalProperties: true
+    BeaconUserName:
+      type: object
+      title: BeaconUserName
+      description: The full name for a given Beacon User.
+      properties:
+        given_name:
+          $ref: '#/components/schemas/GivenNameField'
+        family_name:
+          $ref: '#/components/schemas/FamilyNameField'
+      required:
+      - given_name
+      - family_name
+      additionalProperties: true
+    BeaconUserPhoneNumber:
+      type: string
+      title: BeaconUserPhoneNumber
+      description: A phone number in E.164 format.
+      example: "+19876543212"
+      nullable: true
+    BeaconUserRequestAddress:
+      type: object
+      title: BeaconUserRequestAddress
+      description: Home address for the associated user. For more context on this field, see [Input Validation by Country](https://plaid.com/docs/identity-verification/hybrid-input-validation/#input-validation-by-country).
+      properties:
+        street:
+          $ref: '#/components/schemas/Street'
+        street2:
+          $ref: '#/components/schemas/Street2'
+        city:
+          $ref: '#/components/schemas/City'
+        region:
+          $ref: '#/components/schemas/Region'
+        postal_code:
+          $ref: '#/components/schemas/PostalCode'
+        country:
+          $ref: '#/components/schemas/GenericCountryCode'
+      required:
+      - street
+      - city
+      - country
+      additionalProperties: true
+    BeaconUserRequestData:
+      type: object
+      title: BeaconUserRequestData
+      description: A Beacon User's data which is used to check against duplicate records and the Beacon Fraud Network.
+      properties:
+        date_of_birth:
+          $ref: '#/components/schemas/ISO8601Date'
+        name:
+          $ref: '#/components/schemas/BeaconUserName'
+        address:
+          $ref: '#/components/schemas/BeaconUserRequestAddress'
+        email_address:
+          $ref: '#/components/schemas/EmailAddress'
+        phone_number:
+          $ref: '#/components/schemas/BeaconUserPhoneNumber'
+        id_number:
+          $ref: '#/components/schemas/BeaconUserIDNumber'
+        ip_address:
+          $ref: '#/components/schemas/IPAddress'
+      required:
+      - date_of_birth
+      - name
+      - address
+      additionalProperties: true
+    BeaconUserStatus:
+      type: string
+      title: BeaconUserStatus
+      description: |-
+        A status of a Beacon User.
+
+        `rejected`: The Beacon User has been rejected for fraud. Users can be automatically or manually rejected.
+
+        `pending_review`: The Beacon User has been marked for review.
+
+        `cleared`: The Beacon User has been cleared of fraud.
+      enum:
+      - rejected
+      - pending_review
+      - cleared
+      example: cleared
     City:
       type: string
       example: Pawnee
@@ -35051,13 +36555,13 @@ components:
       title: ClientUserID
       minLength: 1
       example: your-db-id-3b24110
-      description: A unique ID that identifies the end user in your system. This ID can also be used to associate user-specific data from other Plaid products. Financial Account Matching requires this field and the Link Token Create `client_user_id` to be consistent. Personally identifiable information, such as an email address or phone number, should not be used in the `client_user_id`.
+      description: A unique ID that identifies the end user in your system. This ID can also be used to associate user-specific data from other Plaid products. Financial Account Matching requires this field and the `/link/token/create` `client_user_id` to be consistent. Personally identifiable information, such as an email address or phone number, should not be used in the `client_user_id`.
     ClientUserIDNullable:
       type: string
       title: ClientUserID
       minLength: 1
       example: your-db-id-3b24110
-      description: A unique ID that identifies the end user in your system. This ID can also be used to associate user-specific data from other Plaid products. Financial Account Matching requires this field and the Link Token Create `client_user_id` to be consistent. Personally identifiable information, such as an email address or phone number, should not be used in the `client_user_id`.
+      description: A unique ID that identifies the end user in your system. This ID can also be used to associate user-specific data from other Plaid products. Financial Account Matching requires this field and the `/link/token/create` `client_user_id` to be consistent. Personally identifiable information, such as an email address or phone number, should not be used in the `client_user_id`.
       nullable: true
     Cursor:
       description: An identifier that determines which page of results you receive.
@@ -35547,7 +37051,7 @@ components:
       - AU_CON
       - UK_HMC
       example: EU_CON
-      description: Shorthand identifier for a specific screening list for entities.
+      description: "Shorthand identifier for a specific screening list for entities.\n `AU_CON`: Australia Department of Foreign Affairs and Trade Consolidated List\n `CA_CON`: Government of Canada Consolidated List of Sanctions\n `EU_CON`: European External Action Service Consolidated List\n `IZ_SOE`: State Owned Enterprise List\n `IZ_UNC`: United Nations Consolidated Sanctions\n `IZ_PEP`: Politically Exposed Persons List\n `IZ_UNC`: United Nations Consolidated Sanctions\n `US_CAP`: US OFAC Correspondent Account or Payable-Through Account Sanctions\n `US_FSE`: US OFAC Foreign Sanctions Evaders\n `US_MBS`: US Non-SDN Menu-Based Sanctions\n `US_SDN`: US Specially Designated Nationals List \n `US_SSI`: US OFAC Sectoral Sanctions Identifications\n `US_CMC`: US OFAC Non-SDN Chinese Military-Industrial Complex List\n `US_UVL`: Bureau of Industry and Security Unverified List\n `UK_HMC`: UK HM Treasury Consolidated List"
       title: EntityWatchlistCode
     EntityWatchlistProgram:
       type: object
@@ -35779,6 +37283,49 @@ components:
       example: Knope
       title: FamilyName
       description: A string with at least one non-whitespace character, with a max length of 100 characters.
+    FraudAmount:
+      type: object
+      title: FraudAmount
+      description: |-
+        The amount and currency of the fraud or attempted fraud.
+        `fraud_amount` should be omitted to indicate an unknown fraud amount.
+      properties:
+        iso_currency_code:
+          $ref: '#/components/schemas/ISOCurrencyCode'
+        value:
+          type: number
+          format: double
+          example: 100
+          description: |-
+            The amount value.
+            This value can be 0 to indicate no money was lost.
+            Must not contain more than two digits of precision (e.g., `1.23`).
+      required:
+      - iso_currency_code
+      - value
+      additionalProperties: true
+    FraudAmountNullable:
+      type: object
+      title: FraudAmount
+      description: |-
+        The amount and currency of the fraud or attempted fraud.
+        `fraud_amount` should be omitted to indicate an unknown fraud amount.
+      properties:
+        iso_currency_code:
+          $ref: '#/components/schemas/ISOCurrencyCode'
+        value:
+          type: number
+          format: double
+          example: 100
+          description: |-
+            The amount value.
+            This value can be 0 to indicate no money was lost.
+            Must not contain more than two digits of precision (e.g., `1.23`).
+      required:
+      - iso_currency_code
+      - value
+      nullable: true
+      additionalProperties: true
     GenericCountryCode:
       type: string
       title: GenericCountryCode
@@ -35871,6 +37418,13 @@ components:
       example: "1990-05-29"
       description: A date in the format YYYY-MM-DD (RFC 3339 Section 5.6).
       nullable: true
+    ISOCurrencyCode:
+      type: string
+      title: ISOCurrencyCode
+      enum:
+      - USD
+      description: An ISO-4217 currency code.
+      minLength: 3
     IdempotencyFlag:
       type: boolean
       example: true
@@ -36650,7 +38204,7 @@ components:
       - TR_WMD
       - TR_CMB
       example: US_SDN
-      description: Shorthand identifier for a specific screening list for individuals.
+      description: "Shorthand identifier for a specific screening list for individuals.\n `AU_CON`: Australia Department of Foreign Affairs and Trade Consolidated List\n `CA_CON`: Government of Canada Consolidated List of Sanctions\n `EU_CON`: European External Action Service Consolidated List\n `IZ_CIA`: CIA List of Chiefs of State and Cabinet Members\n `IZ_IPL`: Interpol Red Notices for Wanted Persons List\n `IZ_PEP`: Politically Exposed Persons List\n `IZ_UNC`: United Nations Consolidated Sanctions\n `IZ_WBK`: World Bank Listing of Ineligible Firms and Individuals\n `UK_HMC`: UK HM Treasury Consolidated List\n `US_DPL`: Bureau of Industry and Security Denied Persons List\n `US_DTC`: US Department of State AECA Debarred\n `US_FBI`: US Department of Justice FBI Wanted List\n `US_FSE`: US OFAC Foreign Sanctions Evaders\n `US_ISN`: US Department of State Nonproliferation Sanctions\n `US_PLC`: US OFAC Palestinian Legislative Council\n `US_SDN`: US OFAC Specially Designated Nationals List\n `US_SSI`: US OFAC Sectoral Sanctions Identifications\n `SG_SOF`: Government of Singapore Terrorists and Terrorist Entities\n `TR_TWL`: Government of Turkey Terrorist Wanted List\n `TR_DFD`: Government of Turkey Domestic Freezing Decisions\n `TR_FOR`: Government of Turkey Foreign Freezing Requests \n `TR_WMD`: Government of Turkey Weapons of Mass Destruction\n `TR_CMB`: Government of Turkey Capital Markets Board"
       title: IndividualWatchlistCode
     IndividualWatchlistProgram:
       type: object
@@ -36786,8 +38340,11 @@ components:
       properties:
         summary:
           $ref: '#/components/schemas/MatchSummaryCode'
+        area_code:
+          $ref: '#/components/schemas/MatchSummaryCode'
       required:
       - summary
+      - area_code
       additionalProperties: true
     MatchSummary:
       type: object
@@ -37423,7 +38980,7 @@ components:
       additionalProperties: true
     SelfieCheckSelfie:
       type: object
-      description: Catpures and analysis from a user's selfie.
+      description: Captures and analysis from a user's selfie.
       additionalProperties: true
       properties:
         status:
@@ -37582,6 +39139,12 @@ components:
         country:
           $ref: '#/components/schemas/GenericCountryCode'
       nullable: true
+    UpdatedAtTimestamp:
+      description: An ISO8601 formatted timestamp. This field indicates the last time the resource was modified.
+      type: string
+      format: date-time
+      title: Timestamp
+      example: "2020-07-24T03:26:02Z"
     UserAddress:
       type: object
       properties:
@@ -38780,6 +40343,346 @@ components:
       required:
       - request_id
       - updated
+    CraBankIncomeGetRequest:
+      title: CraBankIncomeGetRequest
+      type: object
+      description: CraBankIncomeGetRequest defines the request schema for `/cra/bank_income/get`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        user_token:
+          $ref: '#/components/schemas/UserToken'
+    CraBankIncomeGetResponse:
+      title: CraBankIncomeGetResponse
+      additionalProperties: true
+      type: object
+      description: CraBankIncomeGetResponse defines the response schema for `/cra/bank_income/get`.
+      properties:
+        bank_income:
+          type: array
+          items:
+            $ref: '#/components/schemas/CraBankIncome'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
+    CraBankIncome:
+      type: object
+      description: The report of the Bank Income data for an end user.
+      properties:
+        bank_income_id:
+          type: string
+          description: The unique identifier associated with the Bank Income Report.
+        generated_time:
+          type: string
+          description: The time when the Bank Income Report was generated.
+          format: date-time
+        days_requested:
+          type: integer
+          description: The number of days requested by the customer for the Bank Income Report.
+        items:
+          type: array
+          description: The list of Items in the report along with the associated metadata about the Item.
+          items:
+            $ref: '#/components/schemas/CraBankIncomeItem'
+        bank_income_summary:
+          $ref: '#/components/schemas/CraBankIncomeSummary'
+        warnings:
+          type: array
+          description: If data from the Bank Income report was unable to be retrieved, the warnings will contain information about the error that caused the data to be incomplete.
+          items:
+            $ref: '#/components/schemas/CraBankIncomeWarning'
+    CraBankIncomeItem:
+      type: object
+      description: The details and metadata for an end user's Item.
+      properties:
+        bank_income_accounts:
+          type: array
+          description: The Item's accounts that have Bank Income data.
+          items:
+            $ref: '#/components/schemas/CraBankIncomeAccount'
+        bank_income_sources:
+          type: array
+          description: The income sources for this Item. Each entry in the array is a single income source.
+          items:
+            $ref: '#/components/schemas/CraBankIncomeSource'
+        last_updated_time:
+          type: string
+          description: The time when this Item's data was last retrieved from the financial institution.
+          format: date-time
+        institution_id:
+          type: string
+          description: The unique identifier of the institution associated with the Item.
+        institution_name:
+          type: string
+          description: The name of the institution associated with the Item.
+    CraBankIncomeAccount:
+      type: object
+      description: The Item's bank accounts that have the selected data.
+      properties:
+        mask:
+          type: string
+          description: |-
+            The last 2-4 alphanumeric characters of an account's official account number.
+            Note that the mask may be non-unique between an Item's accounts, and it may also not match the mask that the bank displays to the user.
+          nullable: true
+        name:
+          type: string
+          description: The name of the bank account.
+        official_name:
+          type: string
+          description: The official name of the bank account.
+          nullable: true
+        subtype:
+          $ref: '#/components/schemas/DepositoryAccountSubtype'
+        type:
+          $ref: '#/components/schemas/CreditBankIncomeAccountType'
+        owners:
+          type: array
+          description: Data returned by the financial institution about the account owner or owners. Identity information is optional, so field may return an empty array.
+          items:
+            $ref: '#/components/schemas/Owner'
+      required:
+      - mask
+      - name
+      - official_name
+      - subtype
+      - type
+      - owners
+    CraBankIncomeSource:
+      type: object
+      description: Detailed information for the income source.
+      properties:
+        income_source_id:
+          type: string
+          description: A unique identifier for an income source.
+        income_description:
+          type: string
+          description: The most common name or original description for the underlying income transactions.
+        income_category:
+          $ref: '#/components/schemas/CreditBankIncomeCategory'
+        start_date:
+          type: string
+          format: date
+          description: |-
+            Minimum of all dates within the specific income sources in the user's bank account for days requested by the client.
+            The date will be returned in an ISO 8601 format (YYYY-MM-DD).
+        end_date:
+          type: string
+          format: date
+          description: |-
+            Maximum of all dates within the specific income sources in the user’s bank account for days requested by the client.
+            The date will be returned in an ISO 8601 format (YYYY-MM-DD).
+        pay_frequency:
+          $ref: '#/components/schemas/CreditBankIncomePayFrequency'
+        total_amount:
+          type: number
+          description: Total amount of earnings in the user’s bank account for the specific income source for days requested by the client.
+        iso_currency_code:
+          $ref: '#/components/schemas/CreditIsoCurrencyCode'
+        unofficial_currency_code:
+          $ref: '#/components/schemas/CreditUnofficialCurrencyCode'
+        transaction_count:
+          type: integer
+          description: Number of transactions for the income source within the start and end date.
+        next_payment_date:
+          type: string
+          format: date
+          description: |-
+            The expected date of the end user’s next paycheck for the income source.
+            The date will be returned in an ISO 8601 format (YYYY-MM-DD).
+        historical_average_monthly_gross_income:
+          type: number
+          description: An estimate of the average gross monthly income based on the historical net amount and income category for the income source(s).
+        historical_average_monthly_income:
+          type: number
+          description: The average monthly net income amount estimated based on the historical data for the income source(s).
+        forcasted_average_monthly_income:
+          type: number
+          description: The predicted average monthly net income amount for the income source(s).
+        employer:
+          $ref: '#/components/schemas/CraBankIncomeEmployer'
+        historical_summary:
+          type: array
+          items:
+            $ref: '#/components/schemas/CraBankIncomeHistoricalSummary'
+    CraBankIncomeEmployer:
+      description: The object containing employer data.
+      type: object
+      additionalProperties: true
+      properties:
+        name:
+          type: string
+          description: The name of the employer.
+          nullable: true
+      required:
+      - name
+    CraBankIncomeSummary:
+      type: object
+      description: Summary for bank income across all income sources and items (max history of 730 days).
+      additionalProperties: true
+      properties:
+        total_amounts:
+          type: array
+          description: |-
+            Total amount of earnings across all the income sources in the end user's Items for the days requested by the client.
+            This can contain multiple amounts, with each amount denominated in one unique currency.
+          items:
+            $ref: '#/components/schemas/CreditAmountWithCurrency'
+        start_date:
+          type: string
+          format: date
+          description: |-
+            The earliest date within the days requested in which all income sources identified by Plaid appear in a user's account.
+            The date will be returned in an ISO 8601 format (YYYY-MM-DD).
+        end_date:
+          type: string
+          format: date
+          description: |-
+            The latest date in which all income sources identified by Plaid appear in the user's account.
+            The date will be returned in an ISO 8601 format (YYYY-MM-DD).
+        income_sources_count:
+          type: integer
+          description: Number of income sources per end user.
+        income_categories_count:
+          type: integer
+          description: Number of income categories per end user.
+        income_transactions_count:
+          type: integer
+          description: Number of income transactions per end user.
+        historical_average_monthly_gross_income:
+          type: array
+          description: An estimate of the average gross monthly income based on the historical net amount and income category for the income source(s).
+          items:
+            $ref: '#/components/schemas/CreditAmountWithCurrency'
+        historical_average_monthly_income:
+          type: array
+          description: The average monthly income amount estimated based on the historical data for the income source(s).
+          items:
+            $ref: '#/components/schemas/CreditAmountWithCurrency'
+        forcasted_average_monthly_income:
+          type: array
+          description: The predicted average monthly income amount for the income source(s).
+          items:
+            $ref: '#/components/schemas/CreditAmountWithCurrency'
+        historical_summary:
+          type: array
+          items:
+            $ref: '#/components/schemas/CraBankIncomeHistoricalSummary'
+    CraBankIncomeHistoricalSummary:
+      type: object
+      description: The end user's monthly summary for the income source(s).
+      additionalProperties: true
+      properties:
+        total_amounts:
+          type: array
+          description: |-
+            Total amount of earnings for the income source(s) of the user for the month in the summary.
+            This can contain multiple amounts, with each amount denominated in one unique currency.
+          items:
+            $ref: '#/components/schemas/CreditAmountWithCurrency'
+        start_date:
+          type: string
+          format: date
+          description: |-
+            The start date of the period covered in this monthly summary.
+            This date will be the first day of the month, unless the month being covered is a partial month because it is the first month included in the summary and the date range being requested does not begin with the first day of the month.
+            The date will be returned in an ISO 8601 format (YYYY-MM-DD).
+        end_date:
+          type: string
+          format: date
+          description: |-
+            The end date of the period included in this monthly summary.
+            This date will be the last day of the month, unless the month being covered is a partial month because it is the last month included in the summary and the date range being requested does not end with the last day of the month.
+            The date will be returned in an ISO 8601 format (YYYY-MM-DD).
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/CraBankIncomeTransaction'
+    CraBankIncomeTransaction:
+      type: object
+      description: The transactions data for the end user's income source(s).
+      additionalProperties: true
+      properties:
+        amount:
+          type: number
+          description: |-
+            The settled value of the transaction, denominated in the transactions's currency as stated in `iso_currency_code` or `unofficial_currency_code`.
+            Positive values when money moves out of the account; negative values when money moves in.
+            For example, credit card purchases are positive; credit card payment, direct deposits, and refunds are negative.
+        date:
+          type: string
+          format: date
+          description: |-
+            For pending transactions, the date that the transaction occurred; for posted transactions, the date that the transaction posted.
+            Both dates are returned in an ISO 8601 format (YYYY-MM-DD).
+        name:
+          type: string
+          description: The merchant name or transaction description.
+        original_description:
+          type: string
+          description: The string returned by the financial institution to describe the transaction.
+          nullable: true
+        pending:
+          type: boolean
+          description: |-
+            When true, identifies the transaction as pending or unsettled.
+            Pending transaction details (name, type, amount, category ID) may change before they are settled.
+        check_number:
+          type: string
+          description: The check number of the transaction. This field is only populated for check transactions.
+          nullable: true
+        iso_currency_code:
+          $ref: '#/components/schemas/CreditIsoCurrencyCode'
+        unofficial_currency_code:
+          $ref: '#/components/schemas/CreditUnofficialCurrencyCode'
+    CraBankIncomeWarning:
+      type: object
+      description: The warning associated with the data that was unavailable for the Bank Income Report.
+      properties:
+        warning_type:
+          $ref: '#/components/schemas/CreditBankIncomeWarningType'
+        warning_code:
+          $ref: '#/components/schemas/CraBankIncomeWarningCode'
+        cause:
+          $ref: '#/components/schemas/CraBankIncomeCause'
+    CraBankIncomeWarningCode:
+      type: string
+      description: |-
+        The warning code identifies a specific kind of warning.
+        `IDENTITY_UNAVAILABLE`: Unable to extract identity for the Item
+        `TRANSACTIONS_UNAVAILABLE`: Unable to extract transactions for the Item
+        `REPORT_DELETED`: Report deleted due to customer or consumer request
+        `DATA_UNAVAILABLE`: No relevant data was found for the Item
+      enum:
+      - IDENTITY_UNAVAILABLE
+      - TRANSACTIONS_UNAVAILABLE
+      - REPORT_DELETED
+      - DATA_UNAVAILABLE
+    CraBankIncomeCause:
+      type: object
+      description: An error object and associated `item_id` used to identify a specific Item and error when a batch operation operating on multiple Items has encountered an error in one of the Items.
+      properties:
+        error_type:
+          $ref: '#/components/schemas/CreditBankIncomeErrorType'
+        error_code:
+          type: string
+          description: We use standard HTTP response codes for success and failure notifications, and our errors are further classified by `error_type`. In general, 200 HTTP codes correspond to success, 40X codes are for developer- or user-related failures, and 50X codes are for Plaid-related issues. Error fields will be `null` if no error has occurred.
+        error_message:
+          type: string
+          description: A developer-friendly representation of the error code. This may change over time and is not safe for programmatic use.
+        display_message:
+          type: string
+          description: |-
+            A user-friendly representation of the error code. null if the error is not related to user action.
+            This may change over time and is not safe for programmatic use.
+      required:
+      - error_type
+      - error_code
+      - error_message
+      - display_message
     AssetReportFreddieGetRequest:
       title: AssetReportFreddieGetRequest
       type: object
