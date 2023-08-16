@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.410.1
+  version: 2020-09-14_1.413.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -827,7 +827,7 @@ paths:
                           next_payment_date: "2022-12-15"
                           historical_average_monthly_gross_income: 390
                           historical_average_monthly_income: 300
-                          forcasted_average_monthly_income: 300
+                          forecasted_average_monthly_income: 300
                           employer:
                             name: Plaid Inc
                           historical_summary:
@@ -894,7 +894,7 @@ paths:
                         - amount: 300
                           iso_currency_code: USD
                           unofficial_currency_code: null
-                        forcasted_average_monthly_income:
+                        forecasted_average_monthly_income:
                         - amount: 300
                           iso_currency_code: USD
                           unofficial_currency_code: null
@@ -15955,6 +15955,7 @@ components:
           - adp_roll
           - fortress_trust
           - bond
+          - bakkt
           description: The processor you are integrating with.
       required:
       - access_token
@@ -16354,6 +16355,8 @@ components:
           $ref: '#/components/schemas/LinkTokenCreateRequestUpdate'
         identity_verification:
           $ref: '#/components/schemas/LinkTokenCreateRequestIdentityVerification'
+        statements:
+          $ref: '#/components/schemas/LinkTokenCreateRequestStatements'
         user_token:
           type: string
           description: A user token generated using `/user/create`. Any Item created during the Link session will be associated with the user.
@@ -16361,6 +16364,8 @@ components:
           $ref: '#/components/schemas/LinkTokenInvestments'
         investments_auth:
           $ref: '#/components/schemas/LinkTokenInvestmentsAuth'
+        hosted_link:
+          $ref: '#/components/schemas/LinkTokenCreateHostedLink'
       required:
       - client_name
       - language
@@ -16411,6 +16416,24 @@ components:
           default: false
           type: boolean
           description: If `true`, show institutions that use the masked number match fallback flow.
+    LinkTokenCreateHostedLink:
+      x-hidden-from-docs: true
+      description: Configuration parameters for Hosted Link
+      additionalProperties: true
+      type: object
+      properties:
+        delivery_method:
+          $ref: '#/components/schemas/HostedLinkDeliveryMethod'
+    HostedLinkDeliveryMethod:
+      x-hidden-from-docs: true
+      type: string
+      description: |
+        How Plaid should deliver the Plaid Link session to the customer.
+        'sms' will deliver via SMS. Must pass `user.phone_number`.
+        'email' will deliver via email. Must pass `user.email_address`.
+      enum:
+      - sms
+      - email
     LinkTokenCreateRequestPaymentInitiation:
       type: object
       description: Specifies options for initializing Link for use with the Payment Initiation (Europe) product. This field is required if `payment_initiation` is included in the `products` array. Either `payment_id` or `consent_id` must be provided.
@@ -16462,6 +16485,18 @@ components:
           $ref: '#/components/schemas/UserStatedIncomeSourcePayType'
         pay_frequency:
           $ref: '#/components/schemas/UserStatedIncomeSourceFrequency'
+    LinkTokenCreateRequestStatements:
+      type: object
+      description: Specifies options for initializing Link for use with the Statements product.
+      properties:
+        start_date:
+          type: string
+          format: date
+          description: The start date for statements, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) “YYYY-MM-DD” format, e.g. "2020-10-30". If no value is provided, this will default to 3 months prior to the current date.
+        end_date:
+          type: string
+          format: date
+          description: The end date for statements, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) “YYYY-MM-DD” format, e.g. "2020-10-30". If no value is provided, this will default to the current date.
     UserStatedIncomeSourceCategory:
       type: string
       description: The income category for a specified income source
@@ -16698,6 +16733,12 @@ components:
           format: date-time
           nullable: true
           description: The expiration timestamp for the `link_token`, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format.
+        link_sessions:
+          type: array
+          description: Information about link sessions created using this `link_token`.
+          x-hidden-from-docs: true
+          items:
+            $ref: '#/components/schemas/LinkTokenGetSessionsResponse'
         metadata:
           $ref: '#/components/schemas/LinkTokenGetMetadataResponse'
         request_id:
@@ -16708,6 +16749,185 @@ components:
       - expiration
       - metadata
       - request_id
+    LinkTokenGetSessionsResponse:
+      type: object
+      x-hidden-from-docs: true
+      description: An object containing information about a link session.
+      additionalProperties: true
+      properties:
+        link_session_id:
+          type: string
+          description: The unique ID for the link session.
+        started_at:
+          type: string
+          format: date-time
+          description: The timestamp at which the link session was first started, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format.
+        finished_at:
+          type: string
+          nullable: true
+          format: date-time
+          description: The timestamp at which the link session was finished, if available, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format.
+        on_success:
+          $ref: '#/components/schemas/LinkSessionSuccess'
+        on_exit:
+          $ref: '#/components/schemas/LinkSessionExit'
+      required:
+      - link_session_id
+    LinkSessionSuccess:
+      type: object
+      x-hidden-from-docs: true
+      description: An object representing an [onSuccess](https://plaid.com/docs/link/web/#onsuccess) callback from Link.
+      nullable: true
+      properties:
+        public_token:
+          type: string
+          description: Displayed once a user has successfully linked their Item.
+        metadata:
+          $ref: '#/components/schemas/LinkSessionSuccessMetadata'
+      required:
+      - public_token
+      - metadata
+    LinkSessionSuccessMetadata:
+      type: object
+      description: Displayed once a user has successfully linked their Item.
+      nullable: true
+      properties:
+        institution:
+          $ref: '#/components/schemas/LinkSessionSuccessMetadataInstitution'
+        accounts:
+          type: array
+          description: A list of accounts attached to the connected Item. If Account Select is enabled via the developer dashboard, `accounts` will only include selected accounts.
+          items:
+            $ref: '#/components/schemas/LinkSessionSuccessMetadataAccount'
+        link_session_id:
+          type: string
+          description: A unique identifier associated with a user's actions and events through the Link flow. Include this identifier when opening a support ticket for faster turnaround.
+        transfer_status:
+          $ref: '#/components/schemas/LinkSessionSuccessMetadataTransferStatus'
+    LinkSessionSuccessMetadataInstitution:
+      type: object
+      description: An institution object. If the Item was created via Same-Day micro-deposit verification, will be `null`.
+      nullable: true
+      properties:
+        name:
+          type: string
+          description: The full institution name, such as `'Wells Fargo'`
+        institution_id:
+          type: string
+          description: The Plaid institution identifier
+    LinkSessionSuccessMetadataAccount:
+      type: object
+      description: An account attached to the connected Item.
+      properties:
+        id:
+          type: string
+          description: |
+            The Plaid `account_id`
+        name:
+          type: string
+          description: The official account name
+        mask:
+          type: string
+          nullable: true
+          description: The last 2-4 alphanumeric characters of an account's official account number. Note that the mask may be non-unique between an Item's accounts. It may also not match the mask that the bank displays to the user.
+        type:
+          type: string
+          description: The account type. See the [Account schema](/docs/api/accounts#account-type-schema) for a full list of possible values
+        subtype:
+          type: string
+          description: The account subtype. See the [Account schema](/docs/api/accounts#account-type-schema) for a full list of possible values
+        verification_status:
+          nullable: true
+          type: string
+          description: |
+            Indicates an Item's micro-deposit-based verification status. Possible values are:
+
+            `pending_automatic_verification`: The Item is pending automatic verification
+
+            `pending_manual_verification`: The Item is pending manual micro-deposit verification. Items remain in this state until the user successfully verifies the two amounts.
+
+            `automatically_verified`: The Item has successfully been automatically verified
+
+            `manually_verified`: The Item has successfully been manually verified
+
+            `verification_expired`: Plaid was unable to automatically verify the deposit within 7 calendar days and will no longer attempt to validate the Item. Users may retry by submitting their information again through Link.
+
+            `verification_failed`: The Item failed manual micro-deposit verification because the user exhausted all 3 verification attempts. Users may retry by submitting their information again through Link.
+
+            `null`: micro-deposit-based verification is not being used for the Item.
+        class_type:
+          nullable: true
+          type: string
+          description: If micro-deposit verification is being used, indicates whether the account being verified is a `business` or `personal` account.
+    LinkSessionSuccessMetadataTransferStatus:
+      type: string
+      nullable: true
+      description: |-
+        The status of a transfer. Returned only when [Transfer UI](/docs/transfer/using-transfer-ui) is implemented.
+
+        - `COMPLETE` – The transfer was completed.
+        - `INCOMPLETE` – The transfer could not be completed. For help, see [Troubleshooting transfers](/docs/transfer/using-transfer-ui#troubleshooting-transfers).
+      enum:
+      - COMPLETE
+      - INCOMPLETE
+    LinkSessionExit:
+      type: object
+      x-hidden-from-docs: true
+      description: An object representing an [onExit](https://plaid.com/docs/link/web/#onexit) callback from Link.
+      additionalProperties: true
+      nullable: true
+      properties:
+        error:
+          $ref: '#/components/schemas/PlaidError'
+        metadata:
+          $ref: '#/components/schemas/LinkSessionExitMetadata'
+      required:
+      - error
+      - metadata
+    LinkSessionExitMetadata:
+      type: object
+      description: Displayed if a user exits Link without successfully linking an Item.
+      nullable: true
+      properties:
+        institution:
+          $ref: '#/components/schemas/LinkSessionExitMetadataInstitution'
+        status:
+          type: string
+          description: The point at which the user exited the Link flow. One of the following values.
+          properties:
+            requires_questions:
+              description: User prompted to answer security questions
+            requires_selections:
+              description: User prompted to answer multiple choice question(s)
+            requires_code:
+              description: User prompted to provide a one-time passcode
+            choose_device:
+              description: User prompted to select a device on which to receive a one-time passcode
+            requires_credentials:
+              description: User prompted to provide credentials for the selected financial institution or has not yet selected a financial institution
+            requires_account_selection:
+              description: User prompted to select one or more financial accounts to share
+            requires_oauth:
+              description: User prompted to enter an OAuth flow
+            institution_not_found:
+              description: User exited the Link flow after unsuccessfully (no results returned) searching for a financial institution
+        link_session_id:
+          type: string
+          description: A unique identifier associated with a user's actions and events through the Link flow. Include this identifier when opening a support ticket for faster turnaround.
+        request_id:
+          type: string
+          description: The request ID for the last request made by Link. This can be shared with Plaid Support to expedite investigation.
+    LinkSessionExitMetadataInstitution:
+      type: object
+      description: An institution object. If the Item was created via Same-Day micro-deposit verification, will be `null`.
+      nullable: true
+      properties:
+        name:
+          type: string
+          description: The full institution name, such as `Wells Fargo`
+        institution_id:
+          type: string
+          description: The Plaid institution identifier
     LinkTokenGetMetadataResponse:
       type: object
       additionalProperties: true
@@ -16777,6 +16997,10 @@ components:
           description: The expiration date for the `link_token`, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format. A `link_token` created to generate a `public_token` that will be exchanged for a new `access_token` expires after 4 hours. A `link_token` created for an existing Item (such as when updating an existing `access_token` by launching Link in update mode) expires after 30 minutes.
         request_id:
           $ref: '#/components/schemas/RequestID'
+        hosted_link_url:
+          type: string
+          description: A URL of a Plaid-hosted Link flow that will use the Link token returned by this request
+          x-hidden-from-docs: true
       required:
       - link_token
       - expiration
@@ -35066,6 +35290,37 @@ components:
       - events
       - link_session_id
       - link_token
+    LinkSessionFinishedWebhook:
+      x-hidden-from-docs: true
+      title: LinkSessionFinishedWebhook
+      type: object
+      additionalProperties: true
+      description: Contains the state of a completed link session, along with the public token if available.
+      properties:
+        webhook_type:
+          type: string
+          description: '`LINK`'
+        webhook_code:
+          type: string
+          description: '`SESSION_FINISHED`'
+        status:
+          type: string
+          description: The final status of the link session. Will always be "SUCCESS" or "EXITED".
+        link_session_id:
+          type: string
+          description: The identifier for the link session.
+        link_token:
+          type: string
+          description: The link token used to create the link session.
+        public_token:
+          type: string
+          description: The public token generated by the link session.
+      required:
+      - webhook_type
+      - webhook_code
+      - status
+      - link_session_id
+      - link_token
     AssetReportCreateRequest:
       type: object
       description: AssetReportCreateRequest defines the request schema for `/asset_report/create`
@@ -40597,18 +40852,22 @@ components:
         next_payment_date:
           type: string
           format: date
+          nullable: true
           description: |-
             The expected date of the end user’s next paycheck for the income source.
             The date will be returned in an ISO 8601 format (YYYY-MM-DD).
         historical_average_monthly_gross_income:
           type: number
           description: An estimate of the average gross monthly income based on the historical net amount and income category for the income source(s).
+          nullable: true
         historical_average_monthly_income:
           type: number
           description: The average monthly net income amount estimated based on the historical data for the income source(s).
-        forcasted_average_monthly_income:
+          nullable: true
+        forecasted_average_monthly_income:
           type: number
           description: The predicted average monthly net income amount for the income source(s).
+          nullable: true
         employer:
           $ref: '#/components/schemas/CraBankIncomeEmployer'
         historical_summary:
@@ -40669,7 +40928,7 @@ components:
           description: The average monthly income amount estimated based on the historical data for the income source(s).
           items:
             $ref: '#/components/schemas/CreditAmountWithCurrency'
-        forcasted_average_monthly_income:
+        forecasted_average_monthly_income:
           type: array
           description: The predicted average monthly income amount for the income source(s).
           items:
@@ -40790,6 +41049,49 @@ components:
       - error_code
       - error_message
       - display_message
+    BankIncomeCompleteWebhook:
+      type: object
+      title: BankIncomeCompleteWebhook
+      description: Fired when a refreshed bank income report has finished generating or failed to generate, triggered by calling `/cra/bank_income/get`.
+      additionalProperties: true
+      properties:
+        webhook_type:
+          type: string
+          description: '`CRA_INCOME`'
+        webhook_code:
+          type: string
+          description: '`BANK_INCOME_COMPLETE`'
+        user_id:
+          type: string
+          description: The `user_id` corresponding to the user the webhook has fired for.
+        result:
+          $ref: '#/components/schemas/BankIncomeCompleteResult'
+        environment:
+          $ref: '#/components/schemas/WebhookEnvironmentValues'
+      required:
+      - webhook_type
+      - webhook_code
+      - user_id
+      - result
+      - environment
+      x-examples:
+        example-1:
+          webhook_type: CRA_INCOME
+          webhook_code: BANK_INCOME_COMPLETE
+          user_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
+          result: SUCCESS
+          environment: production
+    BankIncomeCompleteResult:
+      type: string
+      enum:
+      - SUCCESS
+      - FAILURE
+      description: |-
+        The result of the bank income refresh report generation
+
+        `SUCCESS`: The refreshed report was successfully generated and can be retrieved via `/cra/bank_income/get`.
+
+        `FAILURE`: The refreshed report failed to be generated
     AssetReportFreddieGetRequest:
       title: AssetReportFreddieGetRequest
       type: object
