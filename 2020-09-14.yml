@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.413.0
+  version: 2020-09-14_1.419.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -5069,7 +5069,7 @@ paths:
       externalDocs:
         url: /api/processors/#processorsignaldecisionreport
       operationId: processorSignalDecisionReport
-      description: After calling `/processor/signal/evaluate`, call `/processor/signal/decision/report` to report whether the transaction was initiated. This endpoint will return an [`INVALID_FIELD`](/docs/errors/invalid-request/#invalid_field) error if called a second time with a different value for `initiated`.
+      description: After calling `/processor/signal/evaluate`, call `/processor/signal/decision/report` to report whether the transaction was initiated.
       responses:
         "200":
           description: OK
@@ -16347,6 +16347,8 @@ components:
           $ref: '#/components/schemas/LinkTokenCreateRequestIncomeVerification'
         base_report:
           $ref: '#/components/schemas/LinkTokenCreateRequestBaseReport'
+        consumer_report_permissible_purpose:
+          $ref: '#/components/schemas/ConsumerReportPermissiblePurpose'
         auth:
           $ref: '#/components/schemas/LinkTokenCreateRequestAuth'
         transfer:
@@ -18360,6 +18362,30 @@ components:
       - LV
       - PT
       description: ISO-3166-1 alpha-2 country code standard.
+    ConsumerReportPermissiblePurpose:
+      x-hidden-from-docs: true
+      type: string
+      title: ConsumerReportPermissiblePurpose
+      enum:
+      - ACCOUNT_REVIEW_CREDIT
+      - ACCOUNT_REVIEW_NON_CREDIT
+      - EMPLOYMENT
+      - EXTENSION_OF_CREDIT
+      - LEGITIMATE_BUSINESS_NEED_TENANT_SCREENING
+      - LEGITIMATE_BUSINESS_NEED_TENANT_OTHER
+      - WRITTEN_INSTRUCTION_PREQUALIFICATION
+      - WRITTEN_INSTRUCTION_OTHER
+      description: |-
+        This enum describes the reason a consumer report is created for
+
+        `ACCOUNT_REVIEW_CREDIT`: In connection with a consumer credit transaction for the review or collection of an account pursuant to FCRA Section 604(a)(3)(A).
+        `ACCOUNT_REVIEW_NON_CREDIT`: For a legitimate business need of the information to review a non-credit account provided primarily for personal, family, or household purposes to determine whether the consumer continues to meet the terms of the account pursuant to FCRA Section 604(a)(3)(F)(2).
+        `EMPLOYMENT`: For employment purposes pursuant to FCRA 604(a)(3)(B), including hiring, retention and promotion purposes.
+        `EXTENSION_OF_CREDIT`: In connection with a credit transaction initiated by and involving the consumer pursuant to FCRA Section 604(a)(3)(A).
+        `LEGITIMATE_BUSINESS_NEED_TENANT_SCREENING`: For a legitimate business need in connection with a business transaction initiated by the consumer primarily for personal, family, or household purposes in connection with a property rental assessment pursuant to FCRA Section 604(a)(3)(F)(i).
+        `LEGITIMATE_BUSINESS_NEED_TENANT_OTHER`: For a legitimate business need in connection with a business transaction made primarily for personal, family, or household initiated by the consumer pursuant to FCRA Section 604(a)(3)(F)(i).
+        `WRITTEN_INSTRUCTION_PREQUALIFICATION`: In accordance with the written instructions of the consumer pursuant to FCRA Section 604(a)(2), to evaluate an application’s profile to make an offer to the consumer.
+        `WRITTEN_INSTRUCTION_OTHER`: In accordance with the written instructions of the consumer pursuant to FCRA Section 604(a)(2), such as when an individual agrees to act as a guarantor or assumes personal liability for a consumer, business, or commercial loan.
     PaymentMeta:
       title: PaymentMeta
       type: object
@@ -34471,6 +34497,23 @@ components:
           type: boolean
           description: Whether or not the transaction is periodically recurring.
           nullable: true
+        frequency:
+          $ref: '#/components/schemas/RecurringFrequency'
+    RecurringFrequency:
+      type: string
+      title: RecurringFrequency
+      nullable: true
+      enum:
+      - UNKNOWN
+      - WEEKLY
+      - BIWEEKLY
+      - SEMI_MONTHLY
+      - MONTHLY
+      - ANNUALLY
+      - DAILY
+      - DYNAMIC
+      - null
+      description: "Describes the frequency of the transaction stream.\n\n`WEEKLY`: Assigned to a transaction stream that occurs approximately every week.\n\n`BIWEEKLY`: Assigned to a transaction stream that occurs approximately every 2 weeks.\n\n`SEMI_MONTHLY`: Assigned to a transaction stream that occurs approximately twice per month. This frequency is typically seen for inflow transaction streams.\n\n`MONTHLY`: Assigned to a transaction stream that occurs approximately every month.\n\n`ANNUALLY`: Assigned to a transaction stream that occurs approximately every year.\n\n`DAILY`: Assigned to a transaction stream that occurs approximately every day.\n\n`DYNAMIC`: Assigned to a transaction stream that varies in recurrence frequency. This frequency is typically seen for inflow streams in the gig economy. \n\n`UNKNOWN`: Assigned to a transaction stream that isn't recurring in nature."
     PaymentProfileCreateRequest:
       type: object
       description: PaymentProfileCreateRequest defines the request schema for `/payment_profile/create`
@@ -35101,7 +35144,7 @@ components:
       type: object
       additionalProperties: true
       description: |-
-        Information describing the intent of the transaction. Most relevant for credit use cases, but not limited to such use cases. Please reach out to your account manager or sales representative if you would like to receive this field.
+        Information describing the intent of the transaction. Most relevant for credit use cases, but not limited to such use cases.
 
         See the [`taxonomy csv file`](https://plaid.com/documents/credit-category-taxonomy.csv) for a full list of credit categories.
       properties:
@@ -36313,16 +36356,6 @@ components:
           type: string
           description: The string returned by the financial institution to describe the transaction.
           nullable: true
-        category:
-          type: array
-          description: A hierarchical array of the categories to which this transaction belongs. For a full list of categories, see [`/categories/get`](https://plaid.com/docs/api/products/transactions/#categoriesget).
-          nullable: true
-          items:
-            type: string
-        category_id:
-          description: The ID of the category to which this transaction belongs. For a full list of categories, see [`/categories/get`](https://plaid.com/docs/api/products/transactions/#categoriesget).
-          type: string
-          nullable: true
         credit_category:
           $ref: '#/components/schemas/CreditCategory'
         check_number:
@@ -36339,15 +36372,10 @@ components:
           description: The date on which the transaction took place, in IS0 8601 format.
         location:
           $ref: '#/components/schemas/Location'
-        name:
-          type: string
-          description: The merchant name or transaction description.
         merchant_name:
           type: string
           description: The merchant name, as enriched by Plaid from the `name` field. This is typically a more human-readable version of the merchant counterparty in the transaction. For some bank transactions (such as checks or account transfers) where there is no meaningful merchant name, this value will be `null`.
           nullable: true
-        payment_meta:
-          $ref: '#/components/schemas/PaymentMeta'
         pending:
           type: boolean
           description: When `true`, identifies the transaction as pending or unsettled. Pending transaction details (name, type, amount, category ID) may change before they are settled.
@@ -36355,8 +36383,6 @@ components:
           type: string
           description: The name of the account owner. This field is not typically populated and only relevant when dealing with sub-accounts.
           nullable: true
-        transaction_type:
-          $ref: '#/components/schemas/BaseReportTransactionType'
       required:
       - pending
       - date
@@ -36474,23 +36500,6 @@ components:
             The date will be returned in an ISO 8601 format (YYYY-MM-DD).
         total_amount:
           $ref: '#/components/schemas/CreditAmountWithCurrency'
-    BaseReportTransactionType:
-      title: BaseReportTransactionType
-      type: string
-      x-hidden-from-docs: true
-      enum:
-      - digital
-      - place
-      - special
-      - unresolved
-      description: |
-        `digital:` transactions that took place online.
-
-        `place:` transactions that were made at a physical location.
-
-        `special:` transactions that relate to banks, e.g. fees or deposits.
-
-        `unresolved:` transactions that do not fit into the other three types.
     AddressPurposeLabel:
       description: |-
         Field describing whether the associated address is being used for commercial or residential purposes.

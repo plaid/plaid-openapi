@@ -1,89 +1,141 @@
+### 2020-09-14_1.419.0
+
+- Update `/signal/decision/report` description
+  - Overwriting `initiated` field is now supported and no longer returns an `INVALID_FIELD` error
+  
+### 2020-09-14_1.418.0
+
+- Add `frequency` to `/transactions/enrich`
+
+### 2020-09-14_1.417.0
+
+- Remove `category`, `category_id`, `transaction_type`, `name`, `payment_meta` fields from Base Report insights
+
+### 2020-09-14_1.416.0
+
+- Add `card_switch` to `/link/token/create`
+
+### 2020-09-14_1.415.0
+
+- Add `consumer_report_permissible_purpose` to `link/token/create`
+
+### 2020-09-14_1.414.0
+
+- Update `currency` on `payment/reverse` and `amount_refunded` on `payment/get`
+
 ### 2020-09-14_1.413.0
+
 - Add `statements` to `/link/token/create` request
 
 ### 2020-09-14_1.412.0
+
 - Add `hosted_link_url` to `/link/token/create` response
 - Add `hosted_link.delivery_method` to `/link/token/create`
 
 ### 2020-09-14_1.411.0
+
 - Add `link_sessions` to `/link/token/get`
 - Add `LINK:SESSION_FINISHED` webhook
 
 ### 2020-09-14_1.410.1
+
 - Add `statements` to the list of supported Plaid products in the `/link/token/create` endpoint
 
 ### 2020-09-14_1.410.0
+
 - add `/credit/relay/pdf/get` endpoint
 
 ### 2020-09-14_1.409.0
+
 - Add `original_client_id` to `/transfer/balance/get`
 - Mark `type` optional in `/transfer/balance/get` request
 
 ### 2020-09-14_1.408.0
+
 - Add `status` to `document_reference` in `/credit/payroll_income/risk_signals/get`
 
 ### 2020-09-14_1.407.0
+
 - Add `consumer_report_user_identity` to `/user/create`
 
 ### 2020-09-14_1.406.1
+
 - Add comment explaining availability of `confidence_level` field for `/transactions/*` endpoints
 
 ### 2020-09-14_1.406.0
+
 - Added insights fields to `/cra/base_report/get`
 
 ### 2020-09-14_1.405.0
+
 - Update identity/match user.address such that none of the fields are required
 - Add `AddressDataNullableNoRequiredFields`
 
 ### 2020-09-14_1.404.1
+
 - Allowing null failure_reason for refunds to be displayed
-- 
+-
+
 ### 2020-09-14_1.404.0
+
 - Add `failure_reason` to `/wallet/transaction/get` and `/wallet/transaction/list` endpoint in virtual accounts.
 
 ### 2020-09-14_1.403.1
+
 - Add `parsing_config` to `/link/token/create`
 
 ### 2020-09-14_1.403.0
+
 - Add `failure_reason` field to refunds for failed and returned refunds
 
 ### 2020-09-14_1.402.0
+
 - Add `area_code` match status to the response of the `identity_verification/get` and `identity_verification/list` endpoint
 
-
 ### 2020-09-14_1.401.0
+
 - Add `POST /cra/bank_income/get`
 
 ### 2020-09-14_1.400.0
+
 - Add `cra/base_report/get` endpoint
 
 ### 2020-09-14_1.399.0
+
 - Add `base_report` field to `/link/token/create` and corresponding Base Report webhooks
 
 ### 2020-09-14_1.398.0
+
 - Make CreditBankIncomeWebhookUpdateResponse visible
 
 ### 2020-09-14_1.397.0
+
 - Remove extraneous `Item` field from `/processor/transactions/get` response
 - Reference new `/processor/token/webhook/update` endpoint in processor Transactions routes.
 
 ### 2020-09-14_1.396.2
+
 - Document cash management account support
 
 ### 2020-09-14_1.396.1
+
 - Fix document capitalization of `confidence_level` field in `/transactions/enrich`
 
 ### 2020-09-14_1.396.0
+
 - Add `/beacon/report/create`
 
 ### 2020-09-14_1.395.0
+
 - Add `POST /beacon/user/create`
 - Add `POST /beacon/user/get`
 
 ### 2020-09-14_1.394.0
+
 - Made `/statements/list` and `/statements/download` APIs for Plaid's Statements PDF beta product available in client SDKs
 
 ### 2020-09-14_1.393.0
+
 - Add `date_of_birth` and `address` fields to `documentary_verification.documents[].extracted_data` in the response of all of the identity verification endpoints:
   - `identity_verification/create`
   - `identity_verification/get`
@@ -91,11 +143,13 @@
   - `identity_verification/retry`
 
 ### 2020-09-14_1.392.4
+
 - Update the following about identity/match name, phone number, email, and address score descriptions:
   - Ensure consistent language across all fields
   - Include score recommended "match" threshold for all fields.
 
 ### 2020-09-14_1.392.3
+
 - Update the `async_update` field description.
 
 ### 2020-09-14_1.392.2
@@ -108,189 +162,249 @@
   - `risk_check.identity_abuse_signals.stolen_identity.score`
 
 ### 2020-09-14_1.392.1
+
 - Documentation updates for the `/link/token/create` endpoint
 
 ### 2020-09-14_1.392.0
+
 - Add `confidence_level` field to Counterparty and PersonalFinanceCategory for `/transactions/enrich`
 
 ### 2020-09-14_1.391.3
+
 - Remove the `core_attributes` field in `signal_insights` of /transfer/authorization/create
 
 ### 2020-09-14_1.391.2
+
 - Update the `pending_manual_verification` field's description in `/auth/get` response
 
 ### 2020-09-14_1.391.1
+
 - Update the description of `/investments/transactions/get`
 
 ### 2020-09-14_1.391.0
+
 - Update the `async_update` option to be visible in `/investments/transactions/get`
 
 ### 2020-09-14_1.390.1
+
 - Update the `signal_insights` field's description in `/transfers/authorization/create` request
 
-###  2020-09-14_1.390.0
+### 2020-09-14_1.390.0
+
 - Add `transfer_id` field to `/transfers/sweep/list` request
 
 ### 2020-09-14_1.389.0
+
 - Add `InvestmentsHistoricalUpdateWebhook`, a `HISTORICAL_UPDATE` webhook of type `INVESTMENTS_TRANSACTIONS`.
 
 ### 2020-09-14_1.388.1
+
 - Add `status` field to a sweep object. Add `status` field to `/transfers/sweep/list` request
 
 ### 2020-09-14_1.388.0
+
 - [Breaking] Remove `asset_report_token` as required field in `/asset_report/get` and mark as nullable
 
 ### 2020-09-14_1.387.1
+
 - Allow empty `mask` on the `meta` field of overridden accounts in the sandbox custom user configuration object schema.
 
 ### 2020-09-14_1.387.0
+
 - Mark `region` and `postal_code` fields as nullable in `/identity_verification/create`, `/identity_verification/retry`, and `/link/token/create`
 
 ### 2020-09-14_1.386.0
+
 - Add payloads for processor Transactions webhooks.
 
 ### 2020-09-14_1.385.2
+
 - Mark `next_origination_date` nullable
 
 ### 2020-09-14_1.385.1
+
 - Add expiration time description to `transfer/authorization/create` `idempotency_key` parameter
 
 ### 2020-09-14_1.385.0
+
 - Add `user` field to `/identity_verification/retry`
 - Add `client_user_id` field to `/identity_verification/create`
 - Deprecate `user.client_user_id` field in `/identity_verification/create`
 - [Breaking] Renamed `IdentityVerificationRequestUser` object to `IdentityVerificationCreateRequestUser`
 
 ### 2020-09-14_1.384.0
+
 - Remove `maxLength` constraint from `client_user_id` field for `/processor/signal/evaluate` and `/signal/evaluate` requests
 
 ### 2020-09-14_1.383.3
+
 - Add `test_clock_id` to `transfer/authorization/create` request
 
 ### 2020-09-14_1.383.2
+
 - Update `InvestmentsAuthOwner` title
 
 ### 2020-09-14_1.383.1
+
 - Add `account_id` to `bank_accounts` and `transactions` in `/credit/bank_statements/uploads/get` response
 
 ### 2020-09-14_1.383.0
+
 - Add `transfer/diligence/document/upload` endpoint
 
 ### 2020-09-14_1.382.1
+
 - Add `amount` to `/transfer/sweep/list` request
+
 ### 2020-09-14_1.382.0
+
 - Add `signal_insights` to `/transfer/authorization/create` request
 
 ### 2020-09-14_1.381.0
+
 - Add definitions for `/sandbox/bank_income/fire_webhook`
 
 ### 2020-09-14_1.380.0
+
 - Update validation `sweep_id` for `/transfers/sweep/get` to allow UUID or 8 character hexadecimal string
 
 ### 2020-09-14_1.379.0
+
 - Add `scheme` to `/wallet/transaction/get` and `/wallet/transaction/list`
 
 ### 2020-09-14_1.378.1
+
 - Fix issue in which `request_id` was erroneously not listed as required in `ItemActivityListResponse`
 
 ### 2020-09-14_1.378.0
+
 - Add `reroute_to_credentials` to `/link/token/create` auth request
 
 ### 2020-09-14_1.377.0
+
 - Add definitions for `/investments/auth/get`
 
 ### 2020-09-14_1.376.0
+
 - Add `required_if_supported_products` to `/link/token/create` request
 
 ### 2020-09-14_1.375.0
+
 - Add hidden `account_type` to `/transactions/enrich` request and response
 - Add hidden `account_subtype` to `/transactions/enrich` request and response
 
 ### 2020-09-14_1.374.3
+
 - Add `num_bank_statements_uploaded` to `document_income_results` object in `/credit/sessions/get` response
 
 ### 2020-09-14_1.374.2
+
 - Add `income_source` enum to `/transactions/enrich` `counterparty_type` field
 
 ### 2020-09-14_1.374.1
+
 - Update `oauth` descriptions for `/institutions/get` and `/institutions/search`
 
 ### 2020-09-14_1.374.0
+
 - Add `/credit/bank_statements/uploads/get` endpoint
 
 ### 2020-09-14_1.373.0
+
 - Add support for address and date of birth in `virtual-accounts/#wallettransactionexecute` endpoint
 
 ### 2020-09-14_1.372.3
+
 - Modify `/transactions/enrich` field `user_id` to `client_user_id`
 - Modify `/transactions/enrich` field `account_id` to `client_account_id`
 
 ### 2020-09-14_1.372.2
+
 - Update docs for `/transactions/enrich` response to include non-null example values for `lat` and `lon` fields
 
 ### 2020-09-14_1.372.1
+
 - Update descriptions for `PAYMENT_STATUS_EXECUTED` and `PAYMENT_STATUS_INITIATED`
 - Update description for `PaymentAmountCurrency`
 
 ### 2020-09-14_1.372.0
+
 - Add `user_id` and `account_id` fields to `/transactions/enrich` request and resposne
 
 ### 2020-09-14_1.371.4
+
 - Update descriptions for `/credit/payroll_income/risk_signals/get` and `INCOME_VERIFICATION_RISK_SIGNALS` webhook
 
 ### 2020-09-14_1.371.3
+
 - Add test_clock_id to `/transfer/simulate`
 - [Breaking change for Go] Make `virtual_time` optional in `/sandbox/transfer/test_clock/create`
 
 ### 2020-09-14_1.371.2
+
 - Add test_clock_id to `/sandbox/transfer/simulate` and `/sandbox/transfer/sweep/simulate` endpoints
 
 ### 2020-09-14_1.371.1
+
 - Update `transfer/diligence/submit` copy
 
 ### 2020-09-14_1.370.0
+
 - Add `investments/refresh` endpoint
 
 ### 2020-09-14_1.369.3
+
 - Update `description` field in `/transfer/create` to have max length of 15
 
 ### 2020-09-14_1.369.2
+
 - Add new `CreditBankIncomeCategory` value
 
 ### 2020-09-14_1.369.1
+
 - Fix `/processor/transactions` routes doc links
 
 ### 2020-09-14_1.369.0
+
 - Add `/processor/token/permissions/get` endpoint
 - Add `/processor/token/permissions/set` endpoint
 
 ### 2020-09-14_1.368.2
+
 - Add `transfer/diligence/submit` endpoint
 
 ### 2020-09-14_1.368.1
+
 - Update `client_user_id` description for Identity Verification endpoints
 - Update `user` description for Identity Match via Identity Verification Data use case
 
 ### 2020-09-14_1.368.0
+
 - Add `/transfer/balance/get` endpoint
 
 ### 2020-09-14_1.367.0
+
 - Added `LinkEventsWebhook` schema
 
 ### 2020-09-14_1.366.0
+
 - Add `credit_funds_source` field for authorizations and transfers
 - Make `funding_account_id` nullable in various /transfer API responses
 
 ### 2020-09-14_1.356.0
+
 - Update `notificationsPayload.customFields` datatype from an object to an array of objects
 
 ### 2020-09-14_1.355.1
+
 - Added `warnings` to `/processor/signal/evaluate` response.
 
 ### 2020-09-14_1.355.0
+
 - Added `/processor/identity/match` endpoint.
 
 ### 2020-09-14_1.354.0
+
 - Adds a `selfie_check` object to the response schema of all the identity verification endpoints:
   - `identity_verification/create`
   - `identity_verification/get`
@@ -298,39 +412,49 @@
   - `identity_verification/retry`
 
 ### 2020-09-14_1.353.1
+
 - Update `INCOME_VERIFICATION_RISK_SIGNALS` with webhook tag
 
 ### 2020-09-14_1.353.0
+
 - Add `ASSETS: PRODUCT_READY` and `ASSETS: ERROR` webhooks to `/sandbox/item/fire_webhook` endpoint
 
 ### 2020-09-14_1.352.0
+
 - Removed explicit `additionalProperties: true` marker for request objects and objects used only within request objects, primarily impacting the Payment Initiation API. This will result in more strict type checking for those objects, but should not be a breaking change.
 
 ### 2020-09-14_1.351.1
+
 - Update `transfer/authorization/create` copy
 
 ### 2020-09-14_1.351.0
+
 - Add new `INCOME_VERIFICATION_RISK_SIGNALS` webhook
 
 ### 2020-09-14_1.350.0
+
 - Remove `settled_amount`
 - Rename `expected_settlement_schedule` as `expected_sweep_settlement_schedule`
 
 ### 2020-09-14_1.349.0
+
 - [Breaking] Converts several types that were incorrectly typed as `number` to `integer`. In some languages, this will change the type used for this field, which may be a breaking change for some Plaid integrations. The following fields are impacted:
 
 For all products:
-  - `PlaidError.status`
+
+- `PlaidError.status`
 
 For Liabilities:
-  - `PSLFStatus.payments_made`
-  - `PSLFStatus.payments_remaining`
+
+- `PSLFStatus.payments_made`
+- `PSLFStatus.payments_remaining`
 
 For Identity Verification and Monitor:
-  - `DocumentaryVerificationDocument.DocumentAnalysis.attempt`
-  - `EntityScreeningHitAnalysis.search_terms_version`
-  - `EntityWatchlistScreeningSearchTerms.search_terms_version`
-  - `IdentityVerificationTemplateReference.version`
+
+- `DocumentaryVerificationDocument.DocumentAnalysis.attempt`
+- `EntityScreeningHitAnalysis.search_terms_version`
+- `EntityWatchlistScreeningSearchTerms.search_terms_version`
+- `IdentityVerificationTemplateReference.version`
 
 The following client library languages are impacted:
 
@@ -340,13 +464,16 @@ The following client library languages are impacted:
 - Ruby: Type changes from Float to Integer
 
 ### 2020-09-14_1.348.2
+
 - Update `/identity/match`'s score description to explicitly mention that null values are returned if input is missing from either the financial institution or the API
 - Update `/identity/match` sample response to include `is_business_name_detected`
 
 ### 2020-09-14_1.348.1
+
 - Make the `warnings` field in `SignalEvaluateResponse` non-nullable
 
 ### 2020-09-14_1.348.0
+
 - Add `STARTED` and `INTERNAL_ERROR` to bank income and employment `/credit/sessions/get` status
 
 ### 2020-09-14_1.347.1
@@ -355,27 +482,35 @@ The following client library languages are impacted:
 - Update `SignalWarning` descriptions
 
 ### 2020-09-14_1.347.0
+
 Fix npm publish
 
 ### 2020-09-14_1.346.0
+
 - Releasing new `/credit/payroll_income/risk_signals/get` endpoint
 
 ### 2020-09-14_1.345.4
+
 - Revert `sweep_amount` description
 
 ### 2020-09-14_1.345.3
+
 - Update `sweep_amount` description
 
 ### 2020-09-14_1.345.2
+
 - Internal changes
 
 ### 2020-09-14_1.345.1
+
 - Update `/transactions/enrich` field `is_recurring` field to be optional.bool
 
 ### 2020-09-14_1.345.0
+
 - Fix bug in which `environment` field was incorrectly missing from Assets webhooks.
 
 ### 2020-09-14_1.344.0
+
 - Add recurrence and is_recurring fields to `/transactions/enrich`
 
 ### 2020-09-14_1.343.6
@@ -383,183 +518,238 @@ Fix npm publish
 - Update incorrect required fields for `/watchlist_screening/entity/update`
 
 ### 2020-09-14_1.343.5
+
 - Update `owners` description for `/credit/bank_income/get` and `/beta/credit/v1/bank_employment/get`
 
 ### 2020-09-14_1.343.4
+
 - Make comment about `webhook` field in `/link/token/create` request more explicit
 
 ### 2020-09-14_1.343.3
+
 - Make VOA in /credit/freddie_mac/reports/get optional
 
 ### 2020-09-14_1.343.2
+
 - Update `warnings` description for `/credit/bank_income/get` and `/beta/credit/v1/bank_employment/get`
 
 ### 2020-09-14_1.343.1
+
 - Updated Asset endpoint descriptions related to Verification of Employment
 
 ### 2020-09-14_1.343.0
+
 - Add new `warnings` field to the response of `/signal/evaluate`
 
 ### 2020-09-14_1.342.0
+
 - Add `report_type` to assets webhook docs
 - Make `add_ons` public in assets docs for /asset_report/create
 - Make `fast_report` public in assets docs for /asset_report/get
 
 ### 2020-09-14_1.341.0
+
 - Add `risk_check` attribute to all Identity Verification responses
 
 ### 2020-09-14_1.340.1
+
 - Update examples for `entity_id` in `/transactions/enrich`
 
 ### 2020-09-14_1.340.0
+
 - Create `options` in `/link_delivery/create`
 - Create `recipient` within `options` field
 - Move `communication_methods` from top level to `recipient`
 - Add `first_name` in `recipient`
 
 ### 2020-09-14_1.339.0
+
 - Add `callback_type` to link delivery webhooks
 
 ### 2020-09-14_1.338.2
+
 - Make `communication_methods` optional in `/link_delivery/create`
 
 ### 2020-09-14_1.338.1
+
 - Remove beta description from `/transactions/enrich` endpoint docs
 
 ### 2020-09-14_1.338.0
+
 - Add `transaction_id` to `/payment-initiation/#payment_status_update`
 - Add `payment_id` and `wallet_id` to `/virtual-accounts/#wallet_transaction_status_update`
 
 ### 2020-09-14_1.337.4
+
 - Add `credit_category` to the `/asset_report/get` endpoint
 
 ### 2020-09-14_1.337.3
+
 - Update description for the `address` field in `/payment_initiation/recipient/create`.
 
 ### 2020-09-14_1.337.2
+
 - Add annually recurring frequency to `/transactions/recurring/get`
 
 ### 2020-09-14_1.337.1
+
 - Make documentation for credit categories in the `/asset_report/get` endpoint public
 
 ### 2020-09-14_1.337.0
+
 - Add bank employment results to `/credit/sessions/get`
 
 ### 2020-09-14_1.336.1
+
 - Add `signal` to Products array.
 
 ### 2020-09-14_1.336.0
+
 - Add options to `/credit/payroll_income/refresh` to allow item-level refresh
 
 ### 2020-09-14_1.335.2
+
 - Updated `amount.value` description field with new minimum requirement for `/payment_initiation/payment/reverse` and `/wallet/transaction/execute`
 
 ### 2020-09-14_1.335.1
+
 - Add 'employment' as an available product in the request to `/partner/customer/create`
 
 ### 2020-09-14_1.335.0
+
 - [Breaking] Renamed Identity Verification UserName objects to IdentityVerificationRequestUserName and IdentityVerificationResponseUserName
 
 ### 2020-09-14_1.334.0
+
 - Add "entity_id" field to /transactions/enrich
 
 ### 2020-09-14_1.333.0
+
 - Add "add_ons" field to asset_report/create
 
 ### 2020-09-14_1.332.0
+
 - [Breaking] Remove `/wallet/transaction/list` endpoint
   - [Note] Determined that `/wallet/transaction/list` is unused
 
 ### 2020-09-14_1.331.0
+
 Add `LinkDeliveryCallbackWebhook`, `LinkUserDeliveryStatusWebhook` for Link Delivery.
 
 ### 2020-09-14_1.330.0
+
 - [Breaking] Remove `options.wallet_id` field in `/payment_initiation/payment/create` and `/payment_initiation/consent/create` request.
   - [Note] Determined that this field is unused.
 
 ### 2020-09-14_1.229.2
+
 - Undeprecated the `legal_name` field in the `/link/token/create` request.
 
 ### 2020-09-14_1.229.1
+
 - Add `income_verification` as a supported product in the request for `/partner/customer/create`.
 
 ### 2020-09-14_1.229.0
+
 - Add `network` field to `/transfer/intent/create` request.
 - Updated `reference` minLength for `/wallet/transaction/execute` request and `/payment_initiation/payment/reverse` request.
 
 ### 2020-09-14_1.228.0
+
 - Add `access_tokens` and `item_ids` to `/link_delivery/get` response
 
 ### 2020-09-14_1.227.0
+
 - Add optional `persistent_account_id` field to account responses
 
 ### 2020-09-14_1.226.0
+
 - Add `employment` fields to `/link/token/create`
 
 ### 2020-09-14_1.225.0
+
 - Add `redacted_at` field in Identity Verification response and Documentary Verification Document component
 - Update `original_front` field in Identity Verification Document Images to be nullable in redacted Identity Verification sessions
 
 ### 2020-09-14_1.224.0
+
 - Add `earliest_deposit_date` and change `last_deposit_date` to `latest_deposit_date` for `/beta/credit/v1/bank_employment/get`
 
 ### 2020-09-14_1.223.0
+
 - Add `redirect_uris` to `/partner/customer/create` request.
 
 ### 2020-09-14_1.222.0
+
 - Add `wallet_id` field to `/wallet/transaction/get` and `/wallet/transaction/list` responses
 
 ### 2020-09-14_1.221.0
+
 - Update `link_delivery/get` to remove `public_tokens` from the response
 
 ### 2020-09-14_1.220.0
+
 - Update `link_delivery/create` to accept `communication_methods` and deprecate `delivery_method` and `delivery_destination`
 
 ### 2020-09-14_1.219.1
+
 - Fix the `refund_id` example.
 - Update address objects to reflect that in rare instances, `city` may be `null`.
 
 ### 2020-09-14_1.219.0
+
 - Add partner webhook event type
 
 ### 2020-09-14_1.218.1
+
 - Mark `phone_number_verified_time` and `email_address_verified_time` as deprecated, since it is no longer required to provide these fields to enable to enable the Returning User Experience.
 
 ### 2020-09-14_1.218.1
+
 - Introduce `expected_settlement_date` field in the Transfer object
 
 ### 2020-09-14_1.218.0
+
 - Add `/beta/credit/v1/bank_employment/get` endpoint
 
 ### 2020-09-14_1.217.0
+
 - Add `updated` field to `/credit/audit_copy_token/update` response
 - Add `SchemaVersion` to VOE and VOA schemas for `/credit/freddie_mac/reports/get`
 
 ### 2020-09-14_1.216.0
+
 - Introduce `funding_account_id` field in the Transfer API
 - Remove deprecated `origination_account_id` field from the Transfer documentation
 
 ### 2020-09-14_1.215.2
+
 - Use more strict validation for `payment_id` and `recipient_id` fields in API
 
 ### 2020-09-14_1.215.1
+
 - Use more strict validation for payment `consent_id` field in API
 
 ### 2020-09-14_1.215.0
+
 - Add `status` to Wallet schema
 
 ### 2020-09-14_1.214.0
+
 - Add `/credit/freddie_mac/reports/get` endpoint
 
 ### 2020-09-14_1.213.1
+
 - Reflect that `days_requested` field in Bank Income Verification object in `/link/token/create` request is required when using Bank Income.
 - Reflect that `is_update_mode` field in Bank Income Verification object in `/link/token/create` request defaults to `false`.
 - Update description to reflect that Document Income object in `/link/token/create` request is not required, even when using Document Income.
 
 ### 2020-09-14_1.213.0
+
 - Update `PartnerEndCustomerStatus` enum values.
 
 ### 2020-09-14_1.212.0
+
 - Add `/credit/audit_copy_token/update` endpoint
 - Add `report_type` to AssetReportCreateRequest
 
@@ -570,96 +760,123 @@ Add `LinkDeliveryCallbackWebhook`, `LinkUserDeliveryStatusWebhook` for Link Deli
 - Document `IZ_WBK` list code for screening individuals and entities with Monitor
 
 ### 2020-09-14_1.211.0
+
 - Add `/partner/customer/oauth_institutions/get` endpoint.
 
 ### 2020-09-14_1.210.8
+
 - Update example response for `/credit/bank_income/get`
 
 ### 2020-09-14_1.210.7
+
 - Documentation updates for Investments APIs and Bank Transfer APIs.
 
 ### 2020-09-14_1.210.6
+
 - Add validation on `originator_client_id` and `redirect_uri` for `/transfer/originator/create` and `transfer/originator/get` request
 
 ### 2020-09-14_1.210.5
+
 - Add `company_name` to TransferOriginatorGetResponse
 
 ### 2020-09-14_1.210.4
+
 - Add `recurring_transfer_id` to Transfer
 
 ### 2020-09-14_1.210.3
+
 - Make `id_numbers` field hidden in `/user/create` request
 
 ### 2020-09-14_1.210.2
+
 - Make `transfer_ids` required in RecurringTransfer
 
 ### 2020-09-14_1.210.1
+
 - Change the `/transactions/enrich` `options.include_legacy_categories` field to `options.include_legacy_category`
 - Make documentation for the `/transactions/enrich` `options.include_legacy_category` request field visible
 - Make documentation for the `/transactions/enrich` `legacy_category` and `legacy_category_id` response fields visible
 - Add `direction` to required fields for `ClientProvidedTransaction`
 
 ### 2020-09-14_1.210.0
+
 - Add `/transfer/capabilities/get` endpoint to fetch RTP eligibility for a linked plaid item
 
 ### 2020-09-14_1.209.2
+
 - Renamed the `NullableRecurringTransfer` type to `RecurringTransferNullable` type
 
 ### 2020-09-14_1.209.1
+
 Add `nullable` property to `date_of_birth`, `phone_number_verified_time`, and `email_address_verified_time` fields within `LinkTokenCreateRequestUser` to resolve undesireable client library behavior in certain languages.
 
 ### 2020-09-14_1.209.0
+
 - add `NullableRecurringTransfer` field
 - replace `RecurringTransfer` with `NullableRecurringTransfer` for `TransferRecurringCreateResponse`
 - and `Decision` in required fields for `TransferRecurringCreateResponse`
 - add required fields for `TransferRecurringSchedule`
 
 ### 2020-09-14_1.208.0
+
 - Add `total_amounts` field to `/credit/bank_income/get` response
 - Deprecate `amount`, `iso_currency_code`, and `unofficial_currency_code` at top levels in `/credit/bank_income/get` response
 
 ### 2020-09-14_1.207.0
+
 - Add `id_numbers` field to `/user/create` request
 
 ### 2020-09-14_1.206.11
+
 - Add `RECURRING_NEW_TRANSFER` webhook event.
 - Add `RECURRING_TRANSFER_SKIPPED` webhook event.
 - Add `RECURRING_CANCELLED` webhook event.
 
 ### 2020-09-14_1.206.10
+
 - make `idempotency_key` field for `/transfer/recurring/create` non-nullable
 
 ### 2020-09-14_1.206.9
+
 - Add `description` field for `RecurringTransfer` object
 - Make `TransferRecurringStatus` non-nullable
 
 ### 2020-09-14_1.206.8
+
 - Make all mentions of relay tokens lowercase
 
 ### 2020-09-14_1.206.7
+
 - Updated external URLs for Credit Relay endpoints, and marked them as beta in the summary
 
 ### 2020-09-14_1.206.6
+
 - Add more enums values to `pay_rate` field in `/credit/payroll_income/get` response
 - Add `pay_basis` field to `/credit/payroll_income/get`
 
 ### 2020-09-14_1.206.5
+
 - Updated Credit Relay Token descriptions
 
 ### 2020-09-14_1.206.4
+
 - Add `FUNDS_SWEEP` as a `type` enum for the `WalletTransaction` object
 
 ### 2020-09-14_1.206.3
+
 - Make `test_clock_id` non-nullable in `test_clock`.
 
 ### 2020-09-14_1.206.2
+
 - Update `CounterpartyType` to rename `delivery_marketplace` to `marketplace`
 - Update `CounterpartyType` to add `payment_terminal`
 
 ### 2020-09-14_1.206.1
+
 - Update the `transactions/enrich` transaction description example to match the request.
 
 ### 2020-09-14_1.206.0
+
 - Add `/sandbox/transfer/test_clock/list` for recurring transfer
 - rm `decision` and `decision_rationale` from `RecurringTransfer`
 - add `decision` and `decision_rationale` in `TransferRecurringCreateResponse`
@@ -667,49 +884,61 @@ Add `nullable` property to `date_of_birth`, `phone_number_verified_time`, and `e
 - not requiring `client_id` and `secret` for recurring transfer APIs
 
 ### 2020-09-14_1.205.9
+
 - Use a nested `options` field for optional request params to `transactions/enrich`
 - Make nullable fields required for `transactions/enrich`
 
 ### 2020-09-14_1.205.8
+
 - Update supported payment scheme options for `/payment_initiation/payment/create`
-–	Update description of `/payment_initiation/recipient/create` to mention non-Eurozone countries.
-–	Update `/payment_initiation/payment/create` mentioning new currencies and non-Eurozone markets.
-–	Removed `CHF` and `CZK` from the list of supported currencies.
+  – Update description of `/payment_initiation/recipient/create` to mention non-Eurozone countries.
+  – Update `/payment_initiation/payment/create` mentioning new currencies and non-Eurozone markets.
+  – Removed `CHF` and `CZK` from the list of supported currencies.
 
 ### 2020-09-14_1.205.7
+
 - Add website and logo_url to the `Counterparty` object for the Enrich product.
 - Update descriptions for logo_url field in `Counterparty`, `TransactionCounterparty`, `Enrichments` and `Enhancements`.
 
 ### 2020-09-14_1.205.6
+
 - Update field descriptions and response examples for `transactions/enrich`
 
 ### 2020-09-14_1.205.5
+
 - Add support for optional request parameters in /transactions/enrich
 - Add `location` field to `ClientProvidedTransaction` object
 - Add `mcc` field to `ClientProvidedTransaction` object
 - Add `date_posted` field to `ClientProvidedTransaction` object
 
 ### 2020-09-14_1.205.4
+
 - Document partial refunds
 - Update description for `/payment_initiation/payment/reverse` endpoint
 - Update description for `/payment_initiation/payment/get` endpoint
 
 ### 2020-09-14_1.205.3
+
 - Update description for `/signal/evaluate` endpoint
 
 ### 2020-09-14_1.205.2
+
 - Update response examples, descriptions, and formatting for `/transactions/enrich` endpoint
 
 ### 2020-09-14_1.205.1
+
 - Update descriptions for `CUSIP` and `ISIN` fields in the investments `Security` type to reflect CGS license requirements
 
 ### 2020-09-14_1.205.0
+
 - Add `/transactions/enrich` endpoint, the EA version of `/beta/transactions/v1/enhance`.
 
 ### 2020-09-14_1.204.0
+
 - Remove `/income/verification/refresh` endpoint
 
 ### 2020-09-14_1.203.0
+
 - Add 7 brand new recurring transfer APIs
 - Add `/transfer/recurring/create`
 - Add `/transfer/recurring/list`
@@ -720,153 +949,199 @@ Add `nullable` property to `date_of_birth`, `phone_number_verified_time`, and `e
 - Add `/sandbox/transfer/test_clock/get`
 
 ### 2020-09-14_1.202.6
+
 - IdentityMatchResponse `PhoneNumberMatchScore` and `EmailAddressMatchScore` use `score` instead of `scores`
 
 ### 2020-09-14_1.202.5
+
 - Add `/partner/customer/remove` endpoint
 
 ### 2020-09-14_1.202.4
+
 - Internal changes
 
 ### 2020-09-14_1.202.3
+
 - New Transfer API routes for hosted onboarding of TPS end-customers
 
 ### 2020-09-14_1.202.0
+
 - Add `refunds` field to `Transfer` object
 - Add `refund_id` field to `TransferEvent` object
 - Fix typo for `transfer/get` and `transfer/refund/get`
 
 ### 2020-09-14_1.201.0
+
 - Add support for partial refunds
 - Add `amount` field to `/payment_initiation/payment/reverse` request
 - Add `amount_refunded` field to `/payment_initiation/payment/get` and `/payment_initiation/payment/list` responses
 
 ### 2020-09-14_1.200.0
+
 - Add `risk_summary` and `page_number` to `/beta/credit/payroll_income/risk_signals/get`
 
 ### 2020-09-14_1.199.0
+
 - Renamed `/wallet/transactions/list` into `/wallet/transaction/list` as endpoint
 
 ### 2020-09-14_1.198.8
+
 - `/transfer/authorization/create` and `/transfer/create` may not return `account_id` in response.
 
 ### 2020-09-14_1.198.7
+
 - Add `SYNC_UPDATES_AVAILABLE` support to `/sandbox/item/fire_webhook`
 
 ### 2020-09-14_1.198.6
+
 - Make `ProductStatus` object nullable to reflect Sandbox-specific behavior.
 - Clarify documentation for `SYNC_UPDATES_AVAILABLE` webhook.
 
 ### 2020-09-14_1.198.5
+
 - Internal changes
 
 ### 2020-09-14_1.198.4
+
 - Add `deleted_at` to `/payment_profile/get` response.
 
 ### 2020-09-14_1.198.3
+
 - Change `start_date` to `start_time` for `/wallet/transaction/list` response.
 
 ### 2020-09-14_1.198.2
+
 - Update list of available products for `/partner/customer/create`.
 
 ### 2020-09-14_1.198.1
+
 - Add `institution_name` and `institution_id` fields to `/credit/payroll_income/get` response.
 
 ### 2020-09-14_1.198.0
+
 - Add `options.start_date` and `options.end_date` to `/wallet/transaction/list` endpoint.
 - Add `last_status_update` and `payment_id` field to `WalletTransaction`.
 - Add `transaction_id` field to `PaymentInitiationPayment`
 
 ### 2020-09-14_1.197.6
+
 - Add `originator_client_id` to Transfer API endpoints
 
 ### 2020-09-14_1.197.5
+
 - Deprecate `origination_account_id` from `/transfer/authorization/create` endpoint.
 
 ### 2020-09-14_1.197.4
+
 - Add `asset_under_management` field to `PartnerCustomerCreateRequest`.
 
 ### 2020-09-14_1.197.3
+
 - Update supported `CountryCode`'s in `link/token/create` docs.
 
 ### 2020-09-14_1.197.2
+
 - ach_class optional
 - add rtp network option
 
 ### 2020-09-14_1.197.1
+
 - Add newly supported languages for Link
 
 ### 2020-09-14_1.197.0
+
 - Add `PAYMENT_PROFILE_LOGIN_REQUIRED` to transfer authorization `decision_rationale.code`.
 
 ### 2020-09-14_1.196.3
+
 - Add `institution_name` field to `payroll_income_result` of `/credit/sessions/get`
 
 ### 2020-09-14_1.196.2
+
 - Add requirements for `logo` in `PartnerCustomerCreateRequest`.
 
 ### 2020-09-14_1.196.2
+
 - Deprecate webhook status `VERIFICATION_STATUS_PENDING_APPROVAL` in `income_verification` apis.
 
 ### 2020-09-14_1.196.1
+
 - Add a note in the description of `/transfer/authorization/create`
 
 ### 2020-09-14_1.196.0
+
 - Added endpoint `/sandbox/payment_profile/reset_login`
 
 ### 2020-09-14_1.195.0
+
 - Consolidate usages of `Error` into `PlaidError`
 - Add a `PlaidErrorType` enum
 
 ### 2020-09-14_1.194.2
+
 - Fix typo for `income_verification` in `/sandbox/public_token/create` options
 
 ### 2020-09-14_1.194.1
+
 - Update field descriptions in `/partner/customer/*` responses.
 - Make `PartnerEndCustomerWithSecrets` extend `PartnerEndCustomer`.
 - Fix documentation links in `/partner/customer/*` endpoints.
 
 ### 2020-09-14_1.194.0
+
 - Add `/partner/customer/enable` endpoint
 
 ### 2020-09-14_1.193.0
+
 - Rename `LOGIN_REQUIRED` from transfer authorizations `decision_rationale` to `ITEM_LOGIN_REQUIRED`
 
 ### 2020-09-14_1.192.3
+
 - Add `/fdx/notifications` endpoint.
 
 ### 2020-09-14_1.192.2
+
 - Add `USER_REPORTED_NO_INCOME` to CreditSessionBankIncomeStatus
 
 ### 2020-09-14_1.192.1
+
 - Update description for `payment_profile_token` field
 
 ### 2020-09-14_1.192.0
+
 - Add `income_verfication` field to `/sandbox/public_token/create`
 
 ### 2020-09-14_1.191.1
+
 - Add `document_income_result` field to `credit/sessions/get`
 
 ### 2020-09-14_1.191.0
+
 - Remove `payment_profile_id` from `/payment_profile/*`, `/transfer/authorization/create`, and `/transfer/create` endpoints and replace with `payment_profile_token`
 
 ### 2020-09-14_1.190.0
+
 - Removed auditor_id from /credit/audit_copy/token/create
 
 ### 2020-09-14_1.189.0
+
 - Add length boundary for the `client_user_id` field in `user/create`
 
 ### 2020-09-14_1.188.0
+
 - Add `SchemaVersion` field to Freddie Mac Verification of Assets Schema
 
 ### 2020-09-14_1.187.0
+
 - Add `non-custodial wallet` to account subtypes supported for investments
 - Add `trade` investment transaction subtype as a subtype of `transfer` investment transaction type
 
 ### 2020-09-14_1.186.2
+
 - Add `errors` field to `credit/sessions/get`
 
 ### 2020-09-14_1.186.1
+
 - Add `payroll_income_result` field to `credit/sessions/get`
 
 ### 2020-09-14_1.186.0
@@ -886,9 +1161,11 @@ Add `nullable` property to `date_of_birth`, `phone_number_verified_time`, and `e
 - Add `beacon_session_id` field in req of /transfer/authorization/create endpoint.
 
 ### 2020-09-14_1.182.0
+
 - Add `/link/oauth/correlation_id/exchange` endpoint.
 
 ### 2020-09-14_1.181.1
+
 - Update `report_tokens` in `/credit/relay/create` endpoint request to be a list of strings instead a list of objects
 
 ### 2020-09-14_1.181.0
@@ -898,7 +1175,7 @@ Add `nullable` property to `date_of_birth`, `phone_number_verified_time`, and `e
 ### 2020-09-14_1.180.0
 
 - Remove `Date` and `DateNullable` types in identity_verification and monitor endpoints. Replace with `ISO8601Date` and `ISO8601DateNullable`
-    instead.
+  instead.
 
 ### 2020-09-14_1.179.0
 
@@ -922,14 +1199,17 @@ Add `nullable` property to `date_of_birth`, `phone_number_verified_time`, and `e
 - Add `settled` as a valid event type for `/sandbox/transfer/simulate`
 
 ### 2020-09-14_1.177.3
+
 - Replace `ASSET_TRANSACTION_DESCRIPTION` with `ASSET_TRANSACTION_DESCRIPTON` in Freddie Mac
   Asset Report
 
 ### 2020-09-14_1.177.2
+
 - Add `ownership_type` to Asset Report account object, to reflect actual API behavior.
 - Update and clarify docs, including update to reflect new Transfers cutoff times.
 
 ### 2020-09-14_1.177.1
+
 - Add `settled` as a possible Transfer status and `swept_settled` as a possible Transfer sweep status
 - Add `settled` and `swept_settled` as new Transfer event types
 - Add `settled` field to Transfer sweep object
@@ -940,9 +1220,11 @@ Add `nullable` property to `date_of_birth`, `phone_number_verified_time`, and `e
 - Add `options` and `days_to_included` to `AssetReportGetRequest`
 
 ### 2020-09-14_1.176.2
+
 - Add `recipient_id` field examples to the `/wallet/create`, `/wallet/get`, and `/wallet/list` responses
 
 ### 2020-09-14_1.176.1
+
 - Set `employment_report_token` field in the `/credit/employment/get` endpoint to be not required
 
 ### 2020-09-14_1.176.0
