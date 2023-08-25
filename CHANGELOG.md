@@ -1,3 +1,18 @@
+### 2020-09-14_1.421.0
+- Update permissible purpose code `LEGITIMATE_BUSINESS_NEED_TENANT_OTHER` to `LEGITIMATE_BUSINESS_NEED_OTHER`
+
+### 2020-09-14_1.420.1
+- Add new enums to `canonical_description` in `credit/payroll_income/get`
+
+### 2020-09-14_1.420.0
+- Add `database_match_enabled` field to `auth` object in `link/token/create`
+
+### 2020-09-14_1.419.2
+- Add `/transfer/ledger/get` route
+
+### 2020-09-14_1.419.1
+- Add `submitted` and `not_submitted` to transferDiligenceStatus
+
 ### 2020-09-14_1.419.0
 
 - Update `/signal/decision/report` description
