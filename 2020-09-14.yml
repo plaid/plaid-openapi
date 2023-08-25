@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.419.0
+  version: 2020-09-14_1.421.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -7847,6 +7847,41 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/TransferConfigurationGetRequest'
+  /transfer/ledger/get:
+    post:
+      summary: Retrieve Plaid Ledger balance
+      tags:
+      - plaid
+      externalDocs:
+        url: /api/products/transfer/#transferledgerget
+      operationId: transferLedgerGet
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferLedgerGetResponse'
+              examples:
+                example-1:
+                  value:
+                    balance:
+                      available: "1721.70"
+                      pending: "123.45"
+                    request_id: saKrIBuEB9qJZno
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      description: Use the `/transfer/ledger/get` endpoint to view a balance on the ledger held with Plaid.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferLedgerGetRequest'
   /transfer/metrics/get:
     post:
       summary: Get transfer product usage metrics
@@ -15956,6 +15991,7 @@ components:
           - fortress_trust
           - bond
           - bakkt
+          - teal
           description: The processor you are integrating with.
       required:
       - access_token
@@ -18372,7 +18408,7 @@ components:
       - EMPLOYMENT
       - EXTENSION_OF_CREDIT
       - LEGITIMATE_BUSINESS_NEED_TENANT_SCREENING
-      - LEGITIMATE_BUSINESS_NEED_TENANT_OTHER
+      - LEGITIMATE_BUSINESS_NEED_OTHER
       - WRITTEN_INSTRUCTION_PREQUALIFICATION
       - WRITTEN_INSTRUCTION_OTHER
       description: |-
@@ -18383,7 +18419,7 @@ components:
         `EMPLOYMENT`: For employment purposes pursuant to FCRA 604(a)(3)(B), including hiring, retention and promotion purposes.
         `EXTENSION_OF_CREDIT`: In connection with a credit transaction initiated by and involving the consumer pursuant to FCRA Section 604(a)(3)(A).
         `LEGITIMATE_BUSINESS_NEED_TENANT_SCREENING`: For a legitimate business need in connection with a business transaction initiated by the consumer primarily for personal, family, or household purposes in connection with a property rental assessment pursuant to FCRA Section 604(a)(3)(F)(i).
-        `LEGITIMATE_BUSINESS_NEED_TENANT_OTHER`: For a legitimate business need in connection with a business transaction made primarily for personal, family, or household initiated by the consumer pursuant to FCRA Section 604(a)(3)(F)(i).
+        `LEGITIMATE_BUSINESS_NEED_OTHER`: For a legitimate business need in connection with a business transaction made primarily for personal, family, or household initiated by the consumer pursuant to FCRA Section 604(a)(3)(F)(i).
         `WRITTEN_INSTRUCTION_PREQUALIFICATION`: In accordance with the written instructions of the consumer pursuant to FCRA Section 604(a)(2), to evaluate an application’s profile to make an offer to the consumer.
         `WRITTEN_INSTRUCTION_OTHER`: In accordance with the written instructions of the consumer pursuant to FCRA Section 604(a)(2), such as when an individual agrees to act as a guarantor or assumes personal liability for a consumer, business, or commercial loan.
     PaymentMeta:
@@ -24402,6 +24438,8 @@ components:
       title: TransferDiligenceStatus
       description: Originator’s diligence status.
       enum:
+      - not_submitted
+      - submitted
       - under_review
       - approved
       - denied
@@ -26052,6 +26090,47 @@ components:
       required:
       - available
       - type
+    TransferLedgerGetRequest:
+      title: TransferLedgerGetRequest
+      type: object
+      description: Defines the request schema for `/transfer/ledger/get`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        originator_client_id:
+          type: string
+          nullable: true
+          description: Client ID of the end customer.
+    TransferLedgerGetResponse:
+      title: TransferLedgerGetResponse
+      type: object
+      additionalProperties: true
+      description: Defines the response schema for `/transfer/ledger/get`
+      properties:
+        balance:
+          $ref: '#/components/schemas/TransferLedgerBalance'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - balance
+      - request_id
+    TransferLedgerBalance:
+      title: TransferLedgerBalance
+      description: Information about the balance of the ledger held with Plaid.
+      type: object
+      additionalProperties: true
+      properties:
+        available:
+          type: string
+          description: The amount of this balance available for use (decimal string with two digits of precision e.g. "10.00").
+        pending:
+          type: string
+          description: The amount of pending funds that are in processing (decimal string with two digits of precision e.g. "10.00").
+      required:
+      - available
+      - pending
     TransferBalanceType:
       type: string
       title: TransferBalanceType
@@ -31203,6 +31282,24 @@ components:
       - BASIC_ALLOWANCE_HOUSING
       - BASIC_ALLOWANCE_SUBSISTENCE
       - OTHER
+      - ALLOWANCE
+      - BEREAVEMENT
+      - HOLIDAY_PAY
+      - JURY_DUTY
+      - LEAVE
+      - LONG_TERM_DISABILITY_PAY
+      - MILITARY_PAY
+      - PER_DIEM
+      - REFERRAL_BONUS
+      - REIMBURSEMENTS
+      - RETENTION_BONUS
+      - RETROACTIVE_PAY
+      - SEVERANCE_PAY
+      - SHIFT_DIFFERENTIAL
+      - SHORT_TERM_DISABILITY_PAY
+      - SICK_PAY
+      - SIGNING_BONUS
+      - TIPS_INCOME
       - null
       nullable: true
     PayStubEarningsTotal:
@@ -31490,10 +31587,9 @@ components:
     ReportType:
       title: ReportType
       type: string
-      description: The report type. It can be `assets` or `income`.
+      description: The report type. It can be `asset`. Income report types are not yet supported.
       enum:
-      - assets
-      - income
+      - asset
       nullable: false
     DocumentRiskSignal:
       title: DocumentRiskSignal
