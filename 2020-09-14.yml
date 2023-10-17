@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.431.7
+  version: 2020-09-14_1.457.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -1283,8 +1283,8 @@ paths:
                     accounts:
                     - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
                       balances:
-                        available: 110
-                        current: 110
+                        available: 110.94
+                        current: 110.94
                         iso_currency_code: USD
                         limit: null
                         unofficial_currency_code: null
@@ -1295,29 +1295,102 @@ paths:
                       type: depository
                     transactions:
                     - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
-                      amount: 2307.21
+                      account_owner: null
+                      amount: 28.34
+                      iso_currency_code: USD
+                      unofficial_currency_code: null
+                      category:
+                      - Food and Drink
+                      - Restaurants
+                      - Fast Food
+                      category_id: "13005032"
+                      check_number: null
+                      counterparties:
+                      - name: DoorDash
+                        type: marketplace
+                        logo_url: https://plaid-counterparty-logos.plaid.com/doordash_1.png
+                        website: doordash.com
+                        entity_id: YNRJg5o2djJLv52nBA1Yn1KpL858egYVo4dpm
+                        confidence_level: HIGH
+                      - name: Burger King
+                        type: merchant
+                        logo_url: https://plaid-merchant-logos.plaid.com/burger_king_155.png
+                        website: burgerking.com
+                        entity_id: mVrw538wamwdm22mK8jqpp7qd5br0eeV9o4a1
+                        confidence_level: VERY_HIGH
+                      date: "2023-09-28"
+                      datetime: "2023-09-28T15:10:09Z"
+                      authorized_date: "2023-09-27"
+                      authorized_datetime: "2023-09-27T08:01:58Z"
+                      location:
+                        address: null
+                        city: null
+                        region: null
+                        postal_code: null
+                        country: null
+                        lat: null
+                        lon: null
+                        store_number: null
+                      name: Dd Doordash Burgerkin
+                      merchant_name: Burger King
+                      merchant_entity_id: mVrw538wamwdm22mK8jqpp7qd5br0eeV9o4a1
+                      logo_url: https://plaid-merchant-logos.plaid.com/burger_king_155.png
+                      website: burgerking.com
+                      payment_meta:
+                        by_order_of: null
+                        payee: null
+                        payer: null
+                        payment_method: null
+                        payment_processor: null
+                        ppd_id: null
+                        reason: null
+                        reference_number: null
+                      payment_channel: online
+                      pending: true
+                      pending_transaction_id: null
+                      personal_finance_category:
+                        primary: FOOD_AND_DRINK
+                        detailed: FOOD_AND_DRINK_FAST_FOOD
+                        confidence_level: VERY_HIGH
+                      personal_finance_category_icon_url: https://plaid-category-icons.plaid.com/PFC_FOOD_AND_DRINK.png
+                      transaction_id: yhnUVvtcGGcCKU0bcz8PDQr5ZUxUXebUvbKC0
+                      transaction_code: null
+                      transaction_type: digital
+                    - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
+                      account_owner: null
+                      amount: 72.1
                       iso_currency_code: USD
                       unofficial_currency_code: null
                       category:
                       - Shops
-                      - Computers and Electronics
-                      category_id: "19013000"
+                      - Supermarkets and Groceries
+                      category_id: "19046000"
                       check_number: null
-                      date: "2017-01-29"
-                      datetime: "2017-01-27T11:00:00Z"
-                      authorized_date: "2017-01-27"
-                      authorized_datetime: "2017-01-27T10:34:50Z"
+                      counterparties:
+                      - name: Walmart
+                        type: merchant
+                        logo_url: https://plaid-merchant-logos.plaid.com/walmart_1100.png
+                        website: walmart.com
+                        entity_id: O5W5j4dN9OR3E6ypQmjdkWZZRoXEzVMz2ByWM
+                        confidence_level: VERY_HIGH
+                      date: "2023-09-24"
+                      datetime: "2023-09-24T11:01:01Z"
+                      authorized_date: "2023-09-22"
+                      authorized_datetime: "2023-09-22T10:34:50Z"
                       location:
-                        address: 300 Post St
-                        city: San Francisco
+                        address: 13425 Community Rd
+                        city: Poway
                         region: CA
-                        postal_code: "94108"
+                        postal_code: "92064"
                         country: US
-                        lat: 40.740352
-                        lon: -74.001761
-                        store_number: "1235"
-                      name: Apple Store
-                      merchant_name: Apple
+                        lat: 32.959068
+                        lon: -117.037666
+                        store_number: "1700"
+                      name: 'PURCHASE WM SUPERCENTER #1700'
+                      merchant_name: Walmart
+                      merchant_entity_id: O5W5j4dN9OR3E6ypQmjdkWZZRoXEzVMz2ByWM
+                      logo_url: https://plaid-merchant-logos.plaid.com/walmart_1100.png
+                      website: walmart.com
                       payment_meta:
                         by_order_of: null
                         payee: null
@@ -1332,8 +1405,9 @@ paths:
                       pending_transaction_id: no86Eox18VHMvaOVL7gPUM9ap3aR1LsAVZ5nc
                       personal_finance_category:
                         primary: GENERAL_MERCHANDISE
-                        detailed: GENERAL_MERCHANDISE_ELECTRONICS
-                      account_owner: null
+                        detailed: GENERAL_MERCHANDISE_SUPERSTORES
+                        confidence_level: VERY_HIGH
+                      personal_finance_category_icon_url: https://plaid-category-icons.plaid.com/PFC_GENERAL_MERCHANDISE.png
                       transaction_id: lPNjeW1nR6CDn5okmGQ6hEpMo4lLNoSrzqDje
                       transaction_code: null
                       transaction_type: place
@@ -1444,8 +1518,9 @@ paths:
                       description: Platypus Payroll
                       merchant_name: null
                       personal_finance_category:
-                        detailed: INCOME_WAGES
                         primary: INCOME
+                        detailed: INCOME_WAGES
+                        confidence_level: UNKNOWN
                       first_date: "2022-02-28"
                       last_date: "2022-04-30"
                       frequency: SEMI_MONTHLY
@@ -1476,8 +1551,9 @@ paths:
                       description: ConEd Bill Payment
                       merchant_name: ConEd
                       personal_finance_category:
-                        detailed: RENT_AND_UTILITIES_GAS_AND_ELECTRICITY
                         primary: RENT_AND_UTILITIES
+                        detailed: RENT_AND_UTILITIES_GAS_AND_ELECTRICITY
+                        confidence_level: UNKNOWN
                       first_date: "2022-02-04"
                       last_date: "2022-05-02"
                       frequency: MONTHLY
@@ -1505,8 +1581,9 @@ paths:
                       description: Costco Annual Membership
                       merchant_name: Costco
                       personal_finance_category:
-                        detailed: GENERAL_MERCHANDISE_SUPERSTORES
                         primary: GENERAL_MERCHANDISE
+                        detailed: GENERAL_MERCHANDISE_SUPERSTORES
+                        confidence_level: UNKNOWN
                       first_date: "2022-01-23"
                       last_date: "2023-01-22"
                       frequency: ANNUALLY
@@ -1566,29 +1643,40 @@ paths:
                   value:
                     added:
                     - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
-                      amount: 2307.21
+                      account_owner: null
+                      amount: 72.1
                       iso_currency_code: USD
                       unofficial_currency_code: null
                       category:
                       - Shops
-                      - Computers and Electronics
-                      category_id: "19013000"
+                      - Supermarkets and Groceries
+                      category_id: "19046000"
                       check_number: null
-                      date: "2023-01-29"
-                      datetime: "2023-01-27T11:00:00Z"
-                      authorized_date: "2023-01-27"
-                      authorized_datetime: "2023-01-27T10:34:50Z"
+                      counterparties:
+                      - name: Walmart
+                        type: merchant
+                        logo_url: https://plaid-merchant-logos.plaid.com/walmart_1100.png
+                        website: walmart.com
+                        entity_id: O5W5j4dN9OR3E6ypQmjdkWZZRoXEzVMz2ByWM
+                        confidence_level: VERY_HIGH
+                      date: "2023-09-24"
+                      datetime: "2023-09-24T11:01:01Z"
+                      authorized_date: "2023-09-22"
+                      authorized_datetime: "2023-09-22T10:34:50Z"
                       location:
-                        address: 300 Post St
-                        city: San Francisco
+                        address: 13425 Community Rd
+                        city: Poway
                         region: CA
-                        postal_code: "94108"
+                        postal_code: "92064"
                         country: US
-                        lat: 40.740352
-                        lon: -74.001761
-                        store_number: "1235"
-                      name: Apple Store
-                      merchant_name: Apple
+                        lat: 32.959068
+                        lon: -117.037666
+                        store_number: "1700"
+                      name: 'PURCHASE WM SUPERCENTER #1700'
+                      merchant_name: Walmart
+                      merchant_entity_id: O5W5j4dN9OR3E6ypQmjdkWZZRoXEzVMz2ByWM
+                      logo_url: https://plaid-merchant-logos.plaid.com/walmart_1100.png
+                      website: walmart.com
                       payment_meta:
                         by_order_of: null
                         payee: null
@@ -1603,26 +1691,41 @@ paths:
                       pending_transaction_id: no86Eox18VHMvaOVL7gPUM9ap3aR1LsAVZ5nc
                       personal_finance_category:
                         primary: GENERAL_MERCHANDISE
-                        detailed: GENERAL_MERCHANDISE_ELECTRONICS
-                      account_owner: null
+                        detailed: GENERAL_MERCHANDISE_SUPERSTORES
+                        confidence_level: VERY_HIGH
+                      personal_finance_category_icon_url: https://plaid-category-icons.plaid.com/PFC_GENERAL_MERCHANDISE.png
                       transaction_id: lPNjeW1nR6CDn5okmGQ6hEpMo4lLNoSrzqDje
                       transaction_code: null
                       transaction_type: place
                     modified:
                     - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
-                      amount: 98.05
+                      account_owner: null
+                      amount: 28.34
                       iso_currency_code: USD
                       unofficial_currency_code: null
                       category:
-                      - Service
-                      - Utilities
-                      - Electric
-                      category_id: "18068005"
+                      - Food and Drink
+                      - Restaurants
+                      - Fast Food
+                      category_id: "13005032"
                       check_number: null
-                      date: "2023-02-28"
-                      datetime: "2023-02-28T11:00:00Z"
-                      authorized_date: "2023-02-28"
-                      authorized_datetime: "2023-02-28T10:34:50Z"
+                      counterparties:
+                      - name: DoorDash
+                        type: marketplace
+                        logo_url: https://plaid-counterparty-logos.plaid.com/doordash_1.png
+                        website: doordash.com
+                        entity_id: YNRJg5o2djJLv52nBA1Yn1KpL858egYVo4dpm
+                        confidence_level: HIGH
+                      - name: Burger King
+                        type: merchant
+                        logo_url: https://plaid-merchant-logos.plaid.com/burger_king_155.png
+                        website: burgerking.com
+                        entity_id: mVrw538wamwdm22mK8jqpp7qd5br0eeV9o4a1
+                        confidence_level: VERY_HIGH
+                      date: "2023-09-28"
+                      datetime: "2023-09-28T15:10:09Z"
+                      authorized_date: "2023-09-27"
+                      authorized_datetime: "2023-09-27T08:01:58Z"
                       location:
                         address: null
                         city: null
@@ -1632,8 +1735,11 @@ paths:
                         lat: null
                         lon: null
                         store_number: null
-                      name: ConEd Bill Payment
-                      merchant_name: Con Ed
+                      name: Dd Doordash Burgerkin
+                      merchant_name: Burger King
+                      merchant_entity_id: mVrw538wamwdm22mK8jqpp7qd5br0eeV9o4a1
+                      logo_url: https://plaid-merchant-logos.plaid.com/burger_king_155.png
+                      website: burgerking.com
                       payment_meta:
                         by_order_of: null
                         payee: null
@@ -1644,12 +1750,13 @@ paths:
                         reason: null
                         reference_number: null
                       payment_channel: online
-                      pending: false
+                      pending: true
                       pending_transaction_id: null
                       personal_finance_category:
-                        primary: RENT_AND_UTILITIES
-                        detailed: RENT_AND_UTILITIES_GAS_AND_ELECTRICITY
-                      account_owner: null
+                        primary: FOOD_AND_DRINK
+                        detailed: FOOD_AND_DRINK_FAST_FOOD
+                        confidence_level: VERY_HIGH
+                      personal_finance_category_icon_url: https://plaid-category-icons.plaid.com/PFC_FOOD_AND_DRINK.png
                       transaction_id: yhnUVvtcGGcCKU0bcz8PDQr5ZUxUXebUvbKC0
                       transaction_code: null
                       transaction_type: digital
@@ -1657,7 +1764,7 @@ paths:
                     - transaction_id: CmdQTNgems8BT1B7ibkoUXVPyAeehT3Tmzk0l
                     next_cursor: tVUUL15lYQN5rBnfDIc1I8xudpGdIlw9nsgeXWvhOfkECvUeR663i3Dt1uf/94S8ASkitgLcIiOSqNwzzp+bh89kirazha5vuZHBb2ZA5NtCDkkV
                     has_more: false
-                    request_id: 45QSn
+                    request_id: Wvhy9PZHQLV8njG
         default:
           content:
             application/json:
@@ -1705,7 +1812,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransactionsEnrichGetResponse'
+                $ref: '#/components/schemas/TransactionsEnrichResponse'
               examples:
                 example-1:
                   value:
@@ -1797,7 +1904,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TransactionsEnrichGetRequest'
+              $ref: '#/components/schemas/TransactionsEnrichRequest'
   /institutions/get:
     post:
       tags:
@@ -4537,6 +4644,87 @@ paths:
         Note: If you are creating users with the express purpose of providing historical fraud data, you should use the `/beacon/user/create` endpoint instead and embed the fraud report in the request. This will ensure that the Beacon User you create will not be subject to any billing costs.
       externalDocs:
         url: /api/products/beacon/#beaconreportcreate
+  /beacon/report/list:
+    post:
+      summary: List Beacon Reports for a Beacon User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BeaconReportListRequest'
+        required: true
+      tags:
+      - plaid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BeaconReportListResponse'
+              examples:
+                example-1:
+                  value:
+                    beacon_reports:
+                    - id: becrpt_11111111111111
+                      beacon_user_id: becusr_11111111111111
+                      created_at: "2020-07-24T03:26:02Z"
+                      type: first_party
+                      fraud_date: "1990-05-29"
+                      fraud_amount:
+                        iso_currency_code: USD
+                        value: 100
+                      audit_trail:
+                        source: dashboard
+                        dashboard_user_id: 54350110fedcbaf01234ffee
+                    next_cursor: eyJkaXJlY3Rpb24iOiJuZXh0Iiwib2Zmc2V0IjoiMTU5NDM
+                    request_id: saKrIBuEB9qJZng
+      operationId: beaconReportList
+      description: Use the `/beacon/report/list` endpoint to view all Beacon Reports you created for a specific Beacon User. The reports returned by this endpoint are exclusively reports you created for a specific user. A Beacon User can only have one active report at a time, but a new report can be created if a previous report has been deleted. The results from this endpoint are paginated; the `next_cursor` field will be populated if there is another page of results that can be retrieved. To fetch the next page, pass the `next_cursor` value as the `cursor` parameter in the next request.
+      externalDocs:
+        url: /api/products/beacon/#beaconreportlist
+  /beacon/report_syndication/list:
+    post:
+      summary: List Beacon Report Syndications for a Beacon User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BeaconReportSyndicationListRequest'
+        required: true
+      tags:
+      - plaid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BeaconReportSyndicationListResponse'
+              examples:
+                example-1:
+                  value:
+                    beacon_report_syndications:
+                    - id: becrsn_11111111111111
+                      report:
+                        id: becrpt_11111111111111
+                        created_at: "2020-07-24T03:26:02Z"
+                        type: first_party
+                        fraud_date: "1990-05-29"
+                      analysis:
+                        address: match
+                        date_of_birth: match
+                        email_address: match
+                        name: match
+                        id_number: match
+                        ip_address: match
+                        phone_number: match
+                    next_cursor: eyJkaXJlY3Rpb24iOiJuZXh0Iiwib2Zmc2V0IjoiMTU5NDM
+                    request_id: saKrIBuEB9qJZng
+      operationId: beaconReportSyndicationList
+      description: Use the `/beacon/report_syndication/list` endpoint to view all Beacon Reports that have been syndicated to a specific Beacon User. This endpoint returns Beacon Report Syndications which are references to Beacon Reports created either by you, or another Beacon customer, that matched the specified Beacon User. A Beacon User can have multiple active Beacon Report Syndications at once. The results from this endpoint are paginated; the `next_cursor` field will be populated if there is another page of results that can be retrieved. To fetch the next page, pass the `next_cursor` value as the `cursor` parameter in the next request.
+      externalDocs:
+        url: /api/products/beacon/#beaconreportsyndicationlist
   /processor/auth/get:
     post:
       tags:
@@ -4661,8 +4849,8 @@ paths:
                     accounts:
                     - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
                       balances:
-                        available: 110
-                        current: 110
+                        available: 110.94
+                        current: 110.94
                         iso_currency_code: USD
                         limit: null
                         unofficial_currency_code: null
@@ -4673,29 +4861,102 @@ paths:
                       type: depository
                     transactions:
                     - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
-                      amount: 2307.21
+                      account_owner: null
+                      amount: 28.34
+                      iso_currency_code: USD
+                      unofficial_currency_code: null
+                      category:
+                      - Food and Drink
+                      - Restaurants
+                      - Fast Food
+                      category_id: "13005032"
+                      check_number: null
+                      counterparties:
+                      - name: DoorDash
+                        type: marketplace
+                        logo_url: https://plaid-counterparty-logos.plaid.com/doordash_1.png
+                        website: doordash.com
+                        entity_id: YNRJg5o2djJLv52nBA1Yn1KpL858egYVo4dpm
+                        confidence_level: HIGH
+                      - name: Burger King
+                        type: merchant
+                        logo_url: https://plaid-merchant-logos.plaid.com/burger_king_155.png
+                        website: burgerking.com
+                        entity_id: mVrw538wamwdm22mK8jqpp7qd5br0eeV9o4a1
+                        confidence_level: VERY_HIGH
+                      date: "2023-09-28"
+                      datetime: "2023-09-28T15:10:09Z"
+                      authorized_date: "2023-09-27"
+                      authorized_datetime: "2023-09-27T08:01:58Z"
+                      location:
+                        address: null
+                        city: null
+                        region: null
+                        postal_code: null
+                        country: null
+                        lat: null
+                        lon: null
+                        store_number: null
+                      name: Dd Doordash Burgerkin
+                      merchant_name: Burger King
+                      merchant_entity_id: mVrw538wamwdm22mK8jqpp7qd5br0eeV9o4a1
+                      logo_url: https://plaid-merchant-logos.plaid.com/burger_king_155.png
+                      website: burgerking.com
+                      payment_meta:
+                        by_order_of: null
+                        payee: null
+                        payer: null
+                        payment_method: null
+                        payment_processor: null
+                        ppd_id: null
+                        reason: null
+                        reference_number: null
+                      payment_channel: online
+                      pending: true
+                      pending_transaction_id: null
+                      personal_finance_category:
+                        primary: FOOD_AND_DRINK
+                        detailed: FOOD_AND_DRINK_FAST_FOOD
+                        confidence_level: VERY_HIGH
+                      personal_finance_category_icon_url: https://plaid-category-icons.plaid.com/PFC_FOOD_AND_DRINK.png
+                      transaction_id: yhnUVvtcGGcCKU0bcz8PDQr5ZUxUXebUvbKC0
+                      transaction_code: null
+                      transaction_type: digital
+                    - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
+                      account_owner: null
+                      amount: 72.1
                       iso_currency_code: USD
                       unofficial_currency_code: null
                       category:
                       - Shops
-                      - Computers and Electronics
-                      category_id: "19013000"
+                      - Supermarkets and Groceries
+                      category_id: "19046000"
                       check_number: null
-                      date: "2017-01-29"
-                      datetime: "2017-01-27T11:00:00Z"
-                      authorized_date: "2017-01-27"
-                      authorized_datetime: "2017-01-27T10:34:50Z"
+                      counterparties:
+                      - name: Walmart
+                        type: merchant
+                        logo_url: https://plaid-merchant-logos.plaid.com/walmart_1100.png
+                        website: walmart.com
+                        entity_id: O5W5j4dN9OR3E6ypQmjdkWZZRoXEzVMz2ByWM
+                        confidence_level: VERY_HIGH
+                      date: "2023-09-24"
+                      datetime: "2023-09-24T11:01:01Z"
+                      authorized_date: "2023-09-22"
+                      authorized_datetime: "2023-09-22T10:34:50Z"
                       location:
-                        address: 300 Post St
-                        city: San Francisco
+                        address: 13425 Community Rd
+                        city: Poway
                         region: CA
-                        postal_code: "94108"
+                        postal_code: "92064"
                         country: US
-                        lat: 40.740352
-                        lon: -74.001761
-                        store_number: "1235"
-                      name: Apple Store
-                      merchant_name: Apple
+                        lat: 32.959068
+                        lon: -117.037666
+                        store_number: "1700"
+                      name: 'PURCHASE WM SUPERCENTER #1700'
+                      merchant_name: Walmart
+                      merchant_entity_id: O5W5j4dN9OR3E6ypQmjdkWZZRoXEzVMz2ByWM
+                      logo_url: https://plaid-merchant-logos.plaid.com/walmart_1100.png
+                      website: walmart.com
                       payment_meta:
                         by_order_of: null
                         payee: null
@@ -4707,16 +4968,17 @@ paths:
                         reference_number: null
                       payment_channel: in store
                       pending: false
-                      pending_transaction_id: null
+                      pending_transaction_id: no86Eox18VHMvaOVL7gPUM9ap3aR1LsAVZ5nc
                       personal_finance_category:
-                        detailed: GENERAL_MERCHANDISE_ELECTRONICS
                         primary: GENERAL_MERCHANDISE
-                      account_owner: null
+                        detailed: GENERAL_MERCHANDISE_SUPERSTORES
+                        confidence_level: VERY_HIGH
+                      personal_finance_category_icon_url: https://plaid-category-icons.plaid.com/PFC_GENERAL_MERCHANDISE.png
                       transaction_id: lPNjeW1nR6CDn5okmGQ6hEpMo4lLNoSrzqDje
                       transaction_code: null
                       transaction_type: place
                     total_transactions: 1
-                    request_id: 45QSn
+                    request_id: Wvhy9PZHQLV8njG
         default:
           content:
             application/json:
@@ -4762,29 +5024,40 @@ paths:
                   value:
                     added:
                     - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
-                      amount: 2307.21
+                      account_owner: null
+                      amount: 72.1
                       iso_currency_code: USD
                       unofficial_currency_code: null
                       category:
                       - Shops
-                      - Computers and Electronics
-                      category_id: "19013000"
+                      - Supermarkets and Groceries
+                      category_id: "19046000"
                       check_number: null
-                      date: "2022-02-03"
-                      datetime: "2022-02-03T11:00:00Z"
-                      authorized_date: "2022-02-03"
-                      authorized_datetime: "2022-02-03T10:34:50Z"
+                      counterparties:
+                      - name: Walmart
+                        type: merchant
+                        logo_url: https://plaid-merchant-logos.plaid.com/walmart_1100.png
+                        website: walmart.com
+                        entity_id: O5W5j4dN9OR3E6ypQmjdkWZZRoXEzVMz2ByWM
+                        confidence_level: VERY_HIGH
+                      date: "2023-09-24"
+                      datetime: "2023-09-24T11:01:01Z"
+                      authorized_date: "2023-09-22"
+                      authorized_datetime: "2023-09-22T10:34:50Z"
                       location:
-                        address: 300 Post St
-                        city: San Francisco
+                        address: 13425 Community Rd
+                        city: Poway
                         region: CA
-                        postal_code: "94108"
+                        postal_code: "92064"
                         country: US
-                        lat: 40.740352
-                        lon: -74.001761
-                        store_number: "1235"
-                      name: Apple Store
-                      merchant_name: Apple
+                        lat: 32.959068
+                        lon: -117.037666
+                        store_number: "1700"
+                      name: 'PURCHASE WM SUPERCENTER #1700'
+                      merchant_name: Walmart
+                      merchant_entity_id: O5W5j4dN9OR3E6ypQmjdkWZZRoXEzVMz2ByWM
+                      logo_url: https://plaid-merchant-logos.plaid.com/walmart_1100.png
+                      website: walmart.com
                       payment_meta:
                         by_order_of: null
                         payee: null
@@ -4796,28 +5069,44 @@ paths:
                         reference_number: null
                       payment_channel: in store
                       pending: false
+                      pending_transaction_id: no86Eox18VHMvaOVL7gPUM9ap3aR1LsAVZ5nc
                       personal_finance_category:
-                        detailed: GENERAL_MERCHANDISE_ELECTRONICS
                         primary: GENERAL_MERCHANDISE
-                      pending_transaction_id: null
-                      account_owner: null
+                        detailed: GENERAL_MERCHANDISE_SUPERSTORES
+                        confidence_level: VERY_HIGH
+                      personal_finance_category_icon_url: https://plaid-category-icons.plaid.com/PFC_GENERAL_MERCHANDISE.png
                       transaction_id: lPNjeW1nR6CDn5okmGQ6hEpMo4lLNoSrzqDje
                       transaction_code: null
+                      transaction_type: place
                     modified:
                     - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
-                      amount: 98.05
+                      account_owner: null
+                      amount: 28.34
                       iso_currency_code: USD
                       unofficial_currency_code: null
                       category:
-                      - Service
-                      - Utilities
-                      - Electric
-                      category_id: "18068005"
+                      - Food and Drink
+                      - Restaurants
+                      - Fast Food
+                      category_id: "13005032"
                       check_number: null
-                      date: "2022-02-28"
-                      datetime: "2022-02-28T11:00:00Z"
-                      authorized_date: "2022-02-28"
-                      authorized_datetime: "2022-02-28T10:34:50Z"
+                      counterparties:
+                      - name: DoorDash
+                        type: marketplace
+                        logo_url: https://plaid-counterparty-logos.plaid.com/doordash_1.png
+                        website: doordash.com
+                        entity_id: YNRJg5o2djJLv52nBA1Yn1KpL858egYVo4dpm
+                        confidence_level: HIGH
+                      - name: Burger King
+                        type: merchant
+                        logo_url: https://plaid-merchant-logos.plaid.com/burger_king_155.png
+                        website: burgerking.com
+                        entity_id: mVrw538wamwdm22mK8jqpp7qd5br0eeV9o4a1
+                        confidence_level: VERY_HIGH
+                      date: "2023-09-28"
+                      datetime: "2023-09-28T15:10:09Z"
+                      authorized_date: "2023-09-27"
+                      authorized_datetime: "2023-09-27T08:01:58Z"
                       location:
                         address: null
                         city: null
@@ -4827,8 +5116,11 @@ paths:
                         lat: null
                         lon: null
                         store_number: null
-                      name: ConEd Bill Payment
-                      merchant_name: ConEd
+                      name: Dd Doordash Burgerkin
+                      merchant_name: Burger King
+                      merchant_entity_id: mVrw538wamwdm22mK8jqpp7qd5br0eeV9o4a1
+                      logo_url: https://plaid-merchant-logos.plaid.com/burger_king_155.png
+                      website: burgerking.com
                       payment_meta:
                         by_order_of: null
                         payee: null
@@ -4839,14 +5131,16 @@ paths:
                         reason: null
                         reference_number: null
                       payment_channel: online
-                      pending: false
+                      pending: true
                       pending_transaction_id: null
                       personal_finance_category:
-                        detailed: RENT_AND_UTILITIES_GAS_AND_ELECTRICITY
-                        primary: RENT_AND_UTILITIES
-                      account_owner: null
+                        primary: FOOD_AND_DRINK
+                        detailed: FOOD_AND_DRINK_FAST_FOOD
+                        confidence_level: VERY_HIGH
+                      personal_finance_category_icon_url: https://plaid-category-icons.plaid.com/PFC_FOOD_AND_DRINK.png
                       transaction_id: yhnUVvtcGGcCKU0bcz8PDQr5ZUxUXebUvbKC0
                       transaction_code: null
+                      transaction_type: digital
                     removed:
                     - transaction_id: CmdQTNgems8BT1B7ibkoUXVPyAeehT3Tmzk0l
                     next_cursor: tVUUL15lYQN5rBnfDIc1I8xudpGdIlw9nsgeXWvhOfkECvUeR663i3Dt1uf/94S8ASkitgLcIiOSqNwzzp+bh89kirazha5vuZHBb2ZA5NtCDkkV
@@ -4949,8 +5243,9 @@ paths:
                       description: Platypus Payroll
                       merchant_name: null
                       personal_finance_category:
-                        detailed: INCOME_WAGES
                         primary: INCOME
+                        detailed: INCOME_WAGES
+                        confidence_level: UNKNOWN
                       first_date: "2022-02-28"
                       last_date: "2022-04-30"
                       frequency: SEMI_MONTHLY
@@ -4981,8 +5276,9 @@ paths:
                       description: ConEd Bill Payment
                       merchant_name: ConEd
                       personal_finance_category:
-                        detailed: RENT_AND_UTILITIES_GAS_AND_ELECTRICITY
                         primary: RENT_AND_UTILITIES
+                        detailed: RENT_AND_UTILITIES_GAS_AND_ELECTRICITY
+                        confidence_level: UNKNOWN
                       first_date: "2022-02-04"
                       last_date: "2022-05-02"
                       frequency: MONTHLY
@@ -5010,8 +5306,9 @@ paths:
                       description: Costco Annual Membership
                       merchant_name: Costco
                       personal_finance_category:
-                        detailed: GENERAL_MERCHANDISE_SUPERSTORES
                         primary: GENERAL_MERCHANDISE
+                        detailed: GENERAL_MERCHANDISE_SUPERSTORES
+                        confidence_level: UNKNOWN
                       first_date: "2022-01-23"
                       last_date: "2023-01-22"
                       frequency: ANNUALLY
@@ -6219,7 +6516,10 @@ paths:
                 example-1:
                   value:
                     request_id: Aim3b
-      description: "This endpoint is used to update user information associated with an existing `user_token`. The `user_token` should be in the response of `/user/create` call \n\nIf you call the endpoint with a non-exist `user_token`, the call will fail with an error message indicating that the user token is not found."
+      description: |-
+        This endpoint is used to update user information associated with an existing `user_token`. The `user_token` should be in the response of `/user/create` call
+
+        If you call the endpoint with a non-exist `user_token`, the call will fail with an error message indicating that the user token is not found.
       requestBody:
         required: true
         content:
@@ -7587,6 +7887,7 @@ paths:
                           country: US
                       recurring_transfer_id: null
                       credit_funds_source: sweep
+                      facilitator_fee: "1.23"
                     request_id: saKrIBuEB9qJZno
         default:
           description: Error response
@@ -7755,6 +8056,7 @@ paths:
                       decision_rationale: null
                       guarantee_decision: null
                       guarantee_decision_rationale: null
+                      payment_risk: null
                       proposed_transfer:
                         ach_class: ppd
                         account_id: 3gE5gnRzNyfXpBK5wEEKcymJ5albGVUqg77gr
@@ -7783,7 +8085,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
-      description: "Use the `/transfer/authorization/create` endpoint to authorize a transfer. This endpoint must be called prior to calling `/transfer/create`. \n\nThere are three possible outcomes to calling this endpoint: If the `authorization.decision` in the response is `declined`, the proposed transfer has failed the risk check and you cannot proceed with the transfer. If the `authorization.decision` is `approved`, and the `authorization.rationale_code` is `null`, the transfer has passed the risk check and you can proceed to call `/transfer/create`. If the `authorization.decision` is `approved` and the `authorization.rationale_code` is non-`null`, the risk check could not be run: you may proceed with the transfer, but should perform your own risk evaluation. For more details, see the response schema.\n\nIn Plaid's Sandbox environment the decisions will be returned as follows:\n\n  - To approve a transfer with `null` rationale code, make an authorization request with an `amount` less than the available balance in the account.\n\n  - To approve a transfer with the rationale code `MANUALLY_VERIFIED_ITEM`, create an Item in Link through the [Same Day Micro-deposits flow](https://plaid.com/docs/auth/coverage/testing/#testing-same-day-micro-deposits).\n\n  - To approve a transfer with the rationale code `ITEM_LOGIN_REQUIRED`, [reset the login for an Item](https://plaid.com/docs/sandbox/#item_login_required).\n\n  - To decline a transfer with the rationale code `NSF`, the available balance on the account must be less than the authorization `amount`. See [Create Sandbox test data](https://plaid.com/docs/sandbox/user-custom/) for details on how to customize data in Sandbox.\n\n  - To decline a transfer with the rationale code `RISK`, the available balance on the account must be exactly $0. See [Create Sandbox test data](https://plaid.com/docs/sandbox/user-custom/) for details on how to customize data in Sandbox."
+      description: |-
+        Use the `/transfer/authorization/create` endpoint to authorize a transfer. This endpoint must be called prior to calling `/transfer/create`.
+
+        There are three possible outcomes to calling this endpoint: If the `authorization.decision` in the response is `declined`, the proposed transfer has failed the risk check and you cannot proceed with the transfer. If the `authorization.decision` is `approved`, and the `authorization.rationale_code` is `null`, the transfer has passed the risk check and you can proceed to call `/transfer/create`. If the `authorization.decision` is `approved` and the `authorization.rationale_code` is non-`null`, the risk check could not be run: you may proceed with the transfer, but should perform your own risk evaluation. For more details, see the response schema.
+
+        In Plaid's Sandbox environment the decisions will be returned as follows:
+
+          - To approve a transfer with `null` rationale code, make an authorization request with an `amount` less than the available balance in the account.
+
+          - To approve a transfer with the rationale code `MANUALLY_VERIFIED_ITEM`, create an Item in Link through the [Same Day Micro-deposits flow](https://plaid.com/docs/auth/coverage/testing/#testing-same-day-micro-deposits).
+
+          - To approve a transfer with the rationale code `ITEM_LOGIN_REQUIRED`, [reset the login for an Item](https://plaid.com/docs/sandbox/#item_login_required).
+
+          - To decline a transfer with the rationale code `NSF`, the available balance on the account must be less than the authorization `amount`. See [Create Sandbox test data](https://plaid.com/docs/sandbox/user-custom/) for details on how to customize data in Sandbox.
+
+          - To decline a transfer with the rationale code `RISK`, the available balance on the account must be exactly $0. See [Create Sandbox test data](https://plaid.com/docs/sandbox/user-custom/) for details on how to customize data in Sandbox.
       requestBody:
         required: true
         content:
@@ -7853,7 +8170,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
-      description: Use the `/transfer/capabilities/get` endpoint to determine the RTP eligibility information of a transfer.
+      description: Use the `/transfer/capabilities/get` endpoint to determine the RTP eligibility information of a transfer. To simulate RTP eligiblity in Sandbox, log in using the username `user_good` and password `pass_good` and use the first two checking and savings accounts in the "First Platypus Bank" institution (ending in 0000 or 1111), which will return `true`. Any other account will return `false`.
       requestBody:
         required: true
         content:
@@ -7878,12 +8195,12 @@ paths:
               examples:
                 example-1:
                   value:
-                    max_single_transfer_amount: "1000.00"
+                    max_single_transfer_amount: ""
                     max_single_transfer_credit_amount: "1000.00"
                     max_single_transfer_debit_amount: "1000.00"
                     max_daily_credit_amount: "50000.00"
                     max_daily_debit_amount: "50000.00"
-                    max_monthly_amount: "500000.00"
+                    max_monthly_amount: ""
                     max_monthly_credit_amount: "500000.00"
                     max_monthly_debit_amount: "500000.00"
                     iso_currency_code: USD
@@ -7960,8 +8277,8 @@ paths:
                       created: "2020-08-06T17:27:15Z"
                       amount: "-12.34"
                       iso_currency_code: USD
-                      settled: "2020-08-07"
-                      status: settled
+                      settled: null
+                      status: pending
                       trigger: manual
                       description: deposit
                     request_id: saKrIBuEB9qJZno
@@ -8000,10 +8317,10 @@ paths:
                       id: 8c2fda9a-aa2f-4735-a00f-f4e0d2d2faee
                       funding_account_id: 8945fedc-e703-463d-86b1-dc0607b55460
                       created: "2020-08-06T17:27:15Z"
-                      amount: "-12.34"
+                      amount: "12.34"
                       iso_currency_code: USD
-                      settled: "2020-08-07"
-                      status: settled
+                      settled: null
+                      status: pending
                       trigger: manual
                       description: withdraw
                     request_id: saKrIBuEB9qJZno
@@ -8026,7 +8343,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transferoriginatorfundingaccountupdate
+        url: /api/products/transfer/#transferoriginatorfunding_accountupdate
       operationId: transferOriginatorFundingAccountUpdate
       responses:
         "200":
@@ -8072,7 +8389,7 @@ paths:
                   value:
                     daily_debit_transfer_volume: "1234.56"
                     daily_credit_transfer_volume: "567.89"
-                    monthly_transfer_volume: "12345.67"
+                    monthly_transfer_volume: ""
                     monthly_debit_transfer_volume: "10000.00"
                     monthly_credit_transfer_volume: "2345.67"
                     iso_currency_code: USD
@@ -8146,6 +8463,7 @@ paths:
                       originator_client_id: 569ed2f36b3a3a021713abc1
                       recurring_transfer_id: null
                       credit_funds_source: sweep
+                      facilitator_fee: "1.23"
                     request_id: saKrIBuEB9qJZno
         default:
           description: Error response
@@ -8219,7 +8537,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
-      description: Use the `/transfer/recurring/create` endpoint to initiate a new recurring transfer.
+      description: Use the `/transfer/recurring/create` endpoint to initiate a new recurring transfer. This capability is not currently supported for Transfer UI or Platform Payments (beta) customers.
       requestBody:
         required: true
         content:
@@ -8339,6 +8657,7 @@ paths:
                           country: US
                       recurring_transfer_id: null
                       credit_funds_source: sweep
+                      facilitator_fee: "1.23"
                     request_id: saKrIBuEB9qJZno
         default:
           description: Error response
@@ -9316,7 +9635,7 @@ paths:
       parameters: []
   /transfer/diligence/submit:
     post:
-      summary: Submit transfer diligence on behalf of the end customer (i.e. the originator).
+      summary: Submit transfer diligence on behalf of the originator
       tags:
       - plaid
       externalDocs:
@@ -9339,7 +9658,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
-      description: Use the `/transfer/diligence/submit` endpoint to submit transfer diligence on behalf of the originator.
+      description: Use the `/transfer/diligence/submit` endpoint to submit transfer diligence on behalf of the originator (i.e., the end customer).
       requestBody:
         required: true
         content:
@@ -9350,7 +9669,7 @@ paths:
       parameters: []
   /transfer/diligence/document/upload:
     post:
-      summary: This endpoint allows third-party sender customers to upload a document on behalf of its end customer (i.e. originator) to Plaid. You’ll need to send a request of type multipart/form-data.
+      summary: Upload transfer diligence document on behalf of the originator
       tags:
       - plaid
       externalDocs:
@@ -9644,7 +9963,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
-      description: Use the `/sandbox/transfer/sweep/simulate` endpoint to create a sweep and associated events in the Sandbox environment. Upon calling this endpoint, all `posted` or `pending` transfers with a sweep status of `unswept` will become `swept`, and all `returned` transfers with a sweep status of `swept` will become `return_swept`.
+      description: Use the `/sandbox/transfer/sweep/simulate` endpoint to create a sweep and associated events in the Sandbox environment. Upon calling this endpoint, all transfers with a sweep status of `swept` will become `swept_settled`, all `posted` or `pending` transfers with a sweep status of `unswept` will become `swept`, and all `returned` transfers with a sweep status of `swept` will become `return_swept`.
       requestBody:
         required: true
         content:
@@ -9683,6 +10002,38 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SandboxTransferSimulateRequest'
+  /sandbox/transfer/refund/simulate:
+    post:
+      summary: Simulate a refund event in Sandbox
+      tags:
+      - plaid
+      externalDocs:
+        url: /api/sandbox/#sandboxtransferrefundsimulate
+      operationId: sandboxTransferRefundSimulate
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SandboxTransferRefundSimulateResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: mdqfuVxeoza6mhu
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      description: Use the `/sandbox/transfer/refund/simulate` endpoint to simulate a refund event in the Sandbox environment.  Note that while an event will be simulated and will appear when using endpoints such as `/transfer/event/sync` or `/transfer/event/list`, no transactions will actually take place and funds will not move between accounts, even within the Sandbox.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SandboxTransferRefundSimulateRequest'
   /sandbox/transfer/ledger/simulate_available:
     post:
       summary: Simulate converting pending balance to available balance
@@ -10546,7 +10897,7 @@ paths:
                               ReportingInformationIdentifier: a-prod-kol4xb5y4nf2zecqalb2d55mze
                             SERVICE_PRODUCT_FULFILLMENT:
                               SERVICE_PRODUCT_FULFILLMENT_DETAIL:
-                                VendorOrderIdentifier: PLAD
+                                VendorOrderIdentifier: PLAID
                                 ServiceProductFulfillmentIdentifier: VOA
                             VERIFICATION_OF_ASSET_RESPONSE:
                               ASSETS:
@@ -10617,158 +10968,132 @@ paths:
               examples:
                 example-1:
                   value:
-                    VOA:
-                      SchemaVersion: 2.4
-                      DEAL:
-                        LOANS:
-                          LOAN:
-                            LoanRoleType: SubjectLoan
-                            LOAN_IDENTIFIERS:
-                              LOAN_IDENTIFIER:
-                              - LoanIdentifier: "100016746"
-                                LoanIdentifierType: LenderLoan
-                        PARTIES:
-                          PARTY:
-                          - INDIVIDUAL:
-                              NAME:
-                                FirstName: John
-                                LastName: Deere
-                                MiddleName: S
-                            ROLES:
-                              ROLE:
-                                ROLE_DETAIL:
-                                  PartyRoleType: Borrower
-                            TAXPAYER_IDENTIFIERS:
-                              TAXPAYER_IDENTIFIER:
-                                TaxpayerIdentifierType: SocialSecurityNumber
-                                TaxpayerIdentifierValue: 123-45-6789
-                        SERVICES:
-                          SERVICE:
-                            VERIFICATION_OF_ASSET:
-                            - REPORTING_INFORMATION:
-                                ReportDateTime: ""
-                                ReportingInformationParentIdentifier: a-prod-kol4xb5y4nf2zecqalb2d55mze
-                                ReportingInformationIdentifier: assets-prod-20746587-2ad7-407f-a201-0669e1368cf7
-                                ReportIdentifierType: ReportID
-                              SERVICE_PRODUCT_FULFILLMENT:
-                                SERVICE_PRODUCT_FULFILLMENT_DETAIL:
-                                  VendorOrderIdentifier: PLAD
-                                  ServiceProductFulfillmentIdentifier: VOA
-                              VERIFICATION_OF_ASSET_RESPONSE:
-                                ASSETS:
-                                  ASSET:
-                                  - ASSET_DETAIL:
-                                      AssetAccountIdentifier: "3847"
-                                      AssetUniqueIdentifier: c251a55e-c503-471b-a3b1-11a9243bc189
-                                      AssetAsOfDate: "2022-07-27"
-                                      AssetDescription: Unlimited Cash Rewards Visa Signature
-                                      AssetAvailableBalanceAmount: 2073.99
-                                      AssetCurrentBalanceAmount: 2007.09
-                                      AssetType: Other
-                                      AssetTypeAdditionalDescription: credit card
-                                      AssetDaysRequestedCount: 61
-                                      AssetOwnershipType: null
-                                    ASSET_OWNERS:
-                                      ASSET_OWNER:
-                                      - AssetOwnerText: Alberta Bobbeth Charleson
-                                    ASSET_HOLDER:
-                                      NAME:
-                                        FullName: Wells Fargo
-                                    ASSET_TRANSACTIONS:
-                                      ASSET_TRANSACTION:
-                                      - ASSET_TRANSACTION_DETAIL:
-                                          AssetTransactionUniqueIdentifier: 7jagxo9Eq6cXPKM8eMNJUgeeNnbgQdSDw6zgN
-                                          AssetTransactionAmount: 34.43
-                                          AssetTransactionDate: "2022-07-19"
-                                          AssetTransactionPostDate: "2022-07-19"
-                                          AssetTransactionType: Debit
-                                          AssetTransactionPaidByName: null
-                                          AssetTransactionTypeAdditionalDescription: null
-                                          AssetTransactionCategoryType: FoodDining
-                                          FinancialInstitutionTransactionIdentifier: null
-                                        ASSET_TRANSACTION_DESCRIPTION:
-                                        - AssetTransactionDescription: TONYS PIZZA NAPOLETANA SAN FRANCISCOCA
-                                    VALIDATION_SOURCES:
-                                      VALIDATION_SOURCE:
-                                      - ValidationSourceName: ""
-                                        ValidationSourceReferenceIdentifier: ""
-                            STATUSES:
-                              STATUS:
-                                StatusCode: success
-                                StatusDescription: null
-                    VOE:
-                      SchemaVersion: 2.5
-                      DEAL:
-                        LOANS:
-                          LOAN:
-                            LoanRoleType: SubjectLoan
-                            LOAN_IDENTIFIERS:
-                              LOAN_IDENTIFIER:
-                              - LoanIdentifier: "100016746"
-                                LoanIdentifierType: LenderLoan
-                        PARTIES:
-                          PARTY:
-                          - INDIVIDUAL:
-                              NAME:
-                                FirstName: John
-                                LastName: Freddie
-                                MiddleName: S
-                            ROLES:
-                              ROLE:
-                                ROLE_DETAIL:
-                                  PartyRoleType: Borrower
-                            TAXPAYER_IDENTIFIERS:
-                              TAXPAYER_IDENTIFIER:
-                                TaxpayerIdentifierType: SocialSecurityNumber
-                                TaxpayerIdentifierValue: 123-45-6789
-                        SERVICES:
-                          SERVICE:
-                            VERIFICATION_OF_ASSET:
-                            - REPORTING_INFORMATION:
-                                ReportIdentifierType: ReportID
-                                ReportDateTime: ""
-                                ReportingInformationParentIdentifier: a-prod-kol4xb5y4nf2zecqalb2d55mze
-                                ReportingInformationIdentifier: assets-prod-20746587-2ad7-407f-a201-0669e1368cf7
-                              SERVICE_PRODUCT_FULFILLMENT:
-                                SERVICE_PRODUCT_FULFILLMENT_DETAIL:
-                                  VendorOrderIdentifier: PLAD
-                                  ServiceProductFulfillmentIdentifier: VOETRANSACTIONS
-                              VERIFICATION_OF_ASSET_RESPONSE:
-                                ASSETS:
-                                  ASSET:
-                                  - ASSET_DETAIL:
-                                      AssetAccountIdentifier: "3847"
-                                      AssetUniqueIdentifier: c251a55e-c503-471b-a3b1-11a9243bc189
-                                      AssetAsOfDate: "2022-07-27"
-                                      AssetDescription: Unlimited Cash Rewards Visa Signature
-                                      AssetType: Other
-                                      AssetTypeAdditionalDescription: credit card
-                                      AssetDaysRequestedCount: 61
-                                      AssetOwnershipType: null
-                                    ASSET_OWNERS:
-                                      ASSET_OWNER:
-                                      - AssetOwnerText: Alberta Bobbeth Charleson
-                                    ASSET_HOLDER:
-                                      NAME:
-                                        FullName: Wells Fargo
-                                    ASSET_TRANSACTIONS:
-                                      ASSET_TRANSACTION:
-                                      - ASSET_TRANSACTION_DETAIL:
-                                          AssetTransactionCategoryType: FoodDining
-                                          AssetTransactionDate: "2022-07-19"
-                                          AssetTransactionPaidByName: null
-                                          AssetTransactionPaidToName: null
-                                          AssetTransactionPostDate: "2022-07-19"
-                                          AssetTransactionType: Debit
-                                          AssetTransactionTypeAdditionalDescription: null
-                                          AssetTransactionUniqueIdentifier: 7jagxo9Eq6cXPKM8eMNJUgeeNnbgQdSDw6zgN
-                                          FinancialInstitutionTransactionIdentifier: null
-                                        ASSET_TRANSACTION_DESCRIPTION:
-                                        - AssetTransactionDescription: TONYS PIZZA NAPOLETANA SAN FRANCISCOCA
-                            STATUSES:
-                              STATUS:
-                                StatusCode: success
-                                StatusDescription: null
+                    SchemaVersion: 2.4
+                    DEAL:
+                      LOANS:
+                        LOAN:
+                          LoanRoleType: SubjectLoan
+                          LOAN_IDENTIFIERS:
+                            LOAN_IDENTIFIER:
+                            - LoanIdentifier: "100016746"
+                              LoanIdentifierType: LenderLoan
+                      PARTIES:
+                        PARTY:
+                        - INDIVIDUAL:
+                            NAME:
+                              FirstName: John
+                              LastName: Deere
+                              MiddleName: S
+                          ROLES:
+                            ROLE:
+                              ROLE_DETAIL:
+                                PartyRoleType: Borrower
+                          TAXPAYER_IDENTIFIERS:
+                            TAXPAYER_IDENTIFIER:
+                              TaxpayerIdentifierType: SocialSecurityNumber
+                              TaxpayerIdentifierValue: 123-45-6789
+                      SERVICES:
+                        SERVICE:
+                          VERIFICATION_OF_ASSET:
+                          - REPORTING_INFORMATION:
+                              ReportIdentifierType: ReportID
+                              ReportDateTime: ""
+                              ReportingInformationParentIdentifier: a-prod-kol4xb5y4nf2zecqalb2d55mze
+                              ReportingInformationIdentifier: assets-prod-20746587-2ad7-407f-a201-0669e1368cf7
+                            SERVICE_PRODUCT_FULFILLMENT:
+                              SERVICE_PRODUCT_FULFILLMENT_DETAIL:
+                                VendorOrderIdentifier: PLAID
+                                ServiceProductFulfillmentIdentifier: VOE
+                            VERIFICATION_OF_ASSET_RESPONSE:
+                              ASSETS:
+                                ASSET:
+                                - ASSET_DETAIL:
+                                    AssetAccountIdentifier: "3847"
+                                    AssetUniqueIdentifier: c251a55e-c503-471b-a3b1-11a9243bc189
+                                    AssetAsOfDate: "2022-07-27"
+                                    AssetDescription: Unlimited Cash Rewards Visa Signature
+                                    AssetAvailableBalanceAmount: 0
+                                    AssetCurrentBalanceAmount: 0
+                                    AssetType: Other
+                                    AssetTypeAdditionalDescription: credit card
+                                    AssetDaysRequestedCount: 61
+                                    AssetOwnershipType: null
+                                  ASSET_OWNERS:
+                                    ASSET_OWNER:
+                                    - AssetOwnerText: Alberta Bobbeth Charleson
+                                  ASSET_HOLDER:
+                                    NAME:
+                                      FullName: Wells Fargo
+                                  ASSET_TRANSACTIONS:
+                                    ASSET_TRANSACTION:
+                                    - ASSET_TRANSACTION_DETAIL:
+                                        AssetTransactionCategoryType: Reimbursement
+                                        AssetTransactionAmount: 0
+                                        AssetTransactionDate: "2022-07-28"
+                                        AssetTransactionPostDate: "2022-07-28"
+                                        AssetTransactionType: Credit
+                                        AssetTransactionPaidByName: null
+                                        AssetTransactionPaidToName: null
+                                        AssetTransactionTypeAdditionalDescription: null
+                                        AssetTransactionUniqueIdentifier: 8XQ2rJzjagxp87SJLNPKM8eMNJUgeeNnbg
+                                        FinancialInstitutionTransactionIdentifier: null
+                                      ASSET_TRANSACTION_DESCRIPTION:
+                                      - AssetTransactionDescription: UNITED AIRLINES SAN FRANCISCOCA
+                                  VALIDATION_SOURCES:
+                                    VALIDATION_SOURCE:
+                                    - ValidationSourceName: ""
+                                      ValidationSourceReferenceIdentifier: ""
+                          - REPORTING_INFORMATION:
+                              ReportDateTime: ""
+                              ReportingInformationParentIdentifier: a-prod-kol4xb5y4nf2zecqalb2d55mze
+                              ReportingInformationIdentifier: assets-prod-20746587-2ad7-407f-a201-0669e1368cf7
+                              ReportIdentifierType: ReportID
+                            SERVICE_PRODUCT_FULFILLMENT:
+                              SERVICE_PRODUCT_FULFILLMENT_DETAIL:
+                                VendorOrderIdentifier: PLAID
+                                ServiceProductFulfillmentIdentifier: VOA
+                            VERIFICATION_OF_ASSET_RESPONSE:
+                              ASSETS:
+                                ASSET:
+                                - ASSET_DETAIL:
+                                    AssetAccountIdentifier: "3847"
+                                    AssetUniqueIdentifier: c251a55e-c503-471b-a3b1-11a9243bc189
+                                    AssetAsOfDate: "2022-07-27"
+                                    AssetDescription: Unlimited Cash Rewards Visa Signature
+                                    AssetAvailableBalanceAmount: 2073.99
+                                    AssetCurrentBalanceAmount: 2007.09
+                                    AssetType: Other
+                                    AssetTypeAdditionalDescription: credit card
+                                    AssetDaysRequestedCount: 61
+                                    AssetOwnershipType: null
+                                  ASSET_OWNERS:
+                                    ASSET_OWNER:
+                                    - AssetOwnerText: Alberta Bobbeth Charleson
+                                  ASSET_HOLDER:
+                                    NAME:
+                                      FullName: Wells Fargo
+                                  ASSET_TRANSACTIONS:
+                                    ASSET_TRANSACTION:
+                                    - ASSET_TRANSACTION_DETAIL:
+                                        AssetTransactionUniqueIdentifier: 7jagxo9Eq6cXPKM8eMNJUgeeNnbgQdSDw6zgN
+                                        AssetTransactionAmount: 34.43
+                                        AssetTransactionDate: "2022-07-19"
+                                        AssetTransactionPostDate: "2022-07-19"
+                                        AssetTransactionType: Debit
+                                        AssetTransactionPaidByName: null
+                                        AssetTransactionTypeAdditionalDescription: null
+                                        AssetTransactionCategoryType: FoodDining
+                                        FinancialInstitutionTransactionIdentifier: null
+                                      ASSET_TRANSACTION_DESCRIPTION:
+                                      - AssetTransactionDescription: TONYS PIZZA NAPOLETANA SAN FRANCISCOCA
+                                  VALIDATION_SOURCES:
+                                    VALIDATION_SOURCE:
+                                    - ValidationSourceName: ""
+                                      ValidationSourceReferenceIdentifier: ""
+                          STATUSES:
+                            STATUS:
+                              StatusCode: success
+                              StatusDescription: null
                     request_id: eYupqX1mZkEuQRx
       operationId: creditFreddieMacReportsGet
       description: The `credit/asset_report/freddie_mac/get` endpoint retrieves the Verification of Assets and Verification of Employment reports.
@@ -11160,6 +11485,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CreditBankIncomeWebhookUpdateResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: LhQf0THi8SH1yJm
+  /credit/payroll_income/parsing_config/update:
+    post:
+      summary: Update the parsing configuration for a document income verification
+      tags:
+      - plaid
+      externalDocs:
+        url: /api/products/income/#creditpayroll_incomeparsing_configupdate
+      operationId: creditPayrollIncomeParsingConfigUpdate
+      description: '`/credit/payroll_income/parsing_config/update` updates the parsing configuration for a document income verification.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditPayrollIncomeParsingConfigUpdateRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditPayrollIncomeParsingConfigUpdateResponse'
               examples:
                 example-1:
                   value:
@@ -12259,7 +12610,14 @@ paths:
       externalDocs:
         url: /api/products/signal#signalprepare
       operationId: signalPrepare
-      description: "When Link is not initialized with Signal, call `/signal/prepare` to opt-in that Item to the Signal data collection process, developing a Signal score.\n\nIf you are using other Plaid products after Link, e.g. Identity or Assets, call `/signal/prepare` after those product calls are complete.\n\nExample flow: Link is initialized with Auth, call `/auth/get` for the account and routing number, call `/identity/get` to retrieve bank ownership details, then call `/signal/prepare` to begin Signal data collection. Later, once you have obtained details about the proposed transaction from the user, call `/signal/evaluate` for a Signal score. For more information please see [Recommendations for initializing Link with specific product combinations](https://www.plaid.com/docs/link/initializing-products/#recommendations-for-initializing-link-with-specific-product-combinations).\n\nIf run on an Item that is already initialized with Signal, this endpoint will return a 200 response and will not modify the Item. "
+      description: |-
+        When Link is not initialized with Signal, call `/signal/prepare` to opt-in that Item to the Signal data collection process, developing a Signal score.
+
+        If you are using other Plaid products after Link, e.g. Identity or Assets, call `/signal/prepare` after those product calls are complete.
+
+        Example flow: Link is initialized with Auth, call `/auth/get` for the account and routing number, call `/identity/get` to retrieve bank ownership details, then call `/signal/prepare` to begin Signal data collection. Later, once you have obtained details about the proposed transaction from the user, call `/signal/evaluate` for a Signal score. For more information please see [Recommendations for initializing Link with specific product combinations](https://www.plaid.com/docs/link/initializing-products/#recommendations-for-initializing-link-with-specific-product-combinations).
+
+        If run on an Item that is already initialized with Signal, this endpoint will return a 200 response and will not modify the Item.
       responses:
         "200":
           description: OK
@@ -12779,6 +13137,112 @@ paths:
                   secret: 79g03eoofwl8240v776r2h667442119
                   access_token: access-sandbox-71e02f71-0960-4a27-abd2-5631e04f2175
                   rule_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBF
+  /beta/transactions/user_insights/v1/get:
+    x-hidden-from-docs: true
+    post:
+      tags:
+      - plaid
+      summary: Obtain user insights based on transactions sent through /transactions/enrich
+      x-hidden-from-docs: true
+      externalDocs:
+        url: /api/products/enrich/#userinsightsget
+      operationId: transactionsUserInsightsGet
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionsUserInsightsGetResponse'
+              examples:
+                example-1:
+                  value:
+                    user_data_overview:
+                      transaction_count: 21
+                      oldest_transaction_date: "2023-01-01"
+                      newest_transaction_date: "2023-01-31"
+                      days_available: 31
+                      total_outflows: 1245.11
+                      total_inflows: 2300.12
+                    counterparty_insights:
+                      financial_institution_insights:
+                      - name: Chase
+                        entity_id: o2Ry34bq605MvmEed3yjqjkYWwqRQYpnkjd0O
+                        website: chase.com
+                        detected_accounts:
+                        - detected_account_type: depository
+                          detected_account_subtype: null
+                          transaction_count: 1
+                          newest_transaction_date: "2023-01-05"
+                          newest_transaction_amount: 500
+                          total_outflows: 500
+                          total_inflows: 0
+                      merchant_insights:
+                      - name: Costco
+                        entity_id: pBowAoZJMM9DKR37jvNmzM4yWBBXyMzV2rM3A
+                        website: costco.com
+                        primary_personal_finance_category: GENERAL_MERCHANDISE
+                        detailed_personal_finance_category: GENERAL_MERCHANDISE_SUPERSTORES
+                        transaction_count: 2
+                        total_outflows: 953.46
+                        total_inflows: 24.99
+                      - name: PG&E
+                        entity_id: 6gEJJBrw8daLroaYgBAkpa65v9jVby69vejY0
+                        website: pge.com
+                        primary_personal_finance_category: RENT_AND_UTILITIES
+                        detailed_personal_finance_category: RENT_AND_UTILITIES_GAS_AND_ELECTRICITY
+                        transaction_count: 1
+                        total_outflows: 123.01
+                        total_inflows: 0
+                    category_insights:
+                      primary_category_insights:
+                      - name: GENERAL_MERCHANDISE
+                        transaction_count: 7
+                        total_outflows: 1025.23
+                        total_inflows: 24.99
+                        top_counterparties:
+                        - name: Costco
+                          type: merchant
+                          entity_id: pBowAoZJMM9DKR37jvNmzM4yWBBXyMzV2rM3A
+                          website: costco.com
+                          logo_url: https://plaid-merchant-logos.plaid.com/costco_235.png
+                      - name: RENT_AND_UTILITIES
+                        transaction_count: 1
+                        total_outflows: 123.01
+                        total_inflows: 0
+                        top_counterparties:
+                        - name: PG&E
+                          type: merchant
+                          entity_id: 6gEJJBrw8daLroaYgBAkpa65v9jVby69vejY0
+                          website: pge.com
+                          logo_url: https://plaid-merchant-logos.plaid.com/pge_749.png
+                      detailed_category_insights:
+                      - name: GENERAL_MERCHANDISE_SUPERSTORES
+                        transaction_count: 3
+                        total_outflows: 997.11
+                        total_inflows: 24.99
+                        top_counterparties:
+                        - name: Costco
+                          type: merchant
+                          entity_id: pBowAoZJMM9DKR37jvNmzM4yWBBXyMzV2rM3A
+                          website: costco.com
+                          logo_url: https://plaid-merchant-logos.plaid.com/costco_235.png
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+          description: Error response
+      description: |-
+        The `/beta/transactions/user_insights/v1/get` gets user insights for clients who have enriched data with `/transactions/enrich`.
+
+        The product is currently in beta.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionsUserInsightsGetRequest'
   /payment_profile/create:
     post:
       deprecated: true
@@ -13393,28 +13857,26 @@ components:
         include_original_description:
           type: boolean
           default: false
-          description: Include the raw unparsed transaction description from the financial institution. This field is disabled by default. If you need this information in addition to the parsed data provided, contact your Plaid Account Manager, or submit a [Support request](https://dashboard.plaid.com/support/new/product-and-development/product-troubleshooting/product-functionality) .
+          description: Include the raw unparsed transaction description from the financial institution. This field is disabled by default. If you need this information in addition to the parsed data provided, contact your Plaid Account Manager, or submit a [Support request](https://dashboard.plaid.com/support/new/product-and-development/product-troubleshooting/product-functionality).
           nullable: true
         include_personal_finance_category_beta:
           type: boolean
           default: false
-          x-hidden-from-docs: true
-          description: Please use [`include_personal_finance_category`](https://plaid.com/docs/api/products/transactions/#transactions-get-request-options-include-personal-finance-category) instead.
+          description: Personal finance categories are now returned by default.
           deprecated: true
+          x-hidden-from-docs: true
         include_personal_finance_category:
           type: boolean
           default: false
-          description: |-
-            Include the [`personal_finance_category`](https://plaid.com/docs/api/products/transactions/#transactions-get-response-transactions-personal-finance-category) object in the response.
-
-            All implementations are encouraged to set this field to `true` and use the `personal_finance_category` instead of `category`. Personal finance categories are the preferred categorization system for transactions, providing higher accuracy and more meaningful categories.
-
-            See the [`taxonomy csv file`](https://plaid.com/documents/transactions-personal-finance-category-taxonomy.csv) for a full list of personal finance categories.
+          description: Personal finance categories are now returned by default.
+          deprecated: true
+          x-hidden-from-docs: true
         include_logo_and_counterparty_beta:
           type: boolean
           default: false
+          description: Counterparties and extra merchant fields are now returned by default.
+          deprecated: true
           x-hidden-from-docs: true
-          description: Include counterparties and extra merchant fields in the response.
     TransactionsGetResponse:
       type: object
       additionalProperties: true
@@ -13490,16 +13952,14 @@ components:
     TransactionsRecurringGetRequestOptions:
       type: object
       description: An optional object to be used with the request. If specified, `options` must not be `null`.
+      x-hidden-from-docs: true
       properties:
         include_personal_finance_category:
           type: boolean
           default: false
-          description: |-
-            Include the [`personal_finance_category`](https://plaid.com/docs/api/products/transactions/#transactions-get-response-transactions-personal-finance-category) object for each transaction stream in the response.
-
-            All implementations are encouraged to set this field to `true` and to use the `personal_finance_category` field instead of `category`. Personal finance categories are the preferred categorization system for transactions, providing higher accuracy and more meaningful categories.
-
-            See the [`taxonomy csv file`](https://plaid.com/documents/transactions-personal-finance-category-taxonomy.csv) for a full list of personal finance categories.
+          description: Personal finance categories are now returned by default.
+          deprecated: true
+          x-hidden-from-docs: true
     TransactionsRecurringGetResponse:
       type: object
       additionalProperties: true
@@ -13654,17 +14114,15 @@ components:
         include_personal_finance_category:
           type: boolean
           default: false
-          description: |-
-            Include the [`personal_finance_category`](https://plaid.com/docs/api/products/transactions/#transactions-sync-response-added-personal-finance-category) object in the response.
-
-            All implementations are encouraged to use set this field to `true` and to use the `personal_finance_category` instead of `category` for more meaningful and accurate categorization.
-
-            See the [`taxonomy csv file`](https://plaid.com/documents/transactions-personal-finance-category-taxonomy.csv) for a full list of personal finance categories.
+          description: Personal finance categories are now returned by default.
+          deprecated: true
+          x-hidden-from-docs: true
         include_logo_and_counterparty_beta:
           type: boolean
           default: false
+          description: Counterparties and extra merchant fields are now returned by default.
+          deprecated: true
           x-hidden-from-docs: true
-          description: Include counterparties and extra merchant fields in the response.
     TransactionsSyncResponse:
       type: object
       additionalProperties: true
@@ -14178,6 +14636,7 @@ components:
           - DEFAULT_UPDATE
           - NEW_ACCOUNTS_AVAILABLE
           - AUTH_DATA_UPDATE
+          - AUTHORIZATION_GRANTED
           - RECURRING_TRANSACTIONS_UPDATE
           - SYNC_UPDATES_AVAILABLE
           - PRODUCT_READY
@@ -14570,17 +15029,8 @@ components:
           $ref: '#/components/schemas/APISecret'
         options:
           $ref: '#/components/schemas/TransactionsRecurringGetRequestOptions'
-        account_ids:
-          type: array
-          description: |-
-            A list of `account_ids` to retrieve for the Item
-
-            Note: An error will be returned if a provided `account_id` is not associated with the Item.
-          items:
-            type: string
       required:
       - processor_token
-      - account_ids
     ProcessorTransactionsRecurringGetResponse:
       type: object
       additionalProperties: true
@@ -16077,6 +16527,9 @@ components:
           $ref: '#/components/schemas/Item'
         request_id:
           $ref: '#/components/schemas/RequestID'
+        is_investments_fallback_item:
+          type: boolean
+          description: When true, this field indicates that the Item's portfolio was manually created with the Investments Fallback flow.
       required:
       - accounts
       - holdings
@@ -16224,6 +16677,9 @@ components:
           description: The total number of transactions available within the date range specified. If `total_investment_transactions` is larger than the size of the `transactions` array, more transactions are available and can be fetched via manipulating the `offset` parameter.
         request_id:
           $ref: '#/components/schemas/RequestID'
+        is_investments_fallback_item:
+          type: boolean
+          description: When true, this field indicates that the Item's portfolio was manually created with the Investments Fallback flow.
       required:
       - item
       - accounts
@@ -16311,6 +16767,7 @@ components:
           - bakkt
           - teal
           - zero_hash
+          - taba_pay
           description: The processor you are integrating with.
       required:
       - access_token
@@ -16611,7 +17068,7 @@ components:
 
             `balance` is *not* a valid value, the Balance product does not require explicit initialization and will automatically be initialized when any other product is initialized.
 
-            The products specified here will determine which institutions will be available to your users in Link. Only institutions that support *all* requested products can be selected; a if a user attempts to select an institution that does not support a listed product, a "Connectivity not supported" error message will appear in Link. To maximize the number of institutions available, initialize Link with the minimal product set required for your use case. Additional products can be included via the [`required_if_supported_products`](https://plaid.com/docs/api/tokens/#link-token-create-request-required-if-supported-products) field, or can be initialized by calling the endpoint after obtaining an access token. For details and exceptions, see [Choosing when to initialize products](https://plaid.com/docs/link/initializing-products/).
+            The products specified here will determine which institutions will be available to your users in Link. Only institutions that support *all* requested products can be selected; a if a user attempts to select an institution that does not support a listed product, a "Connectivity not supported" error message will appear in Link. To maximize the number of institutions available, initialize Link with the minimal product set required for your use case. Additional products can be included via the [`optional_products`](https://plaid.com/docs/api/tokens/#link-token-create-request-optional-products) or  [`required_if_supported_products`](https://plaid.com/docs/api/tokens/#link-token-create-request-required-if-supported-products) fields, or can be initialized by calling the endpoint after obtaining an access token. For details and exceptions, see [Choosing when to initialize products](https://plaid.com/docs/link/initializing-products/).
 
             Note that, unless you have opted to disable Instant Match support, institutions that support Instant Match will also be shown in Link if `auth` is specified as a product, even though these institutions do not contain `auth` in their product array.
 
@@ -16637,7 +17094,7 @@ components:
           description: |-
             List of Plaid product(s) you wish to use only if the institution and account(s) selected by the user support the product. Institutions that do not support these products will still be shown in Link. The products will only be extracted and billed if the user selects an institution and account type that supports them.
 
-            There should be no overlap between this array and the `products` or `additional_consented_products` arrays. The `products` array must have at least one product.
+            There should be no overlap between this array and the `products`, `optional_products`, or `additional_consented_products` arrays. The `products` array must have at least one product.
 
             For more details on using this feature, see [Required if Supported Products](https://www.plaid.com/docs/link/initializing-products/#required-if-supported-products).
           items:
@@ -16649,6 +17106,23 @@ components:
           - liabilities
           - transactions
           - statements
+        optional_products:
+          type: array
+          description: |-
+            List of Plaid product(s) that you may wish to use but that are not required for your use case. Plaid will attempt to fetch data for these products on a best-effort basis, and failure to support these products will not affect Item creation.
+
+            There should be no overlap between this array and the `products`, `required_if_supported_products`, or `additional_consented_products` arrays. The `products` array must have at least one product.
+
+            For more details on using this feature, see [Optional Products](https://www.plaid.com/docs/link/initializing-products/#optional-products).
+          items:
+            $ref: '#/components/schemas/Products'
+          x-override-enum-values-shown:
+          - auth
+          - identity
+          - investments
+          - liabilities
+          - statements
+          - transactions
         additional_consented_products:
           type: array
           description: |-
@@ -16760,6 +17234,9 @@ components:
         allow_unverified_crypto_wallets:
           type: boolean
           description: If `true`, allow self-custody crypto wallets to be added without requiring signature verification. Defaults to `false`.
+        allow_manual_entry:
+          type: boolean
+          description: If `true`, allow users to manually enter Investments account and holdings information. Defaults to `false`.
     LinkTokenInvestmentsAuth:
       x-hidden-from-docs: true
       description: Configuration parameters for the Investments Auth Product
@@ -16783,6 +17260,8 @@ components:
       properties:
         delivery_method:
           $ref: '#/components/schemas/HostedLinkDeliveryMethod'
+        completion_redirect_uri:
+          $ref: '#/components/schemas/HostedLinkCompletionRedirectURI'
     HostedLinkDeliveryMethod:
       x-hidden-from-docs: true
       type: string
@@ -16793,6 +17272,12 @@ components:
       enum:
       - sms
       - email
+    HostedLinkCompletionRedirectURI:
+      x-hidden-from-docs: true
+      type: string
+      description: |
+        URI that Hosted Link will redirect to upon completion of the Link flow. This will only occur in Hosted Link
+        sessions, not in other implementation methods.
     LinkTokenCreateRequestPaymentInitiation:
       type: object
       description: Specifies options for initializing Link for use with the Payment Initiation (Europe) product. This field is required if `payment_initiation` is included in the `products` array. Either `payment_id` or `consent_id` must be provided.
@@ -18175,21 +18660,23 @@ components:
             See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `iso_currency_code`s.
           nullable: true
         category:
+          deprecated: true
           type: array
           description: |-
             A hierarchical array of the categories to which this transaction belongs. For a full list of categories, see [`/categories/get`](https://plaid.com/docs/api/products/transactions/#categoriesget).
 
-            All Transactions implementations are recommended to use the new `personal_finance_category` instead of `category_id`, as it provides greater accuracy and more meaningful categorization.
+            All Transactions implementations are recommended to use the new `personal_finance_category` instead of `category`, as it provides greater accuracy and more meaningful categorization.
 
             If the `transactions` object was returned by an Assets endpoint such as `/asset_report/get/` or `/asset_report/pdf/get`, this field will only appear in an Asset Report with Insights.
           nullable: true
           items:
             type: string
         category_id:
+          deprecated: true
           description: |-
             The ID of the category to which this transaction belongs. For a full list of categories, see [`/categories/get`](https://plaid.com/docs/api/products/transactions/#categoriesget).
 
-            All Transactions implementations are recommended to use the new `personal_finance_category` instead of `category_id`, as it provides greater accuracy and more meaningful categorization.
+            All Transactions implementations are recommended to use the new `personal_finance_category` instead of `category`, as it provides greater accuracy and more meaningful categorization.
 
             If the `transactions` object was returned by an Assets endpoint such as `/asset_report/get/` or `/asset_report/pdf/get`, this field will only appear in an Asset Report with Insights.
           type: string
@@ -18254,14 +18741,12 @@ components:
           deprecated: true
         logo_url:
           type: string
-          description: The URL of a logo associated with the merchant, if available. The logo will always be 100×100 pixel PNG file.
+          description: The URL of a logo associated with this transaction, if available. The logo will always be 100×100 pixel PNG file.
           nullable: true
-          x-hidden-from-docs: true
         website:
           type: string
-          description: The website associated with the merchant, if available.
+          description: The website associated with this transaction, if available.
           nullable: true
-          x-hidden-from-docs: true
       required:
       - transaction_id
       - pending
@@ -18322,18 +18807,15 @@ components:
           personal_finance_category_icon_url:
             type: string
             description: The URL of an icon associated with the primary personal finance category. The icon will always be 100×100 pixel PNG file.
-            x-hidden-from-docs: true
           counterparties:
             type: array
-            description: The counterparties present in the transaction. Counterparties, such as the financial institutions, are extracted by Plaid from the raw description.
+            description: The counterparties present in the transaction. Counterparties, such as the merchant or the financial institution, are extracted by Plaid from the raw description.
             items:
               $ref: '#/components/schemas/TransactionCounterparty'
-            x-hidden-from-docs: true
           merchant_entity_id:
             type: string
             description: A unique, stable, Plaid-generated ID that maps to the merchant.
             nullable: true
-            x-hidden-from-docs: true
         required:
         - account_owner
         - pending_transaction_id
@@ -18410,6 +18892,7 @@ components:
           type: string
           description: A unique id for the stream
         category:
+          deprecated: true
           type: array
           description: |-
             A hierarchical array of the categories to which this transaction belongs. See [Categories](https://plaid.com/docs/api/products/transactions/#categoriesget).
@@ -18418,6 +18901,7 @@ components:
           items:
             type: string
         category_id:
+          deprecated: true
           description: |-
             The ID of the category to which this transaction belongs. See [Categories](https://plaid.com/docs/api/products/transactions/#categoriesget).
 
@@ -18974,7 +19458,7 @@ components:
       description: |-
         Information describing the intent of the transaction. Most relevant for personal finance use cases, but not limited to such use cases.
 
-        See the [`taxonomy csv file`](https://plaid.com/documents/transactions-personal-finance-category-taxonomy.csv) for a full list of personal finance categories.
+        See the [`taxonomy CSV file`](https://plaid.com/documents/transactions-personal-finance-category-taxonomy.csv) for a full list of personal finance categories. If you are migrating to personal finance categories from the legacy categories, also refer to the [`migration guide`](https://plaid.com/docs/transactions/pfc-migration/).
       properties:
         primary:
           type: string
@@ -18985,8 +19469,6 @@ components:
         confidence_level:
           type: string
           description: |-
-            This field is currently only available for the `/transactions/enrich` endpoint.
-
             A description of how confident we are that the provided categories accurately describe the transaction intent.
 
             `VERY_HIGH`: We are more than 98% confident that this category reflects the intent of the transaction.
@@ -19019,10 +19501,18 @@ components:
     TransferOriginatorClientID:
       type: string
       nullable: true
-      description: Client ID of the customer that owns the Ledger balance. This is so Plaid knows which of your customers to payout or collect funds. Only applicable for Platform customers. Do not include if you’re paying out to yourself.
-    TransferFundingAccountIDRequest:
+      description: Client ID of the customer that owns the Ledger balance. This is so Plaid knows which of your customers to payout or collect funds. Only applicable for [Platform customers](https://plaid.com/docs/transfer/application/#originators-vs-platforms). Do not include if you’re paying out to yourself.
+    TransferMigratedFundingAccountIDRequest:
       type: string
-      description: The id of the funding account to use, available in the Plaid Dashboard. This determines which of your business checking accounts will be credited or debited. Defaults to the account configured during onboarding. You can find your list of `funding_account_id`s in the Accounts page of your Plaid Dashboard, under the "Account ID" column.
+      description: Specify the account used to fund the transfer. Should be specified if using legacy funding methods only. If using Plaid Ledger, leave this field blank. Customers can find a list of `funding_account_id`s in the Accounts page of your Plaid Dashboard, under the "Account ID" column. If this field is left blank and you are using legacy funding methods, this will default to the default `funding_account_id` specified during onboarding. Otherwise, Plaid Ledger will be used.
+      nullable: true
+    TransferUnmigratedFundingAccountIDRequest:
+      type: string
+      description: Specify the account used to fund the transfer. Customers can find a list of `funding_account_id`s in the Accounts page of your Plaid Dashboard, under the "Account ID" column. If this field is left blank, it will default to the default `funding_account_id` specified during onboarding.
+      nullable: true
+    TransferLedgerFundingAccountIDRequest:
+      type: string
+      description: Specify which funding account linked to this Plaid Ledger to use. Customers can find a list of `funding_account_id`s in the Accounts page of your Plaid Dashboard, under the "Account ID" column. If this field is left blank, this will default to the default `funding_account_id` specified during onboarding. If an `originator_client_id` is specified, the `funding_account_id` must belong to the specified originator, and if `funding_account_id` is left blank, the originator's default `funding_account_id` will be used.
       nullable: true
     TransferFundingAccountIDResponse:
       type: string
@@ -21179,10 +21669,10 @@ components:
       description: Specify the security associated with the holding or investment transaction. When inputting custom security data to the Sandbox, Plaid will perform post-data-retrieval normalization and enrichment. These processes may cause the data returned by the Sandbox to be slightly different from the data you input. An ISO-4217 currency code and a security identifier (`ticker_symbol`, `cusip`, `isin`, or `sedol`) are required.
       properties:
         isin:
-          description: 12-character ISIN, a globally unique securities identifier. Please note that Plaid's customers must hold a license directly from CUSIP Global Services to receive CUSIP & ISIN data. This field will be null by default for new customers. For existing customers, this field will be null by default starting on Sept 15, 2023. If you would like access to this field, please contact your Plaid Account Manager or reach out to investments-vendors@plaid.com.
+          description: 12-character ISIN, a globally unique securities identifier. A verified CUSIP Global Services license is required to receive this data. This field will be null by default for new customers, and null for existing customers starting March 12, 2024. If you would like access to this field, please start the verification process [here](https://docs.google.com/forms/d/e/1FAIpQLSd9asHEYEfmf8fxJTHZTAfAzW4dugsnSu-HS2J51f1mxwd6Sw/viewform).
           type: string
         cusip:
-          description: 9-character CUSIP, an identifier assigned to North American securities. Please note that Plaid's customers must hold a license directly from CUSIP Global Services to receive CUSIP & ISIN data. This field will be null by default for new customers. For existing customers, this field will be null by default starting on Sept 15, 2023. If you would like access to this field, please contact your Plaid Account Manager or reach out to investments-vendors@plaid.com.
+          description: 9-character CUSIP, an identifier assigned to North American securities. A verified CUSIP Global Services license is required to receive this data. This field will be null by default for new customers, and null for existing customers starting March 12, 2024. If you would like access to this field, please start the verification process [here](https://docs.google.com/forms/d/e/1FAIpQLSd9asHEYEfmf8fxJTHZTAfAzW4dugsnSu-HS2J51f1mxwd6Sw/viewform).
           type: string
         sedol:
           description: 7-character SEDOL, an identifier assigned to securities in the UK.
@@ -23001,11 +23491,11 @@ components:
         isin:
           type: string
           nullable: true
-          description: 12-character ISIN, a globally unique securities identifier. Please note that Plaid's customers must hold a license directly from CUSIP Global Services to receive CUSIP & ISIN data. This field will be null by default for new customers. For existing customers, this field will be null by default starting on Sept 15, 2023. If you would like access to this field, please contact your Plaid Account Manager or reach out to investments-vendors@plaid.com.
+          description: 12-character ISIN, a globally unique securities identifier. A verified CUSIP Global Services license is required to receive this data. This field will be null by default for new customers, and null for existing customers starting March 12, 2024. If you would like access to this field, please start the verification process [here](https://docs.google.com/forms/d/e/1FAIpQLSd9asHEYEfmf8fxJTHZTAfAzW4dugsnSu-HS2J51f1mxwd6Sw/viewform).
         cusip:
           nullable: true
           type: string
-          description: 9-character CUSIP, an identifier assigned to North American securities. Please note that Plaid's customers must hold a license directly from CUSIP Global Services to receive CUSIP & ISIN data. This field will be null by default for new customers. For existing customers, this field will be null by default starting on Sept 15, 2023. If you would like access to this field, please contact your Plaid Account Manager or reach out to investments-vendors@plaid.com.
+          description: 9-character CUSIP, an identifier assigned to North American securities. A verified CUSIP Global Services license is required to receive this data. This field will be null by default for new customers, and null for existing customers starting March 12, 2024. If you would like access to this field, please start the verification process [here](https://docs.google.com/forms/d/e/1FAIpQLSd9asHEYEfmf8fxJTHZTAfAzW4dugsnSu-HS2J51f1mxwd6Sw/viewform).
         sedol:
           nullable: true
           type: string
@@ -23966,7 +24456,7 @@ components:
         originator_client_id:
           type: string
           nullable: true
-          description: The Plaid client ID that is the originator of this transfer. Only present if created on behalf of another client as a third-party sender (TPS).
+          description: The Plaid client ID that is the originator of this transfer. Only present if created on behalf of another client as a [Platform customer](https://plaid.com/docs/transfer/application/#originators-vs-platforms).
         refunds:
           type: array
           description: A list of refunds associated with this transfer.
@@ -23983,6 +24473,8 @@ components:
             $ref: '#/components/schemas/TransferExpectedSweepSettlementScheduleItem'
         credit_funds_source:
           $ref: '#/components/schemas/TransferCreditFundsSource'
+        facilitator_fee:
+          $ref: '#/components/schemas/TransferFacilitatorFee'
       required:
       - id
       - authorization_id
@@ -24189,6 +24681,7 @@ components:
           $ref: '#/components/schemas/TransferDiligenceStatus'
         company_name:
           type: string
+          description: The company name of the end customer.
       required:
       - client_id
       - transfer_diligence_status
@@ -24253,6 +24746,10 @@ components:
       title: TransferRefundAmount
       type: string
       description: The amount of the refund (decimal string with two digits of precision e.g. "10.00").
+    TransferFacilitatorFee:
+      title: TransferFacilitatorFee
+      type: string
+      description: The amount to deduct from `transfer.amount` and distribute to the platform’s Ledger balance as a facilitator fee (decimal string with two digits of precision e.g. "10.00"). The remainder will go to the end-customer’s Ledger balance. This must be less than or equal to the `transfer.amount`.
     TransferIntentGetFailureReason:
       title: TransferIntentGetFailureReason
       type: object
@@ -24501,7 +24998,28 @@ components:
       - legal_name
     TransferAuthorizationDecisionRationaleCode:
       type: string
-      description: "A code representing the rationale for approving or declining the proposed transfer. \n\nIf the `rationale_code` is `null`, the transfer passed the authorization check. \n\nAny non-`null` value for an `approved` transfer indicates that the the authorization check could not be run and that you should perform your own risk assessment on the transfer. The code will indicate why the check could not be run. Possible values for an `approved` transfer are:\n\n`MANUALLY_VERIFIED_ITEM` – Item created via same-day micro deposits, limited information available. \n\n`ITEM_LOGIN_REQUIRED` – Unable to collect the account information due to Item staleness. Can be resolved by using Link in [update mode](https://www.plaid.com/docs/link/update-mode). \n\n`MIGRATED_ACCOUNT_ITEM` - Item created via `/transfer/account_migration` endpoint, limited information available.\n\n`ERROR` – Unable to collect the account information due to an unspecified error.\n\nThe following codes indicate that the authorization decision was `declined`:\n\n`NSF` – Transaction likely to result in a return due to insufficient funds. \n\n`RISK` - Transaction is high-risk. \n\n`TRANSFER_LIMIT_REACHED` - One or several transfer limits are reached, e.g. monthly transfer limit."
+      description: |-
+        A code representing the rationale for approving or declining the proposed transfer.
+
+        If the `rationale_code` is `null`, the transfer passed the authorization check.
+
+        Any non-`null` value for an `approved` transfer indicates that the the authorization check could not be run and that you should perform your own risk assessment on the transfer. The code will indicate why the check could not be run. Possible values for an `approved` transfer are:
+
+        `MANUALLY_VERIFIED_ITEM` – Item created via same-day micro deposits, limited information available.
+
+        `ITEM_LOGIN_REQUIRED` – Unable to collect the account information due to Item staleness. Can be resolved by using Link in [update mode](https://www.plaid.com/docs/link/update-mode).
+
+        `MIGRATED_ACCOUNT_ITEM` - Item created via `/transfer/account_migration` endpoint, limited information available.
+
+        `ERROR` – Unable to collect the account information due to an unspecified error.
+
+        The following codes indicate that the authorization decision was `declined`:
+
+        `NSF` – Transaction likely to result in a return due to insufficient funds.
+
+        `RISK` - Transaction is high-risk.
+
+        `TRANSFER_LIMIT_REACHED` - One or several transfer limits are reached, e.g. monthly transfer limit.
       enum:
       - NSF
       - RISK
@@ -24655,7 +25173,7 @@ components:
         originator_client_id:
           type: string
           nullable: true
-          description: The Plaid client ID that is the originator of this transfer. Only present if created on behalf of another client as a third-party sender (TPS).
+          description: The Plaid client ID that is the originator of this transfer. Only present if created on behalf of another client as a [Platform customer](https://plaid.com/docs/transfer/application/#originators-vs-platforms).
         credit_funds_source:
           $ref: '#/components/schemas/TransferCreditFundsSource'
       required:
@@ -24904,7 +25422,7 @@ components:
 
         For transfers submitted as either `ach` or `same-day-ach` the cutoff for same-day is 3:30 PM Eastern Time and the cutoff for next-day transfers is 5:30 PM Eastern Time. It is recommended to submit a transfer at least 15 minutes before the cutoff time in order to ensure that it will be processed before the cutoff. Any transfer that is indicated as `same-day-ach` and that misses the same-day cutoff, but is submitted in time for the next-day cutoff, will be sent over next-day rails and will not incur same-day charges. Note that both legs of the transfer will be downgraded if applicable.
 
-        For transfers submitted as `rtp`,  Plaid will automatically route between Real Time Payment rail by TCH or FedNow rails as necessary. If a transfer is submitted as `rtp` and the counterparty account is not eligible for RTP, the `/transfer/authorization/create` request will fail with an `INVALID_FIELD` error code. To pre-check to determine whether a counterparty account can support RTP, call `/transfer/eligibility/get` before calling `/transfer/authorization/create`.
+        For transfers submitted as `rtp`,  Plaid will automatically route between Real Time Payment rail by TCH or FedNow rails as necessary. If a transfer is submitted as `rtp` and the counterparty account is not eligible for RTP, the `/transfer/authorization/create` request will fail with an `INVALID_FIELD` error code. To pre-check to determine whether a counterparty account can support RTP, call `/transfer/capabilities/get` before calling `/transfer/authorization/create`.
       enum:
       - ach
       - same-day-ach
@@ -24969,7 +25487,7 @@ components:
         account_id:
           $ref: '#/components/schemas/TransferAccountID'
         funding_account_id:
-          $ref: '#/components/schemas/TransferFundingAccountIDRequest'
+          $ref: '#/components/schemas/TransferMigratedFundingAccountIDRequest'
         payment_profile_token:
           $ref: '#/components/schemas/TransferPaymentProfileToken'
         type:
@@ -25012,7 +25530,7 @@ components:
         originator_client_id:
           type: string
           nullable: true
-          description: The Plaid client ID that is the originator of this transfer. Only needed if creating transfers on behalf of another client as a third-party sender (TPS).
+          description: The Plaid client ID that is the originator of this transfer. Only needed if creating transfers on behalf of another client as a [Platform customer](https://plaid.com/docs/transfer/application/#originators-vs-platforms).
         credit_funds_source:
           $ref: '#/components/schemas/TransferCreditFundsSource'
         test_clock_id:
@@ -25041,6 +25559,9 @@ components:
           $ref: '#/components/schemas/TransferAccountID'
         payment_profile_token:
           $ref: '#/components/schemas/PaymentProfileToken'
+      required:
+      - access_token
+      - account_id
     TransferConfigurationGetRequest:
       title: TransferConfigurationGetRequest
       type: object
@@ -25053,7 +25574,7 @@ components:
         originator_client_id:
           type: string
           nullable: true
-          description: The Plaid client ID of the transfer originator. Should only be present if `client_id` is a third-party sender (TPS).
+          description: The Plaid client ID of the transfer originator. Should only be present if `client_id` is a [Platform customer](https://plaid.com/docs/transfer/application/#originators-vs-platforms).
     TransferMetricsGetRequest:
       title: TransferMetricsGetRequest
       type: object
@@ -25066,7 +25587,7 @@ components:
         originator_client_id:
           type: string
           nullable: true
-          description: The Plaid client ID of the transfer originator. Should only be present if `client_id` is a third-party sender (TPS).
+          description: The Plaid client ID of the transfer originator. Should only be present if `client_id` is a [Platform customer](https://plaid.com/docs/transfer/application/#originators-vs-platforms).
     TransferCreateRequest:
       title: TransferCreateRequest
       type: object
@@ -25125,6 +25646,8 @@ components:
           type: string
           description: Plaid’s unique identifier for a test clock. This field may only be used when using `sandbox` environment. If provided, the `transfer` is created at the `virtual_time` on the provided `test_clock`.
           nullable: true
+        facilitator_fee:
+          $ref: '#/components/schemas/TransferFacilitatorFee'
       required:
       - authorization_id
       - description
@@ -25144,7 +25667,7 @@ components:
         account_id:
           $ref: '#/components/schemas/TransferAccountID'
         funding_account_id:
-          $ref: '#/components/schemas/TransferFundingAccountIDRequest'
+          $ref: '#/components/schemas/TransferUnmigratedFundingAccountIDRequest'
         type:
           $ref: '#/components/schemas/TransferType'
         network:
@@ -25182,10 +25705,8 @@ components:
       - type
       - network
       - amount
-      - user_present
-      - schedule
       - user
-      - device
+      - schedule
       - description
     BankTransferCreateRequest:
       title: BankTransferCreateRequest
@@ -25278,6 +25799,8 @@ components:
         max_single_transfer_amount:
           type: string
           description: The max limit of dollar amount of a single transfer (decimal string with two digits of precision e.g. "10.00").
+          deprecated: true
+          x-hidden-from-docs: true
         max_single_transfer_credit_amount:
           type: string
           description: The max limit of dollar amount of a single credit transfer (decimal string with two digits of precision e.g. "10.00").
@@ -25293,6 +25816,8 @@ components:
         max_monthly_amount:
           type: string
           description: The max limit of sum of dollar amount of credit and debit transfers in one calendar month (decimal string with two digits of precision e.g. "10.00").
+          deprecated: true
+          x-hidden-from-docs: true
         max_monthly_credit_amount:
           type: string
           description: The max limit of sum of dollar amount of credit transfers in one calendar month (decimal string with two digits of precision e.g. "10.00").
@@ -25330,6 +25855,8 @@ components:
         monthly_transfer_volume:
           type: string
           description: Sum of dollar amount of credit and debit transfers in current calendar month (decimal string with two digits of precision e.g. "10.00").
+          deprecated: true
+          x-hidden-from-docs: true
         monthly_debit_transfer_volume:
           type: string
           description: Sum of dollar amount of debit transfers in current calendar month (decimal string with two digits of precision e.g. "10.00").
@@ -25375,12 +25902,12 @@ components:
           $ref: '#/components/schemas/TransferAuthorizationDecision'
         decision_rationale:
           $ref: '#/components/schemas/TransferAuthorizationDecisionRationale'
-        signal_insights:
-          $ref: '#/components/schemas/SignalInsights'
         guarantee_decision:
           $ref: '#/components/schemas/TransferAuthorizationGuaranteeDecision'
         guarantee_decision_rationale:
           $ref: '#/components/schemas/TransferAuthorizationGuaranteeDecisionRationale'
+        payment_risk:
+          $ref: '#/components/schemas/TransferAuthorizationPaymentRisk'
         proposed_transfer:
           $ref: '#/components/schemas/TransferAuthorizationProposedTransfer'
       required:
@@ -25391,6 +25918,7 @@ components:
       - guarantee_decision
       - guarantee_decision_rationale
       - proposed_transfer
+      - payment_risk
     InstitutionSupportedNetworks:
       title: InstitutionSupportedNetworks
       type: object
@@ -25879,6 +26407,22 @@ components:
         `sweep.returned`: A posted ledger sweep was returned.
 
         `sweep.failed`: The ledger sweep failed, no funds were moved.
+
+        `refund.pending`: A new refund was created; it is in the pending state.
+
+        `refund.cancelled`: The refund was cancelled.
+
+        `refund.failed`: The refund failed, no funds were moved.
+
+        `refund.posted`: The refund has been successfully submitted to the payment network.
+
+        `refund.settled`: The refund transaction has settled in the Plaid linked account.
+
+        `refund.returned`: A posted refund was returned.
+
+        `refund.swept`: The refund was swept from the sweep account.
+
+        `refund.return_swept`: Due to the refund being returned, funds were pushed back to the sweep account.
       enum:
       - pending
       - cancelled
@@ -26589,7 +27133,7 @@ components:
         originator_client_id:
           $ref: '#/components/schemas/TransferOriginatorClientID'
         funding_account_id:
-          $ref: '#/components/schemas/TransferFundingAccountIDRequest'
+          $ref: '#/components/schemas/TransferLedgerFundingAccountIDRequest'
         amount:
           type: string
           description: A positive amount of how much will be deposited into ledger (decimal string with two digits of precision e.g. "5.50").
@@ -26615,7 +27159,7 @@ components:
         originator_client_id:
           $ref: '#/components/schemas/TransferOriginatorClientID'
         funding_account_id:
-          $ref: '#/components/schemas/TransferFundingAccountIDRequest'
+          $ref: '#/components/schemas/TransferLedgerFundingAccountIDRequest'
         amount:
           type: string
           description: A positive amount of how much will be withdrawn from the ledger balance (decimal string with two digits of precision e.g. "5.50").
@@ -26882,7 +27426,7 @@ components:
         file:
           type: string
           format: binary
-          description: A file to upload.
+          description: 'A file to upload. The file size must be less than 20MB. Supported file extensions: .pdf, .docx, .doc.'
         purpose:
           $ref: '#/components/schemas/TransferDocumentPurpose'
       required:
@@ -26908,7 +27452,6 @@ components:
         Specifies the purpose of the uploaded file.
 
         `"DUE_DILIGENCE"` - The transfer due diligence document of the originator.
-        The size of the document should be less than 20MB. Supported file extension: .pdf, .docx, .doc.
     TransferOriginatorDiligence:
       description: The diligence information for the originator.
       type: object
@@ -26949,11 +27492,15 @@ components:
       properties:
         city:
           type: string
+          description: The full city name.
         street:
           type: string
+          description: The full street address.
         region:
           type: string
+          description: The two-letter code for the state or province (e.g., "CA").
         postal_code:
+          description: The postal code (e.g., "94103").
           type: string
         country_code:
           description: ISO-3166-1 alpha-2 country code standard.
@@ -27061,7 +27608,7 @@ components:
     TransferFundingAccount:
       type: object
       title: TransferFundingAccount
-      description: The originator's funding account, linked with Plaid Link or /transfer/migrate_account.
+      description: The originator's funding account, linked with Plaid Link or `/transfer/migrate_account`.
       properties:
         access_token:
           $ref: '#/components/schemas/AccessToken'
@@ -27287,7 +27834,7 @@ components:
           description: The Plaid `account_id` corresponding to the end-user account that will be debited or credited.
           nullable: true
         funding_account_id:
-          $ref: '#/components/schemas/TransferFundingAccountIDRequest'
+          $ref: '#/components/schemas/TransferUnmigratedFundingAccountIDRequest'
         mode:
           $ref: '#/components/schemas/TransferIntentCreateMode'
         network:
@@ -27715,6 +28262,40 @@ components:
       required:
       - transfer_id
       - event_type
+    SandboxTransferRefundSimulateRequest:
+      title: SandboxTransferRefundSimulateRequest
+      type: object
+      description: Defines the request schema for `/sandbox/transfer/refund/simulate`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        refund_id:
+          $ref: '#/components/schemas/TransferRefundID'
+        test_clock_id:
+          type: string
+          description: Plaid’s unique identifier for a test clock. If provided, the event to be simulated is created at the `virtual_time` on the provided `test_clock`.
+          nullable: true
+        event_type:
+          type: string
+          description: |
+            The asynchronous event to be simulated. May be: `refund.posted`, `refund.settled`, `refund.failed`, or `refund.returned`.
+
+            An error will be returned if the event type is incompatible with the current refund status. Compatible status --> event type transitions include:
+
+            `refund.pending` --> `refund.failed`
+
+            `refund.pending` --> `refund.posted`
+
+            `refund.posted` --> `refund.returned`
+
+            `refund.posted` --> `refund.settled`
+        failure_reason:
+          $ref: '#/components/schemas/TransferFailure'
+      required:
+      - refund_id
+      - event_type
     SandboxTransferLedgerDepositSimulateRequest:
       title: SandboxTransferLedgerDepositSimulateRequest
       type: object
@@ -27867,6 +28448,16 @@ components:
       type: object
       additionalProperties: true
       description: Defines the response schema for `/sandbox/transfer/simulate`
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
+    SandboxTransferRefundSimulateResponse:
+      title: SandboxTransferRefundSimulateResponse
+      type: object
+      additionalProperties: true
+      description: Defines the response schema for `/sandbox/transfer/refund/simulate`
       properties:
         request_id:
           $ref: '#/components/schemas/RequestID'
@@ -28713,6 +29304,8 @@ components:
         days_requested:
           type: integer
           description: The maximum integer number of days of history to include in the Base Report.
+      required:
+      - days_requested
     LinkTokenCreateRequestEmployment:
       title: LinkTokenCreateRequestEmployment
       type: object
@@ -30788,6 +31381,38 @@ components:
           $ref: '#/components/schemas/UserToken'
       required:
       - user_token
+    CreditPayrollIncomeParsingConfigUpdateRequest:
+      title: CreditPayrollIncomeParsingConfigUpdateRequest
+      type: object
+      additionalProperties: true
+      description: CreditPayrollIncomeParsingConfigUpdateRequest defines the request schema for `/credit/payroll_income/documents/update`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        user_token:
+          $ref: '#/components/schemas/UserToken'
+        item_id:
+          $ref: '#/components/schemas/ItemId'
+        parsing_config:
+          type: array
+          description: The types of analysis to enable for the document income verification session
+          items:
+            $ref: '#/components/schemas/IncomeVerificationDocParsingConfig'
+      required:
+      - user_token
+      - parsing_config
+    CreditPayrollIncomeParsingConfigUpdateResponse:
+      title: CreditPayrollIncomeParsingConfigUpdateResponse
+      type: object
+      additionalProperties: true
+      description: CreditPayrollIncomeParsingConfigUpdateResponse defines the response schema for `/credit/payroll_income/documents/update`.
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
     CreditBankStatementsUploadsGetResponse:
       title: CreditBankStatementsUploadsGetResponse
       type: object
@@ -33766,20 +34391,55 @@ components:
       - request_id
       - scores
       - warnings
-    SignalInsights:
-      title: SignalInsights
-      description: Signal insights including scores and attributes. This response is offered as an add-on to `/transfer/authorization/create`. To request access to these fields please contact your Plaid account manager.
+    TransferAuthorizationPaymentRisk:
+      title: TransferAuthorizationPaymentRisk
+      description: This object includes the scores and risk level. This response is offered as an add-on to /transfer/authorization/create. To request access to these fields please contact your Plaid account manager.
       type: object
       additionalProperties: true
       nullable: true
       properties:
-        scores:
-          $ref: '#/components/schemas/SignalScores'
+        bank_initiated_return_score:
+          nullable: true
+          description: |-
+            A score from 1-99 that indicates the transaction return risk: a higher risk score suggests a higher return likelihood.
+
+            The score evaluates the transaction return risk because an account is overdrawn or because an ineligible account is used and covers return codes: "R01", "R02", "R03", "R04", "R06", "R08",  "R09", "R13",
+            "R16", "R17", "R20", "R23". These returns have a turnaround time of 2 banking days.
+          type: integer
+          minimum: 1
+          maximum: 99
+        customer_initiated_return_score:
+          nullable: true
+          description: |-
+            A score from 1-99 that indicates the transaction return risk: a higher risk score suggests a higher return likelihood.
+
+            The score evaluates the transaction return risk of an unauthorized debit and covers return codes: "R05", "R07", "R10", "R11", "R29".
+            These returns typically have a return time frame of up to 60 calendar days. During this period, the customer of financial institutions can dispute a transaction as unauthorized.
+          type: integer
+          minimum: 1
+          maximum: 99
+        risk_level:
+          $ref: '#/components/schemas/TransferAuthorizationRiskLevel'
         warnings:
           type: array
           description: If bank information was not available to be used in the Signal model, this array contains warnings describing why bank data is missing. If you want to receive an API error instead of Signal scores in the case of missing bank data, file a support ticket or contact your Plaid account manager.
           items:
             $ref: '#/components/schemas/SignalWarning'
+      required:
+      - bank_initiated_return_score
+      - customer_initiated_return_score
+      - risk_level
+      - warnings
+    TransferAuthorizationRiskLevel:
+      type: string
+      nullable: true
+      description: Comprises five risk categories (high risk, medium-high risk, medium risk, medium-low risk, low risk) based on the probability of return
+      enum:
+      - HIGH_RISK
+      - MEDIUM_HIGH_RISK
+      - MEDIUM_RISK
+      - MEDIUM_LOW_RISK
+      - LOW_RISK
     SignalScores:
       title: SignalEvaluateScores
       description: Risk scoring details broken down by risk category.
@@ -34779,6 +35439,7 @@ components:
           - PIS_PAY_IN
           - REFUND
           - FUNDS_SWEEP
+          - RETURN
           description: |-
             The type of the transaction. The supported transaction types that are returned are:
             `BANK_TRANSFER:` a transaction which credits an e-wallet through an external bank transfer.
@@ -34790,6 +35451,8 @@ components:
             `REFUND:` a transaction which debits an e-wallet by refunding a previously initiated payment made through Plaid's [PIS APIs](https://plaid.com/docs/api/products/payment-initiation/).
 
             `FUNDS_SWEEP`: an automated transaction which debits funds from an e-wallet to a designated client-owned account.
+
+            `RETURN`: an automated transaction where a debit transaction was reversed and money moved back to originating account.
         scheme:
           $ref: '#/components/schemas/WalletPaymentScheme'
         amount:
@@ -34842,9 +35505,9 @@ components:
       required:
       - account_type
       - transactions
-    TransactionsEnrichGetRequest:
+    TransactionsEnrichRequest:
       type: object
-      description: TransactionsEnrichGetRequest defines the request schema for `/transactions/enrich`.
+      description: TransactionsEnrichRequest defines the request schema for `/transactions/enrich`.
       properties:
         client_id:
           $ref: '#/components/schemas/APIClientID'
@@ -35002,9 +35665,9 @@ components:
             $ref: '#/components/schemas/ClientProvidedEnhancedTransaction'
       required:
       - enhanced_transactions
-    TransactionsEnrichGetResponse:
+    TransactionsEnrichResponse:
       type: object
-      description: TransactionsEnrichGetResponse defines the response schema for `/transactions/enrich`.
+      description: TransactionsEnrichResponse defines the response schema for `/transactions/enrich`.
       x-examples: {}
       additionalProperties: true
       properties:
@@ -35274,6 +35937,228 @@ components:
         `DYNAMIC`: Assigned to a transaction stream that varies in recurrence frequency. This frequency is typically seen for inflow streams in the gig economy.
 
         `UNKNOWN`: Assigned to a transaction stream that isn't recurring in nature.
+    TransactionsUserInsightsGetRequest:
+      type: object
+      description: TransactionsUserInsightsGetRequest defines the request schema for `/beta/transactions/user_insights/v1/get`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        client_user_id:
+          type: string
+          description: A unique client-provided user_id to retrieve insights for.
+      required:
+      - client_user_id
+    TransactionsUserInsightsGetResponse:
+      type: object
+      description: TransactionsUserInsightsGetResponse defines the response schema for `/beta/transactions/user_insights/v1/get`.
+      additionalProperties: true
+      properties:
+        user_data_overview:
+          $ref: '#/components/schemas/UserDataOverview'
+        counterparty_insights:
+          $ref: '#/components/schemas/CounterpartyInsights'
+        category_insights:
+          $ref: '#/components/schemas/CategoryInsights'
+      required:
+      - user_data_overview
+    UserDataOverview:
+      type: object
+      description: metadata for the set of insights provided in `TransactionsUserInsightsGetResponse`
+      additionalProperties: true
+      properties:
+        transaction_count:
+          type: integer
+          description: The total number of transactions.
+        oldest_transaction_date:
+          type: string
+          format: date
+          description: The date of the oldest transaction processed to generate insights.
+        newest_transaction_date:
+          type: string
+          format: date
+          description: The date of the newest transaction processed to generate insights.
+        days_available:
+          type: integer
+          description: The range of days of transactions available.
+        total_outflows:
+          type: number
+          format: double
+          description: Sum of outflow amounts.
+        total_inflows:
+          type: number
+          format: double
+          description: Sum of inflow amounts.
+      required:
+      - transaction_count
+      - days_available
+      - total_outflows
+      - total_inflows
+    CounterpartyInsights:
+      type: object
+      description: Insights around a user's counterparties
+      additionalProperties: true
+      properties:
+        financial_institution_insights:
+          type: array
+          description: Insights related to a user’s transactions with other financial institutions, including detected account types.
+          items:
+            $ref: '#/components/schemas/FinancialInstitutionInsights'
+        merchant_insights:
+          type: array
+          description: Insights about a user’s top merchants, ranked by spend.
+          items:
+            $ref: '#/components/schemas/MerchantInsights'
+    FinancialInstitutionInsights:
+      type: object
+      description: Insights surrounding external financial institution counterparties associated with a user.
+      properties:
+        name:
+          type: string
+          description: Name of the financial institution counterparty.
+        entity_id:
+          type: string
+          nullable: true
+          description: A unique, stable, Plaid-generated id that maps to the counterparty.
+        website:
+          type: string
+          nullable: true
+          description: The website associated with the counterparty.
+        detected_accounts:
+          type: array
+          description: Associated accounts, detected based on the nature of transfers to/from this institution.
+          items:
+            $ref: '#/components/schemas/DetectedAccount'
+      required:
+      - name
+      - website
+      - detected_accounts
+    DetectedAccount:
+      type: object
+      description: A possible account detected to be associated with a transaction user.
+      additionalProperties: true
+      properties:
+        detected_account_type:
+          type: string
+          description: The detected account type (depository, credit, loan, investment etc.).
+          nullable: true
+        detected_account_subtype:
+          type: string
+          description: The detected subtype of the account, based on the transactions to/from the institution.
+          nullable: true
+        transaction_count:
+          type: integer
+          description: The number of transactions associated with this detected account type at this financial institution.
+        newest_transaction_date:
+          type: string
+          format: date
+          description: The date of the newest transaction associated with this detected account type at this financial institution.
+        newest_transaction_amount:
+          type: number
+          format: double
+          description: Amount of the most recent transaction associated with this detected account type at this financial institution.
+        total_outflows:
+          type: number
+          format: double
+          description: Sum of outflow amounts associated with this detected account type at this financial institution.
+        total_inflows:
+          type: number
+          format: double
+          description: Sum of inflow amounts associated with this detected account type at this financial institution.
+      required:
+      - detected_account_type
+      - detected_account_subtype
+      - transaction_count
+      - total_outflows
+      - total_inflows
+    MerchantInsights:
+      type: object
+      description: Insights into a user’s top merchants.
+      properties:
+        name:
+          type: string
+          description: The counterparty name.
+        entity_id:
+          type: string
+          nullable: true
+          description: A unique, stable, Plaid-generated id that maps to the merchant.
+        website:
+          type: string
+          nullable: true
+          description: The website associated with the merchant.
+        transaction_count:
+          type: integer
+          description: The number of transactions associated with merchant of this type.
+        primary_personal_finance_category:
+          type: string
+          nullable: true
+          description: The primary personal finance category associated with this merchant.
+        detailed_personal_finance_category:
+          type: string
+          nullable: true
+          description: The detailed personal finance category associated with this merchant.
+        total_outflows:
+          type: number
+          format: double
+          description: Sum of outflow amounts.
+        total_inflows:
+          type: number
+          format: double
+          description: Sum of inflow amounts.
+      required:
+      - name
+      - website
+      - transaction_count
+      - primary_personal_finance_category
+      - detailed_personal_finance_category
+      - total_outflows
+      - total_inflows
+    CategoryInsights:
+      type: object
+      description: Insights on a user's top personal finance categories.
+      additionalProperties: true
+      properties:
+        primary_category_insights:
+          type: array
+          description: List of insights of top primary personal finance categories ranked by outflow.
+          items:
+            $ref: '#/components/schemas/CategoryInsightDetails'
+        detailed_category_insights:
+          type: array
+          description: List of insights of top detailed personal finance categories ranked by outflow.
+          items:
+            $ref: '#/components/schemas/CategoryInsightDetails'
+    CategoryInsightDetails:
+      type: object
+      description: Insights object for categories.
+      additionalProperties: true
+      properties:
+        name:
+          type: string
+          description: Category name.
+        transaction_count:
+          type: integer
+          description: The number of transactions associated with this category.
+        total_outflows:
+          type: number
+          format: double
+          description: Sum of outflow amounts.
+        total_inflows:
+          type: number
+          format: double
+          description: Sum of inflow amounts.
+        top_counterparties:
+          type: array
+          description: The most common counterparties associated with this category sorted by outflow.
+          items:
+            $ref: '#/components/schemas/Counterparty'
+      required:
+      - name
+      - transaction_count
+      - total_outflows
+      - total_inflows
+      - top_counterparties
     PaymentProfileCreateRequest:
       type: object
       description: PaymentProfileCreateRequest defines the request schema for `/payment_profile/create`
@@ -36276,6 +37161,40 @@ components:
       - status
       - link_session_id
       - link_token
+    InstitutionStatusAlertWebhook:
+      title: InstitutionStatusAlertWebhook
+      description: Fired when institution status meets the conditions configured in the developer dashboard.
+      type: object
+      additionalProperties: true
+      properties:
+        webhook_type:
+          type: string
+          description: '`DASHBOARD_CONFIGURED_ALERT`'
+        webhook_code:
+          type: string
+          description: '`INSTITUTION_STATUS_ALERT_TRIGGERED`'
+        institution_id:
+          type: string
+          description: The ID of the associated institution.
+        institution_overall_success_rate:
+          type: number
+          format: double
+          description: The global success rate of the institution, calculated based on item add health.
+        environment:
+          $ref: '#/components/schemas/WebhookEnvironmentValues'
+      required:
+      - webhook_type
+      - webhook_code
+      - institution_id
+      - institution_overall_success_rate
+      - environment
+      x-examples:
+        example-1:
+          webhook_type: DASHBOARD_CONFIGURED_ALERT
+          webhook_code: INSTITUTION_STATUS_ALERT_TRIGGERED
+          institution_id: ins_3
+          institution_overall_success_rate: 0.9
+          environment: production
     AssetReportCreateRequest:
       type: object
       description: AssetReportCreateRequest defines the request schema for `/asset_report/create`
@@ -36291,10 +37210,6 @@ components:
             $ref: '#/components/schemas/AccessToken'
           minItems: 1
           maxItems: 99
-        user_token:
-          type: string
-          description: The user token associated with the User for which to create an asset report for. All items associated with the User will be included in the report.
-          x-hidden-from-docs: true
         days_requested:
           type: integer
           maximum: 731
@@ -36630,11 +37545,39 @@ components:
       properties:
         report:
           $ref: '#/components/schemas/BaseReport'
+        warnings:
+          type: array
+          description: If the Base Report generation was successful but identity information cannot be returned, this array will contain information about the errors causing identity information to be missing
+          items:
+            $ref: '#/components/schemas/BaseReportWarning'
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
       - report
       - request_id
+    BaseReportWarning:
+      title: BaseReportWarning
+      type: object
+      additionalProperties: true
+      description: It is possible for an Base Report to be returned with missing account owner information. In such cases, the Base Report will contain warning data in the response, indicating why obtaining the owner information failed.
+      properties:
+        warning_type:
+          type: string
+          description: The warning type, which will always be `BASE_REPORT_WARNING`
+        warning_code:
+          $ref: '#/components/schemas/BaseReportWarningCode'
+        cause:
+          $ref: '#/components/schemas/Cause'
+      required:
+      - warning_type
+      - warning_code
+      - cause
+    BaseReportWarningCode:
+      type: string
+      description: The warning code identifies a specific kind of warning. `OWNERS_UNAVAILABLE` indicates that account-owner information is not available. `TRANSACTIONS_UNAVAILABLE` indicates that transactions information associated with Credit and Depository accounts are unavailable.
+      enum:
+      - OWNERS_UNAVAILABLE
+      - TRANSACTIONS_UNAVAILABLE
     HistoricalBalance:
       title: HistoricalBalance
       type: object
@@ -37564,11 +38507,65 @@ components:
         `system` - The resource was created or updated automatically by a part of the Plaid Beacon system. For example, if another business using Plaid Beacon created a fraud report that matched one of your users, your matching user's status would automatically be updated and the audit trail source would be `system`.
 
         `bulk_import` - The resource was created or updated as part of a bulk import process. For example, if your company provided a CSV of user data as part of your initial onboarding, the audit trail source would be `bulk_import`.
+    BeaconMatchSummaryCode:
+      description: |-
+        An enum indicating the match type between two Beacon Users.
+
+
+        `match` indicates that the provided input data was a strong match against the other Beacon User.
+
+        `partial_match` indicates the data approximately matched the other Beacon User. For example, "Knope" vs. "Knope-Wyatt" for last name.
+
+        `no_match` indicates that Plaid was able to compare this field against the other Beacon User and it did not match the provided input data.
+
+        `no_data` indicates that Plaid was unable to compare this field against the original Beacon User because the field was not present in one of the Beacon Users.
+      type: string
+      title: BeaconMatchSummaryCode
+      enum:
+      - match
+      - partial_match
+      - no_match
+      - no_data
+      example: match
     BeaconProgramID:
       type: string
       title: BeaconProgramID
       example: becprg_11111111111111
       description: ID of the associated Beacon Program.
+    BeaconReport:
+      type: object
+      title: BeaconReport
+      description: |-
+        A Beacon Report describes the type of fraud committed by a user as well as the date the fraud was committed and the total amount of money lost due to the fraud incident.
+
+        This information is used to block similar fraud attempts on your platform as well as alert other companies who screen a user with matching identity information.
+        Other companies will not receive any new identity information, just what matched, plus information such as industry, type of fraud, and date of fraud.
+
+        You can manage your fraud reports by adding, deleting, or editing reports as you get additional information on fraudulent users.
+      properties:
+        id:
+          $ref: '#/components/schemas/BeaconReportID'
+        beacon_user_id:
+          $ref: '#/components/schemas/BeaconUserID'
+        created_at:
+          $ref: '#/components/schemas/Timestamp'
+        type:
+          $ref: '#/components/schemas/BeaconReportType'
+        fraud_date:
+          $ref: '#/components/schemas/ISO8601Date'
+        fraud_amount:
+          $ref: '#/components/schemas/FraudAmount'
+        audit_trail:
+          $ref: '#/components/schemas/BeaconAuditTrail'
+      required:
+      - id
+      - beacon_user_id
+      - created_at
+      - type
+      - fraud_date
+      - fraud_amount
+      - audit_trail
+      additionalProperties: true
     BeaconReportCreateRequest:
       description: Request input for creating a Beacon Report
       type: object
@@ -37630,6 +38627,150 @@ components:
       title: BeaconReportID
       example: becrpt_11111111111111
       description: ID of the associated Beacon Report.
+    BeaconReportIDNullable:
+      type: string
+      title: BeaconReportID
+      example: becrpt_11111111111111
+      description: ID of the associated Beacon Report.
+      nullable: true
+    BeaconReportListRequest:
+      description: Request input for listing Beacon Reports
+      type: object
+      properties:
+        beacon_user_id:
+          $ref: '#/components/schemas/BeaconUserID'
+        cursor:
+          $ref: '#/components/schemas/Cursor'
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+      required:
+      - beacon_user_id
+    BeaconReportListResponse:
+      description: The response schema for `/beacon/report/list`
+      additionalProperties: true
+      properties:
+        beacon_reports:
+          type: array
+          items:
+            $ref: '#/components/schemas/BeaconReport'
+        next_cursor:
+          $ref: '#/components/schemas/Cursor'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - beacon_reports
+      - next_cursor
+      - request_id
+      type: object
+    BeaconReportSyndication:
+      type: object
+      title: BeaconReportSyndication
+      description: |-
+        A Beacon Report Syndication represents a Beacon Report created either by your organization or another Beacon customer that matches a specific Beacon User you've created.
+
+        The `analysis` field in the response indicates which fields matched between the originally reported Beacon User and the Beacon User that the report was syndicated to.
+
+        The `report` field in the response contains a subset of information from the original report.
+      properties:
+        id:
+          $ref: '#/components/schemas/BeaconReportSyndicationID'
+        report:
+          $ref: '#/components/schemas/BeaconReportSyndicationOriginalReport'
+        analysis:
+          $ref: '#/components/schemas/BeaconReportSyndicationAnalysis'
+      required:
+      - id
+      - report
+      - analysis
+      additionalProperties: true
+    BeaconReportSyndicationAnalysis:
+      type: object
+      title: BeaconReportSyndicationAnalysis
+      description: Analysis of which fields matched between the originally reported Beacon User and the Beacon User that the report was syndicated to.
+      properties:
+        address:
+          $ref: '#/components/schemas/BeaconMatchSummaryCode'
+        date_of_birth:
+          $ref: '#/components/schemas/BeaconMatchSummaryCode'
+        email_address:
+          $ref: '#/components/schemas/BeaconMatchSummaryCode'
+        name:
+          $ref: '#/components/schemas/BeaconMatchSummaryCode'
+        id_number:
+          $ref: '#/components/schemas/BeaconMatchSummaryCode'
+        ip_address:
+          $ref: '#/components/schemas/BeaconMatchSummaryCode'
+        phone_number:
+          $ref: '#/components/schemas/BeaconMatchSummaryCode'
+      required:
+      - address
+      - date_of_birth
+      - email_address
+      - name
+      - id_number
+      - ip_address
+      - phone_number
+      additionalProperties: true
+    BeaconReportSyndicationID:
+      type: string
+      title: BeaconReportSyndicationID
+      example: becrsn_11111111111111
+      description: ID of the associated Beacon Report Syndication.
+    BeaconReportSyndicationListRequest:
+      description: Request input for listing Beacon Report Syndications
+      type: object
+      properties:
+        beacon_user_id:
+          $ref: '#/components/schemas/BeaconUserID'
+        cursor:
+          $ref: '#/components/schemas/Cursor'
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+      required:
+      - beacon_user_id
+    BeaconReportSyndicationListResponse:
+      description: The response schema for `/beacon/report_syndication/list`
+      additionalProperties: true
+      properties:
+        beacon_report_syndications:
+          type: array
+          items:
+            $ref: '#/components/schemas/BeaconReportSyndication'
+        next_cursor:
+          $ref: '#/components/schemas/Cursor'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - beacon_report_syndications
+      - next_cursor
+      - request_id
+      type: object
+    BeaconReportSyndicationOriginalReport:
+      type: object
+      title: BeaconReportSyndicationOriginalReport
+      description: |-
+        A subset of information from a Beacon Report that has been syndicated to a matching Beacon User in your program.
+
+        The `id` field in the response is the ID of the original report that was syndicated. If the original report was created by your organization, the field will be filled with the ID of the report. Otherwise, the field will be `null` indicating that the original report was created by another Beacon customer.
+      properties:
+        id:
+          $ref: '#/components/schemas/BeaconReportIDNullable'
+        created_at:
+          $ref: '#/components/schemas/Timestamp'
+        type:
+          $ref: '#/components/schemas/BeaconReportType'
+        fraud_date:
+          $ref: '#/components/schemas/ISO8601Date'
+      required:
+      - id
+      - created_at
+      - type
+      - fraud_date
+      additionalProperties: true
     BeaconReportType:
       type: string
       title: BeaconReportType
@@ -37692,7 +38833,7 @@ components:
         fraud_date:
           $ref: '#/components/schemas/ISO8601Date'
         fraud_amount:
-          $ref: '#/components/schemas/FraudAmountNullable'
+          $ref: '#/components/schemas/FraudAmount'
       required:
       - type
       - fraud_date
@@ -38441,7 +39582,22 @@ components:
       - AU_CON
       - UK_HMC
       example: EU_CON
-      description: "Shorthand identifier for a specific screening list for entities.\n `AU_CON`: Australia Department of Foreign Affairs and Trade Consolidated List\n `CA_CON`: Government of Canada Consolidated List of Sanctions\n `EU_CON`: European External Action Service Consolidated List\n `IZ_SOE`: State Owned Enterprise List\n `IZ_UNC`: United Nations Consolidated Sanctions\n `IZ_WBK`: World Bank Listing of Ineligible Firms and Individuals\n `US_CAP`: US OFAC Correspondent Account or Payable-Through Account Sanctions\n `US_FSE`: US OFAC Foreign Sanctions Evaders\n `US_MBS`: US Non-SDN Menu-Based Sanctions\n `US_SDN`: US Specially Designated Nationals List \n `US_SSI`: US OFAC Sectoral Sanctions Identifications\n `US_CMC`: US OFAC Non-SDN Chinese Military-Industrial Complex List\n `US_UVL`: Bureau of Industry and Security Unverified List\n `UK_HMC`: UK HM Treasury Consolidated List"
+      description: |-
+        Shorthand identifier for a specific screening list for entities.
+         `AU_CON`: Australia Department of Foreign Affairs and Trade Consolidated List
+         `CA_CON`: Government of Canada Consolidated List of Sanctions
+         `EU_CON`: European External Action Service Consolidated List
+         `IZ_SOE`: State Owned Enterprise List
+         `IZ_UNC`: United Nations Consolidated Sanctions
+         `IZ_WBK`: World Bank Listing of Ineligible Firms and Individuals
+         `US_CAP`: US OFAC Correspondent Account or Payable-Through Account Sanctions
+         `US_FSE`: US OFAC Foreign Sanctions Evaders
+         `US_MBS`: US Non-SDN Menu-Based Sanctions
+         `US_SDN`: US Specially Designated Nationals List
+         `US_SSI`: US OFAC Sectoral Sanctions Identifications
+         `US_CMC`: US OFAC Non-SDN Chinese Military-Industrial Complex List
+         `US_UVL`: Bureau of Industry and Security Unverified List
+         `UK_HMC`: UK HM Treasury Consolidated List
       title: EntityWatchlistCode
     EntityWatchlistProgram:
       type: object
@@ -38674,27 +39830,6 @@ components:
       title: FamilyName
       description: A string with at least one non-whitespace character, with a max length of 100 characters.
     FraudAmount:
-      type: object
-      title: FraudAmount
-      description: |-
-        The amount and currency of the fraud or attempted fraud.
-        `fraud_amount` should be omitted to indicate an unknown fraud amount.
-      properties:
-        iso_currency_code:
-          $ref: '#/components/schemas/ISOCurrencyCode'
-        value:
-          type: number
-          format: double
-          example: 100
-          description: |-
-            The amount value.
-            This value can be 0 to indicate no money was lost.
-            Must not contain more than two digits of precision (e.g., `1.23`).
-      required:
-      - iso_currency_code
-      - value
-      additionalProperties: true
-    FraudAmountNullable:
       type: object
       title: FraudAmount
       description: |-
@@ -39594,7 +40729,31 @@ components:
       - TR_WMD
       - TR_CMB
       example: US_SDN
-      description: "Shorthand identifier for a specific screening list for individuals.\n `AU_CON`: Australia Department of Foreign Affairs and Trade Consolidated List\n `CA_CON`: Government of Canada Consolidated List of Sanctions\n `EU_CON`: European External Action Service Consolidated List\n `IZ_CIA`: CIA List of Chiefs of State and Cabinet Members\n `IZ_IPL`: Interpol Red Notices for Wanted Persons List\n `IZ_PEP`: Politically Exposed Persons List\n `IZ_UNC`: United Nations Consolidated Sanctions\n `IZ_WBK`: World Bank Listing of Ineligible Firms and Individuals\n `UK_HMC`: UK HM Treasury Consolidated List\n `US_DPL`: Bureau of Industry and Security Denied Persons List\n `US_DTC`: US Department of State AECA Debarred\n `US_FBI`: US Department of Justice FBI Wanted List\n `US_FSE`: US OFAC Foreign Sanctions Evaders\n `US_ISN`: US Department of State Nonproliferation Sanctions\n `US_PLC`: US OFAC Palestinian Legislative Council\n `US_SDN`: US OFAC Specially Designated Nationals List\n `US_SSI`: US OFAC Sectoral Sanctions Identifications\n `SG_SOF`: Government of Singapore Terrorists and Terrorist Entities\n `TR_TWL`: Government of Turkey Terrorist Wanted List\n `TR_DFD`: Government of Turkey Domestic Freezing Decisions\n `TR_FOR`: Government of Turkey Foreign Freezing Requests \n `TR_WMD`: Government of Turkey Weapons of Mass Destruction\n `TR_CMB`: Government of Turkey Capital Markets Board"
+      description: |-
+        Shorthand identifier for a specific screening list for individuals.
+         `AU_CON`: Australia Department of Foreign Affairs and Trade Consolidated List
+         `CA_CON`: Government of Canada Consolidated List of Sanctions
+         `EU_CON`: European External Action Service Consolidated List
+         `IZ_CIA`: CIA List of Chiefs of State and Cabinet Members
+         `IZ_IPL`: Interpol Red Notices for Wanted Persons List
+         `IZ_PEP`: Politically Exposed Persons List
+         `IZ_UNC`: United Nations Consolidated Sanctions
+         `IZ_WBK`: World Bank Listing of Ineligible Firms and Individuals
+         `UK_HMC`: UK HM Treasury Consolidated List
+         `US_DPL`: Bureau of Industry and Security Denied Persons List
+         `US_DTC`: US Department of State AECA Debarred
+         `US_FBI`: US Department of Justice FBI Wanted List
+         `US_FSE`: US OFAC Foreign Sanctions Evaders
+         `US_ISN`: US Department of State Nonproliferation Sanctions
+         `US_PLC`: US OFAC Palestinian Legislative Council
+         `US_SDN`: US OFAC Specially Designated Nationals List
+         `US_SSI`: US OFAC Sectoral Sanctions Identifications
+         `SG_SOF`: Government of Singapore Terrorists and Terrorist Entities
+         `TR_TWL`: Government of Turkey Terrorist Wanted List
+         `TR_DFD`: Government of Turkey Domestic Freezing Decisions
+         `TR_FOR`: Government of Turkey Foreign Freezing Requests
+         `TR_WMD`: Government of Turkey Weapons of Mass Destruction
+         `TR_CMB`: Government of Turkey Capital Markets Board
       title: IndividualWatchlistCode
     IndividualWatchlistProgram:
       type: object
@@ -42384,7 +43543,7 @@ components:
       description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
       enum:
       - VOA
-      - VOETRANSACTIONS
+      - VOE
     VerificationOfAssetResponse:
       title: VerificationOfAssetResponse
       type: object
@@ -42819,86 +43978,59 @@ components:
       additionalProperties: true
       description: CreditFreddieMacReportsGetResponse defines the response schema for `/credit/freddie_mac/reports/get`
       properties:
-        VOA:
-          $ref: '#/components/schemas/CreditFreddieMacVerificationOfAssets_VOA_2_4'
-        VOE:
-          $ref: '#/components/schemas/CreditFreddieVerificationOfEmployment_VOE_2_5'
+        DEAL:
+          $ref: '#/components/schemas/CreditFreddieMacVerificationOfAssetsDeal'
         request_id:
           $ref: '#/components/schemas/RequestID'
-      required:
-      - request_id
-    CreditFreddieMacVerificationOfAssets_VOA_2_4:
-      title: CreditFreddieMacVerificationOfAssets_VOA_2_4
-      type: object
-      nullable: true
-      additionalProperties: true
-      description: Verification of Assets Report
-      properties:
-        DEAL:
-          $ref: '#/components/schemas/CreditFreddieMacVerificationOfAssetsDeal_VOA_2_4'
         SchemaVersion:
           type: number
           description: The Verification Of Assets (VOA) schema version.
       required:
+      - request_id
       - DEAL
       - SchemaVersion
-    CreditFreddieVerificationOfEmployment_VOE_2_5:
-      title: CreditFreddieVerificationOfEmployment_VOE_2_5
-      type: object
-      nullable: true
-      additionalProperties: true
-      description: Verification of Employment Report
-      properties:
-        DEAL:
-          $ref: '#/components/schemas/CreditFreddieVerificationOfEmploymentDeal_VOE_2_5'
-        SchemaVersion:
-          type: number
-          description: The Verification Of Employment (VOE) schema version.
-      required:
-      - DEAL
-      - SchemaVersion
-    CreditFreddieMacVerificationOfAssetsDeal_VOA_2_4:
-      title: CreditFreddieMacVerificationOfAssetsDeal_VOA_2_4
+    CreditFreddieMacVerificationOfAssetsDeal:
+      title: CreditFreddieMacVerificationOfAssetsDeal
       type: object
       additionalProperties: true
       description: An object representing an Asset Report with Freddie Mac schema.
       properties:
         LOANS:
-          $ref: '#/components/schemas/CreditFreddieMacLoans_VOA_2_4'
+          $ref: '#/components/schemas/CreditFreddieMacLoans'
         PARTIES:
-          $ref: '#/components/schemas/CreditFreddieMacParties_VOA_2_4'
+          $ref: '#/components/schemas/CreditFreddieMacParties'
         SERVICES:
-          $ref: '#/components/schemas/CreditFreddieMacServices_VOA_2_4'
+          $ref: '#/components/schemas/CreditFreddieMacServices'
       required:
       - LOANS
       - PARTIES
       - SERVICES
-    CreditFreddieMacLoans_VOA_2_4:
-      title: CreditFreddieMacLoans_VOA_2_4
+    CreditFreddieMacLoans:
+      title: CreditFreddieMacLoans
       type: object
       additionalProperties: true
       description: A collection of loans that are part of a single deal.
       properties:
         LOAN:
-          $ref: '#/components/schemas/CreditFreddieMacLoan_VOA_2_4'
+          $ref: '#/components/schemas/CreditFreddieMacLoan'
       required:
       - LOAN
-    CreditFreddieMacLoan_VOA_2_4:
-      title: CreditFreddieMacLoan_VOA_2_4
+    CreditFreddieMacLoan:
+      title: CreditFreddieMacLoan
       type: object
       additionalProperties: true
       description: Information specific to a mortgage loan agreement between one or more borrowers and a mortgage lender.
       properties:
         LOAN_IDENTIFIERS:
-          $ref: '#/components/schemas/CreditFreddieMacLoanIdentifiers_VOA_2_4'
+          $ref: '#/components/schemas/CreditFreddieMacLoanIdentifiers'
         LoanRoleType:
           type: string
           description: Type of loan. The value can only be "SubjectLoan"
       required:
       - LOAN_IDENTIFIERS
       - LoanRoleType
-    CreditFreddieMacLoanIdentifiers_VOA_2_4:
-      title: CreditFreddieMacLoanIdentifiers_VOA_2_4
+    CreditFreddieMacLoanIdentifiers:
+      title: CreditFreddieMacLoanIdentifiers
       type: object
       additionalProperties: true
       description: Collection of current and previous identifiers for this loan.
@@ -42909,18 +44041,18 @@ components:
             $ref: '#/components/schemas/LoanIdentifier'
       required:
       - LOAN_IDENTIFIER
-    CreditFreddieMacServices_VOA_2_4:
-      title: CreditFreddieMacServices_VOA_2_4
+    CreditFreddieMacServices:
+      title: CreditFreddieMacServices
       type: object
       additionalProperties: true
       description: A collection of objects that describe requests and responses for services.
       properties:
         SERVICE:
-          $ref: '#/components/schemas/CreditFreddieMacService_VOA_2_4'
+          $ref: '#/components/schemas/CreditFreddieMacService'
       required:
       - SERVICE
-    CreditFreddieMacService_VOA_2_4:
-      title: CreditFreddieMacService_VOA_2_4
+    CreditFreddieMacService:
+      title: CreditFreddieMacService
       type: object
       additionalProperties: true
       description: A collection of details related to a fulfillment service or product in terms of request, process and result.
@@ -42928,30 +44060,30 @@ components:
         VERIFICATION_OF_ASSET:
           type: array
           items:
-            $ref: '#/components/schemas/CreditFreddieMacVerificationOfAsset_VOA_2_4'
+            $ref: '#/components/schemas/CreditFreddieMacVerificationOfAsset'
         STATUSES:
           $ref: '#/components/schemas/Statuses'
       required:
       - VERIFICATION_OF_ASSET
       - STATUSES
-    CreditFreddieMacVerificationOfAsset_VOA_2_4:
-      title: CreditFreddieMacVerificationOfAsset_VOA_2_4
+    CreditFreddieMacVerificationOfAsset:
+      title: CreditFreddieMacVerificationOfAsset
       type: object
       additionalProperties: true
       description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
       properties:
         REPORTING_INFORMATION:
-          $ref: '#/components/schemas/CreditFreddieMacReportingInformation_VOA_2_4'
+          $ref: '#/components/schemas/CreditFreddieMacReportingInformation'
         SERVICE_PRODUCT_FULFILLMENT:
           $ref: '#/components/schemas/ServiceProductFulfillment'
         VERIFICATION_OF_ASSET_RESPONSE:
-          $ref: '#/components/schemas/CreditFreddieMacVerificationOfAssetResponse_VOA_2_4'
+          $ref: '#/components/schemas/CreditFreddieMacVerificationOfAssetResponse'
       required:
       - REPORTING_INFORMATION
       - SERVICE_PRODUCT_FULFILLMENT
       - VERIFICATION_OF_ASSET_RESPONSE
-    CreditFreddieMacReportingInformation_VOA_2_4:
-      title: CreditFreddieMacReportingInformation_VOA_2_4
+    CreditFreddieMacReportingInformation:
+      title: CreditFreddieMacReportingInformation
       type: object
       additionalProperties: true
       description: Information about an report identifier and a report name.
@@ -42970,18 +44102,18 @@ components:
           description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
       required:
       - ReportingInformationIdentifier
-    CreditFreddieMacVerificationOfAssetResponse_VOA_2_4:
+    CreditFreddieMacVerificationOfAssetResponse:
       title: VerificationOfAssetResponse
       type: object
       additionalProperties: true
       description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
       properties:
         ASSETS:
-          $ref: '#/components/schemas/CreditFreddieMacAssets_VOA_2_4'
+          $ref: '#/components/schemas/CreditFreddieMacAssets'
       required:
       - ASSETS
-    CreditFreddieMacAssets_VOA_2_4:
-      title: CreditFreddieMacAssets_VOA_2_4
+    CreditFreddieMacAssets:
+      title: CreditFreddieMacAssets
       type: object
       additionalProperties: true
       description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
@@ -42989,12 +44121,12 @@ components:
         ASSET:
           type: array
           items:
-            $ref: '#/components/schemas/CreditFreddieMacAsset_VOA_2_4'
+            $ref: '#/components/schemas/CreditFreddieMacAsset'
           description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
       required:
       - ASSET
-    CreditFreddieMacAsset_VOA_2_4:
-      title: CreditFreddieMacAsset_VOA_2_4
+    CreditFreddieMacAsset:
+      title: CreditFreddieMacAsset
       type: object
       additionalProperties: true
       description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
@@ -43006,7 +44138,7 @@ components:
         ASSET_HOLDER:
           $ref: '#/components/schemas/AssetHolder'
         ASSET_TRANSACTIONS:
-          $ref: '#/components/schemas/CreditFreddieMacAssetTransactions_VOA_2_4'
+          $ref: '#/components/schemas/CreditFreddieMacAssetTransactions'
         VALIDATION_SOURCES:
           $ref: '#/components/schemas/ValidationSources'
       required:
@@ -43015,8 +44147,8 @@ components:
       - ASSET_HOLDER
       - ASSET_TRANSACTIONS
       - VALIDATION_SOURCES
-    CreditFreddieMacAssetTransactions_VOA_2_4:
-      title: CreditFreddieMacAssetTransactions_VOA_2_4
+    CreditFreddieMacAssetTransactions:
+      title: CreditFreddieMacAssetTransactions
       type: object
       additionalProperties: true
       description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
@@ -43024,11 +44156,11 @@ components:
         ASSET_TRANSACTION:
           type: array
           items:
-            $ref: '#/components/schemas/CreditFreddieMacAssetTransaction_VOA_2_4'
+            $ref: '#/components/schemas/CreditFreddieMacAssetTransaction'
       required:
       - ASSET_TRANSACTION
-    CreditFreddieMacAssetTransaction_VOA_2_4:
-      title: CreditFreddieMacAssetTransaction_VOA_2_4
+    CreditFreddieMacAssetTransaction:
+      title: CreditFreddieMacAssetTransaction
       type: object
       additionalProperties: true
       description: An object representing...
@@ -43043,8 +44175,8 @@ components:
       required:
       - ASSET_TRANSACTION_DETAIL
       - ASSET_TRANSACTION_DESCRIPTION
-    CreditFreddieMacParties_VOA_2_4:
-      title: CreditFreddieMacParties_VOA_2_4
+    CreditFreddieMacParties:
+      title: CreditFreddieMacParties
       type: object
       additionalProperties: true
       description: A collection of objects that define specific parties to a deal. This includes the direct participating parties, such as borrower and seller and the indirect parties such as the credit report provider.
@@ -43052,17 +44184,17 @@ components:
         PARTY:
           type: array
           items:
-            $ref: '#/components/schemas/CreditFreddieMacParty_VOA_2_4'
+            $ref: '#/components/schemas/CreditFreddieMacParty'
       required:
       - PARTY
-    CreditFreddieMacParty_VOA_2_4:
-      title: CreditFreddieMacParty_VOA_2_4
+    CreditFreddieMacParty:
+      title: CreditFreddieMacParty
       type: object
       additionalProperties: true
       description: A collection of information about a single party to a transaction. Included direct participants like the borrower and seller as well as indirect participants such as the flood certificate provider.
       properties:
         INDIVIDUAL:
-          $ref: '#/components/schemas/CreditFreddieMacPartyIndividual_VOA_2_4'
+          $ref: '#/components/schemas/CreditFreddieMacPartyIndividual'
         ROLES:
           $ref: '#/components/schemas/Roles'
         TAXPAYER_IDENTIFIERS:
@@ -43071,18 +44203,18 @@ components:
       - INDIVIDUAL
       - ROLES
       - TAXPAYER_IDENTIFIERS
-    CreditFreddieMacPartyIndividual_VOA_2_4:
-      title: CreditFreddieMacPartyIndividual_VOA_2_4
+    CreditFreddieMacPartyIndividual:
+      title: CreditFreddieMacPartyIndividual
       type: object
       additionalProperties: true
       description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
       properties:
         NAME:
-          $ref: '#/components/schemas/CreditFreddieMacIndividualName_VOA_2_4'
+          $ref: '#/components/schemas/CreditFreddieMacIndividualName'
       required:
       - NAME
-    CreditFreddieMacIndividualName_VOA_2_4:
-      title: CreditFreddieMacIndividualName_VOA_2_4
+    CreditFreddieMacIndividualName:
+      title: CreditFreddieMacIndividualName
       type: object
       additionalProperties: true
       description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
@@ -43100,221 +44232,6 @@ components:
       - FirstName
       - LastName
       - MiddleName
-    CreditFreddieVerificationOfEmploymentDeal_VOE_2_5:
-      title: CreditFreddieVerificationOfEmploymentDeal_VOE_2_5
-      type: object
-      additionalProperties: true
-      description: An object representing a Verification of Employment report.
-      properties:
-        LOANS:
-          $ref: '#/components/schemas/CreditFreddieMacLoans_VOA_2_4'
-        PARTIES:
-          $ref: '#/components/schemas/CreditFreddieMacParties_VOA_2_4'
-        SERVICES:
-          $ref: '#/components/schemas/CreditFreddieMacServices_VOE_2_5'
-      required:
-      - LOANS
-      - PARTIES
-      - SERVICES
-    CreditFreddieMacServices_VOE_2_5:
-      title: CreditFreddieMacServices_VOE_2_5
-      type: object
-      additionalProperties: true
-      description: A collection of objects that describe requests and responses for services.
-      properties:
-        SERVICE:
-          $ref: '#/components/schemas/CreditFreddieMacService_VOE_2_5'
-      required:
-      - SERVICE
-    CreditFreddieMacService_VOE_2_5:
-      title: CreditFreddieMacService_VOE_2_5
-      type: object
-      additionalProperties: true
-      description: A collection of details related to a fulfillment service or product in terms of request, process and result.
-      properties:
-        VERIFICATION_OF_ASSET:
-          type: array
-          items:
-            $ref: '#/components/schemas/CreditFreddieMacVerificationOfAsset_VOE_2_5'
-        STATUSES:
-          $ref: '#/components/schemas/Statuses'
-      required:
-      - VERIFICATION_OF_ASSET
-      - STATUSES
-    CreditFreddieMacVerificationOfAsset_VOE_2_5:
-      title: CreditFreddieMacVerificationOfAsset_VOE_2_5
-      type: object
-      additionalProperties: true
-      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
-      properties:
-        REPORTING_INFORMATION:
-          $ref: '#/components/schemas/CreditFreddieMacReportingInformation_VOA_2_4'
-        SERVICE_PRODUCT_FULFILLMENT:
-          $ref: '#/components/schemas/ServiceProductFulfillment'
-        VERIFICATION_OF_ASSET_RESPONSE:
-          $ref: '#/components/schemas/CreditFreddieMacVerificationOfAssetResponse_VOE_2_5'
-      required:
-      - REPORTING_INFORMATION
-      - SERVICE_PRODUCT_FULFILLMENT
-      - VERIFICATION_OF_ASSET_RESPONSE
-    CreditFreddieMacVerificationOfAssetResponse_VOE_2_5:
-      title: CreditFreddieMacVerificationOfAssetResponse_VOE_2_5
-      type: object
-      additionalProperties: true
-      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
-      properties:
-        ASSETS:
-          $ref: '#/components/schemas/CreditFreddieMacAssets_VOE_2_5'
-      required:
-      - ASSETS
-    CreditFreddieMacAssets_VOE_2_5:
-      title: CreditFreddieMacAssets_VOE_2_5
-      type: object
-      additionalProperties: true
-      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
-      properties:
-        ASSET:
-          type: array
-          items:
-            $ref: '#/components/schemas/CreditFreddieMacAsset_VOE_2_5'
-          description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
-      required:
-      - ASSET
-    CreditFreddieMacAsset_VOE_2_5:
-      title: CreditFreddieMacAsset_VOE_2_5
-      type: object
-      additionalProperties: true
-      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
-      properties:
-        ASSET_DETAIL:
-          $ref: '#/components/schemas/CreditFreddieMacAssetDetail_VOE_2_5'
-        ASSET_OWNERS:
-          $ref: '#/components/schemas/AssetOwners'
-        ASSET_HOLDER:
-          $ref: '#/components/schemas/AssetHolder'
-        ASSET_TRANSACTIONS:
-          $ref: '#/components/schemas/CreditFreddieMacAssetTransactions_VOE_2_5'
-      required:
-      - ASSET_DETAIL
-      - ASSET_OWNERS
-      - ASSET_HOLDER
-      - ASSET_TRANSACTIONS
-    CreditFreddieMacAssetTransactions_VOE_2_5:
-      title: CreditFreddieMacAssetTransactions_VOE_2_5
-      type: object
-      additionalProperties: true
-      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
-      properties:
-        ASSET_TRANSACTION:
-          type: array
-          items:
-            $ref: '#/components/schemas/CreditFreddieMacAssetTransaction_VOE_2_5'
-      required:
-      - ASSET_TRANSACTION
-    CreditFreddieMacAssetTransaction_VOE_2_5:
-      title: CreditFreddieMacAssetTransaction_VOE_2_5
-      type: object
-      additionalProperties: true
-      description: An object representing...
-      properties:
-        ASSET_TRANSACTION_DETAIL:
-          $ref: '#/components/schemas/CreditFreddieMacAssetTransactionDetail_VOE_2_5'
-        ASSET_TRANSACTION_DESCRIPTION:
-          type: array
-          items:
-            $ref: '#/components/schemas/AssetTransactionDescription'
-          description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
-      required:
-      - ASSET_TRANSACTION_DETAIL
-      - ASSET_TRANSACTION_DESCRIPTION
-    CreditFreddieMacAssetDetail_VOE_2_5:
-      title: CreditFreddieMacAssetDetail_VOE_2_5
-      type: object
-      additionalProperties: true
-      description: Details about an asset.
-      properties:
-        AssetUniqueIdentifier:
-          type: string
-          description: A vendor created unique Identifier.
-        AssetAccountIdentifier:
-          type: string
-          description: A unique alphanumeric string identifying an asset.
-        AssetAsOfDate:
-          type: string
-          description: Account Report As of Date / Create Date. Format YYYY-MM-DD
-        AssetDescription:
-          type: string
-          nullable: true
-          description: A text description that further defines the Asset. This could be used to describe the shares associated with the stocks, bonds or mutual funds, retirement funds or business owned that the borrower has disclosed (named) as an asset.
-        AssetType:
-          $ref: '#/components/schemas/AssetType'
-        AssetTypeAdditionalDescription:
-          type: string
-          nullable: true
-          description: Additional Asset Decription some examples are Investment Tax-Deferred , Loan, 401K, 403B, Checking, Money Market, Credit Card,ROTH,529,Biller,ROLLOVER,CD,Savings,Investment Taxable, IRA, Mortgage, Line Of Credit.
-        AssetDaysRequestedCount:
-          type: integer
-          description: The Number of days requested made to the Financial Institution. Example When looking for 3 months of data from the FI, pass in 90 days.
-        AssetOwnershipType:
-          type: string
-          nullable: true
-          description: Ownership type of the asset account.
-      required:
-      - AssetUniqueIdentifier
-      - AssetAccountIdentifier
-      - AssetAsOfDate
-      - AssetDescription
-      - AssetType
-      - AssetTypeAdditionalDescription
-      - AssetDaysRequestedCount
-      - AssetOwnershipType
-    CreditFreddieMacAssetTransactionDetail_VOE_2_5:
-      title: CreditFreddieMacAssetTransactionDetail_VOE_2_5
-      type: object
-      additionalProperties: true
-      description: Documentation not found in the MISMO model viewer and not provided by Freddie Mac.
-      properties:
-        AssetTransactionUniqueIdentifier:
-          type: string
-          description: A vendor created unique Identifier.
-        AssetTransactionDate:
-          type: string
-          format: date
-          description: Asset Transaction Date.
-        AssetTransactionPostDate:
-          type: string
-          format: date
-          description: Asset Transaction Post Date.
-        AssetTransactionType:
-          $ref: '#/components/schemas/AssetTransactionType'
-        AssetTransactionPaidByName:
-          type: string
-          nullable: true
-          description: Populate with who did the transaction.
-        AssetTransactionPaidToName:
-          type: string
-          nullable: true
-          description: Populate with for whom the transaction is done.
-        AssetTransactionTypeAdditionalDescription:
-          type: string
-          nullable: true
-          description: FI Provided - examples are atm, cash, check, credit, debit, deposit, directDebit, directDeposit, dividend, fee, interest, other, payment, pointOfSale, repeatPayment, serviceCharge, transfer.
-        AssetTransactionCategoryType:
-          $ref: '#/components/schemas/AssetTransactionCategoryType'
-        FinancialInstitutionTransactionIdentifier:
-          type: string
-          nullable: true
-          description: FI provided Transaction Identifier.
-      required:
-      - AssetTransactionUniqueIdentifier
-      - AssetTransactionDate
-      - AssetTransactionPostDate
-      - AssetTransactionType
-      - AssetTransactionPaidByName
-      - AssetTransactionPaidToName
-      - AssetTransactionTypeAdditionalDescription
-      - AssetTransactionCategoryType
-      - FinancialInstitutionTransactionIdentifier
     ItemGetRequest:
       description: ItemGetRequest defines the request schema for `/item/get`
       type: object
@@ -43891,7 +44808,6 @@ components:
       - type
       - sentOn
       - category
-      - publisher
       - notificationPayload
     StatementsListRequest:
       title: StatementsListRequest
