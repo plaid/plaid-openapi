@@ -1,3 +1,101 @@
+### 2020-09-14_1.457.0
+- Remove `account_ids` parameter from `/processor/transactions/recurring/get` request
+
+### 2020-09-14_1.456.0
+- Add `hosted_link.completion_redirect_uri` to `link/token/create` request
+
+### 2020-09-14_1.455.2
+- Deprecate max_single_transfer_amount and max_monthly_amount in /transfer/configuration/get response.
+- Deprecate monthly_transfer_volume in /transfer/metrics/get response.
+
+### 2020-09-14_1.455.1
+- Update documentation for `/credit/payroll_income/parsing_config/update`
+
+### 2020-09-14_1.455.0
+- Add new /sandbox/transfer/refund/simulate route to simulate refund events in sandbox.
+
+### 2020-09-14_1.454.0
+- Add `is_investments_fallback_item` field to `/investments/holdings/get` and `/investments/transactions/get` responses
+
+### 2020-09-14_1.453.0
+- Add `/credit/payroll_income/parsing_config/update` for updating the parsing configuration for document income verficiations
+
+### 2020-09-14_1.452.0
+- Add `warnings` field to `/cra/base_report/get` response
+
+### 2020-09-14_1.451.0
+- Add `/beacon/report_syndication/list` for listing `BeaconReportSyndication` objects linked to a specific `BeaconUser`
+
+### 2020-09-14_1.450.0
+- [Breaking] Remove `user_token` field from `asset_report/create` request.
+
+### 2020-09-14_1.449.2
+- Updates `isin` and `cusip` field descriptions for new call to action.
+
+### 2020-09-14_1.449.1
+- Add new refund event types.
+
+### 2020-09-14_1.449.0
+- Add `/beacon/report/list` for listing `BeaconReport` objects created for a specific `BeaconUser`
+
+### 2020-09-14_1.448.0
+- Make `publisher` field from `FDXNotifications` as optional
+
+### 2020-09-14_1.447.0
+- Mark `fraud_amount` as nullable for `BeaconReport` objects in `/beacon/report/create`
+
+### 2020-09-14_1.446.0
+- Add `allow_manual_entry` field to `investments` object in `link/token/create`
+- Update `/credit/freddie_mac/reports/get` return type data shape to contain one object with both VOA and VOE assets combined
+
+### 2020-09-14_1.445.0
+- Add new insights and counterparty fields for Transactions endpoints
+- Deprecate legacy category fields for Transactions endpoints
+
+### 2020-09-14_1.444.0
+- Add new webhook type `AUTHORIZATION_GRANTED` to `sandbox/item/fire_webhook`
+
+### 2020-09-14_1.443.0
+- Add `RETURN` as possible Virtual Account wallet transaction type
+
+### 2020-09-14_1.442.0
+- Add `facilitator_fee` field for the Transfers endpoints
+
+### 2020-09-14_1.441
+- [Breaking change for Go client library] Update `/transfer/capabilities/get` to no longer accept payment profile token and require an `account_id` and `access_token`
+- Update examples for ledger endpoints to be more realistic
+
+### 2020-09-14_1.440.0
+- Add `optional_products` parameter to `/link/token/create` request.
+
+### 2020-09-14_1.439.0
+- [Breaking] Renamed `TransactionsEnrichGetRequest` and `TransactionsEnrichGetResponse` objects to
+  `TransactionsEnrichRequest` and `TransactionsEnrichResponse`.
+
+### 2020-09-14_1.438.1
+- [Breaking change for Go client library] remove `device`, `user_present` from required request param list of `/transfer/recurring/create`
+
+### 2020-09-14_1.438.0
+- Add new `/beta/transactions/user_insights/v1/get` endpoint
+
+### 2020-09-14_1.437.0
+- Remove min/max restriction of `days_requested` in OpenAPI.
+
+### 2020-09-14_1.436.0
+- Update `days_requested` to be a required field in base reports in `link/token/create`
+
+### 2020-09-14_1.435.0
+- Update `/sandbox/transfer/sweep/simulate` to mark `swept` transfers as `swept_settled`.
+
+### 2020-09-14_1.434.0
+- Added a new type of webhook for dashboard alerts, `InstitutionStatusAlertWebhook`.
+
+### 2020-09-14_1.433.0
+- Update response of `/transfer/authorizarion/create`
+
+### 2020-09-14_1.432.0
+- Update `days_requested` in `base_report` in `link/token/create` to enforce a min/max of 1/731 days
+
 ### 2020-09-14_1.431.7
 - Add processor Zero Hash
 
@@ -45,7 +143,7 @@
 - Updated /identity/match's address score threshold recommendation from 80 or above to 70 or above
 
 ### 2020-09-14_1.429.0
-- [Breaking change for Go client library] For Transfer endpoints that take payment profiles as input, remove `payment_profile` field and make 
+- [Breaking change for Go client library] For Transfer endpoints that take payment profiles as input, remove `payment_profile` field and make
 `account_id` and `access_token` mandatory. The removed field is not in use.
 - Mark all payment profile-specific endpoints as `deprecated`.
 - Docs updates for Transfer, including clarifying that certain request fields for `/transfer/authorization/create`
