@@ -40,7 +40,7 @@ OpenAPI Generator version: 6.1
 openapi-generator-cli generate -g ruby  \
 -i 2020-09-14.yml \
 -o build/generated-ruby \
---global-property=apiTests=false,modelTests=false  \
+--global-property=apiTests=false,modelTests=false,useAutoload=true  \
 --library=faraday \
 -p gemName=plaid,gemRequiredRubyVersion=">= 3.0.0" \
 -t local/templates/ruby
