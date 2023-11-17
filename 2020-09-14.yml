@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.457.0
+  version: 2020-09-14_1.470.1
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -23,6 +23,7 @@ security:
   plaidVersion: []
 paths:
   /asset_report/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -56,6 +57,7 @@ paths:
             schema:
               $ref: '#/components/schemas/AssetReportCreateRequest'
   /asset_report/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -296,6 +298,7 @@ paths:
               $ref: '#/components/schemas/AssetReportGetRequest'
         description: ""
   /asset_report/pdf/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -324,6 +327,7 @@ paths:
               $ref: '#/components/schemas/AssetReportPDFGetRequest'
         description: ""
   /asset_report/refresh:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -356,6 +360,7 @@ paths:
               $ref: '#/components/schemas/AssetReportRefreshRequest'
         description: ""
   /asset_report/filter:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -392,6 +397,7 @@ paths:
               $ref: '#/components/schemas/AssetReportFilterRequest'
         description: ""
   /asset_report/remove:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -423,6 +429,7 @@ paths:
               $ref: '#/components/schemas/AssetReportRemoveRequest'
         description: ""
   /asset_report/audit_copy/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -453,6 +460,7 @@ paths:
             schema:
               $ref: '#/components/schemas/AssetReportAuditCopyCreateRequest'
   /asset_report/audit_copy/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Retrieve an Asset Report Audit Copy
       tags:
@@ -475,6 +483,7 @@ paths:
                 $ref: '#/components/schemas/AssetReportGetResponse'
       description: '`/asset_report/audit_copy/get` allows auditors to get a copy of an Asset Report that was previously shared via the `/asset_report/audit_copy/create` endpoint.  The caller of `/asset_report/audit_copy/create` must provide the `audit_copy_token` to the auditor.  This token can then be used to call `/asset_report/audit_copy/create`.'
   /asset_report/audit_copy/remove:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -503,6 +512,7 @@ paths:
         description: ""
       description: The `/asset_report/audit_copy/remove` endpoint allows you to remove an Audit Copy. Removing an Audit Copy invalidates the `audit_copy_token` associated with it, meaning both you and any third parties holding the token will no longer be able to use it to access Report data. Items associated with the Asset Report, the Asset Report itself and other Audit Copies of it are not affected and will remain accessible after removing the given Audit Copy.
   /cra/base_report/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_CRA
     post:
       summary: Retrieve a Base Report
       tags:
@@ -715,6 +725,7 @@ paths:
                     request_id: GVzMdiDd8DDAQK4
       description: This endpoint allows the customer to retrieve a Base Report. Customers should pass in the `user_token` created in `/link/token/create`.
   /credit/audit_copy_token/update:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -742,6 +753,7 @@ paths:
             schema:
               $ref: '#/components/schemas/CreditAuditCopyTokenUpdateRequest'
   /cra/bank_income/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_CRA
     post:
       summary: Retrieve information from the bank accounts used for income verification
       tags:
@@ -952,6 +964,7 @@ paths:
             schema:
               $ref: '#/components/schemas/CraBankIncomeGetRequest'
   /statements/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -990,6 +1003,7 @@ paths:
               $ref: '#/components/schemas/StatementsListRequest'
         description: ""
   /statements/download:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -1013,6 +1027,7 @@ paths:
               $ref: '#/components/schemas/StatementsDownloadRequest'
         description: ""
   /item/activity/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -1045,6 +1060,7 @@ paths:
             schema:
               $ref: '#/components/schemas/ItemActivityListRequest'
   /item/application/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -1070,7 +1086,46 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ItemApplicationListRequest'
+  /item/application/unlink:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
+    post:
+      tags:
+      - plaid
+      summary: Unlink a user’s connected application
+      externalDocs:
+        url: none
+      operationId: itemApplicationUnlink
+      description: |-
+        Unlink a user’s connected application. On an unlink request, Plaid will immediately revoke the Application’s access to the User’s data.  The User will have to redo the OAuth authentication process in order to restore functionality.
+
+        This endpoint only removes ongoing data access permissions, therefore the User will need to reach out to the Application itself in order to disable and delete their account and delete any data that the Application already received (if the Application does not do so by default).
+
+        This endpoint should be called in real time as the User is unlinking an Application, and should not be batched in order to ensure that the change is reflected as soon as possible.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemApplicationUnlinkResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: m8MDnv9okwxFNBV
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemApplicationUnlinkRequest'
   /item/application/scopes/update:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -1097,6 +1152,7 @@ paths:
             schema:
               $ref: '#/components/schemas/ItemApplicationScopesUpdateRequest'
   /application/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -1124,6 +1180,7 @@ paths:
               $ref: '#/components/schemas/ApplicationGetRequest'
         description: ""
   /item/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -1177,6 +1234,7 @@ paths:
               $ref: '#/components/schemas/ItemGetRequest'
         description: ""
   /auth/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -1263,6 +1321,7 @@ paths:
             examples: {}
         description: ""
   /transactions/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -1455,6 +1514,7 @@ paths:
               $ref: '#/components/schemas/TransactionsGetRequest'
             examples: {}
   /transactions/refresh:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -1490,6 +1550,7 @@ paths:
             schema:
               $ref: '#/components/schemas/TransactionsRefreshRequest'
   /transactions/recurring/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -1540,6 +1601,8 @@ paths:
                         unofficial_currency_code: null
                       is_active: true
                       status: MATURE
+                      is_user_modified: true
+                      last_user_modified: "2023-01-19"
                     outflow_streams:
                     - account_id: lPNjeW1nR6CDn5okmGQ6hEpMo4lLNoSrzqDff
                       stream_id: no86Eox18VHMvaOVL7gPUM9ap3aR1LsAVZ5nd
@@ -1572,6 +1635,7 @@ paths:
                         unofficial_currency_code: null
                       is_active: true
                       status: MATURE
+                      is_user_modified: false
                     - account_id: lPNjeW1nR6CDn5okmGQ6hEpMo4lLNoSrzqDff
                       stream_id: SrBNJZDuUMweodmPmSOeOImwsWt53ZXfJQAfC
                       category:
@@ -1600,6 +1664,8 @@ paths:
                         unofficial_currency_code: null
                       is_active: true
                       status: MATURE
+                      is_user_modified: true
+                      last_user_modified: "2022-02-24"
                     request_id: tbFyCEqkU775ZGG
         default:
           content:
@@ -1622,8 +1688,10 @@ paths:
             schema:
               $ref: '#/components/schemas/TransactionsRecurringGetRequest'
             examples: {}
-  /transactions/recurring/deactivate: {}
+  /transactions/recurring/deactivate:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
   /transactions/sync:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -1772,9 +1840,9 @@ paths:
                 $ref: '#/components/schemas/PlaidError'
           description: Error response
       description: |-
-        This endpoint replaces `/transactions/get` and its associated webhooks for most common use-cases.
+        The `/transactions/sync` endpoint allows developers to subscribe to all transactions associated with an Item and get updates synchronously in a stream-like manner, using a cursor to track which updates have already been seen.
 
-        The `/transactions/sync` endpoint allows developers to subscribe to all transactions associated with an Item and get updates synchronously in a stream-like manner, using a cursor to track which updates have already been seen. `/transactions/sync` provides the same functionality as `/transactions/get` and can be used instead of `/transactions/get` to simplify the process of tracking transactions updates.
+        `/transactions/sync` provides the same functionality as `/transactions/get` and can be used instead of `/transactions/get` to simplify the process of tracking transactions updates. To learn more about migrating from `/transactions/get`, see the [Transactions Sync migration guide](https://plaid.com/docs/transactions/sync-migration/).
 
         This endpoint provides user-authorized transaction data for `credit`, `depository`, and some loan-type accounts (only those with account subtype `student`; coverage may be limited). For transaction history from `investments` accounts, use `/investments/transactions/get` instead.
 
@@ -1788,9 +1856,11 @@ paths:
 
         Whenever new or updated transaction data becomes available, `/transactions/sync` will provide these updates. Plaid typically checks for new data multiple times a day, but these checks may occur less frequently, such as once a day, depending on the institution. An Item's `status.transactions.last_successful_update` field will show the timestamp of the most recent successful update. To force Plaid to check for new transactions, use the `/transactions/refresh` endpoint.
 
-        Note that for newly created Items, data may not be immediately available to `/transactions/sync`. Plaid begins preparing transactions data when the Item is created, but the process can take anywhere from a few seconds to several minutes to complete, depending on the number of transactions available.
+        For newly created Items, data may not be immediately available to `/transactions/sync`. Plaid begins preparing transactions data when the Item is created, but the process can take anywhere from a few seconds to several minutes to complete, depending on the number of transactions available.
 
         To be alerted when new data is available, listen for the [`SYNC_UPDATES_AVAILABLE`](https://plaid.com/docs/api/products/transactions/#sync_updates_available) webhook.
+
+        `/transactions/sync` does not directly return balance data. To get the balance for an account, call `/accounts/get`, which is a free-to-use endpoint that will return the cached balance as of the last successful transactions update.
       requestBody:
         required: true
         content:
@@ -1799,6 +1869,7 @@ paths:
               $ref: '#/components/schemas/TransactionsSyncRequest'
             examples: {}
   /transactions/enrich:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -1906,6 +1977,7 @@ paths:
             schema:
               $ref: '#/components/schemas/TransactionsEnrichRequest'
   /institutions/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -2024,6 +2096,7 @@ paths:
               $ref: '#/components/schemas/InstitutionsGetRequest'
         description: ""
   /institutions/search:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -2139,6 +2212,7 @@ paths:
             schema:
               $ref: '#/components/schemas/InstitutionsSearchRequest'
   /institutions/get_by_id:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -2257,6 +2331,7 @@ paths:
               $ref: '#/components/schemas/InstitutionsGetByIdRequest'
         description: ""
   /item/remove:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -2297,6 +2372,7 @@ paths:
               $ref: '#/components/schemas/ItemRemoveRequest'
         description: ""
   /accounts/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -2308,7 +2384,9 @@ paths:
         The `/accounts/get` endpoint can be used to retrieve a list of accounts associated with any linked Item. Plaid will only return active bank accounts — that is, accounts that are not closed and are capable of carrying a balance.
         For items that went through the updated account selection pane, this endpoint only returns accounts that were permissioned by the user when they initially created the Item. If a user creates a new account after the initial link, you can capture this event through the [`NEW_ACCOUNTS_AVAILABLE`](https://plaid.com/docs/api/items/#new_accounts_available) webhook and then use Link's [update mode](https://plaid.com/docs/link/update-mode/) to request that the user share this new account with you.
 
-        This endpoint retrieves cached information, rather than extracting fresh information from the institution. As a result, balances returned may not be up-to-date; for realtime balance information, use `/accounts/balance/get` instead. Note that some information is nullable.
+        `/accounts/get` is free to use and retrieves cached information, rather than extracting fresh information from the institution. The balance returned will reflect the balance at the time of the last successful Item update. If the Item is enabled for a regularly updating product, such as Transactions, Investments, or Liabilities, the balance will typically update about once a day, as long as the Item is healthy. If the Item is enabled only for products that do not frequently update, such as Auth or Identity, balance data may be much older.
+
+        For realtime balance information, use the paid endpoint `/accounts/balance/get` instead.
       responses:
         "200":
           description: success
@@ -2395,6 +2473,7 @@ paths:
                     account_ids:
                     - string
   /categories/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       security: []
       tags:
@@ -2446,6 +2525,7 @@ paths:
             schema:
               $ref: '#/components/schemas/CategoriesGetRequest'
   /sandbox/processor_token/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -2479,6 +2559,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SandboxProcessorTokenCreateRequest'
   /sandbox/public_token/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -2513,6 +2594,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SandboxPublicTokenCreateRequest'
   /sandbox/item/fire_webhook:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -2566,6 +2648,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SandboxItemFireWebhookRequest'
   /accounts/balance/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -2638,7 +2721,7 @@ paths:
                       update_type: background
                       webhook: https://www.genericwebhookurl.com/webhook
                     request_id: qk5Bxes3gDfv4F2
-      description: The `/accounts/balance/get` endpoint returns the real-time balance for each of an Item's accounts. While other endpoints may return a balance object, only `/accounts/balance/get` forces the available and current balance fields to be refreshed rather than cached. This endpoint can be used for existing Items that were added via any of Plaid’s other products. This endpoint can be used as long as Link has been initialized with any other product, `balance` itself is not a product that can be used to initialize Link. As this endpoint triggers a synchronous request for fresh data, latency may be higher than for other Plaid endpoints; if you encounter errors, you may find it necessary to adjust your timeout period when making requests.
+      description: The `/accounts/balance/get` endpoint returns the real-time balance for each of an Item's accounts. While other endpoints, such as `/accounts/get`, return a balance object, only `/accounts/balance/get` forces the available and current balance fields to be refreshed rather than cached. This endpoint can be used for existing Items that were added via any of Plaid’s other products. This endpoint can be used as long as Link has been initialized with any other product, `balance` itself is not a product that can be used to initialize Link. As this endpoint triggers a synchronous request for fresh data, latency may be higher than for other Plaid endpoints (typically less than 10 seconds, but occasionally up to 30 seconds or more); if you encounter errors, you may find it necessary to adjust your timeout period when making requests.
       requestBody:
         required: true
         content:
@@ -2655,6 +2738,7 @@ paths:
                     account_ids:
                     - string
   /identity/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -2804,6 +2888,7 @@ paths:
               $ref: '#/components/schemas/IdentityGetRequest'
         description: ""
   /identity/match:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -2824,9 +2909,9 @@ paths:
                     accounts:
                     - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
                       balances:
-                        available: 100
-                        current: 110
-                        iso_currency_code: USD
+                        available: null
+                        current: null
+                        iso_currency_code: null
                         limit: null
                         unofficial_currency_code: null
                       mask: "0000"
@@ -2848,9 +2933,9 @@ paths:
                       type: depository
                     - account_id: 3gE5gnRzNyfXpBK5wEEKcymJ5albGVUqg77gr
                       balances:
-                        available: 200
-                        current: 210
-                        iso_currency_code: USD
+                        available: null
+                        current: null
+                        iso_currency_code: null
                         limit: null
                         unofficial_currency_code: null
                       mask: "1111"
@@ -2887,6 +2972,8 @@ paths:
       description: |-
         The `/identity/match` endpoint generates a match score, which indicates how well the provided identity data matches the identity information on file with the account holder's financial institution.
 
+        Fields within the `balances` object will always be null when retrieved by `/identity/match`. Instead, use the free `/accounts/get` endpoint to request balance cached data, or `/accounts/balance/get` for real-time data.
+
         This request may take some time to complete if Identity was not specified as an initial product when creating the Item. This is because Plaid must communicate directly with the institution to retrieve the data.
       requestBody:
         required: true
@@ -2896,6 +2983,7 @@ paths:
               $ref: '#/components/schemas/IdentityMatchRequest'
         description: ""
   /identity/refresh:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -2930,6 +3018,7 @@ paths:
             schema:
               $ref: '#/components/schemas/IdentityRefreshRequest'
   /dashboard_user/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Retrieve a dashboard user
       tags:
@@ -2960,6 +3049,7 @@ paths:
       externalDocs:
         url: /api/products/monitor/#dashboard_userget
   /dashboard_user/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: List dashboard users
       tags:
@@ -2992,6 +3082,7 @@ paths:
       externalDocs:
         url: /api/products/monitor/#dashboard_userlist
   /identity_verification/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Create a new identity verification
       description: |
@@ -3148,6 +3239,7 @@ paths:
       externalDocs:
         url: /api/products/identity-verification/#identity_verificationcreate
   /identity_verification/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Retrieve Identity Verification
       tags:
@@ -3300,6 +3392,7 @@ paths:
       externalDocs:
         url: /api/products/identity-verification/#identity_verificationget
   /identity_verification/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: List Identity Verifications
       tags:
@@ -3454,6 +3547,7 @@ paths:
       externalDocs:
         url: /api/products/identity-verification/#identity_verificationlist
   /identity_verification/retry:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Retry an Identity Verification
       requestBody:
@@ -3606,6 +3700,7 @@ paths:
       externalDocs:
         url: /api/products/identity-verification/#identity_verificationretry
   /watchlist_screening/entity/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Create a watchlist screening for an entity
       operationId: watchlistScreeningEntityCreate
@@ -3649,6 +3744,7 @@ paths:
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningentitycreate
   /watchlist_screening/entity/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Get an entity screening
       tags:
@@ -3692,6 +3788,7 @@ paths:
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningentityget
   /watchlist_screening/entity/history/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: List history for entity watchlist screenings
       tags:
@@ -3737,6 +3834,7 @@ paths:
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningentityhistorylist
   /watchlist_screening/entity/hit/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: List hits for entity watchlist screenings
       tags:
@@ -3817,6 +3915,7 @@ paths:
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningentityhitlist
   /watchlist_screening/entity/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: List entity watchlist screenings
       responses:
@@ -3862,6 +3961,7 @@ paths:
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningentitylist
   /watchlist_screening/entity/program/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Get entity watchlist screening program
       tags:
@@ -3900,6 +4000,7 @@ paths:
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningentityprogramget
   /watchlist_screening/entity/program/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: List entity watchlist screening programs
       responses:
@@ -3940,6 +4041,7 @@ paths:
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningentityprogramlist
   /watchlist_screening/entity/review/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Create a review for an entity watchlist screening
       operationId: watchlistScreeningEntityReviewCreate
@@ -3976,6 +4078,7 @@ paths:
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningentityreviewcreate
   /watchlist_screening/entity/review/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: List reviews for entity watchlist screenings
       tags:
@@ -4014,6 +4117,7 @@ paths:
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningentityreviewlist
   /watchlist_screening/entity/update:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Update an entity screening
       operationId: watchlistScreeningEntityUpdate
@@ -4058,6 +4162,7 @@ paths:
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningentityupdate
   /watchlist_screening/individual/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Create a watchlist screening for a person
       operationId: watchlistScreeningIndividualCreate
@@ -4099,6 +4204,7 @@ paths:
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningindividualcreate
   /watchlist_screening/individual/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Retrieve an individual watchlist screening
       tags:
@@ -4140,6 +4246,7 @@ paths:
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningindividualget
   /watchlist_screening/individual/history/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: List history for individual watchlist screenings
       tags:
@@ -4183,6 +4290,7 @@ paths:
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningindividualhistorylist
   /watchlist_screening/individual/hit/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: List hits for individual watchlist screening
       tags:
@@ -4251,6 +4359,7 @@ paths:
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningindividualhitlist
   /watchlist_screening/individual/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: List Individual Watchlist Screenings
       responses:
@@ -4294,6 +4403,7 @@ paths:
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningindividuallist
   /watchlist_screening/individual/program/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Get individual watchlist screening program
       tags:
@@ -4332,6 +4442,7 @@ paths:
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningindividualprogramget
   /watchlist_screening/individual/program/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: List individual watchlist screening programs
       responses:
@@ -4372,6 +4483,7 @@ paths:
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningindividualprogramlist
   /watchlist_screening/individual/review/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Create a review for an individual watchlist screening
       operationId: watchlistScreeningIndividualReviewCreate
@@ -4408,6 +4520,7 @@ paths:
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningindividualreviewcreate
   /watchlist_screening/individual/review/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: List reviews for individual watchlist screenings
       tags:
@@ -4446,6 +4559,7 @@ paths:
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningindividualreviewlist
   /watchlist_screening/individual/update:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Update individual watchlist screening
       operationId: watchlistScreeningIndividualUpdate
@@ -4487,6 +4601,7 @@ paths:
       externalDocs:
         url: /api/products/monitor/#watchlist_screeningindividualupdate
   /beacon/user/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Create a Beacon User
       requestBody:
@@ -4549,6 +4664,7 @@ paths:
       externalDocs:
         url: /api/products/beacon/#beaconusercreate
   /beacon/user/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Get a Beacon User
       requestBody:
@@ -4604,7 +4720,74 @@ paths:
         The Beacon User is returned with all of their associated information and a `status` based on the Beacon Network duplicate record and fraud checks.
       externalDocs:
         url: /api/products/beacon/#beaconuserget
+  /beacon/user/review:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
+    post:
+      summary: Review a Beacon User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BeaconUserReviewRequest'
+        required: true
+      tags:
+      - plaid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BeaconUserGetResponse'
+              examples:
+                example-1:
+                  value:
+                    id: becusr_11111111111111
+                    created_at: "2020-07-24T03:26:02Z"
+                    updated_at: "2020-07-24T03:26:02Z"
+                    status: cleared
+                    program_id: becprg_11111111111111
+                    client_user_id: your-db-id-3b24110
+                    user:
+                      date_of_birth: "1990-05-29"
+                      name:
+                        given_name: Leslie
+                        family_name: Knope
+                      address:
+                        street: 123 Main St.
+                        street2: Unit 42
+                        city: Pawnee
+                        region: IN
+                        postal_code: "46001"
+                        country: US
+                      email_address: user@example.com
+                      phone_number: "+19876543212"
+                      id_number:
+                        value: "123456789"
+                        type: us_ssn
+                      ip_address: 192.0.2.42
+                    audit_trail:
+                      source: dashboard
+                      dashboard_user_id: 54350110fedcbaf01234ffee
+                    request_id: saKrIBuEB9qJZng
+      operationId: beaconUserReview
+      description: |-
+        Update the status of a Beacon User.
+
+        When updating a Beacon User's status via this endpoint, Plaid validates that the status change is consistent with the related state for this Beacon User. Specifically, we will check:
+
+        1. Whether there are any associated Beacon Reports connected to the Beacon User, and
+        2. Whether there are any confirmed Beacon Report Syndications connected to the Beacon User.
+
+        When updating a Beacon User's status to "rejected", we enforce that either a Beacon Report has been created for the Beacon User or a Beacon Report Syndication has been confirmed.
+        When updating a Beacon User's status to "cleared", we enforce that there are no active Beacon Reports or confirmed Beacon Report Syndications associated with the user. If you previously created a Beacon Report for this user, you must delete it before updating the Beacon User's status to "cleared".
+        There are no restrictions on updating a Beacon User's status to "pending_review".
+
+        If these conditions are not met, the request will be rejected with an error explaining the issue.
+      externalDocs:
+        url: /api/products/beacon/#beaconuserreview
   /beacon/report/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Create a Beacon Report
       requestBody:
@@ -4645,6 +4828,7 @@ paths:
       externalDocs:
         url: /api/products/beacon/#beaconreportcreate
   /beacon/report/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: List Beacon Reports for a Beacon User
       requestBody:
@@ -4684,6 +4868,7 @@ paths:
       externalDocs:
         url: /api/products/beacon/#beaconreportlist
   /beacon/report_syndication/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: List Beacon Report Syndications for a Beacon User
       requestBody:
@@ -4726,6 +4911,7 @@ paths:
       externalDocs:
         url: /api/products/beacon/#beaconreportsyndicationlist
   /processor/auth/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -4787,6 +4973,7 @@ paths:
             schema:
               $ref: '#/components/schemas/ProcessorAuthGetRequest'
   /processor/account/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -4829,6 +5016,7 @@ paths:
             schema:
               $ref: '#/components/schemas/ProcessorAccountGetRequest'
   /processor/transactions/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -4846,8 +5034,8 @@ paths:
               examples:
                 example-1:
                   value:
-                    accounts:
-                    - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
+                    account:
+                      account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
                       balances:
                         available: 110.94
                         current: 110.94
@@ -5005,6 +5193,7 @@ paths:
               $ref: '#/components/schemas/ProcessorTransactionsGetRequest'
             examples: {}
   /processor/transactions/sync:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -5180,6 +5369,7 @@ paths:
               $ref: '#/components/schemas/ProcessorTransactionsSyncRequest'
             examples: {}
   /processor/transactions/refresh:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -5215,6 +5405,7 @@ paths:
             schema:
               $ref: '#/components/schemas/ProcessorTransactionsRefreshRequest'
   /processor/transactions/recurring/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -5265,6 +5456,8 @@ paths:
                         unofficial_currency_code: null
                       is_active: true
                       status: MATURE
+                      is_user_modified: true
+                      last_user_modified: "2023-01-19"
                     outflow_streams:
                     - account_id: lPNjeW1nR6CDn5okmGQ6hEpMo4lLNoSrzqDff
                       stream_id: no86Eox18VHMvaOVL7gPUM9ap3aR1LsAVZ5nd
@@ -5297,6 +5490,7 @@ paths:
                         unofficial_currency_code: null
                       is_active: true
                       status: MATURE
+                      is_user_modified: false
                     - account_id: lPNjeW1nR6CDn5okmGQ6hEpMo4lLNoSrzqDff
                       stream_id: SrBNJZDuUMweodmPmSOeOImwsWt53ZXfJQAfC
                       category:
@@ -5325,6 +5519,8 @@ paths:
                         unofficial_currency_code: null
                       is_active: true
                       status: MATURE
+                      is_user_modified: true
+                      last_user_modified: "2022-02-24"
                     request_id: tbFyCEqkU775ZGG
         default:
           content:
@@ -5350,6 +5546,7 @@ paths:
               $ref: '#/components/schemas/ProcessorTransactionsRecurringGetRequest'
             examples: {}
   /processor/signal/evaluate:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -5401,6 +5598,7 @@ paths:
             schema:
               $ref: '#/components/schemas/ProcessorSignalEvaluateRequest'
   /processor/signal/decision/report:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -5433,6 +5631,7 @@ paths:
             schema:
               $ref: '#/components/schemas/ProcessorSignalDecisionReportRequest'
   /processor/signal/return/report:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -5464,7 +5663,44 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ProcessorSignalReturnReportRequest'
+  /processor/signal/prepare:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
+    post:
+      tags:
+      - plaid
+      summary: Opt-in a processor token to Signal
+      externalDocs:
+        url: /api/processors/#processorsignalprepare
+      operationId: processorSignalPrepare
+      description: |-
+        When a processor token is not initialized with Signal, call `/processor/signal/prepare` to opt-in that processor token to the Signal data collection process, which will improve the accuracy of the Signal score.
+
+        If this endpoint is called with a processor token that is already initialized with Signal, it will return a 200 response and will not modify the processor token.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessorSignalPrepareResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: mdqfuVxeoza6mhu
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcessorSignalPrepareRequest'
   /processor/bank_transfer/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -5520,6 +5756,7 @@ paths:
             schema:
               $ref: '#/components/schemas/ProcessorBankTransferCreateRequest'
   /processor/identity/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -5597,6 +5834,7 @@ paths:
             schema:
               $ref: '#/components/schemas/ProcessorIdentityGetRequest'
   /processor/identity/match:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -5617,9 +5855,9 @@ paths:
                     account:
                       account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
                       balances:
-                        available: 100
-                        current: 110
-                        iso_currency_code: USD
+                        available: null
+                        current: null
+                        iso_currency_code: null
                         limit: null
                         unofficial_currency_code: null
                       mask: "0000"
@@ -5643,6 +5881,8 @@ paths:
       description: |-
         The `/processor/identity/match` endpoint generates a match score, which indicates how well the provided identity data matches the identity information on file with the account holder's financial institution.
 
+        Fields within the `balances` object will always be null when retrieved by `/identity/match`. Instead, use the free `/accounts/get` endpoint to request balance cached data, or `/accounts/balance/get` for real-time data.
+
         This request may take some time to complete if Identity was not specified as an initial product when creating the Item. This is because Plaid must communicate directly with the institution to retrieve the data.
       requestBody:
         required: true
@@ -5652,6 +5892,7 @@ paths:
               $ref: '#/components/schemas/ProcessorIdentityMatchRequest'
         description: ""
   /processor/balance/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -5697,6 +5938,7 @@ paths:
 
           Note that not all institutions calculate the available balance. In the event that available balance is unavailable from the institution, Plaid will return an available balance value of `null`.
   /item/webhook/update:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -5738,6 +5980,7 @@ paths:
             schema:
               $ref: '#/components/schemas/ItemWebhookUpdateRequest'
   /item/access_token/invalidate:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -5768,6 +6011,7 @@ paths:
             schema:
               $ref: '#/components/schemas/ItemAccessTokenInvalidateRequest'
   /webhook_verification_key/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -5808,6 +6052,7 @@ paths:
               $ref: '#/components/schemas/WebhookVerificationKeyGetRequest'
         description: ""
   /liabilities/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -5997,6 +6242,7 @@ paths:
 
         Note: This request may take some time to complete if `liabilities` was not specified as an initial product when creating the Item. This is because Plaid must communicate directly with the institution to retrieve the additional data.
   /payment_initiation/recipient/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -6029,6 +6275,7 @@ paths:
             schema:
               $ref: '#/components/schemas/PaymentInitiationRecipientCreateRequest'
   /payment_initiation/payment/reverse:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -6067,6 +6314,7 @@ paths:
             schema:
               $ref: '#/components/schemas/PaymentInitiationPaymentReverseRequest'
   /payment_initiation/recipient/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -6103,6 +6351,7 @@ paths:
             schema:
               $ref: '#/components/schemas/PaymentInitiationRecipientGetRequest'
   /payment_initiation/recipient/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -6140,6 +6389,7 @@ paths:
             schema:
               $ref: '#/components/schemas/PaymentInitiationRecipientListRequest'
   /payment_initiation/payment/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -6174,6 +6424,7 @@ paths:
               $ref: '#/components/schemas/PaymentInitiationPaymentCreateRequest'
         description: ""
   /payment_initiation/payment/token/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -6206,6 +6457,7 @@ paths:
             schema:
               $ref: '#/components/schemas/PaymentInitiationPaymentTokenCreateRequest'
   /payment_initiation/consent/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -6237,6 +6489,7 @@ paths:
             schema:
               $ref: '#/components/schemas/PaymentInitiationConsentCreateRequest'
   /payment_initiation/consent/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -6283,6 +6536,7 @@ paths:
             schema:
               $ref: '#/components/schemas/PaymentInitiationConsentGetRequest'
   /payment_initiation/consent/revoke:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -6309,6 +6563,7 @@ paths:
             schema:
               $ref: '#/components/schemas/PaymentInitiationConsentRevokeRequest'
   /payment_initiation/consent/payment/execute:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -6337,6 +6592,7 @@ paths:
             schema:
               $ref: '#/components/schemas/PaymentInitiationConsentPaymentExecuteRequest'
   /sandbox/item/reset_login:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -6368,6 +6624,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SandboxItemResetLoginRequest'
   /sandbox/item/set_verification_status:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -6399,6 +6656,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SandboxItemSetVerificationStatusRequest'
   /item/public_token/exchange:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -6430,6 +6688,7 @@ paths:
             schema:
               $ref: '#/components/schemas/ItemPublicTokenExchangeRequest'
   /item/public_token/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -6464,6 +6723,7 @@ paths:
             schema:
               $ref: '#/components/schemas/ItemPublicTokenCreateRequest'
   /user/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_UNDETERMINED
     post:
       tags:
       - plaid
@@ -6497,6 +6757,7 @@ paths:
             schema:
               $ref: '#/components/schemas/UserCreateRequest'
   /user/update:
+    x-plaid-business-unit-context: BUSINESS_UNIT_CRA
     x-hidden-from-docs: true
     post:
       tags:
@@ -6527,6 +6788,7 @@ paths:
             schema:
               $ref: '#/components/schemas/UserUpdateRequest'
   /credit/sessions/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -6575,6 +6837,7 @@ paths:
             schema:
               $ref: '#/components/schemas/CreditSessionsGetRequest'
   /payment_initiation/payment/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -6617,6 +6880,7 @@ paths:
               $ref: '#/components/schemas/PaymentInitiationPaymentGetRequest'
         description: ""
   /payment_initiation/payment/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -6658,6 +6922,7 @@ paths:
               $ref: '#/components/schemas/PaymentInitiationPaymentListRequest'
       description: The `/payment_initiation/payment/list` endpoint can be used to retrieve all created payments. By default, the 10 most recent payments are returned. You can request more payments and paginate through the results using the optional `count` and `cursor` parameters.
   /investments/holdings/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -6943,6 +7208,7 @@ paths:
             schema:
               $ref: '#/components/schemas/InvestmentsHoldingsGetRequest'
   /investments/transactions/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -7124,6 +7390,7 @@ paths:
               $ref: '#/components/schemas/InvestmentsTransactionsGetRequest'
   /investments/refresh:
     x-hidden-from-docs: true
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -7159,6 +7426,7 @@ paths:
               $ref: '#/components/schemas/InvestmentsRefreshRequest'
   /investments/auth/get:
     x-hidden-from-docs: true
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -7428,6 +7696,7 @@ paths:
             schema:
               $ref: '#/components/schemas/InvestmentsAuthGetRequest'
   /processor/token/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -7456,6 +7725,7 @@ paths:
               $ref: '#/components/schemas/ProcessorTokenCreateRequest'
         description: ""
   /processor/token/permissions/set:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -7482,6 +7752,7 @@ paths:
             schema:
               $ref: '#/components/schemas/ProcessorTokenPermissionsSetRequest'
   /processor/token/permissions/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -7512,6 +7783,7 @@ paths:
             schema:
               $ref: '#/components/schemas/ProcessorTokenPermissionsGetRequest'
   /processor/token/webhook/update:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -7538,6 +7810,7 @@ paths:
             schema:
               $ref: '#/components/schemas/ProcessorTokenWebhookUpdateRequest'
   /processor/stripe/bank_account_token/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -7572,6 +7845,7 @@ paths:
               $ref: '#/components/schemas/ProcessorStripeBankAccountTokenCreateRequest'
         description: ""
   /processor/apex/processor_token/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -7595,6 +7869,7 @@ paths:
               $ref: '#/components/schemas/ProcessorApexProcessorTokenCreateRequest'
         description: ""
   /deposit_switch/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -7622,6 +7897,7 @@ paths:
             schema:
               $ref: '#/components/schemas/DepositSwitchCreateRequest'
   /item/import:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -7650,6 +7926,7 @@ paths:
             schema:
               $ref: '#/components/schemas/ItemImportRequest'
   /deposit_switch/token/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -7679,6 +7956,7 @@ paths:
             schema:
               $ref: '#/components/schemas/DepositSwitchTokenCreateRequest'
   /link/token/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_UNDETERMINED
     post:
       tags:
       - plaid
@@ -7711,6 +7989,7 @@ paths:
               $ref: '#/components/schemas/LinkTokenCreateRequest'
         description: ""
   /link/token/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -7757,6 +8036,7 @@ paths:
               $ref: '#/components/schemas/LinkTokenGetRequest'
         description: ""
   /link/oauth/correlation_id/exchange:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -7787,6 +8067,7 @@ paths:
               $ref: '#/components/schemas/LinkOAuthCorrelationIdExchangeRequest'
         description: ""
   /deposit_switch/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Retrieve a deposit switch
       externalDocs:
@@ -7829,6 +8110,7 @@ paths:
               $ref: '#/components/schemas/DepositSwitchGetRequest'
       parameters: []
   /transfer/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Retrieve a transfer
       tags:
@@ -7888,6 +8170,7 @@ paths:
                       recurring_transfer_id: null
                       credit_funds_source: sweep
                       facilitator_fee: "1.23"
+                      network_trace_id: null
                     request_id: saKrIBuEB9qJZno
         default:
           description: Error response
@@ -7905,6 +8188,7 @@ paths:
             examples: {}
       parameters: []
   /transfer/recurring/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Retrieve a recurring transfer
       tags:
@@ -7972,6 +8256,7 @@ paths:
             schema:
               $ref: '#/components/schemas/TransferRecurringGetRequest'
   /bank_transfer/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Retrieve a bank transfer
       tags:
@@ -8032,6 +8317,7 @@ paths:
             examples: {}
       parameters: []
   /transfer/authorization/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Create a transfer authorization
       tags:
@@ -8108,6 +8394,7 @@ paths:
             schema:
               $ref: '#/components/schemas/TransferAuthorizationCreateRequest'
   /transfer/balance/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Retrieve a balance held with Plaid
       tags:
@@ -8143,6 +8430,7 @@ paths:
             schema:
               $ref: '#/components/schemas/TransferBalanceGetRequest'
   /transfer/capabilities/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Get RTP eligibility information of a transfer
       tags:
@@ -8170,7 +8458,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
-      description: Use the `/transfer/capabilities/get` endpoint to determine the RTP eligibility information of a transfer. To simulate RTP eligiblity in Sandbox, log in using the username `user_good` and password `pass_good` and use the first two checking and savings accounts in the "First Platypus Bank" institution (ending in 0000 or 1111), which will return `true`. Any other account will return `false`.
+      description: Use the `/transfer/capabilities/get` endpoint to determine the RTP eligibility information of a transfer. To simulate RTP eligibility in Sandbox, log in using the username `user_good` and password `pass_good` and use the first two checking and savings accounts in the "First Platypus Bank" institution (ending in 0000 or 1111), which will return `true`. Any other account will return `false`.
       requestBody:
         required: true
         content:
@@ -8178,6 +8466,7 @@ paths:
             schema:
               $ref: '#/components/schemas/TransferCapabilitiesGetRequest'
   /transfer/configuration/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Get transfer product configuration
       tags:
@@ -8219,6 +8508,7 @@ paths:
             schema:
               $ref: '#/components/schemas/TransferConfigurationGetRequest'
   /transfer/ledger/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Retrieve Plaid Ledger balance
       tags:
@@ -8253,7 +8543,41 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/TransferLedgerGetRequest'
+  /transfer/ledger/distribute:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
+    post:
+      summary: Move available balance between the ledgers of the platform and one of its originators
+      tags:
+      - plaid
+      externalDocs:
+        url: /api/products/transfer/#transferledgerdistribute
+      operationId: transferLedgerDistribute
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferLedgerDistributeResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: saKrIBuEB9qJZno
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      description: Use the `/transfer/ledger/distribute` endpoint to move available balance between the ledgers of the platform and one of its originators.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferLedgerDistributeRequest'
   /transfer/ledger/deposit:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Deposit funds into a Plaid Ledger balance
       tags:
@@ -8281,6 +8605,7 @@ paths:
                       status: pending
                       trigger: manual
                       description: deposit
+                      network_trace_id: null
                     request_id: saKrIBuEB9qJZno
         default:
           description: Error response
@@ -8296,6 +8621,7 @@ paths:
             schema:
               $ref: '#/components/schemas/TransferLedgerDepositRequest'
   /transfer/ledger/withdraw:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Withdraw funds from a Plaid Ledger balance
       tags:
@@ -8323,6 +8649,7 @@ paths:
                       status: pending
                       trigger: manual
                       description: withdraw
+                      network_trace_id: null
                     request_id: saKrIBuEB9qJZno
         default:
           description: Error response
@@ -8338,6 +8665,7 @@ paths:
             schema:
               $ref: '#/components/schemas/TransferLedgerWithdrawRequest'
   /transfer/originator/funding_account/update:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Update the funding account associated with the originator
       tags:
@@ -8370,6 +8698,7 @@ paths:
             schema:
               $ref: '#/components/schemas/TransferOriginatorFundingAccountUpdateRequest'
   /transfer/metrics/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Get transfer product usage metrics
       tags:
@@ -8408,6 +8737,7 @@ paths:
             schema:
               $ref: '#/components/schemas/TransferMetricsGetRequest'
   /transfer/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Create a transfer
       tags:
@@ -8464,6 +8794,7 @@ paths:
                       recurring_transfer_id: null
                       credit_funds_source: sweep
                       facilitator_fee: "1.23"
+                      network_trace_id: null
                     request_id: saKrIBuEB9qJZno
         default:
           description: Error response
@@ -8479,6 +8810,7 @@ paths:
             schema:
               $ref: '#/components/schemas/TransferCreateRequest'
   /transfer/recurring/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Create a recurring transfer
       tags:
@@ -8545,6 +8877,7 @@ paths:
             schema:
               $ref: '#/components/schemas/TransferRecurringCreateRequest'
   /bank_transfer/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Create a bank transfer
       tags:
@@ -8600,6 +8933,7 @@ paths:
             schema:
               $ref: '#/components/schemas/BankTransferCreateRequest'
   /transfer/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: List transfers
       tags:
@@ -8658,6 +8992,7 @@ paths:
                       recurring_transfer_id: null
                       credit_funds_source: sweep
                       facilitator_fee: "1.23"
+                      network_trace_id: null
                     request_id: saKrIBuEB9qJZno
         default:
           description: Error response
@@ -8674,6 +9009,7 @@ paths:
             schema:
               $ref: '#/components/schemas/TransferListRequest'
   /transfer/recurring/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: List recurring transfers
       tags:
@@ -8740,6 +9076,7 @@ paths:
             schema:
               $ref: '#/components/schemas/TransferRecurringListRequest'
   /bank_transfer/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: List bank transfers
       tags:
@@ -8799,6 +9136,7 @@ paths:
             schema:
               $ref: '#/components/schemas/BankTransferListRequest'
   /transfer/cancel:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Cancel a transfer
       tags:
@@ -8831,6 +9169,7 @@ paths:
             schema:
               $ref: '#/components/schemas/TransferCancelRequest'
   /transfer/recurring/cancel:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Cancel a recurring transfer.
       tags:
@@ -8863,6 +9202,7 @@ paths:
             schema:
               $ref: '#/components/schemas/TransferRecurringCancelRequest'
   /bank_transfer/cancel:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Cancel a bank transfer
       tags:
@@ -8895,6 +9235,7 @@ paths:
             schema:
               $ref: '#/components/schemas/BankTransferCancelRequest'
   /transfer/event/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: List transfer events
       tags:
@@ -8942,6 +9283,7 @@ paths:
             schema:
               $ref: '#/components/schemas/TransferEventListRequest'
   /bank_transfer/event/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: List bank transfer events
       tags:
@@ -8986,6 +9328,7 @@ paths:
             schema:
               $ref: '#/components/schemas/BankTransferEventListRequest'
   /transfer/event/sync:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Sync transfer events
       tags:
@@ -9033,6 +9376,7 @@ paths:
               $ref: '#/components/schemas/TransferEventSyncRequest'
       description: '`/transfer/event/sync` allows you to request up to the next 25 transfer events that happened after a specific `event_id`. Use the `/transfer/event/sync` endpoint to guarantee you have seen all transfer events.'
   /bank_transfer/event/sync:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Sync bank transfer events
       tags:
@@ -9077,6 +9421,7 @@ paths:
               $ref: '#/components/schemas/BankTransferEventSyncRequest'
       description: '`/bank_transfer/event/sync` allows you to request up to the next 25 Plaid-initiated bank transfer events that happened after a specific `event_id`. When using Auth with micro-deposit verification enabled, this endpoint can be used to fetch status updates on ACH micro-deposits. For more details, see [micro-deposit events](https://www.plaid.com/docs/auth/coverage/microdeposit-events/).'
   /transfer/sweep/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Retrieve a sweep
       tags:
@@ -9103,6 +9448,7 @@ paths:
                       iso_currency_code: USD
                       settled: "2020-08-07"
                       status: settled
+                      network_trace_id: "123456789012345"
                     request_id: saKrIBuEB9qJZno
         default:
           description: Error response
@@ -9120,6 +9466,7 @@ paths:
             examples: {}
       parameters: []
   /bank_transfer/sweep/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Retrieve a sweep
       tags:
@@ -9160,6 +9507,7 @@ paths:
             examples: {}
       parameters: []
   /transfer/sweep/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: List sweeps
       tags:
@@ -9204,6 +9552,7 @@ paths:
             examples: {}
       parameters: []
   /bank_transfer/sweep/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: List sweeps
       tags:
@@ -9244,6 +9593,7 @@ paths:
             examples: {}
       parameters: []
   /bank_transfer/balance/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Get balance of your Bank Transfer account
       tags:
@@ -9285,6 +9635,7 @@ paths:
             schema:
               $ref: '#/components/schemas/BankTransferBalanceGetRequest'
   /bank_transfer/migrate_account:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Migrate account into Bank Transfers
       tags:
@@ -9319,6 +9670,7 @@ paths:
             schema:
               $ref: '#/components/schemas/BankTransferMigrateAccountRequest'
   /transfer/migrate_account:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Migrate account into Transfers
       tags:
@@ -9353,6 +9705,7 @@ paths:
             schema:
               $ref: '#/components/schemas/TransferMigrateAccountRequest'
   /transfer/intent/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Create a transfer intent object to invoke the Transfer UI
       tags:
@@ -9410,6 +9763,7 @@ paths:
             schema:
               $ref: '#/components/schemas/TransferIntentCreateRequest'
   /transfer/intent/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Retrieve more information about a transfer intent
       tags:
@@ -9473,6 +9827,7 @@ paths:
             schema:
               $ref: '#/components/schemas/TransferIntentGetRequest'
   /transfer/repayment/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Lists historical repayments
       tags:
@@ -9517,6 +9872,7 @@ paths:
                   count: 1
       parameters: []
   /transfer/repayment/return/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: List the returns included in a repayment
       tags:
@@ -9562,6 +9918,7 @@ paths:
                   repayment_id: d4bfce70-2470-4298-ae87-5e9b3e18bfaf
       parameters: []
   /transfer/originator/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Create a new originator
       tags:
@@ -9598,6 +9955,7 @@ paths:
             examples: {}
       parameters: []
   /transfer/questionnaire/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Generate a Plaid-hosted onboarding UI URL.
       tags:
@@ -9634,6 +9992,7 @@ paths:
             examples: {}
       parameters: []
   /transfer/diligence/submit:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Submit transfer diligence on behalf of the originator
       tags:
@@ -9668,6 +10027,7 @@ paths:
             examples: {}
       parameters: []
   /transfer/diligence/document/upload:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Upload transfer diligence document on behalf of the originator
       tags:
@@ -9704,6 +10064,7 @@ paths:
             examples: {}
       parameters: []
   /transfer/originator/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Get status of an originator's onboarding
       tags:
@@ -9743,6 +10104,7 @@ paths:
           examples: {}
       parameters: []
   /transfer/originator/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Get status of all originators' onboarding
       tags:
@@ -9783,6 +10145,7 @@ paths:
             examples: {}
       parameters: []
   /transfer/refund/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Create a refund
       tags:
@@ -9807,6 +10170,7 @@ paths:
                       status: pending
                       created: "2020-08-06T17:27:15Z"
                       failure_reason: null
+                      network_trace_id: null
                     request_id: saKrIBuEB9qJZno
         default:
           description: Error response
@@ -9817,7 +10181,7 @@ paths:
       description: |-
         Use the `/transfer/refund/create` endpoint to create a refund for a transfer. A transfer can be refunded if the transfer was initiated in the past 180 days.
 
-        Processing of the refund will not occur until at least 3 business days following the transfer's settlement date, plus any hold/settlement delays. This 3-day window helps better protect your business from regular ACH returns. Consumer initiated returns (unauthorized returns) could still happen for about 60 days from the settlement date. If the original transfer is canceled, returned or failed, all pending refunds will automatically be canceled. Processed refunds cannot be revoked.
+        Processing of the refund will not occur until at least 4 business days following the transfer's settlement date, plus any hold/settlement delays. This 3-day window helps better protect your business from regular ACH returns. Consumer initiated returns (unauthorized returns) could still happen for about 60 days from the settlement date. If the original transfer is canceled, returned or failed, all pending refunds will automatically be canceled. Processed refunds cannot be revoked.
       requestBody:
         required: true
         content:
@@ -9826,6 +10190,7 @@ paths:
               $ref: '#/components/schemas/TransferRefundCreateRequest'
       parameters: []
   /transfer/refund/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Retrieve a refund
       tags:
@@ -9851,6 +10216,7 @@ paths:
                       status: pending
                       created: "2020-08-06T17:27:15Z"
                       failure_reason: null
+                      network_trace_id: null
                     request_id: saKrIBuEB9qJZno
         default:
           description: Error response
@@ -9868,6 +10234,7 @@ paths:
             examples: {}
       parameters: []
   /transfer/refund/cancel:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Cancel a refund
       tags:
@@ -9900,6 +10267,7 @@ paths:
             schema:
               $ref: '#/components/schemas/TransferRefundCancelRequest'
   /sandbox/bank_transfer/simulate:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Simulate a bank transfer event in Sandbox
       tags:
@@ -9932,6 +10300,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SandboxBankTransferSimulateRequest'
   /sandbox/transfer/sweep/simulate:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Simulate creating a sweep
       tags:
@@ -9956,6 +10325,7 @@ paths:
                       amount: "12.34"
                       iso_currency_code: USD
                       settled: "2020-08-07"
+                      network_trace_id: null
                     request_id: mdqfuVxeoza6mhu
         default:
           description: Error response
@@ -9971,6 +10341,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SandboxTransferSweepSimulateRequest'
   /sandbox/transfer/simulate:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Simulate a transfer event in Sandbox
       tags:
@@ -10003,6 +10374,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SandboxTransferSimulateRequest'
   /sandbox/transfer/refund/simulate:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Simulate a refund event in Sandbox
       tags:
@@ -10035,6 +10407,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SandboxTransferRefundSimulateRequest'
   /sandbox/transfer/ledger/simulate_available:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Simulate converting pending balance to available balance
       tags:
@@ -10067,6 +10440,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SandboxTransferLedgerSimulateAvailableRequest'
   /sandbox/transfer/ledger/deposit/simulate:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Simulate a ledger deposit event in Sandbox
       tags:
@@ -10099,6 +10473,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SandboxTransferLedgerDepositSimulateRequest'
   /sandbox/transfer/ledger/withdraw/simulate:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Simulate a ledger withdraw event in Sandbox
       tags:
@@ -10131,6 +10506,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SandboxTransferLedgerWithdrawSimulateRequest'
   /sandbox/transfer/repayment/simulate:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Trigger the creation of a repayment
       tags:
@@ -10163,6 +10539,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SandboxTransferRepaymentSimulateRequest'
   /sandbox/transfer/fire_webhook:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Manually fire a Transfer webhook
       tags:
@@ -10195,6 +10572,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SandboxTransferFireWebhookRequest'
   /sandbox/transfer/test_clock/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Create a test clock
       tags:
@@ -10235,6 +10613,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SandboxTransferTestClockCreateRequest'
   /sandbox/transfer/test_clock/advance:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Advance a test clock
       tags:
@@ -10278,6 +10657,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SandboxTransferTestClockAdvanceRequest'
   /sandbox/transfer/test_clock/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Get a test clock
       tags:
@@ -10313,6 +10693,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SandboxTransferTestClockGetRequest'
   /sandbox/transfer/test_clock/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: List test clocks
       tags:
@@ -10350,6 +10731,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SandboxTransferTestClockListRequest'
   /sandbox/payment_profile/reset_login:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       deprecated: true
       tags:
@@ -10383,6 +10765,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SandboxPaymentProfileResetLoginRequest'
   /employers/search:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -10422,6 +10805,7 @@ paths:
             schema:
               $ref: '#/components/schemas/EmployersSearchRequest'
   /income/verification/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: (Deprecated) Create an income verification instance
       tags:
@@ -10450,6 +10834,7 @@ paths:
             schema:
               $ref: '#/components/schemas/IncomeVerificationCreateRequest'
   /income/verification/paystubs/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: (Deprecated) Retrieve information from the paystubs used for income verification
       deprecated: true
@@ -10565,6 +10950,7 @@ paths:
 
         This endpoint has been deprecated; new integrations should use `/credit/payroll_income/get` instead.
   /income/verification/documents/download:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       deprecated: true
       summary: (Deprecated) Download the original documents used for income verification
@@ -10599,6 +10985,7 @@ paths:
               $ref: '#/components/schemas/IncomeVerificationDocumentsDownloadRequest'
       parameters: []
   /income/verification/taxforms/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       deprecated: true
       tags:
@@ -10692,6 +11079,7 @@ paths:
               $ref: '#/components/schemas/IncomeVerificationTaxformsGetRequest'
         description: ""
   /income/verification/precheck:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       deprecated: true
       summary: (Deprecated) Check digital income verification eligibility and optimize conversion
@@ -10726,6 +11114,7 @@ paths:
             schema:
               $ref: '#/components/schemas/IncomeVerificationPrecheckRequest'
   /employment/verification/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       deprecated: true
       summary: (Deprecated) Retrieve a summary of an individual's employment information
@@ -10767,6 +11156,7 @@ paths:
             schema:
               $ref: '#/components/schemas/EmploymentVerificationGetRequest'
   /deposit_switch/alt/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Create a deposit switch without using Plaid Exchange
       tags:
@@ -10794,6 +11184,7 @@ paths:
             schema:
               $ref: '#/components/schemas/DepositSwitchAltCreateRequest'
   /credit/audit_copy_token/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -10824,6 +11215,7 @@ paths:
             schema:
               $ref: '#/components/schemas/CreditAuditCopyTokenCreateRequest'
   /credit/audit_copy_token/remove:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -10852,6 +11244,7 @@ paths:
         description: ""
       description: The `/credit/audit_copy_token/remove` endpoint allows you to remove an Audit Copy. Removing an Audit Copy invalidates the `audit_copy_token` associated with it, meaning both you and any third parties holding the token will no longer be able to use it to access Report data. Items associated with the Report data and other Audit Copies of it are not affected and will remain accessible after removing the given Audit Copy.
   /credit/asset_report/freddie_mac/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -10952,6 +11345,7 @@ paths:
               $ref: '#/components/schemas/AssetReportFreddieGetRequest'
         description: ""
   /credit/freddie_mac/reports/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -11105,6 +11499,7 @@ paths:
               $ref: '#/components/schemas/CreditFreddieMacReportsGetRequest'
         description: ""
   /beta/credit/v1/bank_employment/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Retrieve information from the bank accounts used for employment verification
       tags:
@@ -11193,6 +11588,7 @@ paths:
             schema:
               $ref: '#/components/schemas/CreditBankEmploymentGetRequest'
   /credit/bank_income/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Retrieve information from the bank accounts used for income verification
       tags:
@@ -11413,6 +11809,7 @@ paths:
             schema:
               $ref: '#/components/schemas/CreditBankIncomeGetRequest'
   /credit/bank_income/pdf/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Retrieve information from the bank accounts used for income verification in PDF format
       tags:
@@ -11435,6 +11832,7 @@ paths:
             schema:
               $ref: '#/components/schemas/CreditBankIncomePDFGetRequest'
   /credit/bank_income/refresh:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Refresh a user's bank income information
       tags:
@@ -11461,6 +11859,7 @@ paths:
                   value:
                     request_id: LhQf0THi8SH1yJm
   /credit/bank_income/webhook/update:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Subscribe and unsubscribe to proactive notifications for a user's income profile
       tags:
@@ -11469,7 +11868,7 @@ paths:
         url: /api/products/income/#creditbank_incomewebhookupdate
       operationId: creditBankIncomeWebhookUpdate
       description: |-
-        `/credit/bank_income/webhook/update` allows you to subscribe or unsubscribe a user for income webhook notifications.
+        `/credit/bank_income/webhook/update` allows you to subscribe or unsubscribe a user for income webhook notifications. By default, all users start out unsubscribed.
 
         If a user is subscribed, on significant changes to the user's income profile, you will receive a `BANK_INCOME_REFRESH_UPDATE` webhook, prompting you to refresh bank income data for the user.
       requestBody:
@@ -11490,6 +11889,7 @@ paths:
                   value:
                     request_id: LhQf0THi8SH1yJm
   /credit/payroll_income/parsing_config/update:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Update the parsing configuration for a document income verification
       tags:
@@ -11516,6 +11916,7 @@ paths:
                   value:
                     request_id: LhQf0THi8SH1yJm
   /credit/bank_statements/uploads/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Retrieve data for a user's uploaded bank statements
       tags:
@@ -11577,7 +11978,7 @@ paths:
       externalDocs:
         url: /api/products/income/#creditbank_statementsuploadsget
       operationId: creditBankStatementsUploadsGet
-      description: '`/credit/bank_statements/uploads/get` returns data from user-uploaded bank statements.'
+      description: '`/credit/bank_statements/uploads/get` returns parsed data from bank statements uploaded by users as part of the Document Income flow. If your account is not enabled for Document Parsing, contact your account manager to request access.'
       requestBody:
         required: true
         content:
@@ -11585,6 +11986,7 @@ paths:
             schema:
               $ref: '#/components/schemas/CreditBankStatementsUploadsGetRequest'
   /credit/payroll_income/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Retrieve a user's payroll information
       tags:
@@ -11853,6 +12255,7 @@ paths:
                       updated_at: "2022-08-02T21:14:54Z"
                     request_id: 2pxQ59buGdsHRef
   /credit/payroll_income/risk_signals/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Retrieve fraud insights for a user's manually uploaded document(s).
       tags:
@@ -11861,7 +12264,9 @@ paths:
         url: /api/products/income/#creditpayroll_incomerisk_signalsget
       operationId: creditPayrollIncomeRiskSignalsGet
       description: |-
-        `/credit/payroll_income/risk_signals/get` can be used as part of the Document Income flow to assess a user-uploaded document for signs of potential fraud or tampering. It returns a risk score for each uploaded document that indicates the likelihood of the document being fraudulent, in addition to details on the individual risk signals contributing to the score. `/credit/payroll_income/risk_signals/get` can be called at any time after the `INCOME_VERIFICATION_RISK_SIGNALS` webhook has been fired.
+        `/credit/payroll_income/risk_signals/get` can be used as part of the Document Income flow to assess a user-uploaded document for signs of potential fraud or tampering. It returns a risk score for each uploaded document that indicates the likelihood of the document being fraudulent, in addition to details on the individual risk signals contributing to the score.
+
+        To trigger risk signal generation for an Item, call `/link/token/create` with `parsing_config` set to include `fraud_risk`, or call `/credit/payroll_income/parsing_config/update`. Once risk signal generation has been triggered, `/credit/payroll_income/risk_signals/get` can be called at any time after the `INCOME_VERIFICATION_RISK_SIGNALS` webhook has been fired.
 
         `/credit/payroll_income/risk_signals/get` is offered as an add-on to Document Income and is billed separately. To request access to this endpoint, submit a product access request or contact your Plaid account manager.
       requestBody:
@@ -11911,7 +12316,9 @@ paths:
                             page_number: 0
                     request_id: LhQf0THi8SH1yJm
   /credit/payroll_income/precheck:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
+      deprecated: true
       summary: Check income verification eligibility and optimize conversion
       tags:
       - plaid
@@ -11943,6 +12350,7 @@ paths:
             schema:
               $ref: '#/components/schemas/CreditPayrollIncomePrecheckRequest'
   /credit/employment/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Retrieve a summary of an individual's employment information
       tags:
@@ -11985,6 +12393,7 @@ paths:
             schema:
               $ref: '#/components/schemas/CreditEmploymentGetRequest'
   /credit/payroll_income/refresh:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -12018,6 +12427,7 @@ paths:
             schema:
               $ref: '#/components/schemas/CreditPayrollIncomeRefreshRequest'
   /credit/relay/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Create a relay token to share an Asset Report with a partner client (beta)
       tags:
@@ -12048,6 +12458,7 @@ paths:
 
         To grant a third party access to an Asset Report, use the `/credit/relay/create` endpoint to create a `relay_token` and then pass that token to your third party. Each third party has its own `secondary_client_id`; for example, `ce5bd328dcd34123456`. You'll need to create a separate `relay_token` for each third party that needs access to the report on your behalf.
   /credit/relay/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Retrieve the reports associated with a relay token that was shared with you (beta)
       tags:
@@ -12280,6 +12691,7 @@ paths:
                     warnings: []
       description: '`/credit/relay/get` allows third parties to receive a report that was shared with them, using a `relay_token` that was created by the report owner.'
   /credit/relay/pdf/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Retrieve the pdf reports associated with a relay token that was shared with you (beta)
       tags:
@@ -12309,6 +12721,7 @@ paths:
 
         [View a sample PDF Asset Report](https://plaid.com/documents/sample-asset-report.pdf).
   /credit/relay/refresh:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -12338,6 +12751,7 @@ paths:
               $ref: '#/components/schemas/CreditRelayRefreshRequest'
         description: ""
   /credit/relay/remove:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -12366,6 +12780,7 @@ paths:
         description: ""
       description: The `/credit/relay/remove` endpoint allows you to invalidate a `relay_token`. The third party holding the token will no longer be able to access or refresh the reports which the `relay_token` gives access to. The original report, associated Items, and other relay tokens that provide access to the same report are not affected and will remain accessible after removing the given `relay_token`.
   /sandbox/bank_transfer/fire_webhook:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Manually fire a Bank Transfer webhook
       tags:
@@ -12398,6 +12813,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SandboxBankTransferFireWebhookRequest'
   /sandbox/income/fire_webhook:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Manually fire an Income webhook
       tags:
@@ -12422,7 +12838,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
-      description: Use the `/sandbox/income/fire_webhook` endpoint to manually trigger a Payroll Income webhook in the Sandbox environment.
+      description: Use the `/sandbox/income/fire_webhook` endpoint to manually trigger a Payroll or Document Income webhook in the Sandbox environment.
       requestBody:
         required: true
         content:
@@ -12430,6 +12846,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SandboxIncomeFireWebhookRequest'
   /sandbox/bank_income/fire_webhook:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Manually fire a bank income webhook in sandbox
       tags:
@@ -12462,6 +12879,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SandboxBankIncomeFireWebhookRequest'
   /sandbox/oauth/select_accounts:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       summary: Save the selected accounts when connecting to the Platypus Oauth institution
       description: Save the selected accounts when connecting to the Platypus Oauth institution
@@ -12488,6 +12906,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SandboxOauthSelectAccountsRequest'
   /signal/evaluate:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -12539,6 +12958,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SignalEvaluateRequest'
   /signal/decision/report:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -12571,6 +12991,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SignalDecisionReportRequest'
   /signal/return/report:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -12603,6 +13024,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SignalReturnReportRequest'
   /signal/prepare:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -12642,6 +13064,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SignalPrepareRequest'
   /wallet/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -12678,6 +13101,7 @@ paths:
             schema:
               $ref: '#/components/schemas/WalletCreateRequest'
   /wallet/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -12730,6 +13154,7 @@ paths:
             schema:
               $ref: '#/components/schemas/WalletGetRequest'
   /wallet/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -12777,6 +13202,7 @@ paths:
             schema:
               $ref: '#/components/schemas/WalletListRequest'
   /wallet/transaction/execute:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -12808,6 +13234,7 @@ paths:
             schema:
               $ref: '#/components/schemas/WalletTransactionExecuteRequest'
   /wallet/transaction/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -12868,6 +13295,7 @@ paths:
             schema:
               $ref: '#/components/schemas/WalletTransactionGetRequest'
   /wallet/transaction/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -12927,6 +13355,7 @@ paths:
             schema:
               $ref: '#/components/schemas/WalletTransactionListRequest'
   /beta/transactions/v1/enhance:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -12993,6 +13422,7 @@ paths:
             schema:
               $ref: '#/components/schemas/TransactionsEnhanceGetRequest'
   /beta/transactions/rules/v1/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -13048,6 +13478,7 @@ paths:
                     type: SUBSTRING_MATCH
                     query: Burger Shack
   /beta/transactions/rules/v1/list:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -13101,6 +13532,7 @@ paths:
                   secret: 79g03eoofwl8240v776r2h667442119
                   access_token: access-sandbox-71e02f71-0960-4a27-abd2-5631e04f2175
   /beta/transactions/rules/v1/remove:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -13138,6 +13570,7 @@ paths:
                   access_token: access-sandbox-71e02f71-0960-4a27-abd2-5631e04f2175
                   rule_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBF
   /beta/transactions/user_insights/v1/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     x-hidden-from-docs: true
     post:
       tags:
@@ -13170,27 +13603,28 @@ paths:
                         entity_id: o2Ry34bq605MvmEed3yjqjkYWwqRQYpnkjd0O
                         website: chase.com
                         detected_accounts:
-                        - detected_account_type: depository
-                          detected_account_subtype: null
+                        - account_type: depository
+                          account_subtype: null
                           transaction_count: 1
+                          oldest_transaction_date: "2022-01-24"
                           newest_transaction_date: "2023-01-05"
                           newest_transaction_amount: 500
-                          total_outflows: 500
+                          total_outflows: 503
                           total_inflows: 0
                       merchant_insights:
                       - name: Costco
                         entity_id: pBowAoZJMM9DKR37jvNmzM4yWBBXyMzV2rM3A
                         website: costco.com
-                        primary_personal_finance_category: GENERAL_MERCHANDISE
-                        detailed_personal_finance_category: GENERAL_MERCHANDISE_SUPERSTORES
+                        personal_finance_category_primary: GENERAL_MERCHANDISE
+                        personal_finance_category_detailed: GENERAL_MERCHANDISE_SUPERSTORES
                         transaction_count: 2
                         total_outflows: 953.46
                         total_inflows: 24.99
                       - name: PG&E
                         entity_id: 6gEJJBrw8daLroaYgBAkpa65v9jVby69vejY0
                         website: pge.com
-                        primary_personal_finance_category: RENT_AND_UTILITIES
-                        detailed_personal_finance_category: RENT_AND_UTILITIES_GAS_AND_ELECTRICITY
+                        personal_finance_category_primary: RENT_AND_UTILITIES
+                        personal_finance_category_detailed: RENT_AND_UTILITIES_GAS_AND_ELECTRICITY
                         transaction_count: 1
                         total_outflows: 123.01
                         total_inflows: 0
@@ -13201,32 +13635,74 @@ paths:
                         total_outflows: 1025.23
                         total_inflows: 24.99
                         top_counterparties:
-                        - name: Costco
-                          type: merchant
-                          entity_id: pBowAoZJMM9DKR37jvNmzM4yWBBXyMzV2rM3A
-                          website: costco.com
-                          logo_url: https://plaid-merchant-logos.plaid.com/costco_235.png
+                        - Costco
                       - name: RENT_AND_UTILITIES
                         transaction_count: 1
                         total_outflows: 123.01
                         total_inflows: 0
                         top_counterparties:
-                        - name: PG&E
-                          type: merchant
-                          entity_id: 6gEJJBrw8daLroaYgBAkpa65v9jVby69vejY0
-                          website: pge.com
-                          logo_url: https://plaid-merchant-logos.plaid.com/pge_749.png
+                        - PG&E
                       detailed_category_insights:
                       - name: GENERAL_MERCHANDISE_SUPERSTORES
                         transaction_count: 3
                         total_outflows: 997.11
                         total_inflows: 24.99
                         top_counterparties:
-                        - name: Costco
-                          type: merchant
-                          entity_id: pBowAoZJMM9DKR37jvNmzM4yWBBXyMzV2rM3A
-                          website: costco.com
-                          logo_url: https://plaid-merchant-logos.plaid.com/costco_235.png
+                        - Costco
+                    recurring_transactions:
+                      inflow_streams:
+                      - stream_id: yhnUVSIfe7SfeU0bcz8PDQr5ZUxUXebUvbKC0
+                        description: Payroll * Plaid
+                        merchant_name: Plaid
+                        oldest_transaction_date: "2020-02-04"
+                        newest_transaction_date: "2023-08-02"
+                        average_days_apart: 7
+                        frequency: WEEKLY
+                        transaction_count: 5
+                        transaction_ids:
+                        - nkeaNrDGrhdo6c4qZWDA8ekuIPuJ4Avg5nKfw
+                        - EfC5ekksdy30KuNzad2tQupW8WIPwvjXGbGHL
+                        - ozfvj3FFgp6frbXKJGitsDzck5eWQH7zOJBYd
+                        - QvdDE8AqVWo3bkBZ7WvCd7LskxVix8Q74iMoK
+                        - uQozFPfMzibBouS9h9tz4CsyvFll17jKLdPAF
+                        average_amount:
+                          amount: 1000.91
+                          iso_currency_code: USD
+                          unofficial_currency_code: null
+                        last_amount:
+                          amount: 1000
+                          iso_currency_code: USD
+                          unofficial_currency_code: null
+                        is_active: true
+                        status: MATURE
+                        personal_finance_category_primary: INCOME
+                        personal_finance_category_detailed: INCOME_WAGES
+                      outflow_streams:
+                      - stream_id: no86Eox18VHMvaOVL7gPUM9ap3aR1LsAVZ5nd
+                        description: ConEd Bill Payment
+                        merchant_name: ConEd
+                        oldest_transaction_date: "2022-02-04"
+                        newest_transaction_date: "2022-05-02"
+                        average_days_apart: 29
+                        frequency: MONTHLY
+                        transaction_count: 4
+                        transaction_ids:
+                        - yhnUVvtcGGcCKU0bcz8PDQr5ZUxUXebUvbKC0
+                        - HPDnUVgI5Pa0YQSl0rxwYRwVXeLyJXTWDAvpR
+                        - jEPoSfF8xzMClE9Ohj1he91QnvYoSdwg7IT8L
+                        - CmdQTNgems8BT1B7ibkoUXVPyAeehT3Tmzk0l
+                        average_amount:
+                          amount: 85
+                          iso_currency_code: USD
+                          unofficial_currency_code: null
+                        last_amount:
+                          amount: 100
+                          iso_currency_code: USD
+                          unofficial_currency_code: null
+                        is_active: true
+                        status: MATURE
+                        personal_finance_category_primary: RENT_AND_UTILITIES
+                        personal_finance_category_detailed: RENT_AND_UTILITIES_GAS_AND_ELECTRICITY
         default:
           content:
             application/json:
@@ -13244,6 +13720,7 @@ paths:
             schema:
               $ref: '#/components/schemas/TransactionsUserInsightsGetRequest'
   /payment_profile/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       deprecated: true
       tags:
@@ -13281,6 +13758,7 @@ paths:
             schema:
               $ref: '#/components/schemas/PaymentProfileCreateRequest'
   /payment_profile/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       deprecated: true
       tags:
@@ -13318,6 +13796,7 @@ paths:
             schema:
               $ref: '#/components/schemas/PaymentProfileGetRequest'
   /payment_profile/remove:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       deprecated: true
       tags:
@@ -13351,6 +13830,7 @@ paths:
             schema:
               $ref: '#/components/schemas/PaymentProfileRemoveRequest'
   /partner/customer/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -13428,6 +13908,7 @@ paths:
                   - https://www.example.com/oauth.html
                   - https://*.example.com/oauth.html
   /partner/customer/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -13470,6 +13951,7 @@ paths:
                   secret: 79g03eoofwl8240v776r2h667442119
                   end_customer_client_id: 7f57eb3d2a9j6480121fx361
   /partner/customer/enable:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -13509,6 +13991,7 @@ paths:
                   secret: 79g03eoofwl8240v776r2h667442119
                   end_customer_client_id: 7f57eb3d2a9j6480121fx361
   /partner/customer/remove:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -13547,6 +14030,7 @@ paths:
                   secret: 79g03eoofwl8240v776r2h667442119
                   end_customer_client_id: 7f57eb3d2a9j6480121fx361
   /partner/customer/oauth_institutions/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -13602,6 +14086,7 @@ paths:
                   secret: 79g03eoofwl8240v776r2h667442119
                   end_customer_client_id: 7f57eb3d2a9j6480121fx361
   /link_delivery/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -13636,6 +14121,7 @@ paths:
             schema:
               $ref: '#/components/schemas/LinkDeliveryCreateRequest'
   /link_delivery/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -13673,6 +14159,7 @@ paths:
             schema:
               $ref: '#/components/schemas/LinkDeliveryGetRequest'
   /fdx/notifications:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
       tags:
       - plaid
@@ -13926,6 +14413,156 @@ components:
           $ref: '#/components/schemas/RequestID'
       required:
       - request_id
+    TransactionsRecurringUpdateRequest:
+      type: object
+      description: TransactionsRecurringUpdateRequest defined the request schema for `/transactions/recurring/streams/update` endpoint.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        inputs:
+          type: array
+          description: A list of all the operations to be performed. This will either all succeed or all fail.
+          items:
+            $ref: '#/components/schemas/TransactionsRecurringUpdateInput'
+      required:
+      - access_token
+      - inputs
+    TransactionsRecurringUpdateInput:
+      type: object
+      description: TransactionsRecurringUpdateInput defines a single operation to the `/transactions/recurring/streams/update` endpoint.
+      properties:
+        stream_id:
+          type: string
+          description: ID of the stream that all the transactions will be added in to.
+        transaction_ids:
+          type: array
+          description: IDs of all the transactions that will be added into the stream. If any transaction currently exist in another stream, it will be removed from the other stream.
+          items:
+            type: string
+      required:
+      - stream_id
+      - transaction_ids
+    TransactionsRecurringUpdateResponse:
+      type: object
+      additionalProperties: true
+      description: TransactionsRecurringUpdateResponse defines the response schema for the `/transactions/recurring/streams/update` endpoint.
+      properties:
+        modified_streams:
+          type: array
+          description: Directly modified stream, along with other streams with transactions removed from them as a result of the operation (in no particular order).
+          items:
+            $ref: '#/components/schemas/TransactionStream'
+        removed_stream_ids:
+          type: array
+          description: The ids of streams that are no longer qualified as recurring transaction streams (in no particular order).
+          items:
+            type: string
+            description: ID of the removed stream
+      required:
+      - modified_streams
+    TransactionsRecurringMergeRequest:
+      type: object
+      description: TransactionsRecurringMergeRequest defined the request schema for `/transactions/recurring/streams/merge` endpoint.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        inputs:
+          type: array
+          description: A list of all the operations to be performed. This will either all succeed or all fail.
+          items:
+            $ref: '#/components/schemas/TransactionsRecurringMergeInput'
+      required:
+      - access_token
+      - inputs
+    TransactionsRecurringMergeInput:
+      type: object
+      description: TransactionsRecurringMergeInput defines a single input to the `/transactions/recurring/streams/merge` endpoint.
+      properties:
+        stream_ids:
+          type: array
+          description: IDs of all the streams that will be merged into the first stream. This operation will retain the stream_id of the first stream.
+          items:
+            type: string
+      required:
+      - stream_ids
+    TransactionsRecurringMergeResponse:
+      type: object
+      additionalProperties: true
+      description: TransactionsRecurringMergeResponse defines the response schema for the `/transactions/recurring/streams/merge` endpoint.
+      properties:
+        modified_streams:
+          type: array
+          description: Directly modified stream, along with other streams with transactions removed from them as a result of the operation (in no particular order).
+          items:
+            $ref: '#/components/schemas/TransactionStream'
+        removed_stream_ids:
+          type: array
+          description: The ids of streams that are no longer qualified as recurring transaction streams (in no particular order).
+          items:
+            type: string
+            description: ID of the removed stream
+      required:
+      - modified_streams
+    TransactionsRecurringCreateRequest:
+      type: object
+      description: TransactionsRecurringCreateRequest defined the request schema for `/transactions/recurring/streams/create` endpoint.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        inputs:
+          type: array
+          description: A list of all the operations to be performed. This will either all succeed or all fail.
+          items:
+            $ref: '#/components/schemas/TransactionsRecurringCreateInput'
+      required:
+      - access_token
+      - inputs
+    TransactionsRecurringCreateInput:
+      type: object
+      description: TransactionsRecurringCreateInput defines a single input to the `/transactions/recurring/streams/create` endpoint.
+      properties:
+        transaction_ids:
+          type: array
+          description: IDs of all the transactions that will be merged into one stream. If any transaction currently exists in another stream, it will be removed from the other stream.
+          items:
+            type: string
+      required:
+      - stream_ids
+    TransactionsRecurringCreateResponse:
+      type: object
+      additionalProperties: true
+      description: TransactionsRecurringCreateResponse defines the response schema for the `/transactions/recurring/streams/create` endpoint.
+      properties:
+        added_streams:
+          type: array
+          description: Streams created as a result of the operation.
+          items:
+            $ref: '#/components/schemas/TransactionStream'
+        modified_streams:
+          type: array
+          description: Other streams with transactions removed from them as a result of the operation (in no particular order).
+          items:
+            $ref: '#/components/schemas/TransactionStream'
+        removed_stream_ids:
+          type: array
+          description: The ids of streams that are no longer qualified as recurring transaction streams (in no particular order).
+          items:
+            type: string
+            description: ID of the removed stream
+      required:
+      - added_streams
     TransactionsRecurringGetRequest:
       type: object
       description: TransactionsRecurringGetRequest defines the request schema for `/transactions/recurring/get`
@@ -14885,6 +15522,45 @@ components:
       required:
       - account
       - request_id
+    ProcessorTransactionsGetRequestOptions:
+      type: object
+      description: An optional object to be used with the request. If specified, `options` must not be `null`.
+      properties:
+        count:
+          type: integer
+          default: 100
+          description: The number of transactions to fetch.
+          minimum: 1
+          maximum: 500
+          exclusiveMinimum: false
+        offset:
+          type: integer
+          default: 0
+          description: The number of transactions to skip. The default value is 0.
+          minimum: 0
+        include_original_description:
+          type: boolean
+          default: false
+          description: Include the raw unparsed transaction description from the financial institution. This field is disabled by default. If you need this information in addition to the parsed data provided, contact your Plaid Account Manager, or submit a [Support request](https://dashboard.plaid.com/support/new/product-and-development/product-troubleshooting/product-functionality).
+          nullable: true
+        include_personal_finance_category_beta:
+          type: boolean
+          default: false
+          description: Personal finance categories are now returned by default.
+          deprecated: true
+          x-hidden-from-docs: true
+        include_personal_finance_category:
+          type: boolean
+          default: false
+          description: Personal finance categories are now returned by default.
+          deprecated: true
+          x-hidden-from-docs: true
+        include_logo_and_counterparty_beta:
+          type: boolean
+          default: false
+          description: Counterparties and extra merchant fields are now returned by default.
+          deprecated: true
+          x-hidden-from-docs: true
     ProcessorTransactionsGetRequest:
       type: object
       description: ProcessorTransactionsGetRequest defines the request schema for `/processor/transactions/get`
@@ -14892,7 +15568,7 @@ components:
         client_id:
           $ref: '#/components/schemas/APIClientID'
         options:
-          $ref: '#/components/schemas/TransactionsGetRequestOptions'
+          $ref: '#/components/schemas/ProcessorTransactionsGetRequestOptions'
         processor_token:
           $ref: '#/components/schemas/ProcessorToken'
         secret:
@@ -14914,11 +15590,8 @@ components:
       additionalProperties: true
       description: ProcessorTransactionsGetResponse defines the response schema for `/processor/transactions/get`
       properties:
-        accounts:
-          type: array
-          description: An array containing the `accounts` associated with the Item for which transactions are being returned. Each transaction can be mapped to its corresponding account via the `account_id` field.
-          items:
-            $ref: '#/components/schemas/AccountBase'
+        account:
+          $ref: '#/components/schemas/AccountBase'
         transactions:
           type: array
           description: An array containing transactions from the account. Transactions are returned in reverse chronological order, with the most recent at the beginning of the array. The maximum number of transactions returned is determined by the `count` parameter.
@@ -14930,7 +15603,7 @@ components:
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
-      - accounts
+      - account
       - transactions
       - total_transactions
       - request_id
@@ -15215,6 +15888,29 @@ components:
     ProcessorSignalReturnReportResponse:
       title: ProcessorSignalReturnReportResponse
       description: ProcessorSignalReturnReportResponse defines the response schema for `/processor/signal/return/report`
+      additionalProperties: true
+      type: object
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
+    ProcessorSignalPrepareRequest:
+      title: ProcessorSignalPrepareRequest
+      description: ProcessorSignalPrepareRequest defines the request schema for `/processor/signal/prepare`
+      type: object
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        processor_token:
+          $ref: '#/components/schemas/ProcessorToken'
+      required:
+      - processor_token
+    ProcessorSignalPrepareResponse:
+      title: ProcessorSignalPrepareResponse
+      description: ProcessorSignalPrepareResponse defines the response schema for `/processor/signal/prepare`
       additionalProperties: true
       type: object
       properties:
@@ -17023,6 +17719,7 @@ components:
         client_name:
           type: string
           description: The name of your application, as it should be displayed in Link. Maximum length of 30 characters. If a value longer than 30 characters is provided, Link will display "This Application" instead.
+          minLength: 1
         language:
           type: string
           description: |-
@@ -17046,10 +17743,13 @@ components:
             - Swedish (`'sv'`)
 
             When using a Link customization, the language configured here must match the setting in the customization, or the customization will not be applied.
+          minLength: 1
         country_codes:
           type: array
           description: |-
             Specify an array of Plaid-supported country codes using the ISO-3166-1 alpha-2 country code standard. Institutions from all listed countries will be shown. For a complete mapping of supported products by country, see https://plaid.com/global/.
+
+            If using Identity Verification, `country_codes` should be set to the country where your company is based, not the country where your user is located. For all other products, `country_codes` represents the location of your user's financial institution.
 
             If Link is launched with multiple country codes, only products that you are enabled for in all countries will be used by Link. Note that while all countries are enabled by default in Sandbox and Development, in Production only US and Canada are enabled by default. Access to European institutions requires additional compliance steps. To request access to European institutions in the Production environment, [file a product access Support ticket](https://dashboard.plaid.com/support/new/product-and-development/product-troubleshooting/request-product-access) via the Plaid dashboard. If you initialize with a European country code, your users will see the European consent panel during the Link flow.
 
@@ -17089,6 +17789,7 @@ components:
           - transactions
           - transfer
           - signal
+          nullable: true
         required_if_supported_products:
           type: array
           description: |-
@@ -17106,6 +17807,7 @@ components:
           - liabilities
           - transactions
           - statements
+          nullable: true
         optional_products:
           type: array
           description: |-
@@ -17123,6 +17825,7 @@ components:
           - liabilities
           - statements
           - transactions
+          nullable: true
         additional_consented_products:
           type: array
           description: |-
@@ -17144,12 +17847,21 @@ components:
           - liabilities
           - transactions
           - signal
+          nullable: true
         webhook:
           type: string
           description: The destination URL to which any webhooks should be sent. Note that webhooks for Payment Initiation (e-wallet transactions only), Transfer, Bank Transfer (including Auth micro-deposit notification webhooks) and Identity Verification are configured via the Dashboard instead.
         access_token:
           type: string
           description: The `access_token` associated with the Item to update or reference, used when updating, modifying, or accessing an existing `access_token`. Used when launching Link in update mode, when completing the Same-day (manual) Micro-deposit flow, or (optionally) when initializing Link for a returning user as part of the Transfer UI flow.
+          minLength: 1
+          nullable: true
+        access_tokens:
+          x-hidden-from-docs: true
+          type: array
+          description: A list of access tokens associated with the items to update in Link update mode for the Assets product. Using this instead of the `access_token` field allows the updating of multiple items at once. This feature is in closed beta, please contact your account manager for more info.
+          items:
+            type: string
         link_customization_name:
           type: string
           description: The name of the Link customization from the Plaid Dashboard to be applied to Link. If not specified, the `default` customization will be used. When using a Link customization, the language in the customization must match the language selected via the `language` parameter, and the countries in the customization should match the country codes selected via `country_codes`.
@@ -17199,6 +17911,10 @@ components:
           $ref: '#/components/schemas/LinkTokenInvestmentsAuth'
         hosted_link:
           $ref: '#/components/schemas/LinkTokenCreateHostedLink'
+        cra_enabled:
+          x-hidden-from-docs: true
+          type: boolean
+          description: If `true`, request a CRA connection. Defaults to `false`.
       required:
       - client_name
       - language
@@ -17208,7 +17924,7 @@ components:
       description: |
         By default, Link will provide limited account filtering: it will only display Institutions that are compatible with all products supplied in the `products` parameter of `/link/token/create`, and, if `auth` is specified in the `products` array, will also filter out accounts other than `checking` and `savings` accounts on the Account Select pane. You can further limit the accounts shown in Link by using `account_filters` to specify the account subtypes to be shown in Link. Only the specified subtypes will be shown. This filtering applies to both the Account Select view (if enabled) and the Institution Select view. Institutions that do not support the selected subtypes will be omitted from Link. To indicate that all subtypes should be shown, use the value `"all"`. If the `account_filters` filter is used, any account type for which a filter is not specified will be entirely omitted from Link. For a full list of valid types and subtypes, see the [Account schema](https://plaid.com/docs/api/accounts#account-type-schema).
 
-        For institutions using OAuth, the filter will not affect the list of accounts shown by the bank in the OAuth window.
+        The filter may or may not impact the list of accounts shown by the institution in the OAuth account selection flow, depending on the specific institution. If the user selects excluded account subtypes in the OAuth flow, these accounts will not be added to the Item. If the user selects only excluded account subtypes, the link attempt will fail and the user will be prompted to try again.
       type: object
       additionalProperties: true
       properties:
@@ -17220,6 +17936,8 @@ components:
           $ref: '#/components/schemas/LoanFilter'
         investment:
           $ref: '#/components/schemas/InvestmentFilter'
+        other:
+          $ref: '#/components/schemas/OtherFilter'
     LinkTokenEUConfig:
       description: Configuration parameters for EU flows
       type: object
@@ -17262,6 +17980,8 @@ components:
           $ref: '#/components/schemas/HostedLinkDeliveryMethod'
         completion_redirect_uri:
           $ref: '#/components/schemas/HostedLinkCompletionRedirectURI'
+        url_lifetime_seconds:
+          $ref: '#/components/schemas/HostedLinkURLLifetimeSeconds'
     HostedLinkDeliveryMethod:
       x-hidden-from-docs: true
       type: string
@@ -17278,6 +17998,11 @@ components:
       description: |
         URI that Hosted Link will redirect to upon completion of the Link flow. This will only occur in Hosted Link
         sessions, not in other implementation methods.
+    HostedLinkURLLifetimeSeconds:
+      x-hidden-from-docs: true
+      type: integer
+      description: |
+        How many seconds the link will be valid for. Must be positive. Cannot be longer than 21 days.
     LinkTokenCreateRequestPaymentInitiation:
       type: object
       description: Specifies options for initializing Link for use with the Payment Initiation (Europe) product. This field is required if `payment_initiation` is included in the `products` array. Either `payment_id` or `consent_id` must be provided.
@@ -17390,6 +18115,9 @@ components:
         same_day_microdeposits_enabled:
           type: boolean
           description: Specifies whether the Link session is enabled for the Same Day Micro-deposits flow.
+        instant_microdeposits_enabled:
+          type: boolean
+          description: Specifies whether the Link session is enabled for the Instant Micro-deposits flow.
         reroute_to_credentials:
           type: string
           enum:
@@ -17397,6 +18125,10 @@ components:
           - OPTIONAL
           - FORCED
           description: Specifies what type of [Reroute to Credentials](https://plaid.com/docs/auth/coverage/same-day/#reroute-to-credentials) pane should be used in the Link session for the Same Day Micro-deposits flow. As of October 15 2023, the default setting is `OPTIONAL`.
+        database_match_enabled:
+          type: boolean
+          description: Specifies whether the Link session is enabled for the Database Match flow.
+          x-hidden-from-docs: true
         flow_type:
           type: string
           enum:
@@ -17431,6 +18163,7 @@ components:
         client_user_id:
           type: string
           description: A unique ID representing the end user. Typically this will be a user ID number from your application. Personally identifiable information, such as an email address or phone number, should not be used in the `client_user_id`. It is currently used as a means of searching logs for the given user in the Plaid Dashboard.
+          minLength: 1
         legal_name:
           type: string
           description: The user's full legal name, used for [micro-deposit based verification flows](https://plaid.com/docs/auth/coverage/). For a small number of customers on legacy flows, providing this field is required to enable micro-deposit-based flows. For all other customers, this field is optional, but providing the user's name in this field when using micro-deposit-based verification will enable certain risk checks and can reduce micro-deposit fraud.
@@ -17698,6 +18431,8 @@ components:
             `verification_expired`: Plaid was unable to automatically verify the deposit within 7 calendar days and will no longer attempt to validate the Item. Users may retry by submitting their information again through Link.
 
             `verification_failed`: The Item failed manual micro-deposit verification because the user exhausted all 3 verification attempts. Users may retry by submitting their information again through Link.
+
+            `database_matched`: The Item has successfully been verified using Plaid's data sources. Note: Database Match is currently a beta feature, please contact your account manager for more information.
 
             `null`: micro-deposit-based verification is not being used for the Item.
         class_type:
@@ -18009,7 +18744,8 @@ components:
           - manually_verified
           - verification_expired
           - verification_failed
-          description: "The current verification status of an Auth Item initiated through Automated or Manual micro-deposits.  Returned for Auth Items only.\n\n`pending_automatic_verification`: The Item is pending automatic verification\n\n`pending_manual_verification`: The Item is pending manual micro-deposit verification. Items remain in this state until the user successfully verifies the micro-deposit.\n\n`automatically_verified`: The Item has successfully been automatically verified\t\n\n`manually_verified`: The Item has successfully been manually verified\n\n`verification_expired`: Plaid was unable to automatically verify the deposit within 7 calendar days and will no longer attempt to validate the Item. Users may retry by submitting their information again through Link.\n\n`verification_failed`: The Item failed manual micro-deposit verification because the user exhausted all 3 verification attempts. Users may retry by submitting their information again through Link.\t\n\t"
+          - database_matched
+          description: "The current verification status of an Auth Item initiated through Automated or Manual micro-deposits.  Returned for Auth Items only.\n\n`pending_automatic_verification`: The Item is pending automatic verification\n\n`pending_manual_verification`: The Item is pending manual micro-deposit verification. Items remain in this state until the user successfully verifies the micro-deposit.\n\n`automatically_verified`: The Item has successfully been automatically verified\t\n\n`manually_verified`: The Item has successfully been manually verified\n\n`verification_expired`: Plaid was unable to automatically verify the deposit within 7 calendar days and will no longer attempt to validate the Item. Users may retry by submitting their information again through Link.\n\n`verification_failed`: The Item failed manual micro-deposit verification because the user exhausted all 3 verification attempts. Users may retry by submitting their information again through Link.\n\n`database_matched`: The Item has successfully been verified using Plaid's data sources. Note: Database Match is currently a beta feature, please contact your account manager for more information.\t\n\t"
         persistent_account_id:
           type: string
           description: A unique and persistent identifier for accounts that can be used to trace multiple instances of the same account across different Items for depository accounts. This is currently an opt-in field and only supported for Chase Items.
@@ -18252,6 +18988,7 @@ components:
       - manually_verified
       - verification_expired
       - verification_failed
+      - database_matched
     LinkDeliveryAccount:
       title: LinkDeliveryAccount
       type: object
@@ -18331,7 +19068,7 @@ components:
           description: |-
             The ACH account number for the account.
 
-            Note that when using OAuth with Chase Bank (`ins_56`), Chase will issue "tokenized" routing and account numbers, which are not the user's actual account and routing numbers. These tokenized account numbers (also known as TANs) should work identically to normal account and routing numbers. The digits returned in the `mask` field will continue to reflect the actual account number, rather than the tokenized account number; for this reason, when displaying account numbers to the user to help them identify their account in your UI, always use the `mask` rather than truncating the `account` number. If a user revokes their permissions to your app, the tokenized numbers will continue to work for ACH deposits, but not withdrawals.
+            Note that when using OAuth with Chase Bank (`ins_56`), Chase will issue "tokenized" routing and account numbers, which are not the user's actual account and routing numbers. These tokenized account numbers (also known as TANs) should work identically to normal account and routing numbers. The digits returned in the `mask` field will continue to reflect the actual account number, rather than the tokenized account number; for this reason, when displaying account numbers to the user to help them identify their account in your UI, always use the `mask` rather than truncating the `account` number. If a user revokes their permissions to your app, the tokenized numbers will no longer work.
         routing:
           type: string
           description: The ACH routing number for the account. If the institution is `ins_56`, this may be a tokenized routing number. For more information, see the description of the `account` field.
@@ -18940,6 +19677,13 @@ components:
           $ref: '#/components/schemas/TransactionStreamStatus'
         personal_finance_category:
           $ref: '#/components/schemas/PersonalFinanceCategory'
+        is_user_modified:
+          type: boolean
+          description: This will be set to `true` if the stream has been modified by request to a `/transactions/recurring/streams` endpoint. It will be `false` for all other streams.
+        last_user_modified_date:
+          type: string
+          description: The date of the most recent user modification. This will only be set if `is_user_modified` is `true`.
+          format: date
       required:
       - account_id
       - stream_id
@@ -18955,6 +19699,7 @@ components:
       - last_amount
       - is_active
       - status
+      - is_user_modified
     TransactionStreamAmount:
       type: object
       title: TransactionStreamAmount
@@ -19211,6 +19956,7 @@ components:
       - LT
       - LV
       - PT
+      - BE
       description: ISO-3166-1 alpha-2 country code standard.
     ConsumerReportPermissiblePurpose:
       x-hidden-from-docs: true
@@ -19591,6 +20337,34 @@ components:
           webhook_type: ENTITY_SCREENING
           webhook_code: STATUS_UPDATED
           screening_id: entscr_52xR9LKo77r1Np
+          environment: production
+    BeaconUserStatusUpdatedWebhook:
+      title: BeaconUserStatusUpdatedWebhook
+      description: Fired when a Beacon User status has changed, which can occur manually via the dashboard or when information is reported to the Beacon network.
+      type: object
+      additionalProperties: true
+      properties:
+        webhook_type:
+          type: string
+          description: '`BEACON`'
+        webhook_code:
+          type: string
+          description: '`USER_STATUS_UPDATED`'
+        beacon_user_id:
+          type: string
+          description: The ID of the associated Beacon user.
+        environment:
+          $ref: '#/components/schemas/WebhookEnvironmentValues'
+      required:
+      - webhook_type
+      - webhook_code
+      - beacon_user_id
+      - environment
+      x-examples:
+        example-1:
+          webhook_type: BEACON
+          webhook_code: USER_STATUS_UPDATED
+          beacon_user_id: becusr_4WciCrtbxF76T8
           environment: production
     IdentityVerificationStepUpdatedWebhook:
       title: IdentityVerificationStepUpdatedWebhook
@@ -21056,10 +21830,14 @@ components:
         automated_micro_deposits:
           type: boolean
           description: Indicates if automated microdeposits are supported.
+        instant_micro_deposits:
+          type: boolean
+          description: Indicates if instant microdeposits are supported.
       required:
       - instant_auth
       - instant_match
       - automated_micro_deposits
+      - instant_micro_deposits
     PaymentInitiationMetadata:
       title: PaymentInitiationMetadata
       type: object
@@ -22018,6 +22796,8 @@ components:
           $ref: '#/components/schemas/ItemId'
         environment:
           $ref: '#/components/schemas/WebhookEnvironmentValues'
+        error:
+          $ref: '#/components/schemas/PlaidError'
       required:
       - webhook_type
       - webhook_code
@@ -22031,6 +22811,7 @@ components:
           item_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBFL9DrE6
           account_id: dVzbVMLjrxTnLjX4G66XUp5GLklm4oiZy88yK
           environment: production
+          error: null
     JWTHeader:
       title: JWTHeader
       type: object
@@ -22053,6 +22834,7 @@ components:
           item_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBFL9DrE6
           account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
           environment: production
+          error: null
       properties:
         webhook_type:
           type: string
@@ -22067,6 +22849,8 @@ components:
           description: The `account_id` of the account associated with the webhook
         environment:
           $ref: '#/components/schemas/WebhookEnvironmentValues'
+        error:
+          $ref: '#/components/schemas/PlaidError'
       required:
       - webhook_type
       - webhook_code
@@ -24475,6 +25259,8 @@ components:
           $ref: '#/components/schemas/TransferCreditFundsSource'
         facilitator_fee:
           $ref: '#/components/schemas/TransferFacilitatorFee'
+        network_trace_id:
+          $ref: '#/components/schemas/TransferNetworkTraceID'
       required:
       - id
       - authorization_id
@@ -24713,7 +25499,7 @@ components:
 
         `"ccd"` - Corporate Credit or Debit - fund transfer between two corporate bank accounts
 
-        `"ppd"` - Prearranged Payment or Deposit - the transfer is part of a pre-existing relationship with a consumer, eg. bill payment
+        `"ppd"` - Prearranged Payment or Deposit - the transfer is part of a pre-existing relationship with a consumer, e.g. bill payment
 
         `"tel"` - Telephone-Initiated Entry
 
@@ -24736,7 +25522,7 @@ components:
     TransferAmount:
       title: TransferAmount
       type: string
-      description: The amount of the transfer (decimal string with two digits of precision e.g. "10.00").
+      description: The amount of the transfer (decimal string with two digits of precision e.g. "10.00"). When calling `/transfer/authorization/create`, specify the maximum amount to authorize. When calling `/transfer/create`, specify the exact amount of the transfer, up to a maximum of the amount authorized. If this field is left blank when calling `/transfer/create`, the maximum amount authorized in the `authorization_id` will be sent.
     TransferSweepAmount:
       title: TransferSweepAmount
       type: string
@@ -24750,6 +25536,14 @@ components:
       title: TransferFacilitatorFee
       type: string
       description: The amount to deduct from `transfer.amount` and distribute to the platform’s Ledger balance as a facilitator fee (decimal string with two digits of precision e.g. "10.00"). The remainder will go to the end-customer’s Ledger balance. This must be less than or equal to the `transfer.amount`.
+    TransferNetworkTraceID:
+      title: TransferNetworkTraceID
+      type: string
+      description: |-
+        The trace identifier for the transfer based on its network. This will only be set after the transfer has posted.
+
+        For `ach` or `same-day-ach` transfers, this is the ACH trace number. Currently, the field will remain null for transfers on other rails.
+      nullable: true
     TransferIntentGetFailureReason:
       title: TransferIntentGetFailureReason
       type: object
@@ -24829,6 +25623,14 @@ components:
         A unique key provided by the client, per unique ledger deposit. Maximum of 50 characters.
 
         The API supports idempotency for safely retrying the request without accidentally performing the same operation twice. For example, if a request to create a ledger deposit fails due to a network connection error, you can retry the request with the same idempotency key to guarantee that only a single deposit is created.
+    LedgerDistributeIdempotencyKey:
+      title: LedgerDistributeIdempotencyKey
+      type: string
+      maxLength: 50
+      description: |-
+        A unique key provided by the client, per unique ledger distribute. Maximum of 50 characters.
+
+        The API supports idempotency for safely retrying the request without accidentally performing the same operation twice. For example, if a request to create a ledger distribute fails due to a network connection error, you can retry the request with the same idempotency key to guarantee that only a single distribute is created.
     LedgerWithdrawIdempotencyKey:
       title: LedgerWithdrawIdempotencyKey
       type: string
@@ -25649,6 +26451,8 @@ components:
         facilitator_fee:
           $ref: '#/components/schemas/TransferFacilitatorFee'
       required:
+      - access_token
+      - account_id
       - authorization_id
       - description
     TransferRecurringCreateRequest:
@@ -26446,15 +27250,15 @@ components:
 
         An error will be returned if the event type is incompatible with the current ledger sweep status. Compatible status --> event type transitions include:
 
-        `pending` --> `posted`
+        `sweep.pending` --> `sweep.posted`
 
-        `pending` --> `failed`
+        `sweep.pending` --> `sweep.failed`
 
-        `posted` --> `settled`
+        `sweep.posted` --> `sweep.settled`
 
-        `posted` --> `returned`
+        `sweep.posted` --> `sweep.returned`
 
-        `settled` --> `returned`
+        `sweep.settled` --> `sweep.returned`
       enum:
       - sweep.posted
       - sweep.settled
@@ -26969,6 +27773,8 @@ components:
         description:
           type: string
           description: The description of the deposit that will be passed to the receiving bank (up to 10 characters). Note that banks utilize this field differently, and may or may not show it on the bank statement.
+        network_trace_id:
+          $ref: '#/components/schemas/TransferNetworkTraceID'
       required:
       - id
       - created
@@ -27105,6 +27911,44 @@ components:
           $ref: '#/components/schemas/RequestID'
       required:
       - balance
+      - request_id
+    TransferLedgerDistributeRequest:
+      title: TransferLedgerDistributeRequest
+      type: object
+      description: Defines the request schema for `/transfer/ledger/distribute`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        from_client_id:
+          type: string
+          description: The client to pull money from. Must be the platform itself or its originator. One of `from_client_id` and `to_client_id` must be the platform's `client_id`.
+        to_client_id:
+          type: string
+          description: The client to credit money to. Must be the platform itself or its originator. One of `from_client_id` and `to_client_id` must be the platform's `client_id`.
+        amount:
+          type: string
+          description: The amount to move (decimal string with two digits of precision e.g. "10.00"). Amount must be positive.
+        idempotency_key:
+          $ref: '#/components/schemas/LedgerDistributeIdempotencyKey'
+        description:
+          type: string
+          description: An optional description for the ledger distribute operation.
+      required:
+      - from_client_id
+      - to_client_id
+      - amount
+      - idempotency_key
+    TransferLedgerDistributeResponse:
+      title: TransferLedgerDistributeResponse
+      type: object
+      additionalProperties: true
+      description: Defines the response schema for `/transfer/ledger/distribute`
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
       - request_id
     TransferLedgerBalance:
       title: TransferLedgerBalance
@@ -27426,7 +28270,7 @@ components:
         file:
           type: string
           format: binary
-          description: 'A file to upload. The file size must be less than 20MB. Supported file extensions: .pdf, .docx, .doc.'
+          description: 'A file to upload. The file size must be less than 20MB. Supported file extensions: .pdf.'
         purpose:
           $ref: '#/components/schemas/TransferDocumentPurpose'
       required:
@@ -27533,7 +28377,7 @@ components:
 
             `"ccd"` - Corporate Credit or Debit - fund transfer between two corporate bank accounts
 
-            `"ppd"` - Prearranged Payment or Deposit - the transfer is part of a pre-existing relationship with a consumer, eg. bill payment
+            `"ppd"` - Prearranged Payment or Deposit - the transfer is part of a pre-existing relationship with a consumer, e.g. bill payment
 
             `"web"` - A credit Entry initiated by or on behalf of a holder of a Consumer Account that is intended for a Consumer Account of a Receiver
           type: array
@@ -28144,6 +28988,8 @@ components:
           type: string
           format: date-time
           description: The datetime when this refund was created. This will be of the form `2006-01-02T15:04:05Z`
+        network_trace_id:
+          $ref: '#/components/schemas/TransferNetworkTraceID'
       required:
       - id
       - transfer_id
@@ -28291,6 +29137,8 @@ components:
             `refund.posted` --> `refund.returned`
 
             `refund.posted` --> `refund.settled`
+
+            `refund.posted` events can only be simulated if the refunded transfer has been transitioned to settled. This mimics the ordering of events in Production.
         failure_reason:
           $ref: '#/components/schemas/TransferFailure'
       required:
@@ -28622,7 +29470,7 @@ components:
         properties:
           owners:
             type: array
-            description: Data returned by the financial institution about the account owner or owners. Only returned by Identity or Assets endpoints. For business accounts, the name reported may be either the name of the individual or the name of the business, depending on the institution. Multiple owners on a single account will be represented in the same `owner` object, not in multiple owner objects within the array. In API versions 2018-05-22 and earlier, the `owners` object is not returned, and instead identity information is returned in the top level `identity` object. For more details, see [Plaid API versioning](https://plaid.com/docs/api/versioning/#version-2019-05-29)
+            description: Data returned by the financial institution about the account owner or owners. Only returned by Identity or Assets endpoints. For business accounts, the name reported may be either the name of the individual or the name of the business, depending on the institution; detecting whether the linked account is a business account is not currently supported. Multiple owners on a single account will be represented in the same `owner` object, not in multiple owner objects within the array. In API versions 2018-05-22 and earlier, the `owners` object is not returned, and instead identity information is returned in the top level `identity` object. For more details, see [Plaid API versioning](https://plaid.com/docs/api/versioning/#version-2019-05-29)
             items:
               $ref: '#/components/schemas/Owner'
         required:
@@ -28677,7 +29525,7 @@ components:
         score:
           type: integer
           nullable: true
-          description: Match score for normalized phone number. 100 is a perfect match, 99-70 is a partial match (matching the same phone number with extension against one without extension etc.), anything below 70 is considered a mismatch. Typically, the match threshold should be set to a score of 70 or higher. If the phone number is missing from either the API or financial institution, this is null.
+          description: Match score for normalized phone number. 100 is a perfect match, 99-70 is a partial match (matching the same phone number with extension against one without extension, etc.), anything below 70 is considered a mismatch. Typically, the match threshold should be set to a score of 70 or higher. If the phone number is missing from either the API or financial institution, this is null.
     EmailAddressMatchScore:
       title: EmailAddressMatchScore
       type: object
@@ -28744,6 +29592,16 @@ components:
           $ref: '#/components/schemas/InvestmentAccountSubtypes'
       required:
       - account_subtypes
+    OtherFilter:
+      title: OtherFilter
+      description: A filter to apply to `other`-type accounts
+      type: object
+      additionalProperties: true
+      properties:
+        account_subtypes:
+          $ref: '#/components/schemas/OtherAccountSubtypes'
+      required:
+      - account_subtypes
     DepositoryAccountSubtypes:
       title: DepositoryAccountSubtypes
       type: array
@@ -28768,6 +29626,12 @@ components:
       description: 'An array of account subtypes to display in Link. If not specified, all account subtypes will be shown. For a full list of valid types and subtypes, see the [Account schema](https://plaid.com/docs/api/accounts#account-type-schema). '
       items:
         $ref: '#/components/schemas/InvestmentAccountSubtype'
+    OtherAccountSubtypes:
+      title: OtherAccountSubtypes
+      type: array
+      description: 'An array of account subtypes to display in Link. If not specified, all account subtypes will be shown. For a full list of valid types and subtypes, see the [Account schema](https://plaid.com/docs/api/accounts#account-type-schema). '
+      items:
+        $ref: '#/components/schemas/OtherAccountSubtype'
     DepositoryAccountSubtype:
       type: string
       description: Valid account subtypes for depository accounts. For a list containing descriptions of each subtype, see [Account schemas](https://plaid.com/docs/api/accounts/#StandaloneAccountType-depository).
@@ -28858,6 +29722,12 @@ components:
       - ugma
       - utma
       - variable annuity
+      - all
+    OtherAccountSubtype:
+      type: string
+      description: Valid account subtypes for other accounts. For a list containing descriptions of each subtype, see [Account schemas](https://plaid.com/docs/api/accounts/#StandaloneAccountType-other).
+      enum:
+      - other
       - all
     EmployersSearchRequest:
       title: EmployersSearchRequest
@@ -29130,9 +30000,6 @@ components:
         asset_report_id:
           type: string
           description: The `asset_report_id` of an asset report associated with the user, as provided by `/asset_report/create`. Providing an `asset_report_id` is optional and can be used to verify the user through a streamlined flow. If provided, the bank linking flow will be skipped.
-        precheck_id:
-          type: string
-          description: The ID of a precheck created with `/income/verification/precheck`. Will be used to improve conversion of the income verification flow by streamlining the Link interface presented to the end user.
         access_tokens:
           type: array
           items:
@@ -29141,6 +30008,7 @@ components:
             An array of access tokens corresponding to Items that a user has previously connected with. Data from these institutions will be cross-referenced with document data received during the Document Income flow to help verify that the uploaded documents are accurate. If the `transactions` product was not initialized for these Items during link, it will be initialized after this Link session.
 
             This field should only be used with the `payroll` income source type.
+          nullable: true
         income_source_types:
           type: array
           description: The types of source income data that users will be permitted to share. Options include `bank` and `payroll`. Currently you can only specify one of these options.
@@ -29201,7 +30069,7 @@ components:
         parsing_config:
           type: array
           nullable: true
-          description: The types of analysis to enable for document uploads. If none are specified, then docs will undergo OCR parsing only. This field is only relevant to participants in the Document Fraud beta.
+          description: The types of analysis to enable for document uploads. If this field is not provided, then docs will undergo OCR parsing only.
           items:
             $ref: '#/components/schemas/IncomeVerificationDocParsingConfig'
     IncomeVerificationPayrollFlowType:
@@ -29304,6 +30172,8 @@ components:
         days_requested:
           type: integer
           description: The maximum integer number of days of history to include in the Base Report.
+          minimum: 1
+          maximum: 730
       required:
       - days_requested
     LinkTokenCreateRequestEmployment:
@@ -31671,7 +32541,10 @@ components:
           $ref: '#/components/schemas/CreditDocumentType'
         download_url:
           type: string
-          description: Signed URL to retrieve the underlying file. This download URL can only be used once and expires after two minutes. To generate a new download URL, call `/credit/payroll_income/get` again.
+          description: |-
+            Signed URL to retrieve the underlying file. For Payroll Income, the file type will always be PDF, and the file may not be available, in which case the field will be `null`. If you would like Plaid to generate a PDF if the original is not available, contact your Account Manager. For Document Income, this field will not be `null`, and the file type will be the original file type uploaded by the user. For more details on available file types, see the [Document Income](https://www.plaid.com/docs/income/payroll-income) documentation.
+
+            This download URL can only be used once and expires after two minutes. To generate a new download URL, call `/credit/payroll_income/get` again.
           nullable: true
         status:
           type: string
@@ -33189,7 +34062,7 @@ components:
           type: array
           items:
             type: string
-          description: An array of `item_id`s to be refreshed. Each `item_id` should uniquely identify a payroll income item.
+          description: An array of `item_id`s to be refreshed. Each `item_id` should uniquely identify a payroll income item. If this field is not provided, all `item_id`s associated with the `user_token` will be refreshed.
         webhook:
           type: string
           description: The URL where Plaid will send the payroll income refresh webhook.
@@ -33627,7 +34500,7 @@ components:
     ApplicationID:
       title: ApplicationID
       type: string
-      description: This field will map to the application ID that is returned from /item/applications/list, or provided to the institution in an oauth redirect.
+      description: This field will map to the application ID that is returned from /item/application/list, or provided to the institution in an oauth redirect.
     Application:
       type: object
       description: Metadata about the application
@@ -33844,6 +34717,30 @@ components:
       enum:
       - ENROLLMENT
       - PORTAL
+    ItemApplicationUnlinkRequest:
+      description: ItemApplicationUnlinkRequest defines the request schema for `/item/application/unlink/`
+      type: object
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+        application_id:
+          $ref: '#/components/schemas/ApplicationID'
+      required:
+      - application_id
+      - access_token
+    ItemApplicationUnlinkResponse:
+      description: ItemApplicationUnlinkResponse defines the response schema for `/item/application/unlink`
+      additionalProperties: true
+      type: object
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
     ItemApplicationScopesUpdateRequest:
       description: ItemApplicationScopesUpdateRequest defines the request schema for `/item/application/scopes/update`
       type: object
@@ -33927,7 +34824,7 @@ components:
           description: A string provided by the connected app stating why they use their respective enabled products.
         created_at:
           type: string
-          format: date
+          format: date-time
           description: The date this application was linked in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) (YYYY-MM-DD) format in UTC.
           example: "2020-01-01"
         scopes:
@@ -34154,10 +35051,18 @@ components:
             `VERIFICATION_STATUS_PROCESSING_FAILED`: A failure occurred when attempting to process the verification documentation.
 
             `VERIFICATION_STATUS_PENDING_APPROVAL`: (deprecated) The income verification has been sent to the user for review.
+        webhook_code:
+          $ref: '#/components/schemas/SandboxIncomeWebhookFireRequestWebhookCode'
       required:
       - item_id
       - webhook
-      - verification_status
+      - webhook_code
+    SandboxIncomeWebhookFireRequestWebhookCode:
+      type: string
+      enum:
+      - INCOME_VERIFICATION
+      - INCOME_VERIFICATION_RISK_SIGNALS
+      description: The webhook codes that can be fired by this test endpoint.
     SandboxIncomeFireWebhookResponse:
       title: SandboxIncomeFireWebhookResponse
       additionalProperties: true
@@ -35961,6 +36866,8 @@ components:
           $ref: '#/components/schemas/CounterpartyInsights'
         category_insights:
           $ref: '#/components/schemas/CategoryInsights'
+        recurring_transactions:
+          $ref: '#/components/schemas/RecurringTransactions'
       required:
       - user_data_overview
     UserDataOverview:
@@ -36039,17 +36946,21 @@ components:
       description: A possible account detected to be associated with a transaction user.
       additionalProperties: true
       properties:
-        detected_account_type:
+        account_type:
           type: string
           description: The detected account type (depository, credit, loan, investment etc.).
           nullable: true
-        detected_account_subtype:
+        account_subtype:
           type: string
           description: The detected subtype of the account, based on the transactions to/from the institution.
           nullable: true
         transaction_count:
           type: integer
           description: The number of transactions associated with this detected account type at this financial institution.
+        oldest_transaction_date:
+          type: string
+          format: date
+          description: The date of the oldest transaction associated with this detected account type at this financial institution.
         newest_transaction_date:
           type: string
           format: date
@@ -36067,8 +36978,8 @@ components:
           format: double
           description: Sum of inflow amounts associated with this detected account type at this financial institution.
       required:
-      - detected_account_type
-      - detected_account_subtype
+      - account_type
+      - account_subtype
       - transaction_count
       - total_outflows
       - total_inflows
@@ -36090,11 +37001,11 @@ components:
         transaction_count:
           type: integer
           description: The number of transactions associated with merchant of this type.
-        primary_personal_finance_category:
+        personal_finance_category_primary:
           type: string
           nullable: true
           description: The primary personal finance category associated with this merchant.
-        detailed_personal_finance_category:
+        personal_finance_category_detailed:
           type: string
           nullable: true
           description: The detailed personal finance category associated with this merchant.
@@ -36110,8 +37021,8 @@ components:
       - name
       - website
       - transaction_count
-      - primary_personal_finance_category
-      - detailed_personal_finance_category
+      - personal_finance_category_primary
+      - personal_finance_category_detailed
       - total_outflows
       - total_inflows
     CategoryInsights:
@@ -36152,13 +37063,86 @@ components:
           type: array
           description: The most common counterparties associated with this category sorted by outflow.
           items:
-            $ref: '#/components/schemas/Counterparty'
+            type: string
       required:
       - name
       - transaction_count
       - total_outflows
       - total_inflows
-      - top_counterparties
+    RecurringTransactions:
+      type: object
+      description: Insights object for recurring transactions for `/beta/transactions/user_insights/v1/get` endpoint
+      additionalProperties: true
+      properties:
+        inflow_streams:
+          type: array
+          description: An array of inflow transaction streams (e.g., income).
+          items:
+            $ref: '#/components/schemas/RecurringInsightsStream'
+        outflow_streams:
+          type: array
+          description: An array of outflow transaction streams (e.g., subscriptions, bills, loan payments).
+          items:
+            $ref: '#/components/schemas/RecurringInsightsStream'
+      required:
+      - inflow_streams
+      - outflow_streams
+    RecurringInsightsStream:
+      type: object
+      description: Insights object for recurring transactions streams.
+      additionalProperties: true
+      properties:
+        stream_id:
+          type: string
+          description: A unique id for the stream.
+        description:
+          type: string
+          description: The client-provided raw description of the most recent transaction in the stream.
+        merchant_name:
+          type: string
+          description: The merchant or primary counterparty associated with the transaction stream.
+        oldest_transaction_date:
+          type: string
+          format: date
+          description: The posted date of the earliest transaction in the stream.
+        newest_transaction_date:
+          type: string
+          format: date
+          description: The posted date of the latest transaction in the stream.
+        average_days_apart:
+          type: number
+          format: double
+          description: The average number of days between each of the recurring transactions.
+        frequency:
+          $ref: '#/components/schemas/RecurringTransactionFrequency'
+        transaction_count:
+          type: integer
+          description: The number of transactions in this stream.
+        transaction_ids:
+          type: array
+          description: An array of Plaid transaction IDs belonging to the stream, sorted by posted date.
+          items:
+            type: string
+        average_amount:
+          $ref: '#/components/schemas/TransactionStreamAmount'
+        newest_transaction_amount:
+          $ref: '#/components/schemas/TransactionStreamAmount'
+        is_active:
+          type: boolean
+          description: Indicates whether the transaction stream is still live.
+        status:
+          $ref: '#/components/schemas/TransactionStreamStatus'
+        personal_finance_category_primary:
+          type: string
+          description: The primary category associated with the transaction stream.
+        personal_finance_category_detailed:
+          type: string
+          description: The detailed category associated with the transaction stream.
+      required:
+      - stream_id
+      - merchant_name
+      - average_days_apart
+      - is_active
     PaymentProfileCreateRequest:
       type: object
       description: PaymentProfileCreateRequest defines the request schema for `/payment_profile/create`
@@ -36273,7 +37257,7 @@ components:
           description: Denotes whether or not the partner has completed attestation of diligence for the end customer to be created.
           type: boolean
         products:
-          description: The products to be enabled for the end customer.
+          description: The products to be enabled for the end customer. If empty or `null`, this field will default to the products enabled for the reseller at the time this endpoint is called.
           type: array
           items:
             $ref: '#/components/schemas/Products'
@@ -36291,7 +37275,7 @@ components:
           description: If `true`, the end customer's default Link customization will be set to match the partner's. You can always change the end customer's Link customization in the Plaid Dashboard. See the [Link Customization docs](https://plaid.com/docs/link/customization/) for more information.
           type: boolean
         logo:
-          description: Base64-encoded representation of the end customer's logo. Must be a PNG of size 1024x1024 under 4MB. The logo will be shared with financial institutions and shown to the end user during Link flows. A logo is required if `create_link_customization` is `true`. If `create_link_customization` is `false` and the logo is omitted, a stock logo will be used.
+          description: Base64-encoded representation of the end customer's logo. Must be a PNG of size 1024x1024 under 4MB. The logo will be shared with financial institutions and shown to the end user during Link flows. A logo is required if `create_link_customization` is `true`. If `create_link_customization` is `false` and the logo is omitted, the partner's logo will be used if one exists, otherwise a stock logo will be used.
           type: string
         legal_entity_name:
           description: The end customer's legal name. This will be shared with financial institutions as part of the OAuth registration process. It will not be shown to end users.
@@ -36323,7 +37307,6 @@ components:
       required:
       - company_name
       - is_diligence_attested
-      - products
       - legal_entity_name
       - website
       - application_name
@@ -36388,6 +37371,7 @@ components:
           $ref: '#/components/schemas/APISecret'
         end_customer_client_id:
           type: string
+          description: The `client_id` of the end customer to be removed.
       required:
       - end_customer_client_id
     PartnerCustomerRemoveResponse:
@@ -36483,8 +37467,10 @@ components:
       properties:
         client_id:
           type: string
+          description: The `client_id` of the end customer.
         company_name:
           type: string
+          description: The company name associated with the end customer.
         status:
           $ref: '#/components/schemas/PartnerEndCustomerStatus'
     PartnerEndCustomerWithSecrets:
@@ -36954,10 +37940,38 @@ components:
         `SUCCESS`: The bank income report was successfully generated and can be retrieved via `/credit/bank_income/get`.
 
         `FAILURE`: The bank income report failed to be generated
+    IncomeVerificationRefreshReconnectNeededWebhook:
+      type: object
+      title: IncomeVerificationRefreshReconnectNeededWebhook
+      description: Fired when the attempt to refresh Payroll Income data for a user via `/credit/payroll_income/refresh` failed because the user must re-connect their payroll account.
+      additionalProperties: true
+      properties:
+        webhook_type:
+          type: string
+          description: '`INCOME`'
+        webhook_code:
+          type: string
+          description: '`INCOME_VERIFICATION_REFRESH_RECONNECT_NEEDED`'
+        user_id:
+          type: string
+          description: The `user_id` corresponding to the user the webhook has fired for.
+        environment:
+          $ref: '#/components/schemas/WebhookEnvironmentValues'
+      required:
+      - webhook_type
+      - webhook_code
+      - user_id
+      - environment
+      x-examples:
+        example-1:
+          webhook_type: INCOME
+          webhook_code: INCOME_VERIFICATION_REFRESH_RECONNECT_NEEDED
+          user_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
+          environment: production
     BankIncomeRefreshUpdateWebhook:
       type: object
       title: BankIncomeRefreshUpdateWebhook
-      description: Fired when a change to the user's income is detected. You should call `/credit/bank_income/refresh` to get updated income data for the user
+      description: Fired when a change to the user's income is detected. You should call `/credit/bank_income/refresh` to get updated income data for the user. To receive this webhook, subscribe in the [Dashboard](https://dashboard.plaid.com/developers/webhooks).
       additionalProperties: true
       properties:
         webhook_type:
@@ -36985,7 +37999,7 @@ components:
     BankIncomeRefreshCompleteWebhook:
       type: object
       title: BankIncomeRefreshCompleteWebhook
-      description: Fired when a refreshed bank income report has finished generating or failed to generate, triggered by calling `/credit/bank_income/refresh`.
+      description: Fired when a refreshed bank income report has finished generating or failed to generate, triggered by calling `/credit/bank_income/refresh`. To get this webhook, subscribe via the [Dashboard](https://dashboard.plaid.com/developers/webhooks).
       additionalProperties: true
       properties:
         webhook_type:
@@ -37626,6 +38640,9 @@ components:
         asset_report_id:
           type: string
           description: The `asset_report_id` corresponding to the Asset Report the webhook has fired for.
+        user_id:
+          type: string
+          description: The `user_id` corresponding to the User ID the webhook has fired for.
         report_type:
           type: string
           description: The report type, indicating whether the Asset Report is a `full` or `fast` report.
@@ -37670,6 +38687,9 @@ components:
         asset_report_id:
           type: string
           description: The ID associated with the Asset Report.
+        user_id:
+          type: string
+          description: The `user_id` corresponding to the User ID the webhook has fired for.
         environment:
           $ref: '#/components/schemas/WebhookEnvironmentValues'
       required:
@@ -38240,7 +39260,7 @@ components:
       additionalProperties: true
       properties:
         balances:
-          $ref: '#/components/schemas/AccountBalance'
+          $ref: '#/components/schemas/BaseReportAccountBalances'
         mask:
           type: string
           nullable: true
@@ -38290,6 +39310,32 @@ components:
       - owners
       - ownership_type
       - historical_balances
+    BaseReportAccountBalances:
+      title: BaseReportAccountBalances
+      description: Base Report information about an account's balances
+      x-hidden-from-docs: true
+      type: object
+      additionalProperties: true
+      allOf:
+      - $ref: '#/components/schemas/AccountBalance'
+      - type: object
+        additionalProperties: true
+        properties:
+          average_balance:
+            type: number
+            format: double
+            description: The average historical balance for the entire report
+            nullable: true
+          average_monthly_balances:
+            type: array
+            description: The average historical balance of each calendar month
+            items:
+              $ref: '#/components/schemas/BaseReportAverageMonthlyBalances'
+          most_recent_thirty_day_average_balance:
+            type: number
+            format: double
+            description: The average historical balance from the most recent 30 days
+            nullable: true
     BaseReportId:
       title: BaseReportId
       x-hidden-from-docs: true
@@ -38364,9 +39410,11 @@ components:
       properties:
         oldest_transaction_date:
           type: string
+          format: date
           description: Date of the earliest transaction in the base report for the account.
         most_recent_transaction_date:
           type: string
+          format: date
           description: Date of the most recent transaction in the base report for the account.
         days_available:
           type: integer
@@ -38415,11 +39463,13 @@ components:
       properties:
         start_date:
           type: string
+          format: date
           description: |-
             The start date of this time period.
             The date will be returned in an ISO 8601 format (YYYY-MM-DD).
         end_date:
           type: string
+          format: date
           description: |-
             The end date of this time period.
             The date will be returned in an ISO 8601 format (YYYY-MM-DD).
@@ -38435,11 +39485,13 @@ components:
       properties:
         start_date:
           type: string
+          format: date
           description: |-
             The start date of this time period.
             The date will be returned in an ISO 8601 format (YYYY-MM-DD).
         end_date:
           type: string
+          format: date
           description: |-
             The end date of this time period.
             The date will be returned in an ISO 8601 format (YYYY-MM-DD).
@@ -38455,6 +39507,27 @@ components:
       properties:
         start_date:
           type: string
+          format: date
+          description: |-
+            The start date of this time period.
+            The date will be returned in an ISO 8601 format (YYYY-MM-DD).
+        end_date:
+          type: string
+          format: date
+          description: |-
+            The end date of this time period.
+            The date will be returned in an ISO 8601 format (YYYY-MM-DD).
+        total_amount:
+          $ref: '#/components/schemas/CreditAmountWithCurrency'
+    BaseReportAverageMonthlyBalances:
+      title: BaseReportAverageMonthlyBalances
+      description: Average balance in dollar amount per month
+      x-hidden-from-docs: true
+      type: object
+      additionalProperties: true
+      properties:
+        start_date:
+          type: string
           description: |-
             The start date of this time period.
             The date will be returned in an ISO 8601 format (YYYY-MM-DD).
@@ -38463,7 +39536,7 @@ components:
           description: |-
             The end date of this time period.
             The date will be returned in an ISO 8601 format (YYYY-MM-DD).
-        total_amount:
+        average_balance:
           $ref: '#/components/schemas/CreditAmountWithCurrency'
     AddressPurposeLabel:
       description: |-
@@ -38779,7 +39852,7 @@ components:
 
         `first_party`: If this is the same individual as the one who submitted the KYC.
 
-        `third_party`: If this is a different individual from the one who submitted the KYC.
+        `stolen`: If this is a different individual from the one who submitted the KYC.
 
         `synthetic`: If this is an individual using fabricated information.
 
@@ -38788,7 +39861,7 @@ components:
         `unknown`: If you aren't sure who committed the fraud.
       enum:
       - first_party
-      - third_party
+      - stolen
       - synthetic
       - account_takeover
       - unknown
@@ -38824,21 +39897,6 @@ components:
       - postal_code
       - country
       additionalProperties: true
-    BeaconUserCreateEmbeddedReport:
-      description: Data for creating a Beacon Report as part of an initial Beacon User creation. Providing a fraud report as part of an initial Beacon User creation will omit the Beacon User from any billing charges.
-      type: object
-      properties:
-        type:
-          $ref: '#/components/schemas/BeaconReportType'
-        fraud_date:
-          $ref: '#/components/schemas/ISO8601Date'
-        fraud_amount:
-          $ref: '#/components/schemas/FraudAmount'
-      required:
-      - type
-      - fraud_date
-      nullable: true
-      additionalProperties: true
     BeaconUserCreateRequest:
       description: |-
         Request input for creating a Beacon User.
@@ -38855,8 +39913,6 @@ components:
           $ref: '#/components/schemas/ClientUserID'
         user:
           $ref: '#/components/schemas/BeaconUserRequestData'
-        report:
-          $ref: '#/components/schemas/BeaconUserCreateEmbeddedReport'
         client_id:
           $ref: '#/components/schemas/APIClientID'
         secret:
@@ -39054,6 +40110,21 @@ components:
       - name
       - address
       additionalProperties: true
+    BeaconUserReviewRequest:
+      description: Request input for updating the status of a Beacon User
+      type: object
+      properties:
+        beacon_user_id:
+          $ref: '#/components/schemas/BeaconUserID'
+        status:
+          $ref: '#/components/schemas/BeaconUserStatus'
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+      required:
+      - beacon_user_id
+      - status
     BeaconUserStatus:
       type: string
       title: BeaconUserStatus
@@ -44486,7 +45557,7 @@ components:
             $ref: '#/components/schemas/Products'
         products:
           description: |
-            A list of initialized products for the Item. In almost all cases, this will be the same as the `billed_products` field. For some products, it is possible for the product to be initialized on an Item but not yet billed (e.g. Assets, before `/asset_report/create` has been called), in which case the product may appear in `products` but not in `billed_products`.
+            A list of products added to the Item. In almost all cases, this will be the same as the `billed_products` field. For some products, it is possible for the product to be added to an Item but not yet billed (e.g. Assets, before `/asset_report/create` has been called, or Auth or Identity when added as Optional Products but before their endpoints have been called), in which case the product may appear in `products` but not in `billed_products`.
           type: array
           items:
             $ref: '#/components/schemas/Products'
