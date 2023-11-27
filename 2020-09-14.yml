@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.470.1
+  version: 2020-09-14_1.474.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -14364,6 +14364,12 @@ components:
           description: Counterparties and extra merchant fields are now returned by default.
           deprecated: true
           x-hidden-from-docs: true
+        days_requested:
+          description: If Transactions has not already been added to the Item, this option controls the maximum number of days of transaction history Plaid will request from the financial institution. If Transactions has already been added to the Item, this field will have no effect.
+          type: integer
+          minimum: 1
+          maximum: 730
+          default: 90
     TransactionsGetResponse:
       type: object
       additionalProperties: true
@@ -14760,6 +14766,12 @@ components:
           description: Counterparties and extra merchant fields are now returned by default.
           deprecated: true
           x-hidden-from-docs: true
+        days_requested:
+          description: If Transactions has not already been added to the Item, this option controls the maximum number of days of transaction history Plaid will request from the financial institution. If Transactions has already been added to the Item, this field will have no effect.
+          type: integer
+          minimum: 1
+          maximum: 730
+          default: 90
     TransactionsSyncResponse:
       type: object
       additionalProperties: true
@@ -14938,7 +14950,6 @@ components:
           $ref: '#/components/schemas/InstitutionsSearchRequestOptions'
       required:
       - query
-      - products
       - country_codes
     InstitutionsSearchRequestOptions:
       type: object
@@ -15223,6 +15234,13 @@ components:
           type: string
           format: date
           description: The most recent date for which to fetch transaction history. Dates should be formatted as YYYY-MM-DD.
+        days_requested:
+          description: The maximum number of days of transaction history to request for the Transactions product.
+          type: integer
+          minimum: 1
+          maximum: 730
+          default: 90
+          x-hidden-from-docs: true
       title: SandboxPublicTokenCreateRequestOptionsTransactions
     SandboxPublicTokenCreateRequestOptionsIncomeVerification:
       type: object
@@ -17464,6 +17482,7 @@ components:
           - teal
           - zero_hash
           - taba_pay
+          - knot
           description: The processor you are integrating with.
       required:
       - access_token
@@ -17911,6 +17930,8 @@ components:
           $ref: '#/components/schemas/LinkTokenInvestmentsAuth'
         hosted_link:
           $ref: '#/components/schemas/LinkTokenCreateHostedLink'
+        transactions:
+          $ref: '#/components/schemas/LinkTokenTransactions'
         cra_enabled:
           x-hidden-from-docs: true
           type: boolean
@@ -17970,6 +17991,16 @@ components:
           default: false
           type: boolean
           description: If `true`, show institutions that use the masked number match fallback flow.
+    LinkTokenTransactions:
+      description: Configuration parameters for the Transactions product
+      type: object
+      properties:
+        days_requested:
+          description: The maximum number of days of transaction history to request for the Transactions product. For developer accounts created after December 3, 2023, if no value is specified, this will default to 90 days. For developer accounts created on December 3, 2023 or earlier, if no value is specified, this will default to 730 days until June 24, 2024, at which point it will default to 90 days.
+          type: integer
+          minimum: 1
+          maximum: 730
+          default: 90
     LinkTokenCreateHostedLink:
       x-hidden-from-docs: true
       description: Configuration parameters for Hosted Link
@@ -18066,7 +18097,7 @@ components:
         end_date:
           type: string
           format: date
-          description: The end date for statements, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) “YYYY-MM-DD” format, e.g. "2020-10-30". If no value is provided, this will default to the current date.
+          description: The end date for statements, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) “YYYY-MM-DD” format, e.g. "2020-10-30". If no value is provided, this will default to the current date. You can request up to two years of data.
     UserStatedIncomeSourceCategory:
       type: string
       description: The income category for a specified income source
@@ -20365,6 +20396,118 @@ components:
           webhook_type: BEACON
           webhook_code: USER_STATUS_UPDATED
           beacon_user_id: becusr_4WciCrtbxF76T8
+          environment: production
+    BeaconReportCreatedWebhook:
+      title: BeaconReportCreatedWebhook
+      description: Fired when one of your Beacon Users is first reported to the Beacon network.
+      type: object
+      additionalProperties: true
+      properties:
+        webhook_type:
+          type: string
+          description: '`BEACON`'
+        webhook_code:
+          type: string
+          description: '`REPORT_CREATED`'
+        beacon_report_id:
+          type: string
+          description: The ID of the associated Beacon Report.
+        environment:
+          $ref: '#/components/schemas/WebhookEnvironmentValues'
+      required:
+      - webhook_type
+      - webhook_code
+      - beacon_report_id
+      - environment
+      x-examples:
+        example-1:
+          webhook_type: BEACON
+          webhook_code: REPORT_CREATED
+          beacon_report_id: becrpt_2zugxV6hWQZG91
+          environment: production
+    BeaconReportUpdatedWebhook:
+      title: BeaconReportUpdatedWebhook
+      description: Fired when one of your existing Beacon Reports has been modified or removed from the Beacon Network.
+      type: object
+      additionalProperties: true
+      properties:
+        webhook_type:
+          type: string
+          description: '`BEACON`'
+        webhook_code:
+          type: string
+          description: '`REPORT_UPDATED`'
+        beacon_report_id:
+          type: string
+          description: The ID of the associated Beacon Report.
+        environment:
+          $ref: '#/components/schemas/WebhookEnvironmentValues'
+      required:
+      - webhook_type
+      - webhook_code
+      - beacon_report_id
+      - environment
+      x-examples:
+        example-1:
+          webhook_type: BEACON
+          webhook_code: REPORT_UPDATED
+          beacon_report_id: becrpt_2zugxV6hWQZG91
+          environment: production
+    BeaconReportSyndicationCreatedWebhook:
+      title: BeaconReportSyndicationCreatedWebhook
+      description: Fired when a report created on the Beacon Network matches with one of your Beacon Users.
+      type: object
+      additionalProperties: true
+      properties:
+        webhook_type:
+          type: string
+          description: '`BEACON`'
+        webhook_code:
+          type: string
+          description: '`REPORT_SYNDICATION_CREATED`'
+        beacon_report_syndication_id:
+          type: string
+          description: The ID of the associated Beacon Report Syndication.
+        environment:
+          $ref: '#/components/schemas/WebhookEnvironmentValues'
+      required:
+      - webhook_type
+      - webhook_code
+      - beacon_report_syndication_id
+      - environment
+      x-examples:
+        example-1:
+          webhook_type: BEACON
+          webhook_code: REPORT_SYNDICATION_CREATED
+          beacon_report_syndication_id: becrsn_eZPgiiv3JH8rfT
+          environment: production
+    BeaconDuplicateDetectedWebhook:
+      title: BeaconDuplicateDetectedWebhook
+      description: Fired when a Beacon User created within your organization matches one of your existing users.
+      type: object
+      additionalProperties: true
+      properties:
+        webhook_type:
+          type: string
+          description: '`BEACON`'
+        webhook_code:
+          type: string
+          description: '`DUPLICATE_DETECTED`'
+        beacon_duplicate_id:
+          type: string
+          description: The ID of the associated Beacon Duplicate.
+        environment:
+          $ref: '#/components/schemas/WebhookEnvironmentValues'
+      required:
+      - webhook_type
+      - webhook_code
+      - beacon_duplicate_id
+      - environment
+      x-examples:
+        example-1:
+          webhook_type: BEACON
+          webhook_code: DUPLICATE_DETECTED
+          beacon_duplicate_id: becdup_erJcFn97r9sugZ
           environment: production
     IdentityVerificationStepUpdatedWebhook:
       title: IdentityVerificationStepUpdatedWebhook
@@ -45987,3 +46130,36 @@ components:
       format: binary
       type: string
       description: StatementsDownloadResponse defines the response schema for `/statements/download`. The response will contain a `Plaid-Content-Hash` header containing a SHA 256 checksum of the statement. This can be used to verify that the file being sent by Plaid is the same file that was downloaded to your systems.
+    StatementsRefreshRequest:
+      title: StatementsRefreshRequest
+      type: object
+      description: StatementsRefreshRequest defines the request schema for `/statements/refresh`
+      properties:
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        start_date:
+          description: The start date for statements, in “YYYY-MM-DD” format, e.g. "2023-08-30". To determine whether a statement falls within the specified date range, Plaid will use the statement posted date. The statement posted date is typically either the last day of the statement period, or the following day.
+          type: string
+          format: date
+        end_date:
+          description: The end date for statements, in “YYYY-MM-DD” format, e.g. "2023-10-30". You can request up to two years of data. To determine whether a statement falls within the specified date range, Plaid will use the statement posted date. The statement posted date is typically either the last day of the statement period, or the following day.
+          type: string
+          format: date
+      required:
+      - access_token
+      - start_date
+      - end_date
+    StatementsRefreshResponse:
+      title: StatementsRefreshResponse
+      type: object
+      additionalProperties: true
+      description: StatementsRefreshResponse defines the response schema for `/statements/refresh`
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
