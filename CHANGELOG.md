@@ -1,289 +1,393 @@
-### 2020-09-14_1.470.1
+### 2020-09-14_1.474.0
+
+- Added `statements/refresh` endpoint
+
+### 2020-09-14_1.473.0
+
+- Add Beacon webhooks
+
+### 2020-09-14_1.472.0
+
+- Change client library visibility of `options.transactions.days_requested` field for `/link/token/create` and `/sandbox/public_token/create`
+- Add `options.days_requested` field to `/transactions/get` and `/transactions/sync`
+
+### 2020-09-14_1.471.0
+
+[Breaking change for Go client libraries] Make `products` field in `/institutions/search` request optional to fix https://github.com/plaid/plaid-ruby/issues/476
 
 ### 2020-09-14_1.470.0
+
 - Add balance insights firleds to CRA Base Reports
 
 ### 2020-09-14_1.469.1
+
 - Change visibility of `/transactions/recurring/streams/...` endpoints
 
 ### 2020-09-14_1.469.0
+
 - Update date format in Base reports
 
 ### 2020-09-14_1.468.0
+
 - [Breaking change for Go client library] Mark `income_verification.access_tokens` and `access_token` nullable in `link/token/create` request, to match the actual behavior of the API.
-- Add  `other` to `account_filters` in `link/token/create` request
+- Add `other` to `account_filters` in `link/token/create` request
 
 ### 2020-09-14_1.467.0
+
 - Change `/transactions/recurring/streams/merge` and `/transactions/recurring/streams/update` return type
 
 ### 2020-09-14_1.466.0
+
 - Add `/transactions/recurring/streams/create`, `/transactions/recurring/streams/merge`, and `/transactions/recurring/streams/update` endpoints
 
 ### 2020-09-14_1.465.0
+
 - [Breaking change for Go client library] Mark `products`, `required_if_supported_products`, `optional_products`, `additional_consented_products`, and `user.ssn` as nullable in `/link/token/create` request.
 - Set `minLength` for `client_name`, `language`, `access_token`, and `user.client_user_id` in `/link/token/create` request, to match actual validation behavior of the API.
 
 ### 2020-09-14_1.464.1
+
 - Add `webhook_code` to `/sandbox/income/fire_webhook`
 - Change `verification_status` to be an optional field in `/sandbox/income/fire_webhook`
 
 ### 2020-09-14_1.464.0
+
 - Add `/processor/signal/prepare` endpoint.
 
 ### 2020-09-14_1.463.7
+
 - Internal changes only
 
 ### 2020-09-14_1.463.6
+
 - Add `database_matched` to `verification_status` for database matched items.
 
 ### 2020-09-14_1.463.5
+
 - Add `hosted_link.url_lifetime_seconds` to `/link/token/create` request
 
 ### 2020-09-14_1.463.4
+
 - Add `database_match_enabled` field to `auth` object in `link/token/create`
 
 ### 2020-09-14_1.463.3
+
 - Mark `RecurringInsightsStream` fields `is_active`, `merchant_name`, and `average_days_apart` as required.
 
 ### 2020-09-14_1.463.2
+
 - Add `user_id` into the webhook schema for `AssetsProductReadyWebhook`
 
 ### 2020-09-14_1.463.1
+
 - [Breaking change for Go client library] Mark `access_token` and `account_id` required in `/transfer/create`, to match the actual behavior of the API.
 
 ### 2020-09-14_1.463.0
+
 - Add is_user_modified and last_user_modified_date to TransactionStream
 
 ### 2020-09-14_1.462.0
+
 - Update `/beta/transactions/user_insights/v1/get` endpoint with recurring transactions and feature updates.
 
 ### 2020-09-14_1.461.2
+
 - Clean up description for transfer refund simulate route.
 
 ### 2020-09-14_1.461.1
+
 - Remove `client_id` and `secret` from required param list of `/transfer/ledger/distribute`
 
 ### 2020-09-14_1.461.0
+
 - Add `/beacon/user/review` route for updating the status of Beacon Users
 
 ### 2020-09-14_1.460.0
+
 - Permissions manager API: bug fix: update `date` field in ConnectedApplication schema to `date-time` to match API behavior
 - Permissions manager API: add `/item/application/unlink` endpoint
 
 ### 2020-09-14_1.459.2
+
 - Do not support .docx or .doc file for `/transfer/diligence/document/upload`
 
 ### 2020-09-14_1.459.1
+
 - Make `products` request parameter for `/partner/customer/create` optional.
 
 ### 2020-09-14_1.459.0
+
 - Add route `/transfer/ledger/distribute`
 
 ### 2020-09-14_1.458.1
+
 - Refunds start processing after 4 days (not 3 days).
 
 ### 2020-09-14_1.458.0
+
 - Remove `account_ids` parameter `/processor/transactions/get` options object
 - Change `accounts` response field for `/processor/transactions/get` to `account`
 
 ### 2020-09-14_1.457.4
+
 Add BASE_REPORT_WARNING warning type
 
 ### 2020-09-14_1.457.3
+
 Add `BE` to the list of available countries
 
 ### 2020-09-14_1.457.2
+
 - Add `access_tokens` field to `/link/token/create` request
 
 ### 2020-09-14_1.457.1
+
 - Clean up description for transfer ledger simulate routes.
 
 ### 2020-09-14_1.457.0
+
 - Remove `account_ids` parameter from `/processor/transactions/recurring/get` request
 
 ### 2020-09-14_1.456.0
+
 - Add `hosted_link.completion_redirect_uri` to `link/token/create` request
 
 ### 2020-09-14_1.455.2
+
 - Deprecate max_single_transfer_amount and max_monthly_amount in /transfer/configuration/get response.
 - Deprecate monthly_transfer_volume in /transfer/metrics/get response.
 
 ### 2020-09-14_1.455.1
+
 - Update documentation for `/credit/payroll_income/parsing_config/update`
 
 ### 2020-09-14_1.455.0
+
 - Add new /sandbox/transfer/refund/simulate route to simulate refund events in sandbox.
 
 ### 2020-09-14_1.454.0
+
 - Add `is_investments_fallback_item` field to `/investments/holdings/get` and `/investments/transactions/get` responses
 
 ### 2020-09-14_1.453.0
+
 - Add `/credit/payroll_income/parsing_config/update` for updating the parsing configuration for document income verficiations
 
 ### 2020-09-14_1.452.0
+
 - Add `warnings` field to `/cra/base_report/get` response
 
 ### 2020-09-14_1.451.0
+
 - Add `/beacon/report_syndication/list` for listing `BeaconReportSyndication` objects linked to a specific `BeaconUser`
 
 ### 2020-09-14_1.450.0
+
 - [Breaking] Remove `user_token` field from `asset_report/create` request.
 
 ### 2020-09-14_1.449.2
+
 - Updates `isin` and `cusip` field descriptions for new call to action.
 
 ### 2020-09-14_1.449.1
+
 - Add new refund event types.
 
 ### 2020-09-14_1.449.0
+
 - Add `/beacon/report/list` for listing `BeaconReport` objects created for a specific `BeaconUser`
 
 ### 2020-09-14_1.448.0
+
 - Make `publisher` field from `FDXNotifications` as optional
 
 ### 2020-09-14_1.447.0
+
 - Mark `fraud_amount` as nullable for `BeaconReport` objects in `/beacon/report/create`
 
 ### 2020-09-14_1.446.0
+
 - Add `allow_manual_entry` field to `investments` object in `link/token/create`
 - Update `/credit/freddie_mac/reports/get` return type data shape to contain one object with both VOA and VOE assets combined
 
 ### 2020-09-14_1.445.0
+
 - Add new insights and counterparty fields for Transactions endpoints
 - Deprecate legacy category fields for Transactions endpoints
 
 ### 2020-09-14_1.444.0
+
 - Add new webhook type `AUTHORIZATION_GRANTED` to `sandbox/item/fire_webhook`
 
 ### 2020-09-14_1.443.0
+
 - Add `RETURN` as possible Virtual Account wallet transaction type
 
 ### 2020-09-14_1.442.0
+
 - Add `facilitator_fee` field for the Transfers endpoints
 
 ### 2020-09-14_1.441
+
 - [Breaking change for Go client library] Update `/transfer/capabilities/get` to no longer accept payment profile token and require an `account_id` and `access_token`
 - Update examples for ledger endpoints to be more realistic
 
 ### 2020-09-14_1.440.0
+
 - Add `optional_products` parameter to `/link/token/create` request.
 
 ### 2020-09-14_1.439.0
+
 - [Breaking] Renamed `TransactionsEnrichGetRequest` and `TransactionsEnrichGetResponse` objects to
   `TransactionsEnrichRequest` and `TransactionsEnrichResponse`.
 
 ### 2020-09-14_1.438.1
+
 - [Breaking change for Go client library] remove `device`, `user_present` from required request param list of `/transfer/recurring/create`
 
 ### 2020-09-14_1.438.0
+
 - Add new `/beta/transactions/user_insights/v1/get` endpoint
 
 ### 2020-09-14_1.437.0
+
 - Remove min/max restriction of `days_requested` in OpenAPI.
 
 ### 2020-09-14_1.436.0
+
 - Update `days_requested` to be a required field in base reports in `link/token/create`
 
 ### 2020-09-14_1.435.0
+
 - Update `/sandbox/transfer/sweep/simulate` to mark `swept` transfers as `swept_settled`.
 
 ### 2020-09-14_1.434.0
+
 - Added a new type of webhook for dashboard alerts, `InstitutionStatusAlertWebhook`.
 
 ### 2020-09-14_1.433.0
+
 - Update response of `/transfer/authorizarion/create`
 
 ### 2020-09-14_1.432.0
+
 - Update `days_requested` in `base_report` in `link/token/create` to enforce a min/max of 1/731 days
 
 ### 2020-09-14_1.431.7
+
 - Add processor Zero Hash
 
 ### 2020-09-14_1.431.6
+
 - Update response example of `sandbox/transfer/ledger/deposit/simulate` and `sandbox/transfer/ledger/withdraw/simulate`
 
 ### 2020-09-14_1.431.5
+
 - Update the description of `sweep.settled` event
 
 ### 2020-09-14_1.431.4
+
 - Update description of endpoint `/sandbox/transfer/ledger/simulate_available`
 
 ### 2020-09-14_1.431.3
+
 - Deprecate `originator_client_id` in `/transfer/get`, `/transfer/cancel`, and `/transfer/balance/get`
 
 ### 2020-09-14_1.431.2
+
 - Docs updates for Statements endpoints
 
 ### 2020-09-14_1.431.1
+
 - Remove `balance` field from response of `/sandbox/transfer/ledger/simulate_available`
 
 ### 2020-09-14_1.431.0
+
 - Add `/user/update` and update the description for consumer report user identity
 
 ### 2020-09-14_1.430.3
+
 - Add `sandbox/transfer/ledger/deposit/simulate` and `sandbox/transfer/ledger/withdraw/simulate`
 
 ### 2020-09-14_1.430.2
+
 - Update `transfer/sweep/list` to support filter by `trigger`
 
 ### 2020-09-14_1.430.1
+
 - Add `transfer/ledger/withdraw` route
 
 ### 2020-09-14_1.430.0
+
 - Add `transfer/originator/funding_account/update` route
 
 ### 2020-09-14_1.429.3
+
 - add ledger sweep event types to `TransferEventType`
 
 ### 2020-09-14_1.429.2
+
 - Documentation updates for `LOGIN_REPAIRED` webhook and transfer.
 - Add `transfer/ledger/deposit` route
 
 ### 2020-09-14_1.429.1
+
 - Updated /identity/match's address score threshold recommendation from 80 or above to 70 or above
 
 ### 2020-09-14_1.429.0
+
 - [Breaking change for Go client library] For Transfer endpoints that take payment profiles as input, remove `payment_profile` field and make
-`account_id` and `access_token` mandatory. The removed field is not in use.
+  `account_id` and `access_token` mandatory. The removed field is not in use.
 - Mark all payment profile-specific endpoints as `deprecated`.
 - Docs updates for Transfer, including clarifying that certain request fields for `/transfer/authorization/create`
-are not currently used.
+  are not currently used.
 - Propagate Signal docs update from 2020-09-14_1.419.0 to all relevant endpoints.
 - Add `institution_not_supported` as a property to `LinkSessionExitMetadata.Status`
 
 ### 2020-09-14_1.428.1
+
 - Change `/credit/reports/freddie_mac/get` schema to contain new `ReportingInformationParentIdentifier` field
 
 ### 2020-09-14_1.428.0
+
 - Add `verification_report_type` to `asset_report/create` request
 
 ### 2020-09-14_1.427.1
+
 - Remove references to the verification `report_type` field in `asset_report/get` and `asset_report/pdf/get`
 
 ### 2020-09-14_1.427.0
+
 - Add `/processor/account/get` route
 
 ### 2020-09-14_1.426.0
+
 - Add `instant_microdeposits_enabled` field to `auth` object in `link/token/create`
 
 ### 2020-09-14_1.425.0
+
 - Add `investments` field to `asset_report/get` response as part of the `items.accounts` object
 
 ### 2020-09-14_1.424.2
+
 - Update descriptions of some Transactions endpoint fields
 
 ### 2020-09-14_1.424.1
+
 - Add clarification to processor webhook doc that the processor can call it
 - Fix `sandbox/transfer/ledger/simulate_available` doc url
 
 ### 2020-09-14_1.424.0
+
 - Add `/sandbox/transfer/ledger/simulate_available` route
 
 ### 2020-09-14_1.423.0
+
 - Update code of `BaseReportsErrorWebhook` to `ERROR`
 - Add new enum to StudentRepaymentPlan and add to description of repayment_plan_type
 
 ### 2020-09-14_1.422.0
+
 - Move `BaseReportsProductReadyWebhook` and `BaseReportsErrorWebhook`
 - Remove `asset_report_id` and add `user_id` to `BaseReportsErrorWebhook`
 
