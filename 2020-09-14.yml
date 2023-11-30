@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.474.0
+  version: 2020-09-14_1.474.3
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -4910,6 +4910,44 @@ paths:
       description: Use the `/beacon/report_syndication/list` endpoint to view all Beacon Reports that have been syndicated to a specific Beacon User. This endpoint returns Beacon Report Syndications which are references to Beacon Reports created either by you, or another Beacon customer, that matched the specified Beacon User. A Beacon User can have multiple active Beacon Report Syndications at once. The results from this endpoint are paginated; the `next_cursor` field will be populated if there is another page of results that can be retrieved. To fetch the next page, pass the `next_cursor` value as the `cursor` parameter in the next request.
       externalDocs:
         url: /api/products/beacon/#beaconreportsyndicationlist
+  /beacon/report/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
+    post:
+      summary: Get a Beacon Report
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BeaconReportGetRequest'
+        required: true
+      tags:
+      - plaid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BeaconReportGetResponse'
+              examples:
+                example-1:
+                  value:
+                    id: becrpt_11111111111111
+                    beacon_user_id: becusr_11111111111111
+                    created_at: "2020-07-24T03:26:02Z"
+                    type: first_party
+                    fraud_date: "1990-05-29"
+                    fraud_amount:
+                      iso_currency_code: USD
+                      value: 100
+                    audit_trail:
+                      source: dashboard
+                      dashboard_user_id: 54350110fedcbaf01234ffee
+                    request_id: saKrIBuEB9qJZng
+      operationId: beaconReportGet
+      description: Returns a Beacon report for a given Beacon report id.
+      externalDocs:
+        url: /api/products/beacon/#beaconreportget
   /processor/auth/get:
     x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
@@ -14365,7 +14403,10 @@ components:
           deprecated: true
           x-hidden-from-docs: true
         days_requested:
-          description: If Transactions has not already been added to the Item, this option controls the maximum number of days of transaction history Plaid will request from the financial institution. If Transactions has already been added to the Item, this field will have no effect.
+          description: |-
+            This option only applies to calls for Items that were not initialized with Transactions during Link and are now adding the Transactions product to the Item for the first time. In these cases, this option controls the maximum number of days of transaction history that Plaid will request from the financial institution. For developer accounts created after December 3, 2023, if no value is specified, this will default to 90 days. For developer accounts created on December 3, 2023 or earlier, if no value is specified, this will default to 730 days until June 24, 2024, at which point it will default to 90 days.
+
+            If Transactions has already been added to the Item prior to this call, this field will have no effect.
           type: integer
           minimum: 1
           maximum: 730
@@ -14767,7 +14808,10 @@ components:
           deprecated: true
           x-hidden-from-docs: true
         days_requested:
-          description: If Transactions has not already been added to the Item, this option controls the maximum number of days of transaction history Plaid will request from the financial institution. If Transactions has already been added to the Item, this field will have no effect.
+          description: |-
+            This option only applies to calls for Items that were not initialized with Transactions during Link and are now adding the Transactions product to the Item for the first time. In these cases, this option controls the maximum number of days of transaction history that Plaid will request from the financial institution. For developer accounts created after December 3, 2023, if no value is specified, this will default to 90 days. For developer accounts created on December 3, 2023 or earlier, if no value is specified, this will default to 730 days until June 24, 2024, at which point it will default to 90 days.
+
+            If Transactions has already been added to the Item prior to this call, this field will have no effect.
           type: integer
           minimum: 1
           maximum: 730
@@ -17892,6 +17936,8 @@ components:
           description: The name of your app's Android package. Required if using the `link_token` to initialize Link on Android. Any package name specified here must also be added to the Allowed Android package names setting on the [developer dashboard](https://dashboard.plaid.com/team/api). When creating a `link_token` for initializing Link on other platforms, `android_package_name` must be left blank and `redirect_uri` should be used instead.
         institution_data:
           $ref: '#/components/schemas/LinkTokenCreateInstitutionData'
+        card_switch:
+          $ref: '#/components/schemas/LinkTokenCreateCardSwitch'
         account_filters:
           $ref: '#/components/schemas/LinkTokenAccountFilters'
         eu_config:
@@ -18187,6 +18233,16 @@ components:
         routing_number:
           type: string
           description: The routing number of the bank to highlight.
+    LinkTokenCreateCardSwitch:
+      type: object
+      description: A map containing data to pass in for the Card Switch flow.
+      x-hidden-from-docs: true
+      properties:
+        card_bin:
+          type: string
+          description: The BIN (Bank Identification Number) of the card to switch.
+      required:
+      - card_bin
     LinkTokenCreateRequestUser:
       type: object
       description: An object specifying information about the end user who will be linking their account.
@@ -22280,6 +22336,7 @@ components:
       - auth
       - balance
       - identity
+      - identity_match
       - investments
       - investments_auth
       - liabilities
@@ -25399,7 +25456,9 @@ components:
           items:
             $ref: '#/components/schemas/TransferExpectedSweepSettlementScheduleItem'
         credit_funds_source:
-          $ref: '#/components/schemas/TransferCreditFundsSource'
+          deprecated: true
+          allOf:
+          - $ref: '#/components/schemas/TransferCreditFundsSource'
         facilitator_fee:
           $ref: '#/components/schemas/TransferFacilitatorFee'
         network_trace_id:
@@ -25657,6 +25716,8 @@ components:
       - prefunded_ach_credits
       - null
       description: |-
+        This field is now deprecated. You may ignore it for transfers created on and after 12/01/2023.
+
         Specifies the source of funds for the transfer. Only valid for `credit` transfers, and defaults to `sweep` if not specified. This field is not specified for `debit` transfers.
 
         `sweep` - Sweep funds from your funding account
@@ -26120,7 +26181,9 @@ components:
           nullable: true
           description: The Plaid client ID that is the originator of this transfer. Only present if created on behalf of another client as a [Platform customer](https://plaid.com/docs/transfer/application/#originators-vs-platforms).
         credit_funds_source:
-          $ref: '#/components/schemas/TransferCreditFundsSource'
+          deprecated: true
+          allOf:
+          - $ref: '#/components/schemas/TransferCreditFundsSource'
       required:
       - type
       - user
@@ -26477,7 +26540,10 @@ components:
           nullable: true
           description: The Plaid client ID that is the originator of this transfer. Only needed if creating transfers on behalf of another client as a [Platform customer](https://plaid.com/docs/transfer/application/#originators-vs-platforms).
         credit_funds_source:
-          $ref: '#/components/schemas/TransferCreditFundsSource'
+          x-hidden-from-docs: true
+          deprecated: true
+          allOf:
+          - $ref: '#/components/schemas/TransferCreditFundsSource'
         test_clock_id:
           type: string
           description: Plaid’s unique identifier for a test clock. This field may only be used when using `sandbox` environment. If provided, the `authorization` is created at the `virtual_time` on the provided test clock.
@@ -38318,6 +38384,35 @@ components:
       - status
       - link_session_id
       - link_token
+    HostedMMDVerificationWebhook:
+      x-hidden-from-docs: true
+      title: HostedMMDVerificationWebhook
+      type: object
+      additionalProperties: true
+      description: Contains the state of a hosted same-day microdeposits verification session.
+      properties:
+        webhook_type:
+          type: string
+          description: '`AUTH`'
+        webhook_code:
+          type: string
+          description: '`HOSTED_VERIFICATION`'
+        status:
+          type: string
+          description: The final status of the same-day microdeposits verification. Will always be "MANUALLY_VERIFIED" or "VERIFICATION_FAILED".
+        item_id:
+          $ref: '#/components/schemas/ItemId'
+        account_id:
+          type: string
+          description: The external account ID of the affected account
+        environment:
+          $ref: '#/components/schemas/WebhookEnvironmentValues'
+      required:
+      - webhook_type
+      - webhook_code
+      - status
+      - item_id
+      - account_id
     InstitutionStatusAlertWebhook:
       title: InstitutionStatusAlertWebhook
       description: Fired when institution status meets the conditions configured in the developer dashboard.
@@ -39803,6 +39898,54 @@ components:
       - type
       - fraud_date
     BeaconReportCreateResponse:
+      description: |-
+        A Beacon Report describes the type of fraud committed by a user as well as the date the fraud was committed and the total amount of money lost due to the fraud incident.
+
+        This information is used to block similar fraud attempts on your platform as well as alert other companies who screen a user with matching identity information.
+        Other companies will not receive any new identity information, just what matched, plus information such as industry, type of fraud, and date of fraud.
+
+        You can manage your fraud reports by adding, deleting, or editing reports as you get additional information on fraudulent users.
+      additionalProperties: true
+      properties:
+        id:
+          $ref: '#/components/schemas/BeaconReportID'
+        beacon_user_id:
+          $ref: '#/components/schemas/BeaconUserID'
+        created_at:
+          $ref: '#/components/schemas/Timestamp'
+        type:
+          $ref: '#/components/schemas/BeaconReportType'
+        fraud_date:
+          $ref: '#/components/schemas/ISO8601Date'
+        fraud_amount:
+          $ref: '#/components/schemas/FraudAmount'
+        audit_trail:
+          $ref: '#/components/schemas/BeaconAuditTrail'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - id
+      - beacon_user_id
+      - created_at
+      - type
+      - fraud_date
+      - fraud_amount
+      - audit_trail
+      - request_id
+      type: object
+    BeaconReportGetRequest:
+      description: Request input for getting a Beacon Report
+      type: object
+      properties:
+        beacon_report_id:
+          $ref: '#/components/schemas/BeaconReportID'
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+      required:
+      - beacon_report_id
+    BeaconReportGetResponse:
       description: |-
         A Beacon Report describes the type of fraud committed by a user as well as the date the fraud was committed and the total amount of money lost due to the fraud incident.
 
