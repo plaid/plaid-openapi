@@ -1,3 +1,13 @@
+### 2020-09-14_1.474.3
+- Internal changes only
+
+### 2020-09-14_1.474.2
+- Deprecate `credit_funds_source` in `/transfer/authorization/create` request
+
+### 2020-09-14_1.474.1
+
+- Added `identity_match` to Products schema object
+
 ### 2020-09-14_1.474.0
 
 - Added `statements/refresh` endpoint
