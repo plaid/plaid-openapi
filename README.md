@@ -34,7 +34,7 @@ openapi-generator-cli generate -g python \
 ```
 
 #### plaid-ruby
-OpenAPI Generator version: 6.1
+OpenAPI Generator version: 6.3
 
 ```bash
 openapi-generator-cli generate -g ruby  \
