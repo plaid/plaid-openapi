@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.482.3
+  version: 2020-09-14_1.485.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -986,7 +986,10 @@ paths:
                     institution_name: Chase
                     accounts:
                     - account_id: 3gE5gnRzNyfXpBK5wEEKcymJ5albGVUqg77gr
+                      account_mask: "0000"
                       account_name: Plaid Saving
+                      account_official_name: Plaid Silver Standard 0.1% Interest Saving
+                      account_subtype: savings
                       account_type: depository
                       statements:
                       - statement_id: vzeNDwK7KQIm4yEog683uElbp9GRLEFXGK98D
@@ -1025,6 +1028,34 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/StatementsDownloadRequest'
+        description: ""
+  /statements/refresh:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
+    post:
+      tags:
+      - plaid
+      externalDocs:
+        url: /api/products/statements#statementsrefresh
+      summary: Refresh statements data.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatementsRefreshResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: eYupqX1mZkEuQRx
+      operationId: statementsRefresh
+      description: '`/statements/refresh` initiates an on-demand extraction to fetch the statements for the provided dates.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatementsRefreshRequest'
         description: ""
   /item/activity/list:
     x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
@@ -3089,7 +3120,7 @@ paths:
   /identity_verification/create:
     x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
-      summary: Create a new identity verification
+      summary: Create a new Identity Verification
       description: |
         Create a new Identity Verification for the user specified by the `client_user_id` field. The requirements and behavior of the verification are determined by the `template_id` provided.
         If you don't know whether the associated user already has an active Identity Verification, you can specify `"is_idempotent": true` in the request body. With idempotency enabled, a new Identity Verification will only be created if one does not already exist for the associated `client_user_id` and `template_id`. If an Identity Verification is found, it will be returned unmodified with an `200 OK` HTTP status code.
@@ -3387,7 +3418,7 @@ paths:
                     redacted_at: "2020-07-24T03:26:02Z"
                     request_id: saKrIBuEB9qJZng
       operationId: identityVerificationGet
-      description: Retrieve a previously created identity verification.
+      description: Retrieve a previously created Identity Verification.
       requestBody:
         content:
           application/json:
@@ -3701,7 +3732,7 @@ paths:
                     redacted_at: "2020-07-24T03:26:02Z"
                     request_id: saKrIBuEB9qJZng
       operationId: identityVerificationRetry
-      description: Allow a customer to retry their identity verification
+      description: Allow a customer to retry their Identity Verification
       externalDocs:
         url: /api/products/identity-verification/#identity_verificationretry
   /watchlist_screening/entity/create:
@@ -4627,7 +4658,7 @@ paths:
               examples:
                 example-1:
                   value:
-                    id: becusr_11111111111111
+                    id: becusr_42cF1MNo42r9Xj
                     created_at: "2020-07-24T03:26:02Z"
                     updated_at: "2020-07-24T03:26:02Z"
                     status: cleared
@@ -4690,7 +4721,7 @@ paths:
               examples:
                 example-1:
                   value:
-                    id: becusr_11111111111111
+                    id: becusr_42cF1MNo42r9Xj
                     created_at: "2020-07-24T03:26:02Z"
                     updated_at: "2020-07-24T03:26:02Z"
                     status: cleared
@@ -4747,7 +4778,7 @@ paths:
               examples:
                 example-1:
                   value:
-                    id: becusr_11111111111111
+                    id: becusr_42cF1MNo42r9Xj
                     created_at: "2020-07-24T03:26:02Z"
                     updated_at: "2020-07-24T03:26:02Z"
                     status: cleared
@@ -4814,7 +4845,7 @@ paths:
                 example-1:
                   value:
                     id: becrpt_11111111111111
-                    beacon_user_id: becusr_11111111111111
+                    beacon_user_id: becusr_42cF1MNo42r9Xj
                     created_at: "2020-07-24T03:26:02Z"
                     type: first_party
                     fraud_date: "1990-05-29"
@@ -4856,7 +4887,7 @@ paths:
                   value:
                     beacon_reports:
                     - id: becrpt_11111111111111
-                      beacon_user_id: becusr_11111111111111
+                      beacon_user_id: becusr_42cF1MNo42r9Xj
                       created_at: "2020-07-24T03:26:02Z"
                       type: first_party
                       fraud_date: "1990-05-29"
@@ -4938,7 +4969,7 @@ paths:
                 example-1:
                   value:
                     id: becrpt_11111111111111
-                    beacon_user_id: becusr_11111111111111
+                    beacon_user_id: becusr_42cF1MNo42r9Xj
                     created_at: "2020-07-24T03:26:02Z"
                     type: first_party
                     fraud_date: "1990-05-29"
@@ -5016,7 +5047,7 @@ paths:
               examples:
                 example-1:
                   value:
-                    id: becusr_11111111111111
+                    id: becusr_42cF1MNo42r9Xj
                     created_at: "2020-07-24T03:26:02Z"
                     updated_at: "2020-07-24T03:26:02Z"
                     status: cleared
@@ -5059,6 +5090,102 @@ paths:
         Plaid maintains a version history for each Beacon User, so the Beacon User's identity data before and after the update is retained as separate versions.
       externalDocs:
         url: /api/products/beacon/#beaconuserupdate
+  /beacon/duplicate/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
+    post:
+      summary: Get a Beacon Duplicate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BeaconDuplicateGetRequest'
+        required: true
+      tags:
+      - plaid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BeaconDuplicateGetResponse'
+              examples:
+                example-1:
+                  value:
+                    id: becdup_11111111111111
+                    beacon_user1:
+                      id: becusr_42cF1MNo42r9Xj
+                      version: 1
+                    beacon_user2:
+                      id: becusr_42cF1MNo42r9Xj
+                      version: 1
+                    analysis:
+                      address: match
+                      date_of_birth: match
+                      email_address: match
+                      name: match
+                      id_number: match
+                      ip_address: match
+                      phone_number: match
+                    request_id: saKrIBuEB9qJZng
+      operationId: beaconDuplicateGet
+      description: |
+        Returns a Beacon Duplicate for a given Beacon Duplicate id.
+
+        A Beacon Duplicate represents a pair of similar Beacon Users within your organization.
+
+        Two Beacon User revisions are returned for each Duplicate record in either the `beacon_user1` or `beacon_user2` response fields.
+
+        The `analysis` field in the response indicates which fields matched between `beacon_user1` and `beacon_user2`.
+      externalDocs:
+        url: /api/products/beacon/#beaconduplicateget
+  /identity_verification/autofill/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
+    post:
+      x-hidden-from-docs: true
+      summary: Create autofill for an Identity Verification
+      description: Try to autofill an Identity Verification based of the provided phone number, date of birth and country of residence.
+      tags:
+      - plaid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentityVerificationAutofillCreateRequest'
+            example:
+              identity_verification_id: flwses_42cF1MNo42r9Xj
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityVerificationAutofillCreateResponse'
+              examples:
+                example-1:
+                  value:
+                    status: success
+                    user:
+                      name:
+                        given_name: Leslie
+                        family_name: Knope
+                      address:
+                        street: 123 Main St.
+                        street2: Unit 42
+                        city: Pawnee
+                        region: IN
+                        postal_code: "46001"
+                        country: US
+                        po_box: "yes"
+                        type: residential
+                      id_number:
+                        value: "123456789"
+                        type: us_ssn
+                    request_id: saKrIBuEB9qJZng
+      operationId: identityVerificationAutofillCreate
+      externalDocs:
+        url: /api/products/identity-verification/#identity_verificationautofillcreate
   /processor/auth/get:
     x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
@@ -5904,6 +6031,80 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ProcessorBankTransferCreateRequest'
+  /processor/liabilities/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
+    post:
+      tags:
+      - plaid
+      summary: Retrieve Liabilities data
+      externalDocs:
+        url: /api/processors/#processorliabilitiesget
+      operationId: processorLiabilitiesGet
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessorLiabilitiesGetResponse'
+              examples:
+                example-1:
+                  value:
+                    account:
+                      account_id: dVzbVMLjrxTnLjX4G66XUp5GLklm4oiZy88yK
+                      balances:
+                        available: null
+                        current: 410
+                        iso_currency_code: USD
+                        limit: 2000
+                        unofficial_currency_code: null
+                      mask: "3333"
+                      name: Plaid Credit Card
+                      official_name: Plaid Diamond 12.5% APR Interest Credit Card
+                      subtype: credit card
+                      type: credit
+                    liabilities:
+                      credit:
+                      - account_id: dVzbVMLjrxTnLjX4G66XUp5GLklm4oiZy88yK
+                        aprs:
+                        - apr_percentage: 15.24
+                          apr_type: balance_transfer_apr
+                          balance_subject_to_apr: 1562.32
+                          interest_charge_amount: 130.22
+                        - apr_percentage: 27.95
+                          apr_type: cash_apr
+                          balance_subject_to_apr: 56.22
+                          interest_charge_amount: 14.81
+                        - apr_percentage: 12.5
+                          apr_type: purchase_apr
+                          balance_subject_to_apr: 157.01
+                          interest_charge_amount: 25.66
+                        - apr_percentage: 0
+                          apr_type: special
+                          balance_subject_to_apr: 1000
+                          interest_charge_amount: 0
+                        is_overdue: false
+                        last_payment_amount: 168.25
+                        last_payment_date: "2019-05-22"
+                        last_statement_issue_date: "2019-05-28"
+                        last_statement_balance: 1708.77
+                        minimum_payment_amount: 20
+                        next_payment_due_date: "2020-05-28"
+                      mortgage: []
+                      student: []
+                    request_id: dTnnm60WgKGLnKL
+      description: |-
+        The `/processor/liabilities/get` endpoint returns various details about a loan or credit account. Liabilities data is available primarily for US financial institutions, with some limited coverage of Canadian institutions. Currently supported account types are account type `credit` with account subtype `credit card` or `paypal`, and account type `loan` with account subtype `student` or `mortgage`.
+
+        The types of information returned by Liabilities can include balances and due dates, loan terms, and account details such as original loan amount and guarantor. Data is refreshed approximately once per day; the latest data can be retrieved by calling `/processor/liabilities/get`.
+
+        Note: This request may take some time to complete if `liabilities` was not specified as an initial product when creating the processor token. This is because Plaid must communicate directly with the institution to retrieve the additional data.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcessorLiabilitiesGetRequest'
   /processor/identity/get:
     x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
@@ -7010,7 +7211,6 @@ paths:
                       value: 100
                     status: PAYMENT_STATUS_INPUT_NEEDED
                     last_status_update: "2019-11-06T21:10:52Z"
-                    payment_expiration_time: "2019-11-06T21:25:52Z"
                     recipient_id: recipient-id-sandbox-9b6b4679-914b-445b-9450-efbdb80296f6
                     bacs:
                       account: "31926819"
@@ -16001,194 +16201,6 @@ components:
       - outflow_streams
       - updated_datetime
       - request_id
-    ProcessorSignalEvaluateRequest:
-      title: ProcessorSignalEvaluateRequest
-      description: ProcessorSignalEvaluateRequest defines the request schema for `/processor/signal/evaluate`
-      type: object
-      properties:
-        client_id:
-          $ref: '#/components/schemas/APIClientID'
-        secret:
-          $ref: '#/components/schemas/APISecret'
-        processor_token:
-          $ref: '#/components/schemas/ProcessorToken'
-        client_transaction_id:
-          type: string
-          description: The unique ID that you would like to use to refer to this transaction. For your convenience mapping your internal data, you could use your internal ID/identifier for this transaction. The max length for this field is 36 characters.
-          minLength: 1
-          maxLength: 36
-        amount:
-          type: number
-          format: double
-          description: The transaction amount, in USD (e.g. `102.05`)
-        user_present:
-          type: boolean
-          description: '`true` if the end user is present while initiating the ACH transfer and the endpoint is being called; `false` otherwise (for example, when the ACH transfer is scheduled and the end user is not present, or you call this endpoint after the ACH transfer but before submitting the Nacha file for ACH processing).'
-          nullable: true
-        client_user_id:
-          type: string
-          description: A unique ID that identifies the end user in your system. This ID is used to correlate requests by a user with multiple Items. Personally identifiable information, such as an email address or phone number, should not be used in the `client_user_id`.
-        is_recurring:
-          type: boolean
-          description: '**true** if the ACH transaction is a recurring transaction; **false** otherwise '
-          nullable: true
-        default_payment_method:
-          type: string
-          description: |-
-            The default ACH or non-ACH payment method to complete the transaction.
-            `SAME_DAY_ACH`: Same Day ACH by NACHA. The debit transaction is processed and settled on the same day
-            `NEXT_DAY_ACH`: Next Day ACH settlement for debit transactions, offered by some payment processors
-            `STANDARD_ACH`: standard ACH by NACHA
-            `REAL_TIME_PAYMENTS`: real-time payments such as RTP and FedNow
-            `DEBIT_CARD`: if the default payment is over debit card networks
-            `MULTIPLE_PAYMENT_METHODS`: if there is no default debit rail or there are multiple payment methods
-            Possible values:  `SAME_DAY_ACH`, `NEXT_DAY_ACH`, `STANDARD_ACH`, `REAL_TIME_PAYMENTS`, `DEBIT_CARD`, `MULTIPLE_PAYMENT_METHODS`
-          nullable: true
-        user:
-          $ref: '#/components/schemas/SignalUser'
-        device:
-          $ref: '#/components/schemas/SignalDevice'
-      required:
-      - processor_token
-      - client_transaction_id
-      - amount
-    ProcessorSignalEvaluateResponse:
-      title: ProcessorSignalEvaluateResponse
-      description: ProcessorSignalEvaluateResponse defines the response schema for `/processor/signal/evaluate`
-      type: object
-      additionalProperties: true
-      properties:
-        request_id:
-          $ref: '#/components/schemas/RequestID'
-        scores:
-          $ref: '#/components/schemas/SignalScores'
-        core_attributes:
-          $ref: '#/components/schemas/SignalEvaluateCoreAttributes'
-        warnings:
-          type: array
-          description: If bank information was not available to be used in the Signal model, this array contains warnings describing why bank data is missing. If you want to receive an API error instead of Signal scores in the case of missing bank data, file a support ticket or contact your Plaid account manager.
-          items:
-            $ref: '#/components/schemas/SignalWarning'
-      required:
-      - request_id
-      - scores
-    ProcessorSignalDecisionReportRequest:
-      title: ProcessorSignalDecisionReportRequest
-      description: ProcessorSignalDecisionReportRequest defines the request schema for `/processor/signal/decision/report`
-      type: object
-      properties:
-        client_id:
-          $ref: '#/components/schemas/APIClientID'
-        secret:
-          $ref: '#/components/schemas/APISecret'
-        processor_token:
-          $ref: '#/components/schemas/ProcessorToken'
-        client_transaction_id:
-          type: string
-          description: Must be the same as the `client_transaction_id` supplied when calling `/signal/evaluate`
-          minLength: 1
-          maxLength: 36
-        initiated:
-          type: boolean
-          description: |-
-            `true` if the ACH transaction was initiated, `false` otherwise.
-
-            This field must be returned as a boolean. If formatted incorrectly, this will result in an [`INVALID_FIELD`](/docs/errors/invalid-request/#invalid_field) error.
-        days_funds_on_hold:
-          type: integer
-          description: |-
-            The actual number of days (hold time) since the ACH debit transaction that you wait before making funds available to your customers. The holding time could affect the ACH return rate.
-
-            For example, use 0 if you make funds available to your customers instantly or the same day following the debit transaction, or 1 if you make funds available the next day following the debit initialization.
-          minimum: 0
-          nullable: true
-        decision_outcome:
-          $ref: '#/components/schemas/SignalDecisionOutcome'
-        payment_method:
-          $ref: '#/components/schemas/SignalPaymentMethod'
-        amount_instantly_available:
-          type: number
-          format: double
-          description: 'The amount (in USD) made available to your customers instantly following the debit transaction. It could be a partial amount of the requested transaction (example: 102.05).'
-          nullable: true
-      required:
-      - processor_token
-      - client_transaction_id
-      - initiated
-    ProcessorSignalDecisionReportResponse:
-      title: ProcessorSignalDecisionReportResponse
-      description: ProcessorSignalDecisionReportResponse defines the response schema for `/processor/signal/decision/report`
-      additionalProperties: true
-      type: object
-      properties:
-        request_id:
-          $ref: '#/components/schemas/RequestID'
-      required:
-      - request_id
-    ProcessorSignalReturnReportRequest:
-      title: ProcessorSignalReturnReportRequest
-      description: ProcessorSignalReturnReportRequest defines the request schema for `/processor/signal/return/report`
-      type: object
-      properties:
-        client_id:
-          $ref: '#/components/schemas/APIClientID'
-        secret:
-          $ref: '#/components/schemas/APISecret'
-        processor_token:
-          $ref: '#/components/schemas/ProcessorToken'
-        client_transaction_id:
-          type: string
-          description: Must be the same as the `client_transaction_id` supplied when calling `/processor/signal/evaluate`
-          minLength: 1
-          maxLength: 36
-        return_code:
-          type: string
-          description: |-
-            Must be a valid ACH return code (e.g. "R01")
-
-            If formatted incorrectly, this will result in an [`INVALID_FIELD`](/docs/errors/invalid-request/#invalid_field) error.
-        returned_at:
-          type: string
-          format: date-time
-          description: Date and time when you receive the returns from your payment processors, in ISO 8601 format (`YYYY-MM-DDTHH:mm:ssZ`).
-          nullable: true
-      required:
-      - processor_token
-      - client_transaction_id
-      - return_code
-    ProcessorSignalReturnReportResponse:
-      title: ProcessorSignalReturnReportResponse
-      description: ProcessorSignalReturnReportResponse defines the response schema for `/processor/signal/return/report`
-      additionalProperties: true
-      type: object
-      properties:
-        request_id:
-          $ref: '#/components/schemas/RequestID'
-      required:
-      - request_id
-    ProcessorSignalPrepareRequest:
-      title: ProcessorSignalPrepareRequest
-      description: ProcessorSignalPrepareRequest defines the request schema for `/processor/signal/prepare`
-      type: object
-      properties:
-        client_id:
-          $ref: '#/components/schemas/APIClientID'
-        secret:
-          $ref: '#/components/schemas/APISecret'
-        processor_token:
-          $ref: '#/components/schemas/ProcessorToken'
-      required:
-      - processor_token
-    ProcessorSignalPrepareResponse:
-      title: ProcessorSignalPrepareResponse
-      description: ProcessorSignalPrepareResponse defines the response schema for `/processor/signal/prepare`
-      additionalProperties: true
-      type: object
-      properties:
-        request_id:
-          $ref: '#/components/schemas/RequestID'
-      required:
-      - request_id
     ProcessorBankTransferCreateRequest:
       title: ProcessorBankTransferCreateRequest
       type: object
@@ -16265,6 +16277,33 @@ components:
           $ref: '#/components/schemas/NumbersInternationalNullable'
         bacs:
           $ref: '#/components/schemas/NumbersBACSNullable'
+    ProcessorLiabilitiesGetRequest:
+      type: object
+      description: ProcessorLiabilitiesGetRequest defines the request schema for `/processor/liabilities/get`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        processor_token:
+          $ref: '#/components/schemas/ProcessorToken'
+      required:
+      - processor_token
+    ProcessorLiabilitiesGetResponse:
+      type: object
+      additionalProperties: true
+      description: ProcessorLiabilitiesGetResponse defines the response schema for `/processor/liabilities/get`
+      properties:
+        account:
+          $ref: '#/components/schemas/AccountBase'
+        liabilities:
+          $ref: '#/components/schemas/LiabilitiesObject'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - account
+      - liabilities
+      - request_id
     ProcessorIdentityGetRequest:
       type: object
       description: ProcessorIdentityGetRequest defines the request schema for `/processor/identity/get`
@@ -16603,6 +16642,7 @@ components:
           description: |-
             A reference for the payment. This must be an alphanumeric string with at most 18 characters and must not contain any special characters (since not all institutions support them).
             In order to track settlement via Payment Confirmation, each payment must have a unique reference. If the reference provided through the API is not unique, Plaid will adjust it.
+            Some institutions may limit the reference to less than 18 characters. If necessary, Plaid will adjust the reference by truncating it to fit the institution's requirements.
             Both the originally provided and automatically adjusted references (if any) can be found in the `reference` and `adjusted_reference` fields, respectively.
           minLength: 1
           maxLength: 18
@@ -18443,7 +18483,7 @@ components:
       properties:
         routing_number:
           type: string
-          description: The routing number of the bank to highlight.
+          description: 'The routing number of the bank to highlight in Link. Note: in rare cases, a single routing number can be associated with multiple institutions, e.g. due to a brokerage using another institution to manage ACH on its sweep accounts. If this happens, the bank will not be highlighted in Link even if the routing number is provided.'
     LinkTokenCreateCardSwitch:
       type: object
       description: A map containing data to pass in for the Card Switch flow.
@@ -19041,7 +19081,7 @@ components:
           description: "The current verification status of an Auth Item initiated through Automated or Manual micro-deposits.  Returned for Auth Items only.\n\n`pending_automatic_verification`: The Item is pending automatic verification\n\n`pending_manual_verification`: The Item is pending manual micro-deposit verification. Items remain in this state until the user successfully verifies the micro-deposit.\n\n`automatically_verified`: The Item has successfully been automatically verified\t\n\n`manually_verified`: The Item has successfully been manually verified\n\n`verification_expired`: Plaid was unable to automatically verify the deposit within 7 calendar days and will no longer attempt to validate the Item. Users may retry by submitting their information again through Link.\n\n`verification_failed`: The Item failed manual micro-deposit verification because the user exhausted all 3 verification attempts. Users may retry by submitting their information again through Link.\n\n`database_matched`: The Item has successfully been verified using Plaid's data sources. Note: Database Match is currently a beta feature, please contact your account manager for more information.\t\n\t"
         persistent_account_id:
           type: string
-          description: A unique and persistent identifier for accounts that can be used to trace multiple instances of the same account across different Items for depository accounts. This is currently an opt-in field and only supported for Chase Items.
+          description: A unique and persistent identifier for accounts that can be used to trace multiple instances of the same account across different Items for depository accounts. This is currently only supported for Chase Items.
       required:
       - account_id
       - balances
@@ -19115,9 +19155,11 @@ components:
           type: string
           format: date-time
           description: |-
-            Timestamp in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (`YYYY-MM-DDTHH:mm:ssZ`) indicating the last time that the balance for the given account has been updated
+            Timestamp in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format (`YYYY-MM-DDTHH:mm:ssZ`) indicating the oldest acceptable balance when making a request to `/accounts/balance/get`.
 
-            This is currently only provided when the `min_last_updated_datetime` is passed when calling `/accounts/balance/get` for `ins_128026` (Capital One).
+            This field is only used and expected when the institution is `ins_128026` (Capital One) and the Item contains one or more accounts with a non-depository account type, in which case a value must be provided or an `INVALID_REQUEST` error with the code of `INVALID_FIELD` will be returned. For Capital One depository accounts as well as all other account types on all other institutions, this field is ignored. See [account type schema](https://en.wikipedia.org/wiki/ISO_8601) for a full list of account types.
+
+            If the balance that is pulled is older than the given timestamp for Items with this field required, an `INVALID_REQUEST` error with the code of `LAST_UPDATED_DATETIME_OUT_OF_RANGE` will be returned with the most recent timestamp for the requested account contained in the response.
           nullable: true
       required:
       - available
@@ -22894,7 +22936,7 @@ components:
           type: string
           format: date
         cost_basis:
-          description: The average original value of the holding. Multiple cost basis values for the same security purchased at different prices are not supported.
+          description: The total cost basis of the holding (e.g., the total amount spent to acquire all assets currently in the holding).
           type: number
           format: double
         quantity:
@@ -23145,7 +23187,7 @@ components:
           items:
             $ref: '#/components/schemas/IncomeBreakdown'
         pay_period_details:
-          $ref: '#/components/schemas/PayPeriodDetails'
+          $ref: '#/components/schemas/PaystubOverridePayPeriodDetails'
     PaystubOverrideEmployer:
       type: object
       description: The employer on the paystub.
@@ -23185,6 +23227,80 @@ components:
         country:
           type: string
           description: The country of the address.
+    PaystubOverridePayPeriodDetails:
+      title: PaystubOverridePayPeriodDetails
+      type: object
+      additionalProperties: true
+      description: Details about the pay period.
+      properties:
+        check_amount:
+          type: number
+          format: double
+          description: The amount of the paycheck.
+          nullable: true
+        distribution_breakdown:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaystubOverrideDistributionBreakdown'
+        end_date:
+          type: string
+          format: date
+          description: 'The pay period end date, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format: "yyyy-mm-dd".'
+          nullable: true
+        gross_earnings:
+          type: number
+          format: double
+          description: Total earnings before tax/deductions.
+          nullable: true
+        pay_date:
+          type: string
+          format: date
+          description: The date on which the paystub was issued, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ("yyyy-mm-dd").
+          nullable: true
+        pay_frequency:
+          $ref: '#/components/schemas/PayPeriodDetailsPayFrequency'
+        pay_day:
+          deprecated: true
+          type: string
+          format: date
+          description: The date on which the paystub was issued, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ("yyyy-mm-dd").
+          nullable: true
+        start_date:
+          type: string
+          format: date
+          description: 'The pay period start date, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format: "yyyy-mm-dd".'
+          nullable: true
+    PaystubOverrideDistributionBreakdown:
+      title: DistributionBreakdown
+      type: object
+      description: Information about the accounts that the payment was distributed to.
+      additionalProperties: true
+      properties:
+        account_name:
+          type: string
+          description: Name of the account for the given distribution.
+          nullable: true
+        bank_name:
+          type: string
+          description: The name of the bank that the payment is being deposited to.
+          nullable: true
+        current_amount:
+          type: number
+          format: double
+          description: The amount distributed to this account.
+          nullable: true
+        currency:
+          type: string
+          description: The ISO-4217 currency code of the net pay. Always `null` if `unofficial_currency_code` is non-null.
+          nullable: true
+        mask:
+          type: string
+          description: The last 2-4 alphanumeric characters of an account's official account number.
+          nullable: true
+        type:
+          type: string
+          description: Type of the account that the paystub was sent to (e.g. 'checking').
+          nullable: true
     ItemId:
       title: ItemId
       type: string
@@ -24653,7 +24769,7 @@ components:
         cost_basis:
           type: number
           format: double
-          description: The original total value of the holding. This field is calculated by Plaid as the sum of the purchase price of all of the shares in the holding.
+          description: The total cost basis of the holding (e.g., the total amount spent to acquire all assets currently in the holding).
           nullable: true
         quantity:
           description: The total quantity of the asset held, as reported by the financial institution. If the security is an option, `quantity` will reflect the total number of options (typically the number of contracts multiplied by 100), not the number of contracts.
@@ -26309,55 +26425,6 @@ components:
       required:
       - code
       - description
-    SignalPaymentMethod:
-      type: string
-      enum:
-      - SAME_DAY_ACH
-      - NEXT_DAY_ACH
-      - STANDARD_ACH
-      - REAL_TIME_PAYMENTS
-      - DEBIT_CARD
-      - MULTIPLE_PAYMENT_METHODS
-      description: |
-        The payment method to complete the transaction after the risk assessment. It may be different from the default payment method.
-
-        `SAME_DAY_ACH`: Same Day ACH by NACHA. The debit transaction is processed and settled on the same day
-
-        `NEXT_DAY_ACH`: Next Day ACH settlement for debit transactions, offered by some payment processors
-
-        `STANDARD_ACH`: standard ACH by NACHA
-
-        `REAL_TIME_PAYMENTS`: real-time payments such as RTP and FedNow
-
-        `DEBIT_CARD`: if the default payment is over debit card networks
-
-        `MULTIPLE_PAYMENT_METHODS`: if there is no default debit rail or there are multiple payment methods
-
-        Possible values: `SAME_DAY_ACH`, `NEXT_DAY_ACH`, `STANDARD_ACH`, `REAL_TIME_PAYMENTS`, `DEBIT_CARD`, `MULTIPLE_PAYMENT_METHODS`
-      nullable: true
-    SignalDecisionOutcome:
-      type: string
-      enum:
-      - APPROVE
-      - REVIEW
-      - REJECT
-      - TAKE_OTHER_RISK_MEASURES
-      - NOT_EVALUATED
-      description: |
-        The payment decision from the risk assessment.
-
-        `APPROVE`: approve the transaction without requiring further actions from your customers. For example, use this field if you are placing a standard hold for all the approved transactions before making funds available to your customers. You should also use this field if you decide to accelerate the fund availability for your customers.
-
-        `REVIEW`: the transaction requires manual review
-
-        `REJECT`: reject the transaction
-
-        `TAKE_OTHER_RISK_MEASURES`: for example, placing a longer hold on funds than those approved transactions or introducing customer frictions such as step-up verification/authentication
-
-        `NOT_EVALUATED`: if only logging the Signal results without using them
-
-        Possible values:  `APPROVE`, `REVIEW`, `REJECT`, `TAKE_OTHER_RISK_MEASURES`, `NOT_EVALUATED`
-      nullable: true
     TransferAuthorizationGuaranteeDecision:
       type: string
       nullable: true
@@ -31550,16 +31617,7 @@ components:
           description: The date on which the paystub was issued, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ("yyyy-mm-dd").
           nullable: true
         pay_frequency:
-          type: string
-          description: The frequency at which an individual is paid.
-          enum:
-          - PAY_FREQUENCY_UNKNOWN
-          - PAY_FREQUENCY_WEEKLY
-          - PAY_FREQUENCY_BIWEEKLY
-          - PAY_FREQUENCY_SEMIMONTHLY
-          - PAY_FREQUENCY_MONTHLY
-          - null
-          nullable: true
+          $ref: '#/components/schemas/PayPeriodDetailsPayFrequency'
         pay_day:
           deprecated: true
           type: string
@@ -31571,6 +31629,18 @@ components:
           format: date
           description: 'The pay period start date, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format: "yyyy-mm-dd".'
           nullable: true
+    PayPeriodDetailsPayFrequency:
+      title: PayPeriodDetailsPayFrequency
+      type: string
+      description: The frequency at which an individual is paid.
+      enum:
+      - PAY_FREQUENCY_UNKNOWN
+      - PAY_FREQUENCY_WEEKLY
+      - PAY_FREQUENCY_BIWEEKLY
+      - PAY_FREQUENCY_SEMIMONTHLY
+      - PAY_FREQUENCY_MONTHLY
+      - null
+      nullable: true
     DistributionBreakdown:
       title: DistributionBreakdown
       type: object
@@ -35654,170 +35724,6 @@ components:
           nullable: true
           type: string
           description: Account username hashed by FI.
-    SignalEvaluateRequest:
-      title: SignalEvaluateRequest
-      description: SignalEvaluateRequest defines the request schema for `/signal/evaluate`
-      type: object
-      properties:
-        client_id:
-          $ref: '#/components/schemas/APIClientID'
-        secret:
-          $ref: '#/components/schemas/APISecret'
-        access_token:
-          $ref: '#/components/schemas/AccessToken'
-        account_id:
-          type: string
-          description: |-
-            The Plaid `account_id` of the account that is the funding source for the proposed transaction. The `account_id` is returned in the `/accounts/get` endpoint as well as the [`onSuccess`](/docs/link/ios/#link-ios-onsuccess-linkSuccess-metadata-accounts-id) callback metadata.
-
-            This will return an [`INVALID_ACCOUNT_ID`](/docs/errors/invalid-input/#invalid_account_id) error if the account has been removed at the bank or if the `account_id` is no longer valid.
-        client_transaction_id:
-          type: string
-          description: The unique ID that you would like to use to refer to this transaction. For your convenience mapping your internal data, you could use your internal ID/identifier for this transaction. The max length for this field is 36 characters.
-          minLength: 1
-          maxLength: 36
-        amount:
-          type: number
-          format: double
-          description: The transaction amount, in USD (e.g. `102.05`)
-        user_present:
-          type: boolean
-          description: '`true` if the end user is present while initiating the ACH transfer and the endpoint is being called; `false` otherwise (for example, when the ACH transfer is scheduled and the end user is not present, or you call this endpoint after the ACH transfer but before submitting the Nacha file for ACH processing).'
-          nullable: true
-        client_user_id:
-          type: string
-          description: A unique ID that identifies the end user in your system. This ID is used to correlate requests by a user with multiple Items. Personally identifiable information, such as an email address or phone number, should not be used in the `client_user_id`.
-        is_recurring:
-          type: boolean
-          description: '`true` if the ACH transaction is a recurring transaction; `false` otherwise '
-          nullable: true
-        default_payment_method:
-          type: string
-          description: |-
-            The default ACH or non-ACH payment method to complete the transaction.
-            `SAME_DAY_ACH`: Same Day ACH by NACHA. The debit transaction is processed and settled on the same day
-            `NEXT_DAY_ACH`: Next Day ACH settlement for debit transactions, offered by some payment processors
-            `STANDARD_ACH`: standard ACH by NACHA
-            `REAL_TIME_PAYMENTS`: real-time payments such as RTP and FedNow
-            `DEBIT_CARD`: if the default payment is over debit card networks
-            `MULTIPLE_PAYMENT_METHODS`: if there is no default debit rail or there are multiple payment methods
-            Possible values:  `SAME_DAY_ACH`, `NEXT_DAY_ACH`, `STANDARD_ACH`, `REAL_TIME_PAYMENTS`, `DEBIT_CARD`, `MULTIPLE_PAYMENT_METHODS`
-          nullable: true
-        user:
-          $ref: '#/components/schemas/SignalUser'
-        device:
-          $ref: '#/components/schemas/SignalDevice'
-      required:
-      - access_token
-      - account_id
-      - client_transaction_id
-      - amount
-    SignalUser:
-      title: SignalUser
-      type: object
-      description: Details about the end user initiating the transaction (i.e., the account holder).
-      properties:
-        name:
-          $ref: '#/components/schemas/SignalPersonName'
-        phone_number:
-          type: string
-          description: 'The user''s phone number, in E.164 format: +{countrycode}{number}. For example: "+14151234567"'
-          nullable: true
-        email_address:
-          type: string
-          description: The user's email address.
-          nullable: true
-        address:
-          $ref: '#/components/schemas/SignalAddressData'
-    SignalPersonName:
-      title: SignalPersonName
-      type: object
-      description: The user's legal name
-      nullable: true
-      properties:
-        prefix:
-          type: string
-          description: The user's name prefix (e.g. "Mr.")
-          nullable: true
-        given_name:
-          type: string
-          description: The user's given name. If the user has a one-word name, it should be provided in this field.
-          nullable: true
-        middle_name:
-          type: string
-          description: The user's middle name
-          nullable: true
-        family_name:
-          type: string
-          description: The user's family name / surname
-          nullable: true
-        suffix:
-          type: string
-          description: The user's name suffix (e.g. "II")
-          nullable: true
-    SignalAddressData:
-      title: AddressData
-      type: object
-      nullable: true
-      additionalProperties: true
-      description: Data about the components comprising an address.
-      properties:
-        city:
-          type: string
-          description: The full city name
-        region:
-          type: string
-          description: |-
-            The region or state
-            Example: `"NC"`
-          nullable: true
-        street:
-          type: string
-          description: |-
-            The full street address
-            Example: `"564 Main Street, APT 15"`
-        postal_code:
-          type: string
-          description: The postal code
-          nullable: true
-        country:
-          type: string
-          description: The ISO 3166-1 alpha-2 country code
-          nullable: true
-    SignalDevice:
-      title: SignalEvaluateDevice
-      type: object
-      description: Details about the end user's device
-      properties:
-        ip_address:
-          type: string
-          description: The IP address of the device that initiated the transaction
-          nullable: true
-        user_agent:
-          type: string
-          description: The user agent of the device that initiated the transaction (e.g. "Mozilla/5.0")
-          nullable: true
-    SignalEvaluateResponse:
-      title: SignalEvaluateResponse
-      description: SignalEvaluateResponse defines the response schema for `/signal/income/evaluate`
-      type: object
-      additionalProperties: true
-      properties:
-        request_id:
-          $ref: '#/components/schemas/RequestID'
-        scores:
-          $ref: '#/components/schemas/SignalScores'
-        core_attributes:
-          $ref: '#/components/schemas/SignalEvaluateCoreAttributes'
-        warnings:
-          type: array
-          description: If bank information was not available to be used in the Signal model, this array contains warnings describing why bank data is missing. If you want to receive an API error instead of Signal scores in the case of missing bank data, file a support ticket or contact your Plaid account manager.
-          items:
-            $ref: '#/components/schemas/SignalWarning'
-      required:
-      - request_id
-      - scores
-      - warnings
     TransferAuthorizationPaymentRisk:
       title: TransferAuthorizationPaymentRisk
       description: This object includes the scores and risk level. This response is offered as an add-on to /transfer/authorization/create. To request access to these fields please contact your Plaid account manager.
@@ -35867,510 +35773,6 @@ components:
       - MEDIUM_RISK
       - MEDIUM_LOW_RISK
       - LOW_RISK
-    SignalScores:
-      title: SignalEvaluateScores
-      description: Risk scoring details broken down by risk category.
-      type: object
-      additionalProperties: true
-      properties:
-        customer_initiated_return_risk:
-          $ref: '#/components/schemas/CustomerInitiatedReturnRisk'
-        bank_initiated_return_risk:
-          $ref: '#/components/schemas/BankInitiatedReturnRisk'
-    SignalScore:
-      description: 'A score from 1-99 that indicates the transaction return risk: a higher risk score suggests a higher return likelihood.'
-      type: integer
-      minimum: 1
-      maximum: 99
-    CustomerInitiatedRiskTier:
-      description: |
-        A tier corresponding to the projected likelihood that the transaction, if initiated, will be subject to a return.
-
-        In the `customer_initiated_return_risk` object, there are five risk tiers corresponding to the scores:
-          1: Predicted customer-initiated return incidence rate between 0.00% - 0.02%
-          2: Predicted customer-initiated return incidence rate between 0.02% - 0.05%
-          3: Predicted customer-initiated return incidence rate between 0.05% - 0.1%
-          4: Predicted customer-initiated return incidence rate between 0.1% - 0.5%
-          5: Predicted customer-initiated return incidence rate greater than 0.5%
-      type: integer
-      minimum: 1
-      maximum: 5
-    CustomerInitiatedReturnRisk:
-      title: CustomerInitiatedReturnRisk
-      type: object
-      description: 'The object contains a risk score and a risk tier that evaluate the transaction return risk of an unauthorized debit. Common return codes in this category include: "R05", "R07", "R10", "R11", "R29". These returns typically have a return time frame of up to 60 calendar days. During this period, the customer of financial institutions can dispute a transaction as unauthorized.'
-      properties:
-        score:
-          $ref: '#/components/schemas/SignalScore'
-        risk_tier:
-          $ref: '#/components/schemas/CustomerInitiatedRiskTier'
-      required:
-      - risk_tier
-      - score
-    BankInitiatedRiskTier:
-      description: |
-        In the `bank_initiated_return_risk` object, there are eight risk tiers corresponding to the scores:
-          1: Predicted bank-initiated return incidence rate between 0.0% - 0.5%
-          2: Predicted bank-initiated return incidence rate between 0.5% - 1.5%
-          3: Predicted bank-initiated return incidence rate between 1.5% - 3%
-          4: Predicted bank-initiated return incidence rate between 3% - 5%
-          5: Predicted bank-initiated return incidence rate between 5% - 10%
-          6: Predicted bank-initiated return incidence rate between 10% - 15%
-          7: Predicted bank-initiated return incidence rate between 15% and 50%
-          8: Predicted bank-initiated return incidence rate greater than 50%
-      type: integer
-      minimum: 1
-      maximum: 8
-    BankInitiatedReturnRisk:
-      title: BankInitiatedReturnRisk
-      type: object
-      description: 'The object contains a risk score and a risk tier that evaluate the transaction return risk because an account is overdrawn or because an ineligible account is used. Common return codes in this category include: "R01", "R02", "R03", "R04", "R06", "R08",  "R09", "R13", "R16", "R17", "R20", "R23". These returns have a turnaround time of 2 banking days.'
-      properties:
-        score:
-          $ref: '#/components/schemas/SignalScore'
-        risk_tier:
-          $ref: '#/components/schemas/BankInitiatedRiskTier'
-      required:
-      - risk_tier
-      - score
-    SignalEvaluateCoreAttributes:
-      title: SignalEvaluateCoreAttributes
-      type: object
-      description: |-
-        The core attributes object contains additional data that can be used to assess the ACH return risk. Examples of data include:
-
-        `days_since_first_plaid_connection`: The number of days since the first time the Item was connected to an application via Plaid
-        `plaid_connections_count_7d`: The number of times the Item has been connected to applications via Plaid over the past 7 days
-        `plaid_connections_count_30d`: The number of times the Item has been connected to applications via Plaid over the past 30 days
-        `total_plaid_connections_count`: The number of times the Item has been connected to applications via Plaid
-        `is_savings_or_money_market_account`: Indicates whether the ACH transaction funding account is a savings/money market account
-
-        For the full list and detailed documentation of core attributes available, or to request that core attributes not be returned, contact Sales or your Plaid account manager
-      properties:
-        unauthorized_transactions_count_7d:
-          type: integer
-          description: We parse and analyze historical transaction metadata to identify the number of possible past returns due to unauthorized transactions over the past 7 days from the account that will be debited.
-          nullable: true
-        unauthorized_transactions_count_30d:
-          type: integer
-          description: We parse and analyze historical transaction metadata to identify the number of possible past returns due to unauthorized transactions over the past 30 days from the account that will be debited.
-          nullable: true
-        unauthorized_transactions_count_60d:
-          type: integer
-          description: We parse and analyze historical transaction metadata to identify the number of possible past returns due to unauthorized transactions over the past 60 days from the account that will be debited.
-          nullable: true
-        unauthorized_transactions_count_90d:
-          type: integer
-          description: We parse and analyze historical transaction metadata to identify the number of possible past returns due to unauthorized transactions over the past 90 days from the account that will be debited.
-          nullable: true
-        nsf_overdraft_transactions_count_7d:
-          type: integer
-          description: We parse and analyze historical transaction metadata to identify the number of possible past returns due to non-sufficient funds/overdrafts over the past 7 days from the account that will be debited.
-          nullable: true
-        nsf_overdraft_transactions_count_30d:
-          type: integer
-          description: We parse and analyze historical transaction metadata to identify the number of possible past returns due to non-sufficient funds/overdrafts over the past 30 days from the account that will be debited.
-          nullable: true
-        nsf_overdraft_transactions_count_60d:
-          type: integer
-          description: We parse and analyze historical transaction metadata to identify the number of possible past returns due to non-sufficient funds/overdrafts over the past 60 days from the account that will be debited.
-          nullable: true
-        nsf_overdraft_transactions_count_90d:
-          type: integer
-          description: We parse and analyze historical transaction metadata to identify the number of possible past returns due to non-sufficient funds/overdrafts over the past 90 days from the account that will be debited.
-          nullable: true
-        days_since_first_plaid_connection:
-          type: integer
-          description: The number of days since the first time the Item was connected to an application via Plaid
-          nullable: true
-        plaid_connections_count_7d:
-          type: integer
-          description: The number of times the Item has been connected to applications via Plaid over the past 7 days
-          nullable: true
-        plaid_connections_count_30d:
-          type: integer
-          description: The number of times the Item has been connected to applications via Plaid over the past 30 days
-          nullable: true
-        total_plaid_connections_count:
-          type: integer
-          description: The total number of times the Item has been connected to applications via Plaid
-          nullable: true
-        is_savings_or_money_market_account:
-          type: boolean
-          description: Indicates if the ACH transaction funding account is a savings/money market account
-          nullable: true
-        total_credit_transactions_amount_10d:
-          type: number
-          format: double
-          description: The total credit (inflow) transaction amount over the past 10 days from the account that will be debited
-          nullable: true
-        total_debit_transactions_amount_10d:
-          type: number
-          format: double
-          description: The total debit (outflow) transaction amount over the past 10 days from the account that will be debited
-          nullable: true
-        p50_credit_transactions_amount_28d:
-          type: number
-          format: double
-          description: The 50th percentile of all credit (inflow) transaction amounts over the past 28 days from the account that will be debited
-          nullable: true
-        p50_debit_transactions_amount_28d:
-          type: number
-          format: double
-          description: The 50th percentile of all debit (outflow) transaction amounts over the past 28 days from the account that will be debited
-          nullable: true
-        p95_credit_transactions_amount_28d:
-          type: number
-          format: double
-          description: The 95th percentile of all credit (inflow) transaction amounts over the past 28 days from the account that will be debited
-          nullable: true
-        p95_debit_transactions_amount_28d:
-          type: number
-          format: double
-          description: The 95th percentile of all debit (outflow) transaction amounts over the past 28 days from the account that will be debited
-          nullable: true
-        days_with_negative_balance_count_90d:
-          type: integer
-          description: The number of days within the past 90 days when the account that will be debited had a negative end-of-day available balance
-          nullable: true
-        p90_eod_balance_30d:
-          type: number
-          format: double
-          description: The 90th percentile of the end-of-day available balance over the past 30 days of the account that will be debited
-          nullable: true
-        p90_eod_balance_60d:
-          type: number
-          format: double
-          description: The 90th percentile of the end-of-day available balance over the past 60 days of the account that will be debited
-          nullable: true
-        p90_eod_balance_90d:
-          type: number
-          format: double
-          description: The 90th percentile of the end-of-day available balance over the past 90 days of the account that will be debited
-          nullable: true
-        p10_eod_balance_30d:
-          type: number
-          format: double
-          description: The 10th percentile of the end-of-day available balance over the past 30 days of the account that will be debited
-          nullable: true
-        p10_eod_balance_60d:
-          type: number
-          format: double
-          description: The 10th percentile of the end-of-day available balance over the past 60 days of the account that will be debited
-          nullable: true
-        p10_eod_balance_90d:
-          type: number
-          format: double
-          description: The 10th percentile of the end-of-day available balance over the past 90 days of the account that will be debited
-          nullable: true
-        available_balance:
-          type: number
-          format: double
-          description: Available balance, as of the `balance_last_updated` time. The available balance is the current balance less any outstanding holds or debits that have not yet posted to the account.
-          nullable: true
-        current_balance:
-          type: number
-          format: double
-          description: Current balance, as of the `balance_last_updated` time. The current balance is the total amount of funds in the account.
-          nullable: true
-        balance_last_updated:
-          type: string
-          format: date-time
-          description: Timestamp in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (YYYY-MM-DDTHH:mm:ssZ) indicating the last time that the balance for the given account has been updated.
-          nullable: true
-        phone_change_count_28d:
-          type: integer
-          description: The number of times the account's phone numbers on file have changed over the past 28 days
-          nullable: true
-        phone_change_count_90d:
-          type: integer
-          description: The number of times the account's phone numbers on file have changed over the past 90 days
-          nullable: true
-        email_change_count_28d:
-          type: integer
-          description: The number of times the account's email addresses on file have changed over the past 28 days
-          nullable: true
-        email_change_count_90d:
-          type: integer
-          description: The number of times the account's email addresses on file have changed over the past 90 days
-          nullable: true
-        address_change_count_28d:
-          type: integer
-          description: The number of times the account's addresses on file have changed over the past 28 days
-          nullable: true
-        address_change_count_90d:
-          type: integer
-          description: The number of times the account's addresses on file have changed over the past 90 days
-          nullable: true
-        plaid_non_oauth_authentication_attempts_count_3d:
-          type: integer
-          description: The number of non-OAuth authentication attempts via Plaid for this bank account over the past 3 days
-          nullable: true
-        plaid_non_oauth_authentication_attempts_count_7d:
-          type: integer
-          description: The number of non-OAuth authentication attempts via Plaid for this bank account over the past 7 days
-          nullable: true
-        plaid_non_oauth_authentication_attempts_count_30d:
-          type: integer
-          description: The number of non-OAuth authentication attempts via Plaid for this bank account over the past 30 days
-          nullable: true
-        failed_plaid_non_oauth_authentication_attempts_count_3d:
-          type: integer
-          description: The number of failed non-OAuth authentication attempts via Plaid for this bank account over the past 3 days
-          nullable: true
-        failed_plaid_non_oauth_authentication_attempts_count_7d:
-          type: integer
-          description: The number of failed non-OAuth authentication attempts via Plaid for this bank account over the past 7 days
-          nullable: true
-        failed_plaid_non_oauth_authentication_attempts_count_30d:
-          type: integer
-          description: The number of failed non-OAuth authentication attempts via Plaid for this bank account over the past 30 days
-          nullable: true
-        debit_transactions_count_10d:
-          type: integer
-          description: The total number of debit (outflow) transactions over the past 10 days from the account that will be debited
-          nullable: true
-        credit_transactions_count_10d:
-          type: integer
-          description: The total number of credit (inflow) transactions over the past 10 days from the account that will be debited
-          nullable: true
-        debit_transactions_count_30d:
-          type: integer
-          description: The total number of debit (outflow) transactions over the past 30 days from the account that will be debited
-          nullable: true
-        credit_transactions_count_30d:
-          type: integer
-          description: The total number of credit (inflow) transactions over the past 30 days from the account that will be debited
-          nullable: true
-        debit_transactions_count_60d:
-          type: integer
-          description: The total number of debit (outflow) transactions over the past 60 days from the account that will be debited
-          nullable: true
-        credit_transactions_count_60d:
-          type: integer
-          description: The total number of credit (inflow) transactions over the past 60 days from the account that will be debited
-          nullable: true
-        debit_transactions_count_90d:
-          type: integer
-          description: The total number of debit (outflow) transactions over the past 90 days from the account that will be debited
-          nullable: true
-        credit_transactions_count_90d:
-          type: integer
-          description: The total number of credit (inflow) transactions over the past 90 days from the account that will be debited
-          nullable: true
-        total_debit_transactions_amount_30d:
-          type: number
-          format: double
-          description: The total debit (outflow) transaction amount over the past 30 days from the account that will be debited
-          nullable: true
-        total_credit_transactions_amount_30d:
-          type: number
-          format: double
-          description: The total credit (inflow) transaction amount over the past 30 days from the account that will be debited
-          nullable: true
-        total_debit_transactions_amount_60d:
-          type: number
-          format: double
-          description: The total debit (outflow) transaction amount over the past 60 days from the account that will be debited
-          nullable: true
-        total_credit_transactions_amount_60d:
-          type: number
-          format: double
-          description: The total credit (inflow) transaction amount over the past 60 days from the account that will be debited
-          nullable: true
-        total_debit_transactions_amount_90d:
-          type: number
-          format: double
-          description: The total debit (outflow) transaction amount over the past 90 days from the account that will be debited
-          nullable: true
-        total_credit_transactions_amount_90d:
-          type: number
-          format: double
-          description: The total credit (inflow) transaction amount over the past 90 days from the account that will be debited
-          nullable: true
-        p50_eod_balance_30d:
-          type: number
-          format: double
-          description: The 50th percentile of the end-of-day available balance over the past 30 days of the account that will be debited
-          nullable: true
-        p50_eod_balance_60d:
-          type: number
-          format: double
-          description: The 50th percentile of the end-of-day available balance over the past 60 days of the account that will be debited
-          nullable: true
-        p50_eod_balance_90d:
-          type: number
-          format: double
-          description: The 50th percentile of the end-of-day available balance over the past 90 days of the account that will be debited
-          nullable: true
-        p50_eod_balance_31d_to_60d:
-          type: number
-          format: double
-          description: The 50th percentile of the end-of-day available balance between day 31 and day 60 over the past 60 days of the account that will be debited
-          nullable: true
-        p50_eod_balance_61d_to_90d:
-          type: number
-          format: double
-          description: The 50th percentile of the end-of-day available balance between day 61 and day 90 over the past 60 days of the account that will be debited
-          nullable: true
-        p90_eod_balance_31d_to_60d:
-          type: number
-          format: double
-          description: The 90th percentile of the end-of-day available balance between day 31 and day 60 over the past 60 days of the account that will be debited
-          nullable: true
-        p90_eod_balance_61d_to_90d:
-          type: number
-          format: double
-          description: The 90th percentile of the end-of-day available balance between day 61 and day 90 over the past 60 days of the account that will be debited
-          nullable: true
-        p10_eod_balance_31d_to_60d:
-          type: number
-          format: double
-          description: The 10th percentile of the end-of-day available balance between day 31 and day 60 over the past 60 days of the account that will be debited
-          nullable: true
-        p10_eod_balance_61d_to_90d:
-          type: number
-          format: double
-          description: The 10th percentile of the end-of-day available balance between day 61 and day 90 over the past 60 days of the account that will be debited
-          nullable: true
-        transactions_last_updated:
-          type: string
-          format: date-time
-          description: Timestamp in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (YYYY-MM-DDTHH:mm:ssZ) indicating the last time that the transactions for the given account have been updated.
-          nullable: true
-        is_account_closed:
-          type: boolean
-          description: Indicates if the receiver bank account is closed
-          nullable: true
-        is_account_frozen_or_restricted:
-          type: boolean
-          description: Indicates if the receiver bank account is either frozen or restricted
-          nullable: true
-    SignalWarning:
-      title: SignalWarning
-      type: object
-      description: Conveys information about the errors causing missing or stale bank data used to construct the /signal/evaluate scores and response
-      properties:
-        warning_type:
-          type: string
-          description: A broad categorization of the warning. Safe for programmatic use.
-        warning_code:
-          type: string
-          description: The warning code identifies a specific kind of warning that pertains to the error causing bank data to be missing. Safe for programmatic use. For more details on warning codes, please refer to Plaid standard error codes documentation. If you receive the `ITEM_LOGIN_REQUIRED` warning, we recommend re-authenticating your user by implementing Link's update mode. This will guide your user to fix their credentials, allowing Plaid to start fetching data again for future Signal requests.
-        warning_message:
-          type: string
-          description: A developer-friendly representation of the warning type. This may change over time and is not safe for programmatic use.
-    SignalDecisionReportRequest:
-      title: SignalDecisionReportRequest
-      description: SignalDecisionReportRequest defines the request schema for `/signal/decision/report`
-      type: object
-      properties:
-        client_id:
-          $ref: '#/components/schemas/APIClientID'
-        secret:
-          $ref: '#/components/schemas/APISecret'
-        client_transaction_id:
-          type: string
-          description: Must be the same as the `client_transaction_id` supplied when calling `/signal/evaluate`
-          minLength: 1
-          maxLength: 36
-        initiated:
-          type: boolean
-          description: |-
-            `true` if the ACH transaction was initiated, `false` otherwise.
-
-            This field must be returned as a boolean. If formatted incorrectly, this will result in an [`INVALID_FIELD`](/docs/errors/invalid-request/#invalid_field) error.
-        days_funds_on_hold:
-          type: integer
-          description: |-
-            The actual number of days (hold time) since the ACH debit transaction that you wait before making funds available to your customers. The holding time could affect the ACH return rate.
-
-            For example, use 0 if you make funds available to your customers instantly or the same day following the debit transaction, or 1 if you make funds available the next day following the debit initialization.
-          minimum: 0
-          nullable: true
-        decision_outcome:
-          $ref: '#/components/schemas/SignalDecisionOutcome'
-        payment_method:
-          $ref: '#/components/schemas/SignalPaymentMethod'
-        amount_instantly_available:
-          type: number
-          format: double
-          description: 'The amount (in USD) made available to your customers instantly following the debit transaction. It could be a partial amount of the requested transaction (example: 102.05).'
-          nullable: true
-      required:
-      - client_transaction_id
-      - initiated
-    SignalDecisionReportResponse:
-      title: SignalDecisionReportResponse
-      description: SignalDecisionReportResponse defines the response schema for `/signal/decision/report`
-      additionalProperties: true
-      type: object
-      properties:
-        request_id:
-          $ref: '#/components/schemas/RequestID'
-      required:
-      - request_id
-    SignalReturnReportRequest:
-      title: SignalReturnReportRequest
-      description: SignalReturnReportRequest defines the request schema for `/signal/return/report`
-      type: object
-      properties:
-        client_id:
-          $ref: '#/components/schemas/APIClientID'
-        secret:
-          $ref: '#/components/schemas/APISecret'
-        client_transaction_id:
-          type: string
-          description: Must be the same as the `client_transaction_id` supplied when calling `/signal/evaluate`
-          minLength: 1
-          maxLength: 36
-        return_code:
-          type: string
-          description: |-
-            Must be a valid ACH return code (e.g. "R01")
-
-            If formatted incorrectly, this will result in an [`INVALID_FIELD`](/docs/errors/invalid-request/#invalid_field) error.
-        returned_at:
-          type: string
-          format: date-time
-          description: Date and time when you receive the returns from your payment processors, in ISO 8601 format (`YYYY-MM-DDTHH:mm:ssZ`).
-          nullable: true
-      required:
-      - client_transaction_id
-      - return_code
-    SignalReturnReportResponse:
-      title: SignalReturnReportResponse
-      description: SignalReturnReportResponse defines the response schema for `/signal/return/report`
-      additionalProperties: true
-      type: object
-      properties:
-        request_id:
-          $ref: '#/components/schemas/RequestID'
-      required:
-      - request_id
-    SignalPrepareRequest:
-      title: SignalPrepareRequest
-      description: SignalPrepareRequest defines the request schema for `/signal/prepare`
-      type: object
-      properties:
-        client_id:
-          $ref: '#/components/schemas/APIClientID'
-        secret:
-          $ref: '#/components/schemas/APISecret'
-        access_token:
-          $ref: '#/components/schemas/AccessToken'
-      required:
-      - access_token
-    SignalPrepareResponse:
-      title: SignalPrepareResponse
-      description: SignalPrepareResponse defines the response schema for `/signal/prepare`
-      additionalProperties: true
-      type: object
-      properties:
-        request_id:
-          $ref: '#/components/schemas/RequestID'
-      required:
-      - request_id
     SandboxOauthSelectAccountsRequest:
       title: SandboxOauthSelectAccountsRequest
       type: object
@@ -40245,6 +39647,72 @@ components:
         `system` - The resource was created or updated automatically by a part of the Plaid Beacon system. For example, if another business using Plaid Beacon created a fraud report that matched one of your users, your matching user's status would automatically be updated and the audit trail source would be `system`.
 
         `bulk_import` - The resource was created or updated as part of a bulk import process. For example, if your company provided a CSV of user data as part of your initial onboarding, the audit trail source would be `bulk_import`.
+    BeaconDuplicateGetRequest:
+      description: Request input for getting a Beacon Duplicate
+      type: object
+      properties:
+        beacon_duplicate_id:
+          $ref: '#/components/schemas/BeaconDuplicateID'
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+      required:
+      - beacon_duplicate_id
+    BeaconDuplicateGetResponse:
+      description: A Beacon Duplicate represents a pair of matching Beacon Users and an analysis of the fields they matched on.
+      additionalProperties: true
+      properties:
+        id:
+          $ref: '#/components/schemas/BeaconDuplicateID'
+        beacon_user1:
+          $ref: '#/components/schemas/BeaconUserRevision'
+        beacon_user2:
+          $ref: '#/components/schemas/BeaconUserRevision'
+        analysis:
+          $ref: '#/components/schemas/BeaconMatchSummaryAnalysis'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - id
+      - beacon_user1
+      - beacon_user2
+      - analysis
+      - request_id
+      type: object
+    BeaconDuplicateID:
+      type: string
+      title: BeaconDuplicateID
+      example: becdup_11111111111111
+      description: ID of the associated Beacon Duplicate.
+    BeaconMatchSummaryAnalysis:
+      type: object
+      title: BeaconMatchSummaryAnalysis
+      description: Analysis of which fields matched between one Beacon User and another.
+      properties:
+        address:
+          $ref: '#/components/schemas/BeaconMatchSummaryCode'
+        date_of_birth:
+          $ref: '#/components/schemas/BeaconMatchSummaryCode'
+        email_address:
+          $ref: '#/components/schemas/BeaconMatchSummaryCode'
+        name:
+          $ref: '#/components/schemas/BeaconMatchSummaryCode'
+        id_number:
+          $ref: '#/components/schemas/BeaconMatchSummaryCode'
+        ip_address:
+          $ref: '#/components/schemas/BeaconMatchSummaryCode'
+        phone_number:
+          $ref: '#/components/schemas/BeaconMatchSummaryCode'
+      required:
+      - address
+      - date_of_birth
+      - email_address
+      - name
+      - id_number
+      - ip_address
+      - phone_number
+      additionalProperties: true
     BeaconMatchSummaryCode:
       description: |-
         An enum indicating the match type between two Beacon Users.
@@ -40778,7 +40246,7 @@ components:
     BeaconUserID:
       type: string
       title: BeaconUserID
-      example: becusr_11111111111111
+      example: becusr_42cF1MNo42r9Xj
       description: ID of the associated Beacon User.
     BeaconUserIDNumber:
       type: object
@@ -40911,6 +40379,21 @@ components:
       required:
       - beacon_user_id
       - status
+    BeaconUserRevision:
+      type: object
+      title: BeaconUserRevision
+      description: A Beacon User Revision identifies a Beacon User at some point in its revision history.
+      properties:
+        id:
+          $ref: '#/components/schemas/BeaconUserID'
+        version:
+          type: integer
+          description: The `version` field begins with 1 and increments with each subsequent revision.
+          example: 1
+      required:
+      - id
+      - version
+      additionalProperties: true
     BeaconUserStatus:
       type: string
       title: BeaconUserStatus
@@ -41937,6 +41420,93 @@ components:
       - risk_check
       - watchlist_screening_id
       - redacted_at
+    IdentityVerificationAutofillAddress:
+      description: |-
+        Even if an address has been autofilled, some fields may be null depending on the region's addressing system. For example:
+
+        Addresses from the United Kingdom will not include a region
+
+        Addresses from Hong Kong will not include postal code
+      type: object
+      properties:
+        street:
+          $ref: '#/components/schemas/Street'
+        street2:
+          $ref: '#/components/schemas/Street2'
+        city:
+          $ref: '#/components/schemas/CityNullable'
+        region:
+          $ref: '#/components/schemas/Region'
+        postal_code:
+          $ref: '#/components/schemas/PostalCode'
+        country:
+          $ref: '#/components/schemas/GenericCountryCode'
+        po_box:
+          $ref: '#/components/schemas/POBoxStatus'
+        type:
+          $ref: '#/components/schemas/AddressPurposeLabel'
+      required:
+      - street
+      - street2
+      - city
+      - region
+      - postal_code
+      - country
+      - po_box
+      - type
+      nullable: true
+      additionalProperties: true
+    IdentityVerificationAutofillCreateRequest:
+      type: object
+      description: Request input to autofill an Identity Verification
+      properties:
+        identity_verification_id:
+          $ref: '#/components/schemas/IdentityVerificationID'
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+      required:
+      - identity_verification_id
+    IdentityVerificationAutofillCreateResponse:
+      description: Autofill represents unverified customer information. This needs to be confirmed by the customer before using.
+      additionalProperties: true
+      properties:
+        status:
+          $ref: '#/components/schemas/IdentityVerificationAutofillStatus'
+        user:
+          $ref: '#/components/schemas/IdentityVerificationAutofillUserData'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - status
+      - user
+      - request_id
+      type: object
+    IdentityVerificationAutofillStatus:
+      description: A status enum indicating whether autofill succeeded or failed.
+      type: string
+      enum:
+      - success
+      - failed
+      example: success
+      title: IdentityVerificationAutofillStatus
+    IdentityVerificationAutofillUserData:
+      description: User information that was autofilled. All this information should be confirmed by the user before using.
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/IdentityVerificationResponseUserName'
+        address:
+          $ref: '#/components/schemas/IdentityVerificationAutofillAddress'
+        id_number:
+          $ref: '#/components/schemas/UserIDNumber'
+      required:
+      - name
+      - address
+      - id_number
+      nullable: true
+      additionalProperties: true
     IdentityVerificationConsent:
       type: boolean
       example: true
@@ -42135,7 +41705,7 @@ components:
       title: IdentityVerificationDocumentStreet
       description: The full street address extracted from the document.
     IdentityVerificationGetRequest:
-      description: Request input for fetching an identity verification
+      description: Request input for fetching an Identity Verification
       type: object
       properties:
         identity_verification_id:
@@ -42209,7 +41779,7 @@ components:
       title: IdentityVerificationID
       description: ID of the associated Identity Verification attempt.
     IdentityVerificationListRequest:
-      description: Request input for listing identity verifications
+      description: Request input for listing Identity Verifications
       type: object
       properties:
         secret:
@@ -42458,7 +42028,7 @@ components:
       - manually_rejected
       example: success
       title: IdentityVerificationStepStatus
-      description: The status of a step in the identity verification process.
+      description: The status of a step in the Identity Verification process.
     IdentityVerificationStepSummary:
       type: object
       description: |-
@@ -42525,7 +42095,7 @@ components:
       required:
       - id
       - version
-      description: The resource ID and version number of the template configuring the behavior of a given identity verification.
+      description: The resource ID and version number of the template configuring the behavior of a given Identity Verification.
       additionalProperties: true
     IdentityVerificationTemplateVersion:
       type: integer
@@ -42586,7 +42156,7 @@ components:
       - name
       - address
       - id_number
-      description: The identity data that was either collected from the user or provided via API in order to perform an identity verification.
+      description: The identity data that was either collected from the user or provided via API in order to perform an Identity Verification.
       additionalProperties: true
     IdentityVerificationUserPhoneNumber:
       type: string
@@ -43536,7 +43106,7 @@ components:
       type: string
       example: 123 Main St.
       title: Street
-      description: The primary street portion of an address. If the user has submitted their address, this field will always be filled.
+      description: The primary street portion of an address. If an address is provided, this field will always be filled.
     Street2:
       type: string
       example: Unit 42
@@ -43547,7 +43117,7 @@ components:
       type: string
       example: 123 Main St.
       title: Street
-      description: The primary street portion of an address. If the user has submitted their address, this field will always be filled.
+      description: The primary street portion of an address. If an address is provided, this field will always be filled.
       nullable: true
     Timestamp:
       description: An ISO8601 formatted timestamp.
@@ -46735,6 +46305,933 @@ components:
       - sentOn
       - category
       - notificationPayload
+    SignalEvaluateRequest:
+      title: SignalEvaluateRequest
+      description: SignalEvaluateRequest defines the request schema for `/signal/evaluate`
+      type: object
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+        account_id:
+          type: string
+          description: |-
+            The Plaid `account_id` of the account that is the funding source for the proposed transaction. The `account_id` is returned in the `/accounts/get` endpoint as well as the [`onSuccess`](/docs/link/ios/#link-ios-onsuccess-linkSuccess-metadata-accounts-id) callback metadata.
+
+            This will return an [`INVALID_ACCOUNT_ID`](/docs/errors/invalid-input/#invalid_account_id) error if the account has been removed at the bank or if the `account_id` is no longer valid.
+        client_transaction_id:
+          type: string
+          description: The unique ID that you would like to use to refer to this transaction. For your convenience mapping your internal data, you could use your internal ID/identifier for this transaction. The max length for this field is 36 characters.
+          minLength: 1
+          maxLength: 36
+        amount:
+          type: number
+          format: double
+          description: The transaction amount, in USD (e.g. `102.05`)
+        user_present:
+          type: boolean
+          description: '`true` if the end user is present while initiating the ACH transfer and the endpoint is being called; `false` otherwise (for example, when the ACH transfer is scheduled and the end user is not present, or you call this endpoint after the ACH transfer but before submitting the Nacha file for ACH processing).'
+          nullable: true
+        client_user_id:
+          type: string
+          description: A unique ID that identifies the end user in your system. This ID is used to correlate requests by a user with multiple Items. Personally identifiable information, such as an email address or phone number, should not be used in the `client_user_id`.
+        is_recurring:
+          type: boolean
+          description: '`true` if the ACH transaction is a recurring transaction; `false` otherwise '
+          nullable: true
+        default_payment_method:
+          type: string
+          description: |-
+            The default ACH or non-ACH payment method to complete the transaction.
+            `SAME_DAY_ACH`: Same Day ACH by NACHA. The debit transaction is processed and settled on the same day
+            `NEXT_DAY_ACH`: Next Day ACH settlement for debit transactions, offered by some payment processors
+            `STANDARD_ACH`: standard ACH by NACHA
+            `REAL_TIME_PAYMENTS`: real-time payments such as RTP and FedNow
+            `DEBIT_CARD`: if the default payment is over debit card networks
+            `MULTIPLE_PAYMENT_METHODS`: if there is no default debit rail or there are multiple payment methods
+            Possible values:  `SAME_DAY_ACH`, `NEXT_DAY_ACH`, `STANDARD_ACH`, `REAL_TIME_PAYMENTS`, `DEBIT_CARD`, `MULTIPLE_PAYMENT_METHODS`
+          nullable: true
+        user:
+          $ref: '#/components/schemas/SignalUser'
+        device:
+          $ref: '#/components/schemas/SignalDevice'
+        risk_profile_key:
+          x-hidden-from-docs: true
+          type: string
+          description: The name of the risk profile to use for this transaction. A risk profile can be configured using via the Plaid Dashboard. If not provided, no risk profile will be used. This feature is currently in closed beta; to request access, contact your account manager.
+          minLength: 1
+          maxLength: 32
+          nullable: true
+      required:
+      - access_token
+      - account_id
+      - client_transaction_id
+      - amount
+    SignalEvaluateResponse:
+      title: SignalEvaluateResponse
+      description: SignalEvaluateResponse defines the response schema for `/signal/income/evaluate`
+      type: object
+      additionalProperties: true
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+        scores:
+          $ref: '#/components/schemas/SignalScores'
+        core_attributes:
+          $ref: '#/components/schemas/SignalEvaluateCoreAttributes'
+        risk_profile:
+          $ref: '#/components/schemas/RiskProfile'
+        warnings:
+          type: array
+          description: If bank information was not available to be used in the Signal model, this array contains warnings describing why bank data is missing. If you want to receive an API error instead of Signal scores in the case of missing bank data, file a support ticket or contact your Plaid account manager.
+          items:
+            $ref: '#/components/schemas/SignalWarning'
+      required:
+      - request_id
+      - scores
+      - warnings
+    SignalDecisionReportRequest:
+      title: SignalDecisionReportRequest
+      description: SignalDecisionReportRequest defines the request schema for `/signal/decision/report`
+      type: object
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        client_transaction_id:
+          type: string
+          description: Must be the same as the `client_transaction_id` supplied when calling `/signal/evaluate`
+          minLength: 1
+          maxLength: 36
+        initiated:
+          type: boolean
+          description: |-
+            `true` if the ACH transaction was initiated, `false` otherwise.
+
+            This field must be returned as a boolean. If formatted incorrectly, this will result in an [`INVALID_FIELD`](/docs/errors/invalid-request/#invalid_field) error.
+        days_funds_on_hold:
+          type: integer
+          description: |-
+            The actual number of days (hold time) since the ACH debit transaction that you wait before making funds available to your customers. The holding time could affect the ACH return rate.
+
+            For example, use 0 if you make funds available to your customers instantly or the same day following the debit transaction, or 1 if you make funds available the next day following the debit initialization.
+          minimum: 0
+          nullable: true
+        decision_outcome:
+          $ref: '#/components/schemas/SignalDecisionOutcome'
+        payment_method:
+          $ref: '#/components/schemas/SignalPaymentMethod'
+        amount_instantly_available:
+          type: number
+          format: double
+          description: 'The amount (in USD) made available to your customers instantly following the debit transaction. It could be a partial amount of the requested transaction (example: 102.05).'
+          nullable: true
+      required:
+      - client_transaction_id
+      - initiated
+    SignalDecisionReportResponse:
+      title: SignalDecisionReportResponse
+      description: SignalDecisionReportResponse defines the response schema for `/signal/decision/report`
+      additionalProperties: true
+      type: object
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
+    SignalReturnReportRequest:
+      title: SignalReturnReportRequest
+      description: SignalReturnReportRequest defines the request schema for `/signal/return/report`
+      type: object
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        client_transaction_id:
+          type: string
+          description: Must be the same as the `client_transaction_id` supplied when calling `/signal/evaluate`
+          minLength: 1
+          maxLength: 36
+        return_code:
+          type: string
+          description: |-
+            Must be a valid ACH return code (e.g. "R01")
+
+            If formatted incorrectly, this will result in an [`INVALID_FIELD`](/docs/errors/invalid-request/#invalid_field) error.
+        returned_at:
+          type: string
+          format: date-time
+          description: Date and time when you receive the returns from your payment processors, in ISO 8601 format (`YYYY-MM-DDTHH:mm:ssZ`).
+          nullable: true
+      required:
+      - client_transaction_id
+      - return_code
+    SignalReturnReportResponse:
+      title: SignalReturnReportResponse
+      description: SignalReturnReportResponse defines the response schema for `/signal/return/report`
+      additionalProperties: true
+      type: object
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
+    SignalPrepareRequest:
+      title: SignalPrepareRequest
+      description: SignalPrepareRequest defines the request schema for `/signal/prepare`
+      type: object
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+      required:
+      - access_token
+    SignalPrepareResponse:
+      title: SignalPrepareResponse
+      description: SignalPrepareResponse defines the response schema for `/signal/prepare`
+      additionalProperties: true
+      type: object
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
+    ProcessorSignalEvaluateRequest:
+      title: ProcessorSignalEvaluateRequest
+      description: ProcessorSignalEvaluateRequest defines the request schema for `/processor/signal/evaluate`
+      type: object
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        processor_token:
+          $ref: '#/components/schemas/ProcessorToken'
+        client_transaction_id:
+          type: string
+          description: The unique ID that you would like to use to refer to this transaction. For your convenience mapping your internal data, you could use your internal ID/identifier for this transaction. The max length for this field is 36 characters.
+          minLength: 1
+          maxLength: 36
+        amount:
+          type: number
+          format: double
+          description: The transaction amount, in USD (e.g. `102.05`)
+        user_present:
+          type: boolean
+          description: '`true` if the end user is present while initiating the ACH transfer and the endpoint is being called; `false` otherwise (for example, when the ACH transfer is scheduled and the end user is not present, or you call this endpoint after the ACH transfer but before submitting the Nacha file for ACH processing).'
+          nullable: true
+        client_user_id:
+          type: string
+          description: A unique ID that identifies the end user in your system. This ID is used to correlate requests by a user with multiple Items. Personally identifiable information, such as an email address or phone number, should not be used in the `client_user_id`.
+        is_recurring:
+          type: boolean
+          description: '**true** if the ACH transaction is a recurring transaction; **false** otherwise '
+          nullable: true
+        default_payment_method:
+          type: string
+          description: |-
+            The default ACH or non-ACH payment method to complete the transaction.
+            `SAME_DAY_ACH`: Same Day ACH by NACHA. The debit transaction is processed and settled on the same day
+            `NEXT_DAY_ACH`: Next Day ACH settlement for debit transactions, offered by some payment processors
+            `STANDARD_ACH`: standard ACH by NACHA
+            `REAL_TIME_PAYMENTS`: real-time payments such as RTP and FedNow
+            `DEBIT_CARD`: if the default payment is over debit card networks
+            `MULTIPLE_PAYMENT_METHODS`: if there is no default debit rail or there are multiple payment methods
+            Possible values:  `SAME_DAY_ACH`, `NEXT_DAY_ACH`, `STANDARD_ACH`, `REAL_TIME_PAYMENTS`, `DEBIT_CARD`, `MULTIPLE_PAYMENT_METHODS`
+          nullable: true
+        user:
+          $ref: '#/components/schemas/SignalUser'
+        device:
+          $ref: '#/components/schemas/SignalDevice'
+      required:
+      - processor_token
+      - client_transaction_id
+      - amount
+    ProcessorSignalEvaluateResponse:
+      title: ProcessorSignalEvaluateResponse
+      description: ProcessorSignalEvaluateResponse defines the response schema for `/processor/signal/evaluate`
+      type: object
+      additionalProperties: true
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+        scores:
+          $ref: '#/components/schemas/SignalScores'
+        core_attributes:
+          $ref: '#/components/schemas/SignalEvaluateCoreAttributes'
+        warnings:
+          type: array
+          description: If bank information was not available to be used in the Signal model, this array contains warnings describing why bank data is missing. If you want to receive an API error instead of Signal scores in the case of missing bank data, file a support ticket or contact your Plaid account manager.
+          items:
+            $ref: '#/components/schemas/SignalWarning'
+      required:
+      - request_id
+      - scores
+    ProcessorSignalDecisionReportRequest:
+      title: ProcessorSignalDecisionReportRequest
+      description: ProcessorSignalDecisionReportRequest defines the request schema for `/processor/signal/decision/report`
+      type: object
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        processor_token:
+          $ref: '#/components/schemas/ProcessorToken'
+        client_transaction_id:
+          type: string
+          description: Must be the same as the `client_transaction_id` supplied when calling `/signal/evaluate`
+          minLength: 1
+          maxLength: 36
+        initiated:
+          type: boolean
+          description: |-
+            `true` if the ACH transaction was initiated, `false` otherwise.
+
+            This field must be returned as a boolean. If formatted incorrectly, this will result in an [`INVALID_FIELD`](/docs/errors/invalid-request/#invalid_field) error.
+        days_funds_on_hold:
+          type: integer
+          description: |-
+            The actual number of days (hold time) since the ACH debit transaction that you wait before making funds available to your customers. The holding time could affect the ACH return rate.
+
+            For example, use 0 if you make funds available to your customers instantly or the same day following the debit transaction, or 1 if you make funds available the next day following the debit initialization.
+          minimum: 0
+          nullable: true
+        decision_outcome:
+          $ref: '#/components/schemas/SignalDecisionOutcome'
+        payment_method:
+          $ref: '#/components/schemas/SignalPaymentMethod'
+        amount_instantly_available:
+          type: number
+          format: double
+          description: 'The amount (in USD) made available to your customers instantly following the debit transaction. It could be a partial amount of the requested transaction (example: 102.05).'
+          nullable: true
+      required:
+      - processor_token
+      - client_transaction_id
+      - initiated
+    ProcessorSignalDecisionReportResponse:
+      title: ProcessorSignalDecisionReportResponse
+      description: ProcessorSignalDecisionReportResponse defines the response schema for `/processor/signal/decision/report`
+      additionalProperties: true
+      type: object
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
+    ProcessorSignalReturnReportRequest:
+      title: ProcessorSignalReturnReportRequest
+      description: ProcessorSignalReturnReportRequest defines the request schema for `/processor/signal/return/report`
+      type: object
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        processor_token:
+          $ref: '#/components/schemas/ProcessorToken'
+        client_transaction_id:
+          type: string
+          description: Must be the same as the `client_transaction_id` supplied when calling `/processor/signal/evaluate`
+          minLength: 1
+          maxLength: 36
+        return_code:
+          type: string
+          description: |-
+            Must be a valid ACH return code (e.g. "R01")
+
+            If formatted incorrectly, this will result in an [`INVALID_FIELD`](/docs/errors/invalid-request/#invalid_field) error.
+        returned_at:
+          type: string
+          format: date-time
+          description: Date and time when you receive the returns from your payment processors, in ISO 8601 format (`YYYY-MM-DDTHH:mm:ssZ`).
+          nullable: true
+      required:
+      - processor_token
+      - client_transaction_id
+      - return_code
+    ProcessorSignalReturnReportResponse:
+      title: ProcessorSignalReturnReportResponse
+      description: ProcessorSignalReturnReportResponse defines the response schema for `/processor/signal/return/report`
+      additionalProperties: true
+      type: object
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
+    ProcessorSignalPrepareRequest:
+      title: ProcessorSignalPrepareRequest
+      description: ProcessorSignalPrepareRequest defines the request schema for `/processor/signal/prepare`
+      type: object
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        processor_token:
+          $ref: '#/components/schemas/ProcessorToken'
+      required:
+      - processor_token
+    ProcessorSignalPrepareResponse:
+      title: ProcessorSignalPrepareResponse
+      description: ProcessorSignalPrepareResponse defines the response schema for `/processor/signal/prepare`
+      additionalProperties: true
+      type: object
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
+    SignalScores:
+      title: SignalEvaluateScores
+      description: Risk scoring details broken down by risk category.
+      type: object
+      additionalProperties: true
+      properties:
+        customer_initiated_return_risk:
+          $ref: '#/components/schemas/CustomerInitiatedReturnRisk'
+        bank_initiated_return_risk:
+          $ref: '#/components/schemas/BankInitiatedReturnRisk'
+    SignalScore:
+      description: 'A score from 1-99 that indicates the transaction return risk: a higher risk score suggests a higher return likelihood.'
+      type: integer
+      minimum: 1
+      maximum: 99
+    CustomerInitiatedReturnRisk:
+      title: CustomerInitiatedReturnRisk
+      type: object
+      description: 'The object contains a risk score and a risk tier that evaluate the transaction return risk of an unauthorized debit. Common return codes in this category include: "R05", "R07", "R10", "R11", "R29". These returns typically have a return time frame of up to 60 calendar days. During this period, the customer of financial institutions can dispute a transaction as unauthorized.'
+      properties:
+        score:
+          $ref: '#/components/schemas/SignalScore'
+        risk_tier:
+          $ref: '#/components/schemas/CustomerInitiatedRiskTier'
+      required:
+      - risk_tier
+      - score
+    CustomerInitiatedRiskTier:
+      description: |
+        A tier corresponding to the projected likelihood that the transaction, if initiated, will be subject to a return.
+
+        In the `customer_initiated_return_risk` object, there are five risk tiers corresponding to the scores:
+          1: Predicted customer-initiated return incidence rate between 0.00% - 0.02%
+          2: Predicted customer-initiated return incidence rate between 0.02% - 0.05%
+          3: Predicted customer-initiated return incidence rate between 0.05% - 0.1%
+          4: Predicted customer-initiated return incidence rate between 0.1% - 0.5%
+          5: Predicted customer-initiated return incidence rate greater than 0.5%
+      type: integer
+      minimum: 1
+      maximum: 5
+    BankInitiatedReturnRisk:
+      title: BankInitiatedReturnRisk
+      type: object
+      description: 'The object contains a risk score and a risk tier that evaluate the transaction return risk because an account is overdrawn or because an ineligible account is used. Common return codes in this category include: "R01", "R02", "R03", "R04", "R06", "R08",  "R09", "R13", "R16", "R17", "R20", "R23". These returns have a turnaround time of 2 banking days.'
+      properties:
+        score:
+          $ref: '#/components/schemas/SignalScore'
+        risk_tier:
+          $ref: '#/components/schemas/BankInitiatedRiskTier'
+      required:
+      - risk_tier
+      - score
+    BankInitiatedRiskTier:
+      description: |
+        In the `bank_initiated_return_risk` object, there are eight risk tiers corresponding to the scores:
+          1: Predicted bank-initiated return incidence rate between 0.0% - 0.5%
+          2: Predicted bank-initiated return incidence rate between 0.5% - 1.5%
+          3: Predicted bank-initiated return incidence rate between 1.5% - 3%
+          4: Predicted bank-initiated return incidence rate between 3% - 5%
+          5: Predicted bank-initiated return incidence rate between 5% - 10%
+          6: Predicted bank-initiated return incidence rate between 10% - 15%
+          7: Predicted bank-initiated return incidence rate between 15% and 50%
+          8: Predicted bank-initiated return incidence rate greater than 50%
+      type: integer
+      minimum: 1
+      maximum: 8
+    SignalWarning:
+      title: SignalWarning
+      type: object
+      description: Conveys information about the errors causing missing or stale bank data used to construct the /signal/evaluate scores and response
+      properties:
+        warning_type:
+          type: string
+          description: A broad categorization of the warning. Safe for programmatic use.
+        warning_code:
+          type: string
+          description: The warning code identifies a specific kind of warning that pertains to the error causing bank data to be missing. Safe for programmatic use. For more details on warning codes, please refer to Plaid standard error codes documentation. If you receive the `ITEM_LOGIN_REQUIRED` warning, we recommend re-authenticating your user by implementing Link's update mode. This will guide your user to fix their credentials, allowing Plaid to start fetching data again for future Signal requests.
+        warning_message:
+          type: string
+          description: A developer-friendly representation of the warning type. This may change over time and is not safe for programmatic use.
+    SignalUser:
+      title: SignalUser
+      type: object
+      description: Details about the end user initiating the transaction (i.e., the account holder).
+      properties:
+        name:
+          $ref: '#/components/schemas/SignalPersonName'
+        phone_number:
+          type: string
+          description: 'The user''s phone number, in E.164 format: +{countrycode}{number}. For example: "+14151234567"'
+          nullable: true
+        email_address:
+          type: string
+          description: The user's email address.
+          nullable: true
+        address:
+          $ref: '#/components/schemas/SignalAddressData'
+    SignalPersonName:
+      title: SignalPersonName
+      type: object
+      description: The user's legal name
+      nullable: true
+      properties:
+        prefix:
+          type: string
+          description: The user's name prefix (e.g. "Mr.")
+          nullable: true
+        given_name:
+          type: string
+          description: The user's given name. If the user has a one-word name, it should be provided in this field.
+          nullable: true
+        middle_name:
+          type: string
+          description: The user's middle name
+          nullable: true
+        family_name:
+          type: string
+          description: The user's family name / surname
+          nullable: true
+        suffix:
+          type: string
+          description: The user's name suffix (e.g. "II")
+          nullable: true
+    SignalAddressData:
+      title: AddressData
+      type: object
+      nullable: true
+      additionalProperties: true
+      description: Data about the components comprising an address.
+      properties:
+        city:
+          type: string
+          description: The full city name
+        region:
+          type: string
+          description: |-
+            The region or state
+            Example: `"NC"`
+          nullable: true
+        street:
+          type: string
+          description: |-
+            The full street address
+            Example: `"564 Main Street, APT 15"`
+        postal_code:
+          type: string
+          description: The postal code
+          nullable: true
+        country:
+          type: string
+          description: The ISO 3166-1 alpha-2 country code
+          nullable: true
+    SignalDevice:
+      title: SignalEvaluateDevice
+      type: object
+      description: Details about the end user's device
+      properties:
+        ip_address:
+          type: string
+          description: The IP address of the device that initiated the transaction
+          nullable: true
+        user_agent:
+          type: string
+          description: The user agent of the device that initiated the transaction (e.g. "Mozilla/5.0")
+          nullable: true
+    RiskProfile:
+      x-hidden-from-docs: true
+      title: SignalEvaluateRiskProfile
+      type: object
+      description: Details about the transaction result after evaluated by the requested risk profile. If a `risk_profile_key` is not provided, this field will be omitted. This feature is currently in closed beta; to request access, contact your account manager.
+      nullable: true
+      properties:
+        key:
+          type: string
+          description: The name of the risk profile used for this transaction.
+        outcome:
+          type: string
+          description: The name of the evaluated outcome for this transaction.
+    SignalDecisionOutcome:
+      type: string
+      enum:
+      - APPROVE
+      - REVIEW
+      - REJECT
+      - TAKE_OTHER_RISK_MEASURES
+      - NOT_EVALUATED
+      description: |
+        The payment decision from the risk assessment.
+
+        `APPROVE`: approve the transaction without requiring further actions from your customers. For example, use this field if you are placing a standard hold for all the approved transactions before making funds available to your customers. You should also use this field if you decide to accelerate the fund availability for your customers.
+
+        `REVIEW`: the transaction requires manual review
+
+        `REJECT`: reject the transaction
+
+        `TAKE_OTHER_RISK_MEASURES`: for example, placing a longer hold on funds than those approved transactions or introducing customer frictions such as step-up verification/authentication
+
+        `NOT_EVALUATED`: if only logging the Signal results without using them
+
+        Possible values:  `APPROVE`, `REVIEW`, `REJECT`, `TAKE_OTHER_RISK_MEASURES`, `NOT_EVALUATED`
+      nullable: true
+    SignalPaymentMethod:
+      type: string
+      enum:
+      - SAME_DAY_ACH
+      - NEXT_DAY_ACH
+      - STANDARD_ACH
+      - REAL_TIME_PAYMENTS
+      - DEBIT_CARD
+      - MULTIPLE_PAYMENT_METHODS
+      description: |
+        The payment method to complete the transaction after the risk assessment. It may be different from the default payment method.
+
+        `SAME_DAY_ACH`: Same Day ACH by NACHA. The debit transaction is processed and settled on the same day
+
+        `NEXT_DAY_ACH`: Next Day ACH settlement for debit transactions, offered by some payment processors
+
+        `STANDARD_ACH`: standard ACH by NACHA
+
+        `REAL_TIME_PAYMENTS`: real-time payments such as RTP and FedNow
+
+        `DEBIT_CARD`: if the default payment is over debit card networks
+
+        `MULTIPLE_PAYMENT_METHODS`: if there is no default debit rail or there are multiple payment methods
+
+        Possible values: `SAME_DAY_ACH`, `NEXT_DAY_ACH`, `STANDARD_ACH`, `REAL_TIME_PAYMENTS`, `DEBIT_CARD`, `MULTIPLE_PAYMENT_METHODS`
+      nullable: true
+    SignalEvaluateCoreAttributes:
+      title: SignalEvaluateCoreAttributes
+      type: object
+      description: |-
+        The core attributes object contains additional data that can be used to assess the ACH return risk. Examples of data include:
+
+        `days_since_first_plaid_connection`: The number of days since the first time the Item was connected to an application via Plaid
+        `plaid_connections_count_7d`: The number of times the Item has been connected to applications via Plaid over the past 7 days
+        `plaid_connections_count_30d`: The number of times the Item has been connected to applications via Plaid over the past 30 days
+        `total_plaid_connections_count`: The number of times the Item has been connected to applications via Plaid
+        `is_savings_or_money_market_account`: Indicates whether the ACH transaction funding account is a savings/money market account
+
+        For the full list and detailed documentation of core attributes available, or to request that core attributes not be returned, contact Sales or your Plaid account manager
+      properties:
+        unauthorized_transactions_count_7d:
+          type: integer
+          description: We parse and analyze historical transaction metadata to identify the number of possible past returns due to unauthorized transactions over the past 7 days from the account that will be debited.
+          nullable: true
+        unauthorized_transactions_count_30d:
+          type: integer
+          description: We parse and analyze historical transaction metadata to identify the number of possible past returns due to unauthorized transactions over the past 30 days from the account that will be debited.
+          nullable: true
+        unauthorized_transactions_count_60d:
+          type: integer
+          description: We parse and analyze historical transaction metadata to identify the number of possible past returns due to unauthorized transactions over the past 60 days from the account that will be debited.
+          nullable: true
+        unauthorized_transactions_count_90d:
+          type: integer
+          description: We parse and analyze historical transaction metadata to identify the number of possible past returns due to unauthorized transactions over the past 90 days from the account that will be debited.
+          nullable: true
+        nsf_overdraft_transactions_count_7d:
+          type: integer
+          description: We parse and analyze historical transaction metadata to identify the number of possible past returns due to non-sufficient funds/overdrafts over the past 7 days from the account that will be debited.
+          nullable: true
+        nsf_overdraft_transactions_count_30d:
+          type: integer
+          description: We parse and analyze historical transaction metadata to identify the number of possible past returns due to non-sufficient funds/overdrafts over the past 30 days from the account that will be debited.
+          nullable: true
+        nsf_overdraft_transactions_count_60d:
+          type: integer
+          description: We parse and analyze historical transaction metadata to identify the number of possible past returns due to non-sufficient funds/overdrafts over the past 60 days from the account that will be debited.
+          nullable: true
+        nsf_overdraft_transactions_count_90d:
+          type: integer
+          description: We parse and analyze historical transaction metadata to identify the number of possible past returns due to non-sufficient funds/overdrafts over the past 90 days from the account that will be debited.
+          nullable: true
+        days_since_first_plaid_connection:
+          type: integer
+          description: The number of days since the first time the Item was connected to an application via Plaid
+          nullable: true
+        plaid_connections_count_7d:
+          type: integer
+          description: The number of times the Item has been connected to applications via Plaid over the past 7 days
+          nullable: true
+        plaid_connections_count_30d:
+          type: integer
+          description: The number of times the Item has been connected to applications via Plaid over the past 30 days
+          nullable: true
+        total_plaid_connections_count:
+          type: integer
+          description: The total number of times the Item has been connected to applications via Plaid
+          nullable: true
+        is_savings_or_money_market_account:
+          type: boolean
+          description: Indicates if the ACH transaction funding account is a savings/money market account
+          nullable: true
+        total_credit_transactions_amount_10d:
+          type: number
+          format: double
+          description: The total credit (inflow) transaction amount over the past 10 days from the account that will be debited
+          nullable: true
+        total_debit_transactions_amount_10d:
+          type: number
+          format: double
+          description: The total debit (outflow) transaction amount over the past 10 days from the account that will be debited
+          nullable: true
+        p50_credit_transactions_amount_28d:
+          type: number
+          format: double
+          description: The 50th percentile of all credit (inflow) transaction amounts over the past 28 days from the account that will be debited
+          nullable: true
+        p50_debit_transactions_amount_28d:
+          type: number
+          format: double
+          description: The 50th percentile of all debit (outflow) transaction amounts over the past 28 days from the account that will be debited
+          nullable: true
+        p95_credit_transactions_amount_28d:
+          type: number
+          format: double
+          description: The 95th percentile of all credit (inflow) transaction amounts over the past 28 days from the account that will be debited
+          nullable: true
+        p95_debit_transactions_amount_28d:
+          type: number
+          format: double
+          description: The 95th percentile of all debit (outflow) transaction amounts over the past 28 days from the account that will be debited
+          nullable: true
+        days_with_negative_balance_count_90d:
+          type: integer
+          description: The number of days within the past 90 days when the account that will be debited had a negative end-of-day available balance
+          nullable: true
+        p90_eod_balance_30d:
+          type: number
+          format: double
+          description: The 90th percentile of the end-of-day available balance over the past 30 days of the account that will be debited
+          nullable: true
+        p90_eod_balance_60d:
+          type: number
+          format: double
+          description: The 90th percentile of the end-of-day available balance over the past 60 days of the account that will be debited
+          nullable: true
+        p90_eod_balance_90d:
+          type: number
+          format: double
+          description: The 90th percentile of the end-of-day available balance over the past 90 days of the account that will be debited
+          nullable: true
+        p10_eod_balance_30d:
+          type: number
+          format: double
+          description: The 10th percentile of the end-of-day available balance over the past 30 days of the account that will be debited
+          nullable: true
+        p10_eod_balance_60d:
+          type: number
+          format: double
+          description: The 10th percentile of the end-of-day available balance over the past 60 days of the account that will be debited
+          nullable: true
+        p10_eod_balance_90d:
+          type: number
+          format: double
+          description: The 10th percentile of the end-of-day available balance over the past 90 days of the account that will be debited
+          nullable: true
+        available_balance:
+          type: number
+          format: double
+          description: Available balance, as of the `balance_last_updated` time. The available balance is the current balance less any outstanding holds or debits that have not yet posted to the account.
+          nullable: true
+        current_balance:
+          type: number
+          format: double
+          description: Current balance, as of the `balance_last_updated` time. The current balance is the total amount of funds in the account.
+          nullable: true
+        balance_last_updated:
+          type: string
+          format: date-time
+          description: Timestamp in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (YYYY-MM-DDTHH:mm:ssZ) indicating the last time that the balance for the given account has been updated.
+          nullable: true
+        phone_change_count_28d:
+          type: integer
+          description: The number of times the account's phone numbers on file have changed over the past 28 days
+          nullable: true
+        phone_change_count_90d:
+          type: integer
+          description: The number of times the account's phone numbers on file have changed over the past 90 days
+          nullable: true
+        email_change_count_28d:
+          type: integer
+          description: The number of times the account's email addresses on file have changed over the past 28 days
+          nullable: true
+        email_change_count_90d:
+          type: integer
+          description: The number of times the account's email addresses on file have changed over the past 90 days
+          nullable: true
+        address_change_count_28d:
+          type: integer
+          description: The number of times the account's addresses on file have changed over the past 28 days
+          nullable: true
+        address_change_count_90d:
+          type: integer
+          description: The number of times the account's addresses on file have changed over the past 90 days
+          nullable: true
+        plaid_non_oauth_authentication_attempts_count_3d:
+          type: integer
+          description: The number of non-OAuth authentication attempts via Plaid for this bank account over the past 3 days
+          nullable: true
+        plaid_non_oauth_authentication_attempts_count_7d:
+          type: integer
+          description: The number of non-OAuth authentication attempts via Plaid for this bank account over the past 7 days
+          nullable: true
+        plaid_non_oauth_authentication_attempts_count_30d:
+          type: integer
+          description: The number of non-OAuth authentication attempts via Plaid for this bank account over the past 30 days
+          nullable: true
+        failed_plaid_non_oauth_authentication_attempts_count_3d:
+          type: integer
+          description: The number of failed non-OAuth authentication attempts via Plaid for this bank account over the past 3 days
+          nullable: true
+        failed_plaid_non_oauth_authentication_attempts_count_7d:
+          type: integer
+          description: The number of failed non-OAuth authentication attempts via Plaid for this bank account over the past 7 days
+          nullable: true
+        failed_plaid_non_oauth_authentication_attempts_count_30d:
+          type: integer
+          description: The number of failed non-OAuth authentication attempts via Plaid for this bank account over the past 30 days
+          nullable: true
+        debit_transactions_count_10d:
+          type: integer
+          description: The total number of debit (outflow) transactions over the past 10 days from the account that will be debited
+          nullable: true
+        credit_transactions_count_10d:
+          type: integer
+          description: The total number of credit (inflow) transactions over the past 10 days from the account that will be debited
+          nullable: true
+        debit_transactions_count_30d:
+          type: integer
+          description: The total number of debit (outflow) transactions over the past 30 days from the account that will be debited
+          nullable: true
+        credit_transactions_count_30d:
+          type: integer
+          description: The total number of credit (inflow) transactions over the past 30 days from the account that will be debited
+          nullable: true
+        debit_transactions_count_60d:
+          type: integer
+          description: The total number of debit (outflow) transactions over the past 60 days from the account that will be debited
+          nullable: true
+        credit_transactions_count_60d:
+          type: integer
+          description: The total number of credit (inflow) transactions over the past 60 days from the account that will be debited
+          nullable: true
+        debit_transactions_count_90d:
+          type: integer
+          description: The total number of debit (outflow) transactions over the past 90 days from the account that will be debited
+          nullable: true
+        credit_transactions_count_90d:
+          type: integer
+          description: The total number of credit (inflow) transactions over the past 90 days from the account that will be debited
+          nullable: true
+        total_debit_transactions_amount_30d:
+          type: number
+          format: double
+          description: The total debit (outflow) transaction amount over the past 30 days from the account that will be debited
+          nullable: true
+        total_credit_transactions_amount_30d:
+          type: number
+          format: double
+          description: The total credit (inflow) transaction amount over the past 30 days from the account that will be debited
+          nullable: true
+        total_debit_transactions_amount_60d:
+          type: number
+          format: double
+          description: The total debit (outflow) transaction amount over the past 60 days from the account that will be debited
+          nullable: true
+        total_credit_transactions_amount_60d:
+          type: number
+          format: double
+          description: The total credit (inflow) transaction amount over the past 60 days from the account that will be debited
+          nullable: true
+        total_debit_transactions_amount_90d:
+          type: number
+          format: double
+          description: The total debit (outflow) transaction amount over the past 90 days from the account that will be debited
+          nullable: true
+        total_credit_transactions_amount_90d:
+          type: number
+          format: double
+          description: The total credit (inflow) transaction amount over the past 90 days from the account that will be debited
+          nullable: true
+        p50_eod_balance_30d:
+          type: number
+          format: double
+          description: The 50th percentile of the end-of-day available balance over the past 30 days of the account that will be debited
+          nullable: true
+        p50_eod_balance_60d:
+          type: number
+          format: double
+          description: The 50th percentile of the end-of-day available balance over the past 60 days of the account that will be debited
+          nullable: true
+        p50_eod_balance_90d:
+          type: number
+          format: double
+          description: The 50th percentile of the end-of-day available balance over the past 90 days of the account that will be debited
+          nullable: true
+        p50_eod_balance_31d_to_60d:
+          type: number
+          format: double
+          description: The 50th percentile of the end-of-day available balance between day 31 and day 60 over the past 60 days of the account that will be debited
+          nullable: true
+        p50_eod_balance_61d_to_90d:
+          type: number
+          format: double
+          description: The 50th percentile of the end-of-day available balance between day 61 and day 90 over the past 60 days of the account that will be debited
+          nullable: true
+        p90_eod_balance_31d_to_60d:
+          type: number
+          format: double
+          description: The 90th percentile of the end-of-day available balance between day 31 and day 60 over the past 60 days of the account that will be debited
+          nullable: true
+        p90_eod_balance_61d_to_90d:
+          type: number
+          format: double
+          description: The 90th percentile of the end-of-day available balance between day 61 and day 90 over the past 60 days of the account that will be debited
+          nullable: true
+        p10_eod_balance_31d_to_60d:
+          type: number
+          format: double
+          description: The 10th percentile of the end-of-day available balance between day 31 and day 60 over the past 60 days of the account that will be debited
+          nullable: true
+        p10_eod_balance_61d_to_90d:
+          type: number
+          format: double
+          description: The 10th percentile of the end-of-day available balance between day 61 and day 90 over the past 60 days of the account that will be debited
+          nullable: true
+        transactions_last_updated:
+          type: string
+          format: date-time
+          description: Timestamp in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (YYYY-MM-DDTHH:mm:ssZ) indicating the last time that the transactions for the given account have been updated.
+          nullable: true
+        is_account_closed:
+          type: boolean
+          description: Indicates if the receiver bank account is closed
+          nullable: true
+        is_account_frozen_or_restricted:
+          type: boolean
+          description: Indicates if the receiver bank account is either frozen or restricted
+          nullable: true
     StatementsListRequest:
       title: StatementsListRequest
       type: object
@@ -46784,11 +47281,20 @@ components:
         account_id:
           description: Plaid's unique identifier for the account.
           type: string
+        account_mask:
+          description: The last 2-4 alphanumeric characters of an account's official account number. Note that the mask may be non-unique between an Item's accounts, and it may also not match the mask that the bank displays to the user.
+          type: string
         account_name:
           description: The name of the account, either assigned by the user or by the financial institution itself.
           type: string
+        account_official_name:
+          description: The official name of the account as given by the financial institution.
+          type: string
+        account_subtype:
+          description: The subtype of the account. For a full list of valid types and subtypes, see the [Account schema](https://plaid.com/docs/api/accounts#account-type-schema).
+          type: string
         account_type:
-          description: The type of account. Possible values are investment, credit, depository, loan, brokerage, other.
+          description: The type of account. For a full list of valid types and subtypes, see the [Account schema](https://plaid.com/docs/api/accounts#account-type-schema).
           type: string
         statements:
           description: The list of statements' metadata associated with this account.
@@ -46798,7 +47304,10 @@ components:
       required:
       - account_id
       - account_name
+      - account_official_name
+      - account_subtype
       - account_type
+      - account_mask
       - statements
     StatementsStatement:
       title: StatementsStatement
