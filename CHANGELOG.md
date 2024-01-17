@@ -1,3 +1,21 @@
+### 2020-09-14_1.485.0
+- Add `/processor/liabilities/get` endpoint
+
+### 2020-09-14_1.484.1
+- Add `/identity_verification/autofill/create` (closed beta)
+
+### 2020-09-14_1.484.0
+- Add `/statements/refresh` endpoint
+
+### 2020-09-14_1.483.2
+- Add `/beacon/duplicate/get` route
+
+### 2020-09-14_1.483.1
+- Internal changes only
+
+### 2020-09-14_1.483.0
+- Added net new fields to StatementsAccount object: `account_mask`, `account_subtype`, `account_official_name` 
+
 ### 2020-09-14_1.482.3
 - Update `description` description for `/transfer/create`
 
@@ -30,6 +48,7 @@
 - Add `registration_number` to `/partner/customer/create` request
 
 ### 2020-09-14_1.478.3
+- Update `/identity/get` response for identity document upload beta customers
 
 ### 2020-09-14_1.478.2
 - Deprecate `funding_account_id` from `/transfer/recurring/create` request
