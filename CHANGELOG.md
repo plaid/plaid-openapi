@@ -1,3 +1,6 @@
+### 2020-09-14_1.485.1
+- Update `legal_name` description in `user` object in `/link/token.create` request
+
 ### 2020-09-14_1.485.0
 - Add `/processor/liabilities/get` endpoint
 
