@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.485.1
+  version: 2020-09-14_1.491.3
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -85,9 +85,10 @@ paths:
                           balances:
                             available: 43200
                             current: 43200
+                            limit: null
+                            margin_loan_amount: null
                             iso_currency_code: USD
                             unofficial_currency_code: null
-                            limit: null
                           days_available: 5
                           historical_balances:
                           - current: 49050
@@ -167,9 +168,10 @@ paths:
                           balances:
                             available: 100
                             current: 110
+                            limit: null
+                            margin_loan_amount: null
                             iso_currency_code: USD
                             unofficial_currency_code: null
-                            limit: null
                           days_available: 5
                           historical_balances:
                           - current: 110
@@ -4857,10 +4859,7 @@ paths:
                       dashboard_user_id: 54350110fedcbaf01234ffee
                     request_id: saKrIBuEB9qJZng
       operationId: beaconReportCreate
-      description: |-
-        Create a fraud report for a given Beacon User.
-
-        Note: If you are creating users with the express purpose of providing historical fraud data, you should use the `/beacon/user/create` endpoint instead and embed the fraud report in the request. This will ensure that the Beacon User you create will not be subject to any billing costs.
+      description: Create a fraud report for a given Beacon User.
       externalDocs:
         url: /api/products/beacon/#beaconreportcreate
   /beacon/report/list:
@@ -5882,7 +5881,10 @@ paths:
       externalDocs:
         url: /api/processors/#processorsignaldecisionreport
       operationId: processorSignalDecisionReport
-      description: After calling `/processor/signal/evaluate`, call `/processor/signal/decision/report` to report whether the transaction was initiated.
+      description: |-
+        After calling `/processor/signal/evaluate`, call `/processor/signal/decision/report` to report whether the transaction was initiated.
+
+        If you are using the [Plaid Transfer product](https://www.plaid.com/docs/transfer) to create transfers, it is not necessary to use this endpoint, as Plaid already knows whether the transfer was initiated.
       responses:
         "200":
           description: OK
@@ -5915,7 +5917,10 @@ paths:
       externalDocs:
         url: /api/processors/#processorsignalreturnreport
       operationId: processorSignalReturnReport
-      description: Call the `/processor/signal/return/report` endpoint to report a returned transaction that was previously sent to the `/processor/signal/evaluate` endpoint. Your feedback will be used by the model to incorporate the latest risk trend in your portfolio.
+      description: |-
+        Call the `/processor/signal/return/report` endpoint to report a returned transaction that was previously sent to the `/processor/signal/evaluate` endpoint. Your feedback will be used by the model to incorporate the latest risk trend in your portfolio.
+
+        If you are using the [Plaid Transfer product](https://www.plaid.com/docs/transfer) to create transfers, it is not necessary to use this endpoint, as Plaid already knows whether the transfer was returned.
       responses:
         "200":
           description: OK
@@ -12655,7 +12660,7 @@ paths:
       description: |-
         `/credit/payroll_income/risk_signals/get` can be used as part of the Document Income flow to assess a user-uploaded document for signs of potential fraud or tampering. It returns a risk score for each uploaded document that indicates the likelihood of the document being fraudulent, in addition to details on the individual risk signals contributing to the score.
 
-        To trigger risk signal generation for an Item, call `/link/token/create` with `parsing_config` set to include `fraud_risk`, or call `/credit/payroll_income/parsing_config/update`. Once risk signal generation has been triggered, `/credit/payroll_income/risk_signals/get` can be called at any time after the `INCOME_VERIFICATION_RISK_SIGNALS` webhook has been fired.
+        To trigger risk signal generation for an Item, call `/link/token/create` with `parsing_config` set to include `risk_signals`, or call `/credit/payroll_income/parsing_config/update`. Once risk signal generation has been triggered, `/credit/payroll_income/risk_signals/get` can be called at any time after the `INCOME_VERIFICATION_RISK_SIGNALS` webhook has been fired.
 
         `/credit/payroll_income/risk_signals/get` is offered as an add-on to Document Income and is billed separately. To request access to this endpoint, submit a product access request or contact your Plaid account manager.
       requestBody:
@@ -12882,9 +12887,10 @@ paths:
                           balances:
                             available: 43200
                             current: 43200
+                            limit: null
+                            margin_loan_amount: null
                             iso_currency_code: USD
                             unofficial_currency_code: null
-                            limit: null
                           days_available: 5
                           historical_balances:
                           - current: 49050
@@ -12964,9 +12970,10 @@ paths:
                           balances:
                             available: 100
                             current: 110
+                            limit: null
+                            margin_loan_amount: null
                             iso_currency_code: USD
                             unofficial_currency_code: null
-                            limit: null
                           days_available: 5
                           historical_balances:
                           - current: 110
@@ -13425,10 +13432,6 @@ paths:
       operationId: signalPrepare
       description: |-
         When Link is not initialized with Signal, call `/signal/prepare` to opt-in that Item to the Signal data collection process, developing a Signal score.
-
-        If you are using other Plaid products after Link, e.g. Identity or Assets, call `/signal/prepare` after those product calls are complete.
-
-        Example flow: Link is initialized with Auth, call `/auth/get` for the account and routing number, call `/identity/get` to retrieve bank ownership details, then call `/signal/prepare` to begin Signal data collection. Later, once you have obtained details about the proposed transaction from the user, call `/signal/evaluate` for a Signal score. For more information please see [Recommendations for initializing Link with specific product combinations](https://www.plaid.com/docs/link/initializing-products/#recommendations-for-initializing-link-with-specific-product-combinations).
 
         If run on an Item that is already initialized with Signal, this endpoint will return a 200 response and will not modify the Item.
       responses:
@@ -15525,9 +15528,37 @@ components:
         risk_level:
           type: string
           description: A five-tier risk assessment for the transaction based on the probability of return.
+        attributes:
+          $ref: '#/components/schemas/BalancePlusAttributes'
+        score:
+          nullable: true
+          description: |-
+            A score from 1-99 that indicates the transaction return risk: a higher risk score suggests a higher return likelihood.
+
+            The score evaluates the transaction return risk because an account is overdrawn or because an ineligible account is used and covers return codes: "R01", "R02", "R03", "R04", "R06", "R08",  "R09", "R13",
+            "R16", "R17", "R20", "R23". These returns have a turnaround time of 2 banking days.
+          type: integer
+          minimum: 1
+          maximum: 99
+        balance_last_updated:
+          type: string
+          description: Timestamp of the last successful balance update, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format.
+          format: date-time
+        risk_reasons:
+          type: array
+          description: |-
+            An array of objects, each representing a specific reason contributing to the risk assessment of an
+            ACH transaction. This field is particularly useful for understanding risk factors affecting the risk
+            level assigned to a transaction classified as “high”, “medium-high”, and “medium” risk.
+          items:
+            $ref: '#/components/schemas/RiskReason'
         exceeds_balance_threshold:
           type: boolean
-          description: Indicates whether the requested ACH debit amount is greater than the threshold (set by customers) of the available or current balance.
+          description: |-
+            This boolean field denotes if the requested ACH debit amount exceeds the calculated threshold based on either the available or current balance
+            of the bank account. Specifically, it checks if the amount is greater than the account balance multiplied by "balance_threshold_percentage"/100.
+            In cases where available_balance is not accessible, current_balance is used. This field is particularly useful for clients handling indirect items
+            who lack direct access to raw balance data.
     CategoriesGetRequest:
       type: object
       description: CategoriesGetRequest defines the request schema for `/categories/get`
@@ -15791,6 +15822,9 @@ components:
           maximum: 100
           default: 90
           description: The threshold percentage of the account balance used for comparison with the requested ACH debit amount.
+        requires_real_time_balance_refresh:
+          type: boolean
+          description: A boolean that determines whether the balance has to be refreshed in real time as part of the API call.
     AccountsBalanceGetRequestOptions:
       type: object
       description: An optional object to filter `/accounts/balance/get` results.
@@ -15812,9 +15846,9 @@ components:
       description: |-
         Timestamp in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (`YYYY-MM-DDTHH:mm:ssZ`) indicating the oldest acceptable balance when making a request to `/accounts/balance/get`.
 
-        If the balance that is pulled for `ins_128026` (Capital One) is older than the given timestamp, an `INVALID_REQUEST` error with the code of `LAST_UPDATED_DATETIME_OUT_OF_RANGE` will be returned with the most recent timestamp for the requested account contained in the response.
+        This field is only necessary when the institution is `ins_128026` (Capital One), *and* the account type is a non-depository account (such as a credit card) in which case a value must be provided or an `INVALID_REQUEST` error with the code of `INVALID_FIELD` will be returned. For all other institutions, as well as for depository accounts at Capital One (including all checking and savings accounts) this field is ignored.
 
-        This field is only used when the institution is `ins_128026` (Capital One), in which case a value must be provided or an `INVALID_REQUEST` error with the code of `INVALID_FIELD` will be returned. For all other institutions, this field is ignored.
+        If this field is not ignored, and no acceptable balance is available, an `INVALID_RESULT` error with the code `LAST_UPDATED_DATETIME_OUT_OF_RANGE` will be returned.
     IdentityGetRequest:
       type: object
       description: IdentityGetRequest defines the request schema for `/identity/get`
@@ -17028,10 +17062,14 @@ components:
         num_bank_statements_uploaded:
           type: integer
           description: The number of bank statements uploaded by the user.
+        num_1099s_uploaded:
+          type: integer
+          description: The number of 1099s uploaded by the user
       required:
       - num_paystubs_uploaded
       - num_w2s_uploaded
       - num_bank_statements_uploaded
+      - num_1099s_uploaded
     CreditSessionBankIncomeStatus:
       type: string
       enum:
@@ -17422,6 +17460,22 @@ components:
           $ref: '#/components/schemas/PaymentAmount'
         idempotency_key:
           $ref: '#/components/schemas/ConsentPaymentIdempotencyKey'
+        reference:
+          type: string
+          description: |-
+            A reference for the payment. This must be an alphanumeric string with at most 18 characters and must not contain any special characters (since not all institutions support them).
+            If not provided, Plaid will automatically fall back to the reference from consent. In order to track settlement via Payment Confirmation, each payment must have a unique reference. If the reference provided through the API is not unique, Plaid will adjust it.
+            Some institutions may limit the reference to less than 18 characters. If necessary, Plaid will adjust the reference by truncating it to fit the institution's requirements.
+            Both the originally provided and automatically adjusted references (if any) can be found in the `reference` and `adjusted_reference` fields, respectively.
+          minLength: 1
+          maxLength: 18
+          nullable: true
+        scope:
+          allOf:
+          - $ref: '#/components/schemas/PaymentInitiationConsentScope'
+          - type: string
+            description: A scope of the payment. Must be one of the scopes mentioned in the consent. Optional if the appropriate consent has only one scope defined, required otherwise.
+            nullable: true
       required:
       - consent_id
       - amount
@@ -18206,6 +18260,8 @@ components:
           $ref: '#/components/schemas/LinkTokenCreateRequestIncomeVerification'
         base_report:
           $ref: '#/components/schemas/LinkTokenCreateRequestBaseReport'
+        credit_partner_insights:
+          $ref: '#/components/schemas/LinkTokenCreateRequestCreditPartnerInsights'
         consumer_report_permissible_purpose:
           $ref: '#/components/schemas/ConsumerReportPermissiblePurpose'
         auth:
@@ -18233,6 +18289,8 @@ components:
           x-hidden-from-docs: true
           type: boolean
           description: If `true`, request a CRA connection. Defaults to `false`.
+        identity:
+          $ref: '#/components/schemas/LinkTokenCreateIdentity'
       required:
       - client_name
       - language
@@ -18312,6 +18370,8 @@ components:
           $ref: '#/components/schemas/HostedLinkCompletionRedirectURI'
         url_lifetime_seconds:
           $ref: '#/components/schemas/HostedLinkURLLifetimeSeconds'
+        is_mobile_app:
+          $ref: '#/components/schemas/HostedLinkIsMobileApp'
     HostedLinkDeliveryMethod:
       type: string
       description: |
@@ -18330,6 +18390,23 @@ components:
       type: integer
       description: |
         How many seconds the link will be valid for. Must be positive. Cannot be longer than 21 days. The default lifetime is 4 hours.
+    HostedLinkIsMobileApp:
+      type: boolean
+      default: false
+      description: |
+        This indicates whether the client is opening hosted Link in a mobile app in an out of process web view (OOPWV).
+    LinkTokenCreateIdentity:
+      type: object
+      description: Identity object used to specify document upload
+      properties:
+        is_document_upload:
+          type: boolean
+          description: Used to specify whether the Link session is Identity Document Upload
+        account_ids:
+          type: array
+          description: An array of `account_ids`
+          items:
+            type: string
     LinkTokenCreateRequestPaymentInitiation:
       type: object
       description: Specifies options for initializing Link for use with the Payment Initiation (Europe) product. This field is required if `payment_initiation` is included in the `products` array. Either `payment_id` or `consent_id` must be provided.
@@ -18685,6 +18762,11 @@ components:
           $ref: '#/components/schemas/LinkSessionSuccess'
         on_exit:
           $ref: '#/components/schemas/LinkSessionExit'
+        events:
+          type: array
+          description: List of customer-related Link events
+          items:
+            $ref: '#/components/schemas/LinkEvent'
       required:
       - link_session_id
     LinkSessionSuccess:
@@ -19081,7 +19163,7 @@ components:
           description: "The current verification status of an Auth Item initiated through Automated or Manual micro-deposits.  Returned for Auth Items only.\n\n`pending_automatic_verification`: The Item is pending automatic verification\n\n`pending_manual_verification`: The Item is pending manual micro-deposit verification. Items remain in this state until the user successfully verifies the micro-deposit.\n\n`automatically_verified`: The Item has successfully been automatically verified\t\n\n`manually_verified`: The Item has successfully been manually verified\n\n`verification_expired`: Plaid was unable to automatically verify the deposit within 7 calendar days and will no longer attempt to validate the Item. Users may retry by submitting their information again through Link.\n\n`verification_failed`: The Item failed manual micro-deposit verification because the user exhausted all 3 verification attempts. Users may retry by submitting their information again through Link.\n\n`database_matched`: The Item has successfully been verified using Plaid's data sources. Note: Database Match is currently a beta feature, please contact your account manager for more information.\t\n\t"
         persistent_account_id:
           type: string
-          description: A unique and persistent identifier for accounts that can be used to trace multiple instances of the same account across different Items for depository accounts. This is currently only supported for Chase Items.
+          description: A unique and persistent identifier for accounts that can be used to trace multiple instances of the same account across different Items for depository accounts. This is currently only supported for Chase Items. Because Chase accounts have a different account number each time they are linked, this field may be instead of the account number to uniquely identify a Chase account across multiple Items for payments use cases, helping to reduce duplicate Items or attempted fraud.
       required:
       - account_id
       - balances
@@ -20470,7 +20552,7 @@ components:
           nullable: true
         phone_number:
           type: string
-          description: The phone number associated with the primary_counterparty in E. 164 format. If there is a location match (i.e. a street address is returned in the location object), the phone number will be location specific.
+          description: The phone number associated with the counterparty in E. 164 format. If there is a location match (i.e. a street address is returned in the location object), the phone number will be location specific.
           nullable: true
       required:
       - name
@@ -22611,6 +22693,7 @@ components:
       - recurring_transactions
       - signal
       - statements
+      - processor_payments
       description: A list of products that an institution can support. All Items must be initialized with at least one product. The Balance product is always available and does not need to be specified during initialization.
       type: string
     ProductStatus:
@@ -24844,7 +24927,11 @@ components:
           nullable: true
           type: string
           description: |-
-            The security type of the holding. Valid security types are:
+            The security type of the holding.
+
+            In rare instances, a null value is returned when institutional data is insufficient to determine the security type.
+
+            Valid security types are:
 
             `cash`: Cash, currency, and money market funds
 
@@ -25353,7 +25440,10 @@ components:
       title: UserPermissionRevokedWebhook
       type: object
       additionalProperties: true
-      description: The `USER_PERMISSION_REVOKED` webhook may be fired when an end user has used either the [my.plaid.com portal](https://my.plaid.com) or the financial institution’s OAuth consent portal to revoke the permission that they previously granted to access an Item. This webhook is not guaranteed to always be fired upon consent revocation, since some institutions’ consent portals do not trigger this webhook. Once access to an Item has been revoked, it cannot be restored. If the user subsequently returns to your application, a new Item must be created for the user.
+      description: |-
+        The `USER_PERMISSION_REVOKED` webhook may be fired when an end user has used either the [my.plaid.com portal](https://my.plaid.com) or the financial institution’s OAuth consent portal to revoke the permission that they previously granted to access an Item. This webhook is not guaranteed to always be fired upon consent revocation, since some institutions’ consent portals do not trigger this webhook. Once access to an Item has been revoked, it cannot be restored. If the user subsequently returns to your application, a new Item must be created for the user.
+
+        Note that when using ACH flows with Chase Items specifically, the account number provided by Plaid will no longer work for creating transfers once user permission has been revoked. If you receive this webhook for a Chase Item, you should not create any new ACH transfers for that Item, as they will be returned.
       x-examples:
         example-1:
           webhook_type: ITEM
@@ -29229,9 +29319,9 @@ components:
           $ref: '#/components/schemas/TransferAmount'
         description:
           type: string
-          description: A description for the underlying transfer. Maximum of 8 characters.
+          description: A description for the underlying transfer. Maximum of 15 characters.
           minLength: 1
-          maxLength: 8
+          maxLength: 15
         ach_class:
           $ref: '#/components/schemas/ACHClass'
         origination_account_id:
@@ -30641,7 +30731,7 @@ components:
       title: IncomeVerificationDocParsingConfig
       enum:
       - ocr
-      - fraud_risk
+      - risk_signals
       description: Analysis options to enable for document parsing
       type: string
     IncomeVerificationStatusWebhook:
@@ -30734,6 +30824,17 @@ components:
           maximum: 730
       required:
       - days_requested
+    LinkTokenCreateRequestCreditPartnerInsights:
+      title: LinkTokenCreateRequestCreditPartnerInsights
+      type: object
+      x-hidden-from-docs: true
+      description: Specifies options for initializing Link for use with the Credit Partner Insights product.
+      properties:
+        days_requested:
+          type: integer
+          description: The maximum integer number of days of history to compute Crdit Partner Insights. Defaults to 180 if not specified
+          minimum: 1
+          maximum: 730
     LinkTokenCreateRequestEmployment:
       title: LinkTokenCreateRequestEmployment
       type: object
@@ -32810,8 +32911,19 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_token:
           $ref: '#/components/schemas/UserToken'
+        options:
+          $ref: '#/components/schemas/CreditBankStatementsUploadsGetRequestOptions'
       required:
       - user_token
+    CreditBankStatementsUploadsGetRequestOptions:
+      description: An optional object for `/credit/bank_statements/uploads/get` request options.
+      type: object
+      properties:
+        item_ids:
+          type: array
+          description: An array of `item_id`s whose bank statements information is returned. Each `item_id` should uniquely identify a bank statements uploaded item. If this field is not provided, all `item_id`s associated with the `user_token` will returned in the response.
+          items:
+            type: string
     CreditPayrollIncomeParsingConfigUpdateRequest:
       title: CreditPayrollIncomeParsingConfigUpdateRequest
       type: object
@@ -33071,6 +33183,17 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_token:
           $ref: '#/components/schemas/UserToken'
+        options:
+          $ref: '#/components/schemas/CreditPayrollIncomeGetRequestOptions'
+    CreditPayrollIncomeGetRequestOptions:
+      description: An optional object for `/credit/payroll_income/get` request options.
+      type: object
+      properties:
+        item_ids:
+          type: array
+          description: An array of `item_id`s whose payroll information is returned. Each `item_id` should uniquely identify a payroll income item. If this field is not provided, all `item_id`s associated with the `user_token` will returned in the response.
+          items:
+            type: string
     CreditPayrollIncomeGetResponse:
       title: CreditPayrollIncomeGetResponse
       type: object
@@ -35724,6 +35847,21 @@ components:
           nullable: true
           type: string
           description: Account username hashed by FI.
+    RiskReason:
+      title: RiskReason
+      type: object
+      description: This object includes a code and description to describe medium risk transactions and above on /accounts/balance/get.
+      additionalProperties: true
+      properties:
+        code:
+          description: |-
+            A code that represents the type of risk associated with the proposed transaction.
+
+            The codes are from PL01 to PL07 and from BK01 to BK07.
+          type: string
+        description:
+          description: A brief description explaining the risk associated with the proposed transaction and some recommended actions.
+          type: string
     TransferAuthorizationPaymentRisk:
       title: TransferAuthorizationPaymentRisk
       description: This object includes the scores and risk level. This response is offered as an add-on to /transfer/authorization/create. To request access to these fields please contact your Plaid account manager.
@@ -36711,7 +36849,7 @@ components:
           $ref: '#/components/schemas/PaymentChannel'
         phone_number:
           type: string
-          description: The phone number associated with the primary_counterparty in E. 164 format. If there is a location match (i.e. a street address is returned in the location object), the phone number will be location specific.
+          description: The phone number associated with the counterparty in E. 164 format. If there is a location match (i.e. a street address is returned in the location object), the phone number will be location specific.
           nullable: true
         personal_finance_category:
           $ref: '#/components/schemas/PersonalFinanceCategory'
@@ -37738,7 +37876,14 @@ components:
       title: UserAccountRevokedWebhook
       type: object
       additionalProperties: true
-      description: The `USER_ACCOUNT_REVOKED` webhook is fired when an end user has revoked access to their account on the Data Provider's portal. The user can restore access to the revoked account by regranting permissions on the Data Provider's portal. This webhook is currently in beta. It will be available in GA in Jan 2024.
+      description: |-
+        The `USER_ACCOUNT_REVOKED` webhook is fired when an end user has revoked access to their account on the Data Provider's portal. This webhook is currently sent only for Chase Items, but may be sent in the future for other financial institutions that allow account-level permissions revocation through their portals.
+
+        If you are using Auth and receive this webhook for a Chase Item, this webhook indicates that the TAN associated with the revoked account is no longer valid and cannot be used to create new transfers. You should not create new ACH transfers for the account that was revoked until access has been re-granted.
+
+        You can request the user to re-grant access to their account by sending them through [update mode](https://www.plaid.com/docs/link/update-mode). Alternatively, they may re-grant access directly through the Data Provider's portal.
+
+        After the user has re-granted access, Auth customers should call the auth endpoint again to obtain the new TAN.
       x-examples:
         example-1:
           webhook_type: '`ITEM`'
@@ -37967,6 +38112,52 @@ components:
         `SUCCESS`: The bank income report was successfully generated and can be retrieved via `/credit/bank_income/get`.
 
         `FAILURE`: The bank income report failed to be generated
+    CraPartnerInsightsCompleteWebhook:
+      type: object
+      title: CraPartnerInsightsCompleteWebhook
+      description: Fired when a partner insights report has finished generating or failed to generate.
+      additionalProperties: true
+      properties:
+        webhook_type:
+          type: string
+          description: '`CRA_INSIGHTS`'
+        webhook_code:
+          type: string
+          description: '`PARTNER_INSIGHTS_COMPLETE`'
+        user_id:
+          type: string
+          description: The `user_id` corresponding to the user the webhook has fired for.
+        result:
+          $ref: '#/components/schemas/CraPartnerInsightsCompleteResult'
+        environment:
+          $ref: '#/components/schemas/WebhookEnvironmentValues'
+      required:
+      - webhook_type
+      - webhook_code
+      - user_id
+      - result
+      - environment
+      x-examples:
+        example-1:
+          webhook_type: CRA_INSIGHTS
+          webhook_code: PARTNER_INSIGHTS_COMPLETE
+          user_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
+          result: SUCCESS
+          environment: production
+    CraPartnerInsightsCompleteResult:
+      type: string
+      enum:
+      - SUCCESS
+      - FAILURE
+      - PARTIAL_SUCCESS
+      description: |-
+        The result of the partner insights report generation
+
+        `SUCCESS`: All insights in the partner insights report were successfully generated and can be retrieved via `/cra/partner_insights/get`.
+
+        `FAILURE`: The partner insights report failed to be generated.
+
+        `PARTIAL_SUCCESS`: Some, but not all, insights in the partner insights report were successfully generated and can be retrieved via `/cra/partner_insights/get`.
     IncomeVerificationRefreshReconnectNeededWebhook:
       type: object
       title: IncomeVerificationRefreshReconnectNeededWebhook
@@ -38136,11 +38327,13 @@ components:
         event_id:
           type: string
           description: UUID that can be used to deduplicate events
+        event_metadata:
+          $ref: '#/components/schemas/LinkEventMetadata'
       required:
       - event_id
       - timestamp
       - event_name
-      - event_metdata
+      - event_metadata
     LinkEventsWebhook:
       x-hidden-from-docs: true
       title: LinkEventsWebhook
@@ -38927,39 +39120,171 @@ components:
       - accounts
     AccountAssets:
       title: AccountAssets
+      type: object
+      additionalProperties: true
       description: Asset information about an account
-      allOf:
-      - $ref: '#/components/schemas/AccountBase'
-      - type: object
-        additionalProperties: true
-        properties:
-          days_available:
-            type: number
-            description: The duration of transaction history available for this Item, typically defined as the time since the date of the earliest transaction in that account.
-          transactions:
-            type: array
-            description: Transaction history associated with the account.
-            items:
-              $ref: '#/components/schemas/AssetReportTransaction'
-          investments:
-            $ref: '#/components/schemas/AssetReportInvestments'
-          owners:
-            type: array
-            description: Data returned by the financial institution about the account owner or owners.For business accounts, the name reported may be either the name of the individual or the name of the business, depending on the institution. Multiple owners on a single account will be represented in the same `owner` object, not in multiple owner objects within the array. In API versions 2018-05-22 and earlier, the `owners` object is not returned, and instead identity information is returned in the top level `identity` object. For more details, see [Plaid API versioning](https://plaid.com/docs/api/versioning/#version-2019-05-29)
-            items:
-              $ref: '#/components/schemas/Owner'
-          ownership_type:
-            $ref: '#/components/schemas/OwnershipType'
-          historical_balances:
-            type: array
-            description: Calculated data about the historical balances on the account.
-            items:
-              $ref: '#/components/schemas/HistoricalBalance'
+      properties:
+        account_id:
+          type: string
+          description: |-
+            Plaid’s unique identifier for the account. This value will not change unless Plaid can't reconcile the account with the data returned by the financial institution. This may occur, for example, when the name of the account changes. If this happens a new `account_id` will be assigned to the account.
+
+            The `account_id` can also change if the `access_token` is deleted and the same credentials that were used to generate that `access_token` are used to generate a new `access_token` on a later date. In that case, the new `account_id` will be different from the old `account_id`.
+
+            If an account with a specific `account_id` disappears instead of changing, the account is likely closed. Closed accounts are not returned by the Plaid API.
+
+            Like all Plaid identifiers, the `account_id` is case sensitive.
+        balances:
+          $ref: '#/components/schemas/AssetReportAccountBalance'
+        mask:
+          type: string
+          nullable: true
+          description: The last 2-4 alphanumeric characters of an account's official account number. Note that the mask may be non-unique between an Item's accounts, and it may also not match the mask that the bank displays to the user.
+        name:
+          type: string
+          description: The name of the account, either assigned by the user or by the financial institution itself
+        official_name:
+          type: string
+          nullable: true
+          description: The official name of the account as given by the financial institution
+        type:
+          $ref: '#/components/schemas/AccountType'
+        subtype:
+          $ref: '#/components/schemas/AccountSubtype'
+        verification_status:
+          type: string
+          enum:
+          - automatically_verified
+          - pending_automatic_verification
+          - pending_manual_verification
+          - manually_verified
+          - verification_expired
+          - verification_failed
+          - database_matched
+          description: "The current verification status of an Auth Item initiated through Automated or Manual micro-deposits.  Returned for Auth Items only.\n\n`pending_automatic_verification`: The Item is pending automatic verification\n\n`pending_manual_verification`: The Item is pending manual micro-deposit verification. Items remain in this state until the user successfully verifies the micro-deposit.\n\n`automatically_verified`: The Item has successfully been automatically verified\t\n\n`manually_verified`: The Item has successfully been manually verified\n\n`verification_expired`: Plaid was unable to automatically verify the deposit within 7 calendar days and will no longer attempt to validate the Item. Users may retry by submitting their information again through Link.\n\n`verification_failed`: The Item failed manual micro-deposit verification because the user exhausted all 3 verification attempts. Users may retry by submitting their information again through Link.\n\n`database_matched`: The Item has successfully been verified using Plaid's data sources. Note: Database Match is currently a beta feature, please contact your account manager for more information.\t\n\t"
+        persistent_account_id:
+          type: string
+          description: A unique and persistent identifier for accounts that can be used to trace multiple instances of the same account across different Items for depository accounts. This is currently an opt-in field and only supported for Chase Items.
+        days_available:
+          type: number
+          description: The duration of transaction history available for this Item, typically defined as the time since the date of the earliest transaction in that account.
+        transactions:
+          type: array
+          description: Transaction history associated with the account.
+          items:
+            $ref: '#/components/schemas/AssetReportTransaction'
+        investments:
+          $ref: '#/components/schemas/AssetReportInvestments'
+        owners:
+          type: array
+          description: Data returned by the financial institution about the account owner or owners.For business accounts, the name reported may be either the name of the individual or the name of the business, depending on the institution. Multiple owners on a single account will be represented in the same `owner` object, not in multiple owner objects within the array. In API versions 2018-05-22 and earlier, the `owners` object is not returned, and instead identity information is returned in the top level `identity` object. For more details, see [Plaid API versioning](https://plaid.com/docs/api/versioning/#version-2019-05-29)
+          items:
+            $ref: '#/components/schemas/Owner'
+        ownership_type:
+          $ref: '#/components/schemas/OwnershipType'
+        historical_balances:
+          type: array
+          description: Calculated data about the historical balances on the account.
+          items:
+            $ref: '#/components/schemas/HistoricalBalance'
       required:
+      - account_id
+      - balances
+      - mask
+      - name
+      - official_name
+      - type
+      - subtype
       - days_available
       - transactions
       - owners
       - historical_balances
+    AssetReportAccountBalance:
+      title: AssetReportAccountBalance
+      type: object
+      additionalProperties: true
+      description: A set of fields describing the balance for an account. Balance information may be cached unless the balance object was returned by `/accounts/balance/get`.
+      properties:
+        available:
+          type: number
+          format: double
+          description: |-
+            The amount of funds available to be withdrawn from the account, as determined by the financial institution.
+
+            For `credit`-type accounts, the `available` balance typically equals the `limit` less the `current` balance, less any pending outflows plus any pending inflows.
+
+            For `depository`-type accounts, the `available` balance typically equals the `current` balance less any pending outflows plus any pending inflows. For `depository`-type accounts, the `available` balance does not include the overdraft limit.
+
+            For `investment`-type accounts (or `brokerage`-type accounts for API versions 2018-05-22 and earlier), the `available` balance is the total cash available to withdraw as presented by the institution.
+
+            Note that not all institutions calculate the `available`  balance. In the event that `available` balance is unavailable, Plaid will return an `available` balance value of `null`.
+
+            Available balance may be cached and is not guaranteed to be up-to-date in realtime unless the value was returned by `/accounts/balance/get`.
+
+            If `current` is `null` this field is guaranteed not to be `null`.
+          nullable: true
+        current:
+          type: number
+          format: double
+          description: |-
+            The total amount of funds in or owed by the account.
+
+            For `credit`-type accounts, a positive balance indicates the amount owed; a negative amount indicates the lender owing the account holder.
+
+            For `loan`-type accounts, the current balance is the principal remaining on the loan, except in the case of student loan accounts at Sallie Mae (`ins_116944`). For Sallie Mae student loans, the account's balance includes both principal and any outstanding interest.
+
+            For `investment`-type accounts (or `brokerage`-type accounts for API versions 2018-05-22 and earlier), the current balance is the total value of assets as presented by the institution.
+
+            Note that balance information may be cached unless the value was returned by `/accounts/balance/get`; if the Item is enabled for Transactions, the balance will be at least as recent as the most recent Transaction update. If you require realtime balance information, use the `available` balance as provided by `/accounts/balance/get`.
+
+            When returned by `/accounts/balance/get`, this field may be `null`. When this happens, `available` is guaranteed not to be `null`.
+          nullable: true
+        limit:
+          type: number
+          format: double
+          description: |-
+            For `credit`-type accounts, this represents the credit limit.
+
+            For `depository`-type accounts, this represents the pre-arranged overdraft limit, which is common for current (checking) accounts in Europe.
+
+            In North America, this field is typically only available for `credit`-type accounts.
+          nullable: true
+        margin_loan_amount:
+          type: number
+          format: double
+          description: |-
+            The total amount of borrowed funds in the account, as determined by the financial institution.
+            For investment-type accounts, the margin balance is the total value of borrowed assets in the account, as presented by the institution.
+            This is commonly referred to as margin or a loan.
+          nullable: true
+        iso_currency_code:
+          type: string
+          description: The ISO-4217 currency code of the balance. Always null if `unofficial_currency_code` is non-null.
+          nullable: true
+        unofficial_currency_code:
+          type: string
+          description: |-
+            The unofficial currency code associated with the balance. Always null if `iso_currency_code` is non-null. Unofficial currency codes are used for currencies that do not have official ISO currency codes, such as cryptocurrencies and the currencies of certain countries.
+
+            See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `unofficial_currency_code`s.
+          nullable: true
+        last_updated_datetime:
+          type: string
+          format: date-time
+          description: |-
+            Timestamp in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format (`YYYY-MM-DDTHH:mm:ssZ`) indicating the oldest acceptable balance when making a request to `/accounts/balance/get`.
+
+            This field is only used and expected when the institution is `ins_128026` (Capital One) and the Item contains one or more accounts with a non-depository account type, in which case a value must be provided or an `INVALID_REQUEST` error with the code of `INVALID_FIELD` will be returned. For Capital One depository accounts as well as all other account types on all other institutions, this field is ignored. See [account type schema](https://en.wikipedia.org/wiki/ISO_8601) for a full list of account types.
+
+            If the balance that is pulled is older than the given timestamp for Items with this field required, an `INVALID_REQUEST` error with the code of `LAST_UPDATED_DATETIME_OUT_OF_RANGE` will be returned with the most recent timestamp for the requested account contained in the response.
+          nullable: true
+      required:
+      - available
+      - current
+      - limit
+      - margin_loan_amount
+      - iso_currency_code
+      - unofficial_currency_code
     AssetReportInvestments:
       title: AssetReportInvestments
       type: object
@@ -38987,6 +39312,14 @@ components:
           type: number
           format: double
           description: The number of units of the security involved in this transaction. Positive for buy transactions; negative for sell transactions.
+        vested_quantity:
+          type: number
+          format: double
+          description: The total quantity of vested assets held, as reported by the financial institution. Vested assets are only associated with [equities](https://plaid.com/docs/api/products/investments/#investments-holdings-get-response-securities-type).
+        vested_value:
+          type: number
+          format: double
+          description: The value of the vested holdings as reported by the institution.
         amount:
           description: The complete value of the transaction. Positive values when cash is debited, e.g. purchases of stock; negative values when cash is credited, e.g. sales of stock. Treatment remains the same for cash-only movements unassociated with securities.
           type: number
@@ -39022,6 +39355,8 @@ components:
       - date
       - name
       - quantity
+      - vested_quantity
+      - vested_value
       - amount
       - price
       - fees
@@ -39605,6 +39940,128 @@ components:
             The date will be returned in an ISO 8601 format (YYYY-MM-DD).
         average_balance:
           $ref: '#/components/schemas/CreditAmountWithCurrency'
+    BalancePlusAttributes:
+      title: BalancePlusAttributes
+      type: object
+      description: |-
+        Contains additional data that can be used to assess the ACH return risk. Examples of data include:
+
+        `days_since_first_plaid_connection`: The number of days since the first time the Item was connected to an application via Plaid
+        `plaid_connections_count_7d`: The number of times the Item has been connected to applications via Plaid over the past 7 days
+        `plaid_connections_count_30d`: The number of times the Item has been connected to applications via Plaid over the past 30 days
+        `total_plaid_connections_count`: The number of times the Item has been connected to applications via Plaid
+        `is_savings_or_money_market_account`: Indicates whether the ACH transaction funding account is a savings/money market account
+
+        For the full list and detailed documentation of attributes available, or to request that attributes not be returned, contact Sales or your Plaid account manager
+      properties:
+        unauthorized_transactions_count_7d:
+          type: integer
+          description: We parse and analyze historical transaction metadata to identify the number of possible past returns due to unauthorized transactions over the past 7 days from the account that will be debited.
+          nullable: true
+        unauthorized_transactions_count_30d:
+          type: integer
+          description: We parse and analyze historical transaction metadata to identify the number of possible past returns due to unauthorized transactions over the past 30 days from the account that will be debited.
+          nullable: true
+        unauthorized_transactions_count_60d:
+          type: integer
+          description: We parse and analyze historical transaction metadata to identify the number of possible past returns due to unauthorized transactions over the past 60 days from the account that will be debited.
+          nullable: true
+        unauthorized_transactions_count_90d:
+          type: integer
+          description: We parse and analyze historical transaction metadata to identify the number of possible past returns due to unauthorized transactions over the past 90 days from the account that will be debited.
+          nullable: true
+        nsf_overdraft_transactions_count_7d:
+          type: integer
+          description: We parse and analyze historical transaction metadata to identify the number of possible past returns due to non-sufficient funds/overdrafts over the past 7 days from the account that will be debited.
+          nullable: true
+        nsf_overdraft_transactions_count_30d:
+          type: integer
+          description: We parse and analyze historical transaction metadata to identify the number of possible past returns due to non-sufficient funds/overdrafts over the past 30 days from the account that will be debited.
+          nullable: true
+        nsf_overdraft_transactions_count_60d:
+          type: integer
+          description: We parse and analyze historical transaction metadata to identify the number of possible past returns due to non-sufficient funds/overdrafts over the past 60 days from the account that will be debited.
+          nullable: true
+        nsf_overdraft_transactions_count_90d:
+          type: integer
+          description: We parse and analyze historical transaction metadata to identify the number of possible past returns due to non-sufficient funds/overdrafts over the past 90 days from the account that will be debited.
+          nullable: true
+        days_since_first_plaid_connection:
+          type: integer
+          description: The number of days since the first time the Item was connected to an application via Plaid
+          nullable: true
+        plaid_connections_count_7d:
+          type: integer
+          description: The number of times the Item has been connected to applications via Plaid over the past 7 days
+          nullable: true
+        plaid_connections_count_30d:
+          type: integer
+          description: The number of times the Item has been connected to applications via Plaid over the past 30 days
+          nullable: true
+        total_plaid_connections_count:
+          type: integer
+          description: The total number of times the Item has been connected to applications via Plaid
+          nullable: true
+        is_savings_or_money_market_account:
+          type: boolean
+          description: Indicates if the ACH transaction funding account is a savings/money market account
+          nullable: true
+        phone_change_count_28d:
+          type: integer
+          description: The number of times the account's phone numbers on file have changed over the past 28 days
+          nullable: true
+        phone_change_count_90d:
+          type: integer
+          description: The number of times the account's phone numbers on file have changed over the past 90 days
+          nullable: true
+        email_change_count_28d:
+          type: integer
+          description: The number of times the account's email addresses on file have changed over the past 28 days
+          nullable: true
+        email_change_count_90d:
+          type: integer
+          description: The number of times the account's email addresses on file have changed over the past 90 days
+          nullable: true
+        address_change_count_28d:
+          type: integer
+          description: The number of times the account's addresses on file have changed over the past 28 days
+          nullable: true
+        address_change_count_90d:
+          type: integer
+          description: The number of times the account's addresses on file have changed over the past 90 days
+          nullable: true
+        plaid_non_oauth_authentication_attempts_count_3d:
+          type: integer
+          description: The number of non-OAuth authentication attempts via Plaid for this bank account over the past 3 days
+          nullable: true
+        plaid_non_oauth_authentication_attempts_count_7d:
+          type: integer
+          description: The number of non-OAuth authentication attempts via Plaid for this bank account over the past 7 days
+          nullable: true
+        plaid_non_oauth_authentication_attempts_count_30d:
+          type: integer
+          description: The number of non-OAuth authentication attempts via Plaid for this bank account over the past 30 days
+          nullable: true
+        failed_plaid_non_oauth_authentication_attempts_count_3d:
+          type: integer
+          description: The number of failed non-OAuth authentication attempts via Plaid for this bank account over the past 3 days
+          nullable: true
+        failed_plaid_non_oauth_authentication_attempts_count_7d:
+          type: integer
+          description: The number of failed non-OAuth authentication attempts via Plaid for this bank account over the past 7 days
+          nullable: true
+        failed_plaid_non_oauth_authentication_attempts_count_30d:
+          type: integer
+          description: The number of failed non-OAuth authentication attempts via Plaid for this bank account over the past 30 days
+          nullable: true
+        is_account_closed:
+          type: boolean
+          description: Indicates if the receiver bank account is closed
+          nullable: true
+        is_account_frozen_or_restricted:
+          type: boolean
+          description: Indicates if the receiver bank account is either frozen or restricted
+          nullable: true
     AddressPurposeLabel:
       description: |-
         Field describing whether the associated address is being used for commercial or residential purposes.
@@ -40678,6 +41135,7 @@ components:
       - match
       - partial_match
       - no_match
+      - no_data
       example: match
     DocumentImage__Back:
       type: string
@@ -40711,6 +41169,7 @@ components:
       - match
       - partial_match
       - no_match
+      - no_data
       example: match
     DocumentStatus:
       type: string
@@ -44466,6 +44925,9 @@ components:
         institution_name:
           type: string
           description: The name of the institution associated with the Item.
+      required:
+      - bank_income_sources
+      - bank_income_accounts
     CraBankIncomeAccount:
       type: object
       description: The Item's bank accounts that have the selected data.
@@ -46775,7 +47237,7 @@ components:
     SignalUser:
       title: SignalUser
       type: object
-      description: Details about the end user initiating the transaction (i.e., the account holder).
+      description: Details about the end user initiating the transaction (i.e., the account holder). When calling `/signal/evaluate` or `/signal/processor/evaluate`, this field is optional, but strongly recommended to increase the accuracy of Signal results.
       properties:
         name:
           $ref: '#/components/schemas/SignalPersonName'
@@ -46847,7 +47309,7 @@ components:
     SignalDevice:
       title: SignalEvaluateDevice
       type: object
-      description: Details about the end user's device
+      description: Details about the end user's device. When calling `/signal/evaluate` or `/signal/processor/evaluate`, this field is optional, but strongly recommended to increase the accuracy of Signal results.
       properties:
         ip_address:
           type: string
