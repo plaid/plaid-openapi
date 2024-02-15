@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.491.3
+  version: 2020-09-14_1.496.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -965,6 +965,128 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CraBankIncomeGetRequest'
+  /cra/partner_insights/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_CRA
+    post:
+      summary: Retrieve cash flow insights from the bank accounts used for income verification
+      tags:
+      - plaid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CraPartnerInsightsGetResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: LhQf0THi8SH1yJm
+                    report:
+                    - report_id: abc123
+                      generated_time: "2022-01-31T22:47:53Z"
+                      items:
+                      - institution_id: ins_0
+                        institution_name: Plaid Bank
+                        item_id: ABC123
+                        accounts:
+                        - mask: "8888"
+                          name: Plaid Checking Account
+                          official_name: Plaid Checking Account
+                          type: depository
+                          subtype: checking
+                          owners:
+                          - addresses:
+                            - data:
+                                city: Malakoff
+                                country: US
+                                postal_code: "14236"
+                                region: NY
+                                street: 2992 Cameron Road
+                              primary: true
+                            - data:
+                                city: San Matias
+                                country: US
+                                postal_code: 93405-2255
+                                region: CA
+                                street: 2493 Leisure Lane
+                              primary: false
+                            emails:
+                            - data: accountholder0@example.com
+                              primary: true
+                              type: primary
+                            - data: accountholder1@example.com
+                              primary: false
+                              type: secondary
+                            - data: extraordinarily.long.email.username.123456@reallylonghostname.com
+                              primary: false
+                              type: other
+                            names:
+                            - Alberta Bobbeth Charleson
+                            phone_numbers:
+                            - data: "1112223333"
+                              primary: false
+                              type: home
+                            - data: "1112224444"
+                              primary: false
+                              type: work
+                            - data: "1112225555"
+                              primary: false
+                              type: mobile
+                      prism:
+                        insights:
+                          version: 3
+                          result:
+                            l6m_cumbal_acc: 1
+                        cash_score:
+                          version: 3
+                          score: 900
+                          reason_codes:
+                          - CASHFLOW_D11
+                          metadata:
+                            max_age: 20
+                            min_age: 1
+                            min_age_credit: 0
+                            min_age_debit: 1
+                            max_age_debit: 20
+                            max_age_credit: 0
+                            num_trxn_credit: 0
+                            num_trxn_debit: 40
+                            l1m_credit_value_cnt: 0
+                            l1m_debit_value_cnt: 40
+                        detect:
+                          version: 3
+                          score: 900
+                          reason_codes:
+                          - CASHFLOW_D11
+                          metadata:
+                            max_age: 20
+                            min_age: 1
+                            min_age_credit: 0
+                            min_age_debit: 1
+                            max_age_debit: 20
+                            max_age_credit: 0
+                            num_trxn_credit: 0
+                            num_trxn_debit: 40
+                            l1m_credit_value_cnt: 0
+                            l1m_debit_value_cnt: 40
+                        status: SUCCESS
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      externalDocs:
+        url: /api/products/income/#crapartner_insightsget
+      operationId: craPartnerInsightsGet
+      description: '`/cra/partner_insights/get` returns cash flow insights for a specified user.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CraPartnerInsightsGetRequest'
   /statements/list:
     x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
@@ -1573,7 +1695,9 @@ paths:
                 $ref: '#/components/schemas/PlaidError'
           description: Error response
       description: |-
-        `/transactions/refresh` is an optional endpoint for users of the Transactions product. It initiates an on-demand extraction to fetch the newest transactions for an Item. This on-demand extraction takes place in addition to the periodic extractions that automatically occur multiple times a day for any Transactions-enabled Item. If changes to transactions are discovered after calling `/transactions/refresh`, Plaid will fire a webhook: for `/transactions/sync` users, [`SYNC_UPDATES_AVAILABLE`](https://plaid.com/docs/api/products/transactions/#sync_updates_available) will be fired if there are any transactions updated, added, or removed. For users of both `/transactions/sync` and `/transactions/get`, [`TRANSACTIONS_REMOVED`](https://plaid.com/docs/api/products/transactions/#transactions_removed) will be fired if any removed transactions are detected, and [`DEFAULT_UPDATE`](https://plaid.com/docs/api/products/transactions/#default_update) will be fired if any new transactions are detected. New transactions can be fetched by calling `/transactions/get` or `/transactions/sync`. Note that the `/transactions/refresh` endpoint is not supported for Capital One (`ins_128026`) and will result in a `PRODUCT_NOT_SUPPORTED` error if called on an Item from that institution.
+        `/transactions/refresh` is an optional endpoint for users of the Transactions product. It initiates an on-demand extraction to fetch the newest transactions for an Item. This on-demand extraction takes place in addition to the periodic extractions that automatically occur one or more times per day for any Transactions-enabled Item. If changes to transactions are discovered after calling `/transactions/refresh`, Plaid will fire a webhook: for `/transactions/sync` users, [`SYNC_UPDATES_AVAILABLE`](https://plaid.com/docs/api/products/transactions/#sync_updates_available) will be fired if there are any transactions updated, added, or removed. For users of both `/transactions/sync` and `/transactions/get`, [`TRANSACTIONS_REMOVED`](https://plaid.com/docs/api/products/transactions/#transactions_removed) will be fired if any removed transactions are detected, and [`DEFAULT_UPDATE`](https://plaid.com/docs/api/products/transactions/#default_update) will be fired if any new transactions are detected. New transactions can be fetched by calling `/transactions/get` or `/transactions/sync`. Note that the `/transactions/refresh` endpoint is not supported for Capital One (`ins_128026`) and will result in a `PRODUCT_NOT_SUPPORTED` error if called on an Item from that institution.
+
+        As this endpoint triggers a synchronous request for fresh data, latency may be higher than for other Plaid endpoints (typically less than 10 seconds, but occasionally up to 30 seconds or more); if you encounter errors, you may find it necessary to adjust your timeout period when making requests.
 
         `/transactions/refresh` is offered as an add-on to Transactions and has a separate [fee model](/docs/account/billing/#per-request-flat-fee). To request access to this endpoint, submit a [product access request](https://dashboard.plaid.com/team/products) or contact your Plaid account manager.
       requestBody:
@@ -3047,7 +3171,10 @@ paths:
                 $ref: '#/components/schemas/PlaidError'
           description: Error response
       description: |-
-        `/identity/refresh` is an optional endpoint for users of the Identity product. It initiates an on-demand extraction to fetch the most up to date Identity information from the Financial Institution. This on-demand extraction takes place in addition to the periodic extractions that automatically occur any Identity-enabled Item. If changes to Identity are discovered after calling `/identity/refresh`, Plaid will fire a webhook [`DEFAULT_UPDATE`](https://plaid.com/docs/api/products/identity/#default_update).
+        `/identity/refresh` is an optional endpoint for users of the Identity product. It initiates an on-demand extraction to fetch the most up to date Identity information from the Financial Institution. This on-demand extraction takes place in addition to the periodic extractions that automatically occur for any Identity-enabled Item. If changes to Identity are discovered after calling `/identity/refresh`, Plaid will fire a webhook [`DEFAULT_UPDATE`](https://plaid.com/docs/api/products/identity/#default_update).
+
+        As this endpoint triggers a synchronous request for fresh data, latency may be higher than for other Plaid endpoints (typically less than 10 seconds, but occasionally up to 30 seconds or more); if you encounter errors, you may find it necessary to adjust your timeout period when making requests.
+
         `/identity/refresh` is offered as an add-on to Identity and has a separate [fee model](/docs/account/billing/#per-request-flat-fee). To request access to this endpoint, submit a [product access request](https://dashboard.plaid.com/team/products) or contact your Plaid account manager.
       requestBody:
         required: true
@@ -5670,7 +5797,9 @@ paths:
                 $ref: '#/components/schemas/PlaidError'
           description: Error response
       description: |-
-        `/processor/transactions/refresh` is an optional endpoint for users of the Transactions product. It initiates an on-demand extraction to fetch the newest transactions for a processor token. This on-demand extraction takes place in addition to the periodic extractions that automatically occur multiple times a day for any Transactions-enabled processor token. If changes to transactions are discovered after calling `/processor/transactions/refresh`, Plaid will fire a webhook: for `/transactions/sync` users, [`SYNC_UPDATES_AVAILABLE`](https://plaid.com/docs/api/products/transactions/#sync_updates_available) will be fired if there are any transactions updated, added, or removed. For users of both `/processor/transactions/sync` and `/processor/transactions/get`, [`TRANSACTIONS_REMOVED`](https://plaid.com/docs/api/products/transactions/#transactions_removed) will be fired if any removed transactions are detected, and [`DEFAULT_UPDATE`](https://plaid.com/docs/api/products/transactions/#default_update) will be fired if any new transactions are detected. New transactions can be fetched by calling `/processor/transactions/get` or `/processor/transactions/sync`. Note that the `/processor/transactions/refresh` endpoint is not supported for Capital One (`ins_128026`) and will result in a `PRODUCT_NOT_SUPPORTED` error if called on a processor token from that institution.
+        `/processor/transactions/refresh` is an optional endpoint for users of the Transactions product. It initiates an on-demand extraction to fetch the newest transactions for a processor token. This on-demand extraction takes place in addition to the periodic extractions that automatically occur one or more times per day for any Transactions-enabled processor token. If changes to transactions are discovered after calling `/processor/transactions/refresh`, Plaid will fire a webhook: for `/transactions/sync` users, [`SYNC_UPDATES_AVAILABLE`](https://plaid.com/docs/api/products/transactions/#sync_updates_available) will be fired if there are any transactions updated, added, or removed. For users of both `/processor/transactions/sync` and `/processor/transactions/get`, [`TRANSACTIONS_REMOVED`](https://plaid.com/docs/api/products/transactions/#transactions_removed) will be fired if any removed transactions are detected, and [`DEFAULT_UPDATE`](https://plaid.com/docs/api/products/transactions/#default_update) will be fired if any new transactions are detected. New transactions can be fetched by calling `/processor/transactions/get` or `/processor/transactions/sync`. Note that the `/processor/transactions/refresh` endpoint is not supported for Capital One (`ins_128026`) and will result in a `PRODUCT_NOT_SUPPORTED` error if called on a processor token from that institution.
+
+        As this endpoint triggers a synchronous request for fresh data, latency may be higher than for other Plaid endpoints (typically less than 10 seconds, but occasionally up to 30 seconds or more); if you encounter errors, you may find it necessary to adjust your timeout period when making requests.
 
         `/processor/transactions/refresh` is offered as an add-on to Transactions and has a separate [fee model](/docs/account/billing/#per-request-flat-fee). To request access to this endpoint, submit a [product access request](https://dashboard.plaid.com/team/products) or contact your Plaid account manager.
       requestBody:
@@ -7792,7 +7921,10 @@ paths:
                 $ref: '#/components/schemas/PlaidError'
           description: Error response
       description: |-
-        `/investments/refresh` is an optional endpoint for users of the Investments product. It initiates an on-demand extraction to fetch the newest investments, holdings and investment transactions for an Item. This on-demand extraction takes place in addition to the periodic extractions that automatically occur multiple times a day for any Investments-enabled Item. If changes to investments are discovered after calling `/investments/refresh`, Plaid will fire webhooks: [`HOLDINGS: DEFAULT_UPDATE`](https://plaid.com/docs/api/products/investments/#holdings-default_update) if any new holdings are detected, and [INVESTMENTS_TRANSACTIONS: DEFAULT_UPDATE](https://plaid.com/docs/api/products/investments/#investments_transactions-default_update) if any new investment transactions are detected. Updated holdings and investment transactions can be fetched by calling `/investments/holdings/get` and `/investments/transactions/get`. "Note that the `/investments/refresh` endpoint is not supported by all institutions. If called on an Item from an institution that does not support this functionality, it will return a `PRODUCT_NOT_SUPPORTED` error.
+        `/investments/refresh` is an optional endpoint for users of the Investments product. It initiates an on-demand extraction to fetch the newest investments, holdings and investment transactions for an Item. This on-demand extraction takes place in addition to the periodic extractions that automatically occur one or more times per day for any Investments-enabled Item. If changes to investments are discovered after calling `/investments/refresh`, Plaid will fire webhooks: [`HOLDINGS: DEFAULT_UPDATE`](https://plaid.com/docs/api/products/investments/#holdings-default_update) if any new holdings are detected, and [INVESTMENTS_TRANSACTIONS: DEFAULT_UPDATE](https://plaid.com/docs/api/products/investments/#investments_transactions-default_update) if any new investment transactions are detected. Updated holdings and investment transactions can be fetched by calling `/investments/holdings/get` and `/investments/transactions/get`. "Note that the `/investments/refresh` endpoint is not supported by all institutions. If called on an Item from an institution that does not support this functionality, it will return a `PRODUCT_NOT_SUPPORTED` error.
+
+        As this endpoint triggers a synchronous request for fresh data, latency may be higher than for other Plaid endpoints (typically less than 10 seconds, but occasionally up to 30 seconds or more); if you encounter errors, you may find it necessary to adjust your timeout period when making requests.
+
         `/investments/refresh` is offered as an add-on to Investments and has a separate [fee model](/docs/account/billing/#per-request-flat-fee). To request access to this endpoint, submit a [product access request](https://dashboard.plaid.com/team/products) or contact your Plaid account manager.
       requestBody:
         required: true
@@ -10091,7 +10223,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
-      description: As an alternative to adding Items via Link, you can also use the `/transfer/migrate_account` endpoint to migrate known account and routing numbers to Plaid Items.  Note that Items created in this way are not compatible with endpoints for other products, such as `/accounts/balance/get`, and can only be used with Transfer endpoints.  If you require access to other endpoints, create the Item through Link instead.  Access to `/transfer/migrate_account` is not enabled by default; to obtain access, contact your Plaid Account Manager.
+      description: As an alternative to adding Items via Link, you can also use the `/transfer/migrate_account` endpoint to migrate known account and routing numbers to Plaid Items. If you intend to create wire transfers on this account, you must provide `wire_routing_number`. Note that Items created in this way are not compatible with endpoints for other products, such as `/accounts/balance/get`, and can only be used with Transfer endpoints.  If you require access to other endpoints, create the Item through Link instead.  Access to `/transfer/migrate_account` is not enabled by default; to obtain access, contact your Plaid Account Manager.
       requestBody:
         required: true
         content:
@@ -18533,6 +18665,10 @@ components:
           type: boolean
           description: Specifies whether the Link session is enabled for the Database Match flow.
           x-hidden-from-docs: true
+        database_insights_enabled:
+          type: boolean
+          description: Specifies whether the Link session is enabled for the Database Insights flow.
+          x-hidden_from_docs: true
         flow_type:
           type: string
           enum:
@@ -18851,6 +18987,12 @@ components:
 
             `database_matched`: The Item has successfully been verified using Plaid's data sources. Note: Database Match is currently a beta feature, please contact your account manager for more information.
 
+            `database_insights_pass`: The Item's ACH numbers have been verified using Plaid's data sources and have strong signal for being valid. Note: Database Insights is currently a beta feature, please contact your account manager for more information.
+
+            `database_insights_pass_with_caution`: The Item's ACH numbers have been verified using Plaid's data sources and have some signal for being valid. Note: Database Insights is currently a beta feature, please contact your account manager for more information.
+
+            `database_insights_fail`: The Item's ACH numbers have been verified using Plaid's data sources and have signal for being invalid and/or have no signal for being valid. Note: Database Insights is currently a beta feature, please contact your account manager for more information.
+
             `null`: micro-deposit-based verification is not being used for the Item.
         class_type:
           nullable: true
@@ -19160,7 +19302,12 @@ components:
           - verification_expired
           - verification_failed
           - database_matched
-          description: "The current verification status of an Auth Item initiated through Automated or Manual micro-deposits.  Returned for Auth Items only.\n\n`pending_automatic_verification`: The Item is pending automatic verification\n\n`pending_manual_verification`: The Item is pending manual micro-deposit verification. Items remain in this state until the user successfully verifies the micro-deposit.\n\n`automatically_verified`: The Item has successfully been automatically verified\t\n\n`manually_verified`: The Item has successfully been manually verified\n\n`verification_expired`: Plaid was unable to automatically verify the deposit within 7 calendar days and will no longer attempt to validate the Item. Users may retry by submitting their information again through Link.\n\n`verification_failed`: The Item failed manual micro-deposit verification because the user exhausted all 3 verification attempts. Users may retry by submitting their information again through Link.\n\n`database_matched`: The Item has successfully been verified using Plaid's data sources. Note: Database Match is currently a beta feature, please contact your account manager for more information.\t\n\t"
+          - database_insights_pass
+          - database_insights_pass_with_caution
+          - database_insights_fail
+          description: "The current verification status of an Auth Item initiated through Automated or Manual micro-deposits.  Returned for Auth Items only.\n\n`pending_automatic_verification`: The Item is pending automatic verification\n\n`pending_manual_verification`: The Item is pending manual micro-deposit verification. Items remain in this state until the user successfully verifies the micro-deposit.\n\n`automatically_verified`: The Item has successfully been automatically verified\t\n\n`manually_verified`: The Item has successfully been manually verified\n\n`verification_expired`: Plaid was unable to automatically verify the deposit within 7 calendar days and will no longer attempt to validate the Item. Users may retry by submitting their information again through Link.\n\n`verification_failed`: The Item failed manual micro-deposit verification because the user exhausted all 3 verification attempts. Users may retry by submitting their information again through Link.\n\n`database_matched`: The Item has successfully been verified using Plaid's data sources. Note: Database Match is currently a beta feature, please contact your account manager for more information.\n\n`database_insights_pass`: The Item's ACH numbers have been verified using Plaid's data sources and have strong signal for being valid. Note: Database Insights is currently a beta feature, please contact your account manager for more information.\n\n`database_insights_pass_with_caution`: The Item's ACH numbers have been verified using Plaid's data sources and have some signal for being valid. Note: Database Insights is currently a beta feature, please contact your account manager for more information.\n\n`database_insights_fail`:  The Item's ACH numbers have been verified using Plaid's data sources and have signal for being invalid and/or have no signal for being valid. Note: Database Insights is currently a beta feature, please contact your account manager for more information.\t\n\t"
+        verification_insights:
+          $ref: '#/components/schemas/AccountVerificationInsights'
         persistent_account_id:
           type: string
           description: A unique and persistent identifier for accounts that can be used to trace multiple instances of the same account across different Items for depository accounts. This is currently only supported for Chase Items. Because Chase accounts have a different account number each time they are linked, this field may be instead of the account number to uniquely identify a Chase account across multiple Items for payments use cases, helping to reduce duplicate Items or attempted fraud.
@@ -19329,6 +19476,66 @@ components:
       - sarsep
       - payroll
       - null
+    AccountVerificationInsights:
+      title: VerificationInsights
+      type: object
+      additionalProperties: true
+      description: Insights from performing database verification for the account.
+      x-hidden-from-docs: true
+      properties:
+        network_status:
+          $ref: '#/components/schemas/AccountVerificationInsightsNetworkStatus'
+        previous_returns:
+          $ref: '#/components/schemas/AccountVerificationInsightsPreviousReturns'
+        account_number_format:
+          $ref: '#/components/schemas/AccountVerificationInsightsAccountNumberFormat'
+      required:
+      - network_status
+      - account_number_format
+    AccountVerificationInsightsAccountNumberFormat:
+      title: VerificationInsightsAccountNumberFormat
+      type: string
+      x-hidden-from-docs: true
+      enum:
+      - valid
+      - invalid
+      - unknown
+      description: |-
+        Indicator of account number format validity for institution.
+
+        `valid`: indicates that the account number has a correct format for the institution.
+
+        `invalid`: indicates that the account number has an incorrect format for the institution.
+
+        `unknown`: indicates that there was not enough information to determine whether the format is correct for the institution.
+    AccountVerificationInsightsNetworkStatus:
+      title: VerificationInsightsNetworkStatus
+      type: object
+      additionalProperties: true
+      x-hidden-from-docs: true
+      description: Status information about the account and routing number in the Plaid network.
+      properties:
+        has_numbers_match:
+          type: boolean
+          description: Indicates whether we found at least one matching account for the ACH account and routing number.
+        is_numbers_match_verified:
+          type: boolean
+          description: Indicates if at least one matching account for the ACH account and routing number is already verified.
+      required:
+      - has_numbers_match
+      - is_numbers_match_verified
+    AccountVerificationInsightsPreviousReturns:
+      title: VerificationInsightsNetworkStatus
+      type: object
+      additionalProperties: true
+      x-hidden-from-docs: true
+      description: Information about known ACH returns for the account and routing number.
+      properties:
+        has_previous_administrative_return:
+          type: boolean
+          description: Indicates whether Plaid's data sources include a known administrative ACH return for account and routing number.
+      required:
+      - has_previous_administrative_return
     LinkEventName:
       title: LinkEventName
       description: A string representing the event that has just occurred in the Link flow.
@@ -19406,6 +19613,9 @@ components:
       - verification_expired
       - verification_failed
       - database_matched
+      - database_insights_pass
+      - database_insights_pass_with_caution
+      - database_insights_fail
     LinkDeliveryAccount:
       title: LinkDeliveryAccount
       type: object
@@ -22214,6 +22424,7 @@ components:
           - refunded
           - repayment
           - transferred
+          - pending idr
           description: The status type of the student loan
           nullable: true
       required:
@@ -22694,6 +22905,7 @@ components:
       - signal
       - statements
       - processor_payments
+      - processor_identity
       description: A list of products that an institution can support. All Items must be initialized with at least one product. The Balance product is always available and does not need to be specified during initialization.
       type: string
     ProductStatus:
@@ -23026,6 +23238,16 @@ components:
           description: The total quantity of the asset held, as reported by the financial institution.
           type: number
           format: double
+        vested_quantity:
+          type: number
+          format: double
+          description: The total quantity of vested assets held, as reported by the financial institution. Vested assets are only associated with [equities](https://plaid.com/docs/api/products/investments/#investments-holdings-get-response-securities-type).
+          nullable: true
+        vested_value:
+          type: number
+          format: double
+          description: The value of the vested holdings as reported by the institution.
+          nullable: true
         currency:
           description: Either a valid `iso_currency_code` or `unofficial_currency_code`
           type: string
@@ -25867,6 +26089,8 @@ components:
           $ref: '#/components/schemas/TransferSweepStatus'
         network:
           $ref: '#/components/schemas/TransferNetwork'
+        wire_details:
+          $ref: '#/components/schemas/TransferWireDetails'
         cancellable:
           type: boolean
           description: When `true`, you can still cancel this transfer.
@@ -26210,7 +26434,9 @@ components:
       description: |-
         The trace identifier for the transfer based on its network. This will only be set after the transfer has posted.
 
-        For `ach` or `same-day-ach` transfers, this is the ACH trace number. Currently, the field will remain null for transfers on other rails.
+        For `ach` or `same-day-ach` transfers, this is the ACH trace number.
+        For `wire` transfers, this will be in the format of `<IMAD>/<OMAD>`.
+        The field will remain null for transfers on other rails.
       nullable: true
     TransferIntentGetFailureReason:
       title: TransferIntentGetFailureReason
@@ -26333,6 +26559,16 @@ components:
           $ref: '#/components/schemas/TransferUserAddressInRequest'
       required:
       - legal_name
+    TransferWireDetails:
+      title: TransferWireDetails
+      type: object
+      nullable: true
+      description: Information specific to wire transfers.
+      properties:
+        message_to_beneficiary:
+          type: string
+          nullable: true
+          description: Additional information from the wire originator to the beneficiary. Max 140 characters.
     TransferUserInRequest:
       title: TransferUserInRequest
       type: object
@@ -26583,6 +26819,8 @@ components:
         network:
           type: string
           description: The network or rails used for the transfer.
+        wire_details:
+          $ref: '#/components/schemas/TransferWireDetails'
         origination_account_id:
           type: string
           description: Plaid's unique identifier for the origination account that was used for this transfer.
@@ -26854,6 +27092,7 @@ components:
       - ach
       - same-day-ach
       - rtp
+      - wire
     TransferACHNetwork:
       type: string
       title: TransferACHNetwork
@@ -26925,6 +27164,8 @@ components:
           $ref: '#/components/schemas/TransferAmount'
         ach_class:
           $ref: '#/components/schemas/ACHClass'
+        wire_details:
+          $ref: '#/components/schemas/TransferWireDetails'
         user:
           $ref: '#/components/schemas/TransferAuthorizationUserInRequest'
         device:
@@ -28773,7 +29014,7 @@ components:
           description: The user's routing number.
         wire_routing_number:
           type: string
-          description: The user's wire transfer routing number. This is the ABA number; for some institutions, this may differ from the ACH number used in `routing_number`.
+          description: The user's wire transfer routing number. This is the ABA number; for some institutions, this may differ from the ACH number used in `routing_number`. This field must be set for the created item to be eligible for wire transfers.
         account_type:
           type: string
           description: The type of the bank account (`checking` or `savings`).
@@ -30835,6 +31076,19 @@ components:
           description: The maximum integer number of days of history to compute Crdit Partner Insights. Defaults to 180 if not specified
           minimum: 1
           maximum: 730
+        prism_products:
+          type: array
+          description: The specific prism products to return. If none are passed in, then all products will be returned.
+          items:
+            $ref: '#/components/schemas/PrismProduct'
+    PrismProduct:
+      title: PrismProduct
+      x-hidden-from-docs: true
+      enum:
+      - detect
+      - scores
+      description: The prism products that can be returned by the Plaid API
+      type: string
     LinkTokenCreateRequestEmployment:
       title: LinkTokenCreateRequestEmployment
       type: object
@@ -33261,30 +33515,15 @@ components:
       additionalProperties: true
       description: In closed beta. Object representing metadata pertaining to the document.
       properties:
-        name:
-          type: string
-          description: The name of the document.
         is_account_number_match:
           type: boolean
           description: Boolean field indicating if the uploaded document's account number matches the account number we have on file
-        status:
-          type: string
-          description: |-
-            The processing status of the document.
-
-            `PROCESSING_COMPLETE`: The document was successfully processed.
-
-            `DOCUMENT_ERROR`: The document could not be processed. Possible causes include: The document was an unacceptable document type such as an offer letter or bank statement, the document image was cropped or blurry, or the document was corrupted.
-
-            `UNKNOWN` or `null`: An internal error occurred. If this happens repeatedly, contact support or your Plaid account manager.
         last_updated:
           type: string
           format: date-time
         uploaded_at:
           type: string
           format: date-time
-        page_count:
-          type: integer
       x-hidden-from-docs: true
     CreditDocumentType:
       title: CreditDocumentType
@@ -38407,7 +38646,6 @@ components:
           public_token: public-sandbox-b0e2c4ee-a763-4df5-bfe9-46a46bce993d
           environment: sandbox
     HostedMMDVerificationWebhook:
-      x-hidden-from-docs: true
       title: HostedMMDVerificationWebhook
       type: object
       additionalProperties: true
@@ -38421,7 +38659,7 @@ components:
           description: '`HOSTED_VERIFICATION`'
         status:
           type: string
-          description: The final status of the same-day microdeposits verification. Will always be "MANUALLY_VERIFIED" or "VERIFICATION_FAILED".
+          description: The final status of the same-day microdeposits verification. Will always be `MANUALLY_VERIFIED` or `VERIFICATION_FAILED`.
         item_id:
           $ref: '#/components/schemas/ItemId'
         account_id:
@@ -38435,6 +38673,14 @@ components:
       - status
       - item_id
       - account_id
+      x-examples:
+        example-1:
+          webhook_type: AUTH
+          webhook_code: HOSTED_VERIFICATION
+          status: MANUALLY_VERIFIED
+          item_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBFL9DrE6
+          account_id: dVzbVMLjrxTnLjX4G66XUp5GLklm4oiZy88yK
+          environment: sandbox
     InstitutionStatusAlertWebhook:
       title: InstitutionStatusAlertWebhook
       description: Fired when institution status meets the conditions configured in the developer dashboard.
@@ -45197,6 +45443,237 @@ components:
       - error_code
       - error_message
       - display_message
+    CraPartnerInsightsGetRequest:
+      title: CraPartnerInsightsGetRequest
+      type: object
+      description: CraPartnerInsightsGetRequest defines the request schema for `/cra/partner_insights/get`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        user_token:
+          $ref: '#/components/schemas/UserToken'
+    CraPartnerInsightsGetResponse:
+      title: CraPartnerInsightsGetResponse
+      additionalProperties: true
+      type: object
+      description: CraPartnerInsightsGetResponse defines the response schema for `/cra/partner_insights/get`.
+      properties:
+        report:
+          type: array
+          items:
+            $ref: '#/components/schemas/CraPartnerInsights'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
+    CraPartnerInsights:
+      type: object
+      additionalProperties: true
+      description: The partner insights report of the bank data for an end user.
+      properties:
+        report_id:
+          type: string
+          description: A unique identifier associated with the Partner Insights object.
+        generated_time:
+          type: string
+          description: The time when the partner insights report was generated.
+          format: date-time
+        prism:
+          $ref: '#/components/schemas/CraPartnerInsightsPrism'
+        items:
+          type: array
+          description: The list of Items used in the report along with the associated metadata about the Item.
+          items:
+            $ref: '#/components/schemas/CraPartnerInsightsItem'
+    CraPartnerInsightsItem:
+      type: object
+      additionalProperties: true
+      description: The details and metadata for an end user's Item.
+      properties:
+        institution_id:
+          type: string
+          description: The ID for the institution that the user linked.
+        institution_name:
+          type: string
+          description: The name of the institution the user linked.
+        item_id:
+          type: string
+          description: The identifier for the item.
+        accounts:
+          type: array
+          description: A list of accounts in the item
+          items:
+            $ref: '#/components/schemas/CraPartnerInsightsItemAccount'
+    CraPartnerInsightsItemAccount:
+      type: object
+      additionalProperties: true
+      description: Account data corresponding to the item from which Partner Insights were generated from
+      properties:
+        mask:
+          type: string
+          nullable: true
+          description: |-
+            The last 2-4 alphanumeric characters of an account's official account number.
+            Note that the mask may be non-unique between an Item's accounts, and it may also
+            not match the mask that the bank displays to the user.
+        name:
+          type: string
+          description: The name of the account
+        official_name:
+          type: string
+          description: The official name of the bank account.
+          nullable: true
+        subtype:
+          $ref: '#/components/schemas/DepositoryAccountSubtype'
+        type:
+          $ref: '#/components/schemas/CreditBankIncomeAccountType'
+        owners:
+          type: array
+          description: Data returned by the financial institution about the account owner or owners. Identity information is optional, so field may return an empty array.
+          items:
+            $ref: '#/components/schemas/Owner'
+      required:
+      - mask
+      - name
+      - official_name
+      - subtype
+      - type
+      - owners
+    CraPartnerInsightsPrism:
+      type: object
+      additionalProperties: true
+      description: The Prism insights for the user.
+      properties:
+        insights:
+          $ref: '#/components/schemas/PrismInsights'
+        cash_score:
+          $ref: '#/components/schemas/PrismCashScore'
+        detect:
+          $ref: '#/components/schemas/PrismDetect'
+        status:
+          type: string
+          description: Details on whether the Prism attributes succeeded or failed to be generated.
+      required:
+      - status
+    PrismInsights:
+      type: object
+      additionalProperties: true
+      description: The data from the Insights product returned by Prism.
+      nullable: true
+      properties:
+        version:
+          type: integer
+          description: The version of Prism's insights model used.
+        result:
+          $ref: '#/components/schemas/PrismInsightsResult'
+      required:
+      - version
+    PrismInsightsResult:
+      type: object
+      title: PrismInsightsResult
+      description: The Insights Result object is a map of cash flow attributes, in string to float format.
+    PrismCashScore:
+      type: object
+      additionalProperties: true
+      description: The data from the Cash Score product returned by Prism.
+      nullable: true
+      properties:
+        version:
+          type: integer
+          description: The version of Prism's cash score model used.
+        score:
+          type: integer
+          description: The score returned by Prism. Ranges from 1-999, with higher score indicating lower risk.
+        reason_codes:
+          type: array
+          description: The reasons for an individual having risk according to the cash score.
+          items:
+            type: string
+        metadata:
+          $ref: '#/components/schemas/PrismCashScoreMetadata'
+      required:
+      - version
+      - score
+    PrismCashScoreMetadata:
+      type: object
+      additionalProperties: true
+      description: An object containing metadata about the provided transactions.
+      properties:
+        max_age:
+          type: integer
+          nullable: true
+          description: Number of days since the oldest transaction.
+        min_age:
+          type: integer
+          nullable: true
+          description: Number of days since the latest transaction.
+        min_age_credit:
+          type: integer
+          nullable: true
+          description: Number of days since the latest credit transaction.
+        min_age_debit:
+          type: integer
+          nullable: true
+          description: Number of days since the latest debit transaction.
+        max_age_debit:
+          type: integer
+          nullable: true
+          description: Number of days since the oldest debit transaction.
+        max_age_credit:
+          type: integer
+          nullable: true
+          description: Number of days since the oldest credit transaction.
+        num_trxn_credit:
+          type: integer
+          nullable: true
+          description: Number of credit transactions.
+        num_trxn_debit:
+          type: integer
+          nullable: true
+          description: Number of debit transactions.
+        l1m_credit_value_cnt:
+          type: integer
+          nullable: true
+          description: Number of credit transactions in the last 30 days.
+        l1m_debit_value_cnt:
+          type: integer
+          nullable: true
+          description: Number of debit transactions in the last 30 days.
+      required:
+      - max_age
+      - min_age
+      - min_age_credit
+      - min_age_debit
+      - max_age_debit
+      - max_age_credit
+      - num_trxn_credit
+      - num_trxn_debit
+      - l1m_credit_value_cnt
+      - l1m_debit_value_cnt
+    PrismDetect:
+      type: object
+      additionalProperties: true
+      description: The data from the Detect product returned by Prism.
+      nullable: true
+      properties:
+        version:
+          type: integer
+          description: The version of Prism's detect model used.
+        score:
+          type: integer
+          description: The score returned by Prism. Ranges from 1-999, with higher score indicating lower risk.
+        reason_codes:
+          type: array
+          description: The reasons for an individual having risk according to the detect cash score.
+          items:
+            type: string
+        metadata:
+          $ref: '#/components/schemas/PrismCashScoreMetadata'
+      required:
+      - version
+      - score
     AssetReportFreddieGetRequest:
       title: AssetReportFreddieGetRequest
       type: object
@@ -47693,6 +48170,54 @@ components:
         is_account_frozen_or_restricted:
           type: boolean
           description: Indicates if the receiver bank account is either frozen or restricted
+          nullable: true
+        distinct_ip_addresses_count_3d:
+          type: integer
+          description: The number of distinct IP addresses linked to the same bank account during Plaid authentication in the last 3 days
+          nullable: true
+        distinct_ip_addresses_count_7d:
+          type: integer
+          description: The number of distinct IP addresses linked to the same bank account during Plaid authentication in the last 7 days
+          nullable: true
+        distinct_ip_addresses_count_30d:
+          type: integer
+          description: The number of distinct IP addresses linked to the same bank account during Plaid authentication in the last 30 days (max 100)
+          nullable: true
+        distinct_ip_addresses_count_90d:
+          type: integer
+          description: The number of distinct IP addresses linked to the same bank account during Plaid authentication in the last 90 days (max 100)
+          nullable: true
+        distinct_user_agents_count_3d:
+          type: integer
+          description: The number of distinct user agents linked to the same bank account during Plaid authentication in the last 3 days
+          nullable: true
+        distinct_user_agents_count_7d:
+          type: integer
+          description: The number of distinct user agents linked to the same bank account during Plaid authentication in the last 7 days
+          nullable: true
+        distinct_user_agents_count_30d:
+          type: integer
+          description: The number of distinct user agents linked to the same bank account during Plaid authentication in the last 30 days
+          nullable: true
+        distinct_user_agents_count_90d:
+          type: integer
+          description: The number of distinct user agents linked to the same bank account during Plaid authentication in the last 90 days
+          nullable: true
+        distinct_ssl_tls_connection_sessions_count_3d:
+          type: integer
+          description: The number of distinct SSL/TLS connection sessions linked to the same bank account during Plaid authentication in the last 3 days
+          nullable: true
+        distinct_ssl_tls_connection_sessions_count_7d:
+          type: integer
+          description: The number of distinct SSL/TLS connection sessions linked to the same bank account during Plaid authentication in the last 7 days
+          nullable: true
+        distinct_ssl_tls_connection_sessions_count_30d:
+          type: integer
+          description: The number of distinct SSL/TLS connection sessions linked to the same bank account during Plaid authentication in the last 30 days
+          nullable: true
+        distinct_ssl_tls_connection_sessions_count_90d:
+          type: integer
+          description: The number of distinct SSL/TLS connection sessions linked to the same bank account during Plaid authentication in the last 90 days
           nullable: true
     StatementsListRequest:
       title: StatementsListRequest
