@@ -1,3 +1,29 @@
+### 2020-09-14_1.496.0
+- Add `verification_insights` object to `Account` (closed beta feature - Database Insights)
+- Add `database_insights_pass`, `database_insights_pass_with_caution`, and `database_insights_fail` as new values for `verification_status` field (closed beta feature - Database Insights)
+
+### 2020-09-14_1.495.2
+- Add `pending idr` to student loan liability statuses
+
+### 2020-09-14_1.495.1
+- Add `processor_identity` product
+
+### 2020-09-14_1.494.1
+- Mark `wire_details` as nullable in the transfer object
+
+### 2020-09-14_1.494.0
+- Add `vested_quantity` and `vested_value` fields to the `Holding` object.
+
+### 2020-09-14_1.493.0
+- Add `POST /cra/partner_insights/get`
+
+### 2020-09-14_1.492.1
+- Added documentation for the `HOSTED_VERIFICATION` webhook.
+- Add `wire` to request and response of `/transfer/authorization/create`
+
+### 2020-09-14_1.492.0
+- Remove `page_count`, `name`, and `status` fields from Identity Document Upload's document metadata.
+
 ### 2020-09-14_1.491.3
 - Increase max length of description field on `/transfer/intent/create` from 8 to 15
 
