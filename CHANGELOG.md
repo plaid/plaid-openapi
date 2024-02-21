@@ -1,3 +1,9 @@
+### 2020-09-14_1.496.2
+- Adds prediction interval to `/cra/bank_income/get`
+
+### 2020-09-14_1.496.1
+- Update the descriptions for `risk_level` and `score` in `/accounts/balance/get`
+
 ### 2020-09-14_1.496.0
 - Add `verification_insights` object to `Account` (closed beta feature - Database Insights)
 - Add `database_insights_pass`, `database_insights_pass_with_caution`, and `database_insights_fail` as new values for `verification_status` field (closed beta feature - Database Insights)
