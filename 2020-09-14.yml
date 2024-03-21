@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.499.0
+  version: 2020-09-14_1.502.4
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -422,7 +422,7 @@ paths:
       description: |-
         The `/item/remove` endpoint allows you to invalidate an `access_token`, meaning you will not be able to create new Asset Reports with it. Removing an Item does not affect any Asset Reports or Audit Copies you have already created, which will remain accessible until you remove them specifically.
 
-        The `/asset_report/remove` endpoint allows you to remove an Asset Report. Removing an Asset Report invalidates its `asset_report_token`, meaning you will no longer be able to use it to access Report data or create new Audit Copies. Removing an Asset Report does not affect the underlying Items, but does invalidate any `audit_copy_tokens` associated with the Asset Report.
+        The `/asset_report/remove` endpoint allows you to remove access to an Asset Report. Removing an Asset Report invalidates its `asset_report_token`, meaning you will no longer be able to use it to access Report data or create new Audit Copies. Removing an Asset Report does not affect the underlying Items, but does invalidate any `audit_copy_tokens` associated with the Asset Report.
       requestBody:
         required: true
         content:
@@ -969,6 +969,33 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CraBankIncomeGetRequest'
+  /cra/bank_income/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_CRA
+    post:
+      summary: Create a CRA report for income verification
+      tags:
+      - plaid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CraBankIncomeCreateResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: LhQf0THi8SH1yJm
+      externalDocs:
+        url: /api/products/income/#crabank_incomecreate
+      operationId: craBankIncomeCreate
+      description: '`/cra/bank_income/create` creates a CRA report for income verification'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CraBankIncomeCreateRequest'
   /cra/partner_insights/get:
     x-plaid-business-unit-context: BUSINESS_UNIT_CRA
     post:
@@ -1715,7 +1742,7 @@ paths:
 
         Due to the potentially large number of transactions associated with an Item, results are paginated. Manipulate the `count` and `offset` parameters in conjunction with the `total_transactions` response body field to fetch all available transactions.
 
-        Data returned by `/transactions/get` will be the data available for the Item as of the most recent successful check for new transactions. Plaid typically checks for new data multiple times a day, but these checks may occur less frequently, such as once a day, depending on the institution. An Item's `status.transactions.last_successful_update` field will show the timestamp of the most recent successful update. To force Plaid to check for new transactions, you can use the `/transactions/refresh` endpoint.
+        Data returned by `/transactions/get` will be the data available for the Item as of the most recent successful check for new transactions. Plaid typically checks for new data multiple times a day, but these checks may occur less frequently, such as once a day, depending on the institution. To find out when the Item was last updated, use the [Item Debugger](https://plaid.com/docs/account/activity/#troubleshooting-with-item-debugger) or call `/item/get`; the `item.status.transactions.last_successful_update` field will show the timestamp of the most recent successful update. To force Plaid to check for new transactions, you can use the `/transactions/refresh` endpoint.
 
         Note that data may not be immediately available to `/transactions/get`. Plaid will begin to prepare transactions data upon Item link, if Link was initialized with `transactions`, or upon the first call to `/transactions/get`, if it wasn't. To be alerted when transaction data is ready to be fetched, listen for the [`INITIAL_UPDATE`](https://plaid.com/docs/api/products/transactions/#initial_update) and [`HISTORICAL_UPDATE`](https://plaid.com/docs/api/products/transactions/#historical_update) webhooks. If no transaction history is ready when `/transactions/get` is called, it will return a `PRODUCT_NOT_READY` error.
       requestBody:
@@ -2063,7 +2090,7 @@ paths:
 
         When retrieving paginated updates, track both the `next_cursor` from the latest response and the original cursor from the first call in which `has_more` was `true`; if a call to `/transactions/sync` fails due to the [`TRANSACTIONS_SYNC_MUTATION_DURING_PAGINATION`](https://plaid.com/docs/errors/transactions/#transactions_sync_mutation_during_pagination) error, the entire pagination request loop must be restarted beginning with the cursor for the first page of the update, rather than retrying only the single request that failed.
 
-        Whenever new or updated transaction data becomes available, `/transactions/sync` will provide these updates. Plaid typically checks for new data multiple times a day, but these checks may occur less frequently, such as once a day, depending on the institution. An Item's `status.transactions.last_successful_update` field will show the timestamp of the most recent successful update. To force Plaid to check for new transactions, use the `/transactions/refresh` endpoint.
+        Whenever new or updated transaction data becomes available, `/transactions/sync` will provide these updates. Plaid typically checks for new data multiple times a day, but these checks may occur less frequently, such as once a day, depending on the institution. To find out when the Item was last updated, use the [Item Debugger](https://plaid.com/docs/account/activity/#troubleshooting-with-item-debugger) or call `/item/get`; the `item.status.transactions.last_successful_update` field will show the timestamp of the most recent successful update. To force Plaid to check for new transactions, use the `/transactions/refresh` endpoint.
 
         For newly created Items, data may not be immediately available to `/transactions/sync`. Plaid begins preparing transactions data when the Item is created, but the process can take anywhere from a few seconds to several minutes to complete, depending on the number of transactions available.
 
@@ -2555,6 +2582,8 @@ paths:
       operationId: itemRemove
       description: |-
         The `/item/remove` endpoint allows you to remove an Item. Once removed, the `access_token`, as well as any processor tokens or bank account tokens associated with the Item, is no longer valid and cannot be used to access any data that was associated with the Item.
+
+        Removing an Item does not affect any Asset Reports or Audit Copies you have already created, which will remain accessible until you remove access to them specifically using the `/asset_report/remove` endpoint.
 
         Note that in the Development environment, issuing an `/item/remove`  request will not decrement your live credential count. To increase your credential account in Development, contact Support.
 
@@ -5545,7 +5574,7 @@ paths:
       - plaid
       summary: Retrieve the account associated with a processor token
       externalDocs:
-        url: /api/processors/#processoraccountget
+        url: /api/processor-partners/#processoraccountget
       operationId: processorAccountGet
       responses:
         "200":
@@ -5589,7 +5618,7 @@ paths:
       - plaid
       summary: Get transaction data
       externalDocs:
-        url: /api/processors/#processortransactionsget
+        url: /api/processor-partners/#processortransactionsget
       operationId: processorTransactionsGet
       responses:
         "200":
@@ -5751,7 +5780,7 @@ paths:
 
         Note that data may not be immediately available to `/processor/transactions/get`. Plaid will begin to prepare transactions data upon Item link, if Link was initialized with `transactions`, or upon the first call to `/processor/transactions/get`, if it wasn't. If no transaction history is ready when `/processor/transactions/get` is called, it will return a `PRODUCT_NOT_READY` error.
 
-        To receive Transactions webhooks for a processor token, set its webhook URL via the [`/processor/token/webhook/update`](https://plaid.com/docs/api/processors/#processortokenwebhookupdate) endpoint.
+        To receive Transactions webhooks for a processor token, set its webhook URL via the [`/processor/token/webhook/update`](https://plaid.com/docs/api/processor-partners/#processortokenwebhookupdate) endpoint.
       requestBody:
         required: true
         content:
@@ -5766,7 +5795,7 @@ paths:
       - plaid
       summary: Get incremental transaction updates on a processor token
       externalDocs:
-        url: /api/processors/#processortransactionssync
+        url: /api/processor-partners/#processortransactionssync
       operationId: processorTransactionsSync
       responses:
         "200":
@@ -5927,7 +5956,7 @@ paths:
 
         Note that for newly created processor tokens, data may not be immediately available to `/processor/transactions/sync`. Plaid begins preparing transactions data when the corresponding Item is created, but the process can take anywhere from a few seconds to several minutes to complete, depending on the number of transactions available.
 
-        To receive Transactions webhooks for a processor token, set its webhook URL via the [`/processor/token/webhook/update`](https://plaid.com/docs/api/processors/#processortokenwebhookupdate) endpoint.
+        To receive Transactions webhooks for a processor token, set its webhook URL via the [`/processor/token/webhook/update`](https://plaid.com/docs/api/processor-partners/#processortokenwebhookupdate) endpoint.
       requestBody:
         required: true
         content:
@@ -5942,7 +5971,7 @@ paths:
       - plaid
       summary: Refresh transaction data
       externalDocs:
-        url: /api/processors/#processortransactionsrefresh
+        url: /api/processor-partners/#processortransactionsrefresh
       operationId: processorTransactionsRefresh
       responses:
         "200":
@@ -5980,7 +6009,7 @@ paths:
       - plaid
       summary: Fetch recurring transaction streams
       externalDocs:
-        url: /api/processors/#processortransactionsrecurringget
+        url: /api/processor-partners/#processortransactionsrecurringget
       operationId: processorTransactionsRecurringGet
       responses:
         "200":
@@ -6106,7 +6135,7 @@ paths:
 
         After the initial call, you can call `/processor/transactions/recurring/get` endpoint at any point in the future to retrieve the latest summary of recurring streams. Listen to the [`RECURRING_TRANSACTIONS_UPDATE`](https://plaid.com/docs/api/products/transactions/#recurring_transactions_update) webhook to be notified when new updates are available.
 
-        To receive Transactions webhooks for a processor token, set its webhook URL via the [`/processor/token/webhook/update`](https://plaid.com/docs/api/processors/#processortokenwebhookupdate) endpoint.
+        To receive Transactions webhooks for a processor token, set its webhook URL via the [`/processor/token/webhook/update`](https://plaid.com/docs/api/processor-partners/#processortokenwebhookupdate) endpoint.
       requestBody:
         required: true
         content:
@@ -6121,7 +6150,7 @@ paths:
       - plaid
       summary: Evaluate a planned ACH transaction
       externalDocs:
-        url: /api/processors/#processorsignalevaluate
+        url: /api/processor-partners/#processorsignalevaluate
       operationId: processorSignalEvaluate
       description: |-
         Use `/processor/signal/evaluate` to evaluate a planned ACH transaction as a processor to get a return risk assessment (such as a risk score and risk tier) and additional risk signals.
@@ -6173,7 +6202,7 @@ paths:
       - plaid
       summary: Report whether you initiated an ACH transaction
       externalDocs:
-        url: /api/processors/#processorsignaldecisionreport
+        url: /api/processor-partners/#processorsignaldecisionreport
       operationId: processorSignalDecisionReport
       description: |-
         After calling `/processor/signal/evaluate`, call `/processor/signal/decision/report` to report whether the transaction was initiated.
@@ -6209,7 +6238,7 @@ paths:
       - plaid
       summary: Report a return for an ACH transaction
       externalDocs:
-        url: /api/processors/#processorsignalreturnreport
+        url: /api/processor-partners/#processorsignalreturnreport
       operationId: processorSignalReturnReport
       description: |-
         Call the `/processor/signal/return/report` endpoint to report a returned transaction that was previously sent to the `/processor/signal/evaluate` endpoint. Your feedback will be used by the model to incorporate the latest risk trend in your portfolio.
@@ -6245,7 +6274,7 @@ paths:
       - plaid
       summary: Opt-in a processor token to Signal
       externalDocs:
-        url: /api/processors/#processorsignalprepare
+        url: /api/processor-partners/#processorsignalprepare
       operationId: processorSignalPrepare
       description: |-
         When a processor token is not initialized with Signal, call `/processor/signal/prepare` to opt-in that processor token to the Signal data collection process, which will improve the accuracy of the Signal score.
@@ -6281,7 +6310,7 @@ paths:
       - plaid
       summary: Create a bank transfer as a processor
       externalDocs:
-        url: /api/processors/#bank_transfercreate
+        url: /api/processor-partners/#bank_transfercreate
       operationId: processorBankTransferCreate
       responses:
         "200":
@@ -6337,7 +6366,7 @@ paths:
       - plaid
       summary: Retrieve Liabilities data
       externalDocs:
-        url: /api/processors/#processorliabilitiesget
+        url: /api/processor-partners/#processorliabilitiesget
       operationId: processorLiabilitiesGet
       responses:
         "200":
@@ -6411,7 +6440,7 @@ paths:
       - plaid
       summary: Retrieve Identity data
       externalDocs:
-        url: /api/processors/#processoridentityget
+        url: /api/processor-partners/#processoridentityget
       operationId: processorIdentityGet
       responses:
         "200":
@@ -6489,7 +6518,7 @@ paths:
       - plaid
       summary: Retrieve identity match score
       externalDocs:
-        url: /api/processors/#processoridentitymatch
+        url: /api/processor-partners/#processoridentitymatch
       operationId: processorIdentityMatch
       responses:
         "200":
@@ -6547,7 +6576,7 @@ paths:
       - plaid
       summary: Retrieve Balance data
       externalDocs:
-        url: /api/processors/#processorbalanceget
+        url: /api/processor-partners/#processorbalanceget
       operationId: processorBalanceGet
       responses:
         "200":
@@ -8478,7 +8507,7 @@ paths:
       - plaid
       summary: Update a processor token's webhook URL
       externalDocs:
-        url: /api/processors/#processortokenwebhookupdate
+        url: /api/processor-partners/#processortokenwebhookupdate
       operationId: processorTokenWebhookUpdate
       responses:
         "200":
@@ -8807,7 +8836,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transferget
+        url: /api/products/transfer/reading-transfers/#transferget
       operationId: transferGet
       responses:
         "200":
@@ -8885,7 +8914,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transferrecurringget
+        url: /api/products/transfer/recurring-transfers/#transferrecurringget
       operationId: transferRecurringGet
       responses:
         "200":
@@ -9014,7 +9043,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transferauthorizationcreate
+        url: /api/products/transfer/initiating-transfers/#transferauthorizationcreate
       operationId: transferAuthorizationCreate
       responses:
         "200":
@@ -9091,7 +9120,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transferbalanceget
+        url: /api/products/transfer/balance/#transferbalanceget
       operationId: transferBalanceGet
       responses:
         "200":
@@ -9127,7 +9156,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transfercapabilitiesget
+        url: /api/products/transfer/account-linking/#transfercapabilitiesget
       operationId: transferCapabilitiesGet
       responses:
         "200":
@@ -9163,7 +9192,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transferconfigurationget
+        url: /api/products/transfer/metrics/#transferconfigurationget
       operationId: transferConfigurationGet
       responses:
         "200":
@@ -9205,7 +9234,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transferledgerget
+        url: /api/products/transfer/ledger/#transferledgerget
       operationId: transferLedgerGet
       responses:
         "200":
@@ -9241,7 +9270,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transferledgerdistribute
+        url: /api/products/transfer/ledger/#transferledgerdistribute
       operationId: transferLedgerDistribute
       responses:
         "200":
@@ -9274,7 +9303,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transferledgerdeposit
+        url: /api/products/transfer/ledger/#transferledgerdeposit
       operationId: transferLedgerDeposit
       responses:
         "200":
@@ -9318,7 +9347,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transferledgerwithdraw
+        url: /api/products/transfer/ledger/#transferledgerwithdraw
       operationId: transferLedgerWithdraw
       responses:
         "200":
@@ -9362,7 +9391,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transferoriginatorfunding_accountupdate
+        url: /api/products/transfer/platform-payments/#transferoriginatorfunding_accountupdate
       operationId: transferOriginatorFundingAccountUpdate
       responses:
         "200":
@@ -9395,7 +9424,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transfermetricsget
+        url: /api/products/transfer/metrics/#transfermetricsget
       operationId: transferMetricsGet
       responses:
         "200":
@@ -9434,7 +9463,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transfercreate
+        url: /api/products/transfer/initiating-transfers/#transfercreate
       operationId: transferCreate
       responses:
         "200":
@@ -9507,7 +9536,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transferrecurringcreate
+        url: /api/products/transfer/recurring-transfers/#transferrecurringcreate
       operationId: transferRecurringCreate
       responses:
         "200":
@@ -9630,7 +9659,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transferlist
+        url: /api/products/transfer/reading-transfers/#transferlist
       operationId: transferList
       responses:
         "200":
@@ -9706,7 +9735,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transferrecurringlist
+        url: /api/products/transfer/recurring-transfers/#transferrecurringlist
       operationId: transferRecurringList
       responses:
         "200":
@@ -9833,7 +9862,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transfercancel
+        url: /api/products/transfer/initiating-transfers/#transfercancel
       operationId: transferCancel
       responses:
         "200":
@@ -9866,7 +9895,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transferrecurringcancel
+        url: /api/products/transfer/recurring-transfers/#transferrecurringcancel
       operationId: transferRecurringCancel
       responses:
         "200":
@@ -9932,7 +9961,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transfereventlist
+        url: /api/products/transfer/reading-transfers/#transfereventlist
       operationId: transferEventList
       responses:
         "200":
@@ -10025,7 +10054,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transfereventsync
+        url: /api/products/transfer/reading-transfers/#transfereventsync
       operationId: transferEventSync
       responses:
         "200":
@@ -10118,7 +10147,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transfersweepget
+        url: /api/products/transfer/reading-transfers/#transfersweepget
       operationId: transferSweepGet
       responses:
         "200":
@@ -10204,7 +10233,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transfersweeplist
+        url: /api/products/transfer/reading-transfers/#transfersweeplist
       operationId: transferSweepList
       responses:
         "200":
@@ -10367,7 +10396,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transfermigrate_account
+        url: /api/products/transfer/account-linking/#transfermigrate_account
       operationId: transferMigrateAccount
       responses:
         "200":
@@ -10402,7 +10431,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transferintentcreate
+        url: /api/products/transfer/account-linking/#transferintentcreate
       operationId: transferIntentCreate
       responses:
         "200":
@@ -10460,7 +10489,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transferintentget
+        url: /api/products/transfer/account-linking/#transferintentget
       operationId: transferIntentGet
       responses:
         "200":
@@ -10615,7 +10644,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transferoriginatorcreate
+        url: /api/products/transfer/platform-payments/#transferoriginatorcreate
       operationId: transferOriginatorCreate
       responses:
         "200":
@@ -10652,7 +10681,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transferquestionnairecreate
+        url: /api/products/transfer/platform-payments/#transferquestionnairecreate
       operationId: transferQuestionnaireCreate
       responses:
         "200":
@@ -10689,7 +10718,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transferdiligencesubmit
+        url: /api/products/transfer/platform-payments/#transferdiligencesubmit
       operationId: transferDiligenceSubmit
       responses:
         "200":
@@ -10724,7 +10753,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transferdiligencedocumentupload
+        url: /api/products/transfer/platform-payments/#transferdiligencedocumentupload
       operationId: transferDiligenceDocumentUpload
       responses:
         "200":
@@ -10761,7 +10790,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transferoriginatorget
+        url: /api/products/transfer/platform-payments/#transferoriginatorget
       operationId: transferOriginatorGet
       responses:
         "200":
@@ -10801,7 +10830,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transferoriginatorlist
+        url: /api/products/transfer/platform-payments/#transferoriginatorlist
       operationId: transferOriginatorList
       responses:
         "200":
@@ -10842,7 +10871,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transferrefundcreate
+        url: /api/products/transfer/refunds/#transferrefundcreate
       operationId: transferRefundCreate
       responses:
         "200":
@@ -10887,7 +10916,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transferrefundget
+        url: /api/products/transfer/refunds/#transferrefundget
       operationId: transferRefundGet
       responses:
         "200":
@@ -10931,7 +10960,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transferrefundcancel
+        url: /api/products/transfer/refunds/#transferrefundcancel
       operationId: transferRefundCancel
       responses:
         "200":
@@ -15488,7 +15517,7 @@ components:
         include_original_description:
           type: boolean
           default: false
-          description: Include the raw unparsed transaction description from the financial institution. This field is disabled by default. If you need this information in addition to the parsed data provided, contact your Plaid Account Manager or submit a [Support request](https://dashboard.plaid.com/support/new/product-and-development/product-troubleshooting/product-functionality).
+          description: Include the raw unparsed transaction description from the financial institution.
           nullable: true
         include_personal_finance_category:
           type: boolean
@@ -15518,6 +15547,14 @@ components:
       additionalProperties: true
       description: TransactionsSyncResponse defines the response schema for `/transactions/sync`
       properties:
+        transactions_update_status:
+          $ref: '#/components/schemas/TransactionsUpdateStatus'
+        accounts:
+          type: array
+          x-hidden-from-docs: true
+          description: An array of accounts at a financial institution associated with the transactions in this response.
+          items:
+            $ref: '#/components/schemas/AccountBase'
         added:
           type: array
           description: Transactions that have been added to the Item since `cursor` ordered by ascending last modified time.
@@ -15984,6 +16021,7 @@ components:
           - liabilities
           - payment_initiation
           - standing_orders
+          - statements
           - transactions
           - transfer
         options:
@@ -16382,7 +16420,7 @@ components:
         include_original_description:
           type: boolean
           default: false
-          description: Include the raw unparsed transaction description from the financial institution. This field is disabled by default. If you need this information in addition to the parsed data provided, contact your Plaid Account Manager, or submit a [Support request](https://dashboard.plaid.com/support/new/product-and-development/product-troubleshooting/product-functionality).
+          description: Include the raw unparsed transaction description from the financial institution.
           nullable: true
         include_personal_finance_category_beta:
           type: boolean
@@ -18211,7 +18249,6 @@ components:
           - galileo
           - modern_treasury
           - ocrolus
-          - prime_trust
           - vesta
           - drivewealth
           - vopay
@@ -18999,13 +19036,16 @@ components:
         database_insights_enabled:
           type: boolean
           description: Specifies whether the Link session is enabled for the Database Insights flow.
-          x-hidden_from_docs: true
+          x-hidden-from-docs: true
         flow_type:
           type: string
           enum:
           - FLEXIBLE_AUTH
           description: This field has been deprecated in favor of `auth_type_select_enabled`.
           deprecated: true
+        sms_microdeposits_verification_enabled:
+          type: boolean
+          description: Specifies whether the Link session is enabled for SMS microdeposits verification. If omitted, behavior defaults to as if this was set to `true`.
     LinkTokenCreateRequestIdentityVerification:
       type: object
       description: Specifies option for initializing Link for use with the Identity Verification product.
@@ -19641,7 +19681,7 @@ components:
           $ref: '#/components/schemas/AccountVerificationInsights'
         persistent_account_id:
           type: string
-          description: A unique and persistent identifier for accounts that can be used to trace multiple instances of the same account across different Items for depository accounts. This is currently only supported for Chase Items. Because Chase accounts have a different account number each time they are linked, this field may be instead of the account number to uniquely identify a Chase account across multiple Items for payments use cases, helping to reduce duplicate Items or attempted fraud.
+          description: A unique and persistent identifier for accounts that can be used to trace multiple instances of the same account across different Items for depository accounts. This is currently only supported for Chase Items. Because Chase accounts have a different account number each time they are linked, this field may be used instead of the account number to uniquely identify a Chase account across multiple Items for payments use cases, helping to reduce duplicate Items or attempted fraud. In Sandbox, this field may be populated for any account; in Production and Development, it will only be populated for Chase accounts.
       required:
       - account_id
       - balances
@@ -20257,6 +20297,22 @@ components:
       - $ref: '#/components/schemas/RecipientBACS'
       - type: object
         additionalProperties: true
+    TransactionsUpdateStatus:
+      title: TransactionsUpdateStatus
+      x-hidden-from-docs: true
+      type: string
+      description: |-
+        A description of the update status for transaction pulls of an item.
+
+        `TRANSACTIONS_UPDATE_STATE_UNKNOWN`: Error, unable to fetch transactions update state for item.
+        `NOT_READY`: The item is pending transaction pull.
+        `INITIAL_UPDATE_COMPLETE`: Initial pull for the item is complete, pending Historical pull.
+        `HISTORICAL_UPDATE_COMPLETE`: Both Initial and Historical pull for item is complete.
+      enum:
+      - TRANSACTIONS_UPDATE_STATE_UNKNOWN
+      - NOT_READY
+      - INITIAL_UPDATE_COMPLETE
+      - HISTORICAL_UPDATE_COMPLETE
     RemovedTransaction:
       title: RemovedTransaction
       type: object
@@ -20266,6 +20322,10 @@ components:
         transaction_id:
           type: string
           description: The ID of the removed transaction.
+        account_id:
+          type: string
+          x-hidden-from-docs: true
+          description: The ID of the account of the removed transaction.
     RequestID:
       title: RequestID
       type: string
@@ -20398,7 +20458,7 @@ components:
           nullable: true
         original_description:
           type: string
-          description: The string returned by the financial institution to describe the transaction. For transactions returned by `/transactions/sync` or `/transactions/get`, this field is in beta and will be omitted unless the client is both enrolled in the closed beta program and has set `options.include_original_description` to `true`.
+          description: The string returned by the financial institution to describe the transaction. For transactions returned by `/transactions/sync` or `/transactions/get`, this field will be omitted unless the client has set `options.include_original_description` to `true`.
           nullable: true
         payment_meta:
           $ref: '#/components/schemas/PaymentMeta'
@@ -20753,7 +20813,7 @@ components:
           description: The official name of the institution.
         products:
           type: array
-          description: A list of the Plaid products supported by the institution. Note that only institutions that support Instant Auth will return `auth` in the product array; institutions that do not list `auth` may still support other Auth methods such as Instant Match or Automated Micro-deposit Verification. To identify institutions that support those methods, use the `auth_metadata` object. For more details, see [Full Auth coverage](https://plaid.com/docs/auth/coverage/).
+          description: A list of the Plaid products supported by the institution. Note that only institutions that support Instant Auth will return `auth` in the product array; institutions that do not list `auth` may still support other Auth methods such as Instant Match or Automated Micro-deposit Verification. To identify institutions that support those methods, use the `auth_metadata` object. For more details, see [Full Auth coverage](https://plaid.com/docs/auth/coverage/). The `income_verification` product here indicates support for Bank Income.
           items:
             $ref: '#/components/schemas/Products'
         country_codes:
@@ -23531,10 +23591,10 @@ components:
       description: Specify the security associated with the holding or investment transaction. When inputting custom security data to the Sandbox, Plaid will perform post-data-retrieval normalization and enrichment. These processes may cause the data returned by the Sandbox to be slightly different from the data you input. An ISO-4217 currency code and a security identifier (`ticker_symbol`, `cusip`, `isin`, or `sedol`) are required.
       properties:
         isin:
-          description: 12-character ISIN, a globally unique securities identifier. A verified CUSIP Global Services license is required to receive this data. This field will be null by default for new customers, and null for existing customers starting March 12, 2024. If you would like access to this field, please start the verification process [here](https://docs.google.com/forms/d/e/1FAIpQLSd9asHEYEfmf8fxJTHZTAfAzW4dugsnSu-HS2J51f1mxwd6Sw/viewform).
+          description: 12-character ISIN, a globally unique securities identifier. A verified CUSIP Global Services license is required to receive this data. This field will be null by default for new customers, and null for existing customers starting March 12, 2024. If you would like access to this field, please [request ISIN/CUSIP access here](https://docs.google.com/forms/d/e/1FAIpQLSd9asHEYEfmf8fxJTHZTAfAzW4dugsnSu-HS2J51f1mxwd6Sw/viewform).
           type: string
         cusip:
-          description: 9-character CUSIP, an identifier assigned to North American securities. A verified CUSIP Global Services license is required to receive this data. This field will be null by default for new customers, and null for existing customers starting March 12, 2024. If you would like access to this field, please start the verification process [here](https://docs.google.com/forms/d/e/1FAIpQLSd9asHEYEfmf8fxJTHZTAfAzW4dugsnSu-HS2J51f1mxwd6Sw/viewform).
+          description: 9-character CUSIP, an identifier assigned to North American securities. A verified CUSIP Global Services license is required to receive this data. This field will be null by default for new customers, and null for existing customers starting March 12, 2024. If you would like access to this field, please [request ISIN/CUSIP access here](https://docs.google.com/forms/d/e/1FAIpQLSd9asHEYEfmf8fxJTHZTAfAzW4dugsnSu-HS2J51f1mxwd6Sw/viewform).
           type: string
         sedol:
           description: 7-character SEDOL, an identifier assigned to securities in the UK.
@@ -23569,16 +23629,6 @@ components:
           description: The total quantity of the asset held, as reported by the financial institution.
           type: number
           format: double
-        vested_quantity:
-          type: number
-          format: double
-          description: The total quantity of vested assets held, as reported by the financial institution. Vested assets are only associated with [equities](https://plaid.com/docs/api/products/investments/#investments-holdings-get-response-securities-type).
-          nullable: true
-        vested_value:
-          type: number
-          format: double
-          description: The value of the vested holdings as reported by the institution.
-          nullable: true
         currency:
           description: Either a valid `iso_currency_code` or `unofficial_currency_code`
           type: string
@@ -25422,6 +25472,16 @@ components:
 
             See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `iso_currency_code`s.
           nullable: true
+        vested_quantity:
+          type: number
+          format: double
+          description: The total quantity of vested assets held, as reported by the financial institution. Vested assets are only associated with [equities](https://plaid.com/docs/api/products/investments/#investments-holdings-get-response-securities-type).
+          nullable: true
+        vested_value:
+          type: number
+          format: double
+          description: The value of the vested holdings as reported by the institution.
+          nullable: true
       required:
       - account_id
       - security_id
@@ -26540,7 +26600,7 @@ components:
         ach_class:
           $ref: '#/components/schemas/ACHClass'
         network:
-          $ref: '#/components/schemas/TransferNetwork'
+          $ref: '#/components/schemas/TransferACHNetwork'
         origination_account_id:
           type: string
           description: Plaid’s unique identifier for the origination account that was used for this transfer.
@@ -26717,6 +26777,9 @@ components:
       - web
       description: |-
         Specifies the use case of the transfer. Required for transfers on an ACH network.
+
+        Codes supported for credits: `ccd`, `ppd`
+        Codes supported for debits: `ccd`, `tel`, `web`
 
         `"ccd"` - Corporate Credit or Debit - fund transfer between two corporate bank accounts
 
@@ -27679,7 +27742,7 @@ components:
         type:
           $ref: '#/components/schemas/TransferType'
         network:
-          $ref: '#/components/schemas/TransferNetwork'
+          $ref: '#/components/schemas/TransferACHNetwork'
         ach_class:
           $ref: '#/components/schemas/ACHClass'
         amount:
@@ -31393,6 +31456,10 @@ components:
           description: The maximum integer number of days of history to include in the Base Report.
           minimum: 1
           maximum: 730
+        client_report_id:
+          type: string
+          nullable: true
+          description: Client-generated identifier, which can be used by lenders to track loan applications.
       required:
       - days_requested
     LinkTokenCreateRequestCreditPartnerInsights:
@@ -38620,14 +38687,12 @@ components:
       - webhook_type
       - webhook_code
       - user_id
-      - result
       - environment
       x-examples:
         example-1:
           webhook_type: CRA_INCOME
           webhook_code: BANK_INCOME_COMPLETE
           user_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
-          result: SUCCESS
           environment: production
     CraBankIncomeCompleteResult:
       type: string
@@ -38640,6 +38705,34 @@ components:
         `SUCCESS`: The bank income report was successfully generated and can be retrieved via `/cra/bank_income/get`.
 
         `FAILURE`: The bank income report failed to be generated
+    CraBankIncomeErrorWebhook:
+      type: object
+      title: CraBankIncomeErrorWebhook
+      description: Fired when a bank income report has failed to generate
+      additionalProperties: true
+      properties:
+        webhook_type:
+          type: string
+          description: '`CRA_INCOME`'
+        webhook_code:
+          type: string
+          description: '`ERROR`'
+        user_id:
+          type: string
+          description: The `user_id` corresponding to the user the webhook has fired for.
+        environment:
+          $ref: '#/components/schemas/WebhookEnvironmentValues'
+      required:
+      - webhook_type
+      - webhook_code
+      - user_id
+      - environment
+      x-examples:
+        example-1:
+          webhook_type: CRA_INCOME
+          webhook_code: ERROR
+          user_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
+          environment: production
     BankIncomeCompleteWebhook:
       type: object
       title: BankIncomeCompleteWebhook
@@ -40195,6 +40288,10 @@ components:
         days_requested:
           type: number
           description: The number of days of transaction history requested.
+        client_report_id:
+          type: string
+          nullable: true
+          description: Client-generated identifier, which can be used by lenders to track loan applications.
         items:
           type: array
           description: Data returned by Plaid about each of the Items included in the Base Report.
@@ -41390,9 +41487,9 @@ components:
         Request input for creating a Beacon User.
 
         The primary use for this endpoint is to add a new end user to Beacon for fraud and duplicate scanning.
-        This endpoint can also be used to import historical fraud cases into the Beacon Network without being charged
-        for creating a Beacon User. To import historical fraud cases, embed the fraud report in the optional `report`
-        section of the request payload.
+
+        Some fields are optional, but it is recommended to provide as much information as possible to improve
+        the accuracy of the fraud and duplicate scanning.
       type: object
       properties:
         program_id:
@@ -41629,6 +41726,7 @@ components:
       - street
       - city
       - country
+      nullable: true
       additionalProperties: true
     BeaconUserRequestAddressNullable:
       type: object
@@ -41675,7 +41773,6 @@ components:
       required:
       - date_of_birth
       - name
-      - address
       additionalProperties: true
     BeaconUserReviewRequest:
       description: Request input for updating the status of a Beacon User
@@ -46141,6 +46238,36 @@ components:
       - error_code
       - error_message
       - display_message
+    CraBankIncomeCreateRequest:
+      title: CraBankIncomeCreateRequest
+      type: object
+      description: CraBankIncomeCreateRequest defines the request schema for `/cra/bank_income/create`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        user_token:
+          $ref: '#/components/schemas/UserToken'
+        webhook:
+          type: string
+          description: |
+            The destination URL to which webhooks will be sent
+        days_requested:
+          type: integer
+          description: The number of days of data to request for the Bank Income product
+          minimum: 1
+          maximum: 731
+        consumer_report_permissible_purpose:
+          $ref: '#/components/schemas/ConsumerReportPermissiblePurpose'
+    CraBankIncomeCreateResponse:
+      title: CraBankIncomeCreateResponse
+      additionalProperties: true
+      type: object
+      description: CraBankIncomeCreateRequest defines the response schema for `/cra/bank_income/create`.
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
     CraPartnerInsightsGetRequest:
       title: CraPartnerInsightsGetRequest
       type: object
@@ -46248,8 +46375,8 @@ components:
           $ref: '#/components/schemas/PrismInsights'
         cash_score:
           $ref: '#/components/schemas/PrismCashScore'
-        detect:
-          $ref: '#/components/schemas/PrismDetect'
+        first_detect:
+          $ref: '#/components/schemas/PrismFirstDetect'
         status:
           type: string
           description: Details on whether the Prism attributes succeeded or failed to be generated.
@@ -46271,7 +46398,7 @@ components:
     PrismInsightsResult:
       type: object
       title: PrismInsightsResult
-      description: The Insights Result object is a map of cash flow attributes, in string to float format.
+      description: The Insights Result object is a map of cash flow attributes, where the key is a string, and the value is a float or string.
     PrismCashScore:
       type: object
       additionalProperties: true
@@ -46350,21 +46477,21 @@ components:
       - num_trxn_debit
       - l1m_credit_value_cnt
       - l1m_debit_value_cnt
-    PrismDetect:
+    PrismFirstDetect:
       type: object
       additionalProperties: true
-      description: The data from the Detect product returned by Prism.
+      description: The data from the Firstdetect product returned by Prism.
       nullable: true
       properties:
         version:
           type: integer
-          description: The version of Prism's detect model used.
+          description: The version of Prism's Firstdetect model used.
         score:
           type: integer
           description: The score returned by Prism. Ranges from 1-999, with higher score indicating lower risk.
         reason_codes:
           type: array
-          description: The reasons for an individual having risk according to the detect cash score.
+          description: The reasons for an individual having risk according to the Firstdetect score.
           items:
             type: string
         metadata:
