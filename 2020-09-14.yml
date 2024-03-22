@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.502.4
+  version: 2020-09-14_1.503.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -726,6 +726,34 @@ paths:
                         institution_name: First Platypus Bank
                     request_id: GVzMdiDd8DDAQK4
       description: This endpoint allows the customer to retrieve a Base Report. Customers should pass in the `user_token` created in `/link/token/create`.
+  /cra/base_report/create:
+    x-plaid-business-unit-context: BUSINESS_UNIT_CRA
+    post:
+      summary: Create a Base Report
+      tags:
+      - plaid
+      operationId: baseReportCreate
+      x-hidden-from-docs: true
+      externalDocs:
+        url: /none/
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BaseReportCreateRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseReportCreateResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: GVzMdiDd8DDAQK4
+      description: This endpoint allows the customer to create a Base Report by passing in a user token. The Base Report will be generated based on the most recently linked item from the user token.
   /credit/audit_copy_token/update:
     x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
@@ -19004,7 +19032,7 @@ components:
       - request_id
     LinkTokenCreateRequestAuth:
       type: object
-      description: Specifies options for initializing Link for use with the Auth product. This field can be used to enable or disable extended Auth flows for the resulting Link session. Omitting any field will result in a default that can be configured by your account manager.
+      description: Specifies options for initializing Link for use with the Auth product. This field can be used to enable or disable extended Auth flows for the resulting Link session. Omitting any field will result in a default that can be configured by your account manager. The default behavior described in the documentation is the default behavior that will apply if you have not requested your account manager to apply a different default.
       properties:
         auth_type_select_enabled:
           type: boolean
@@ -19012,16 +19040,16 @@ components:
           default: false
         automated_microdeposits_enabled:
           type: boolean
-          description: Specifies whether the Link session is enabled for the Automated Micro-deposits flow.
+          description: Specifies whether the Link session is enabled for the Automated Micro-deposits flow. Default behavior is `false`.
         instant_match_enabled:
           type: boolean
           description: Specifies whether the Link session is enabled for the Instant Match flow. As of November 2022, Instant Match will be enabled by default. Instant Match can be disabled by setting this field to `false`.
         same_day_microdeposits_enabled:
           type: boolean
-          description: Specifies whether the Link session is enabled for the Same Day Micro-deposits flow.
+          description: Specifies whether the Link session is enabled for the Same Day Micro-deposits flow.  Default behavior is `false`.
         instant_microdeposits_enabled:
           type: boolean
-          description: Specifies whether the Link session is enabled for the Instant Micro-deposits flow.
+          description: Specifies whether the Link session is enabled for the Instant Micro-deposits flow.  Default behavior is `true`.
         reroute_to_credentials:
           type: string
           enum:
@@ -20304,12 +20332,12 @@ components:
       description: |-
         A description of the update status for transaction pulls of an item.
 
-        `TRANSACTIONS_UPDATE_STATE_UNKNOWN`: Error, unable to fetch transactions update state for item.
+        `TRANSACTIONS_UPDATE_STATUS_UNKNOWN`: Unable to fetch transactions update status for item.
         `NOT_READY`: The item is pending transaction pull.
         `INITIAL_UPDATE_COMPLETE`: Initial pull for the item is complete, pending Historical pull.
         `HISTORICAL_UPDATE_COMPLETE`: Both Initial and Historical pull for item is complete.
       enum:
-      - TRANSACTIONS_UPDATE_STATE_UNKNOWN
+      - TRANSACTIONS_UPDATE_STATUS_UNKNOWN
       - NOT_READY
       - INITIAL_UPDATE_COMPLETE
       - HISTORICAL_UPDATE_COMPLETE
@@ -38779,7 +38807,7 @@ components:
     CraPartnerInsightsCompleteWebhook:
       type: object
       title: CraPartnerInsightsCompleteWebhook
-      description: Fired when a partner insights report has finished generating or failed to generate.
+      description: Fired when a partner insights report has finished generating and results are available
       additionalProperties: true
       properties:
         webhook_type:
@@ -38791,37 +38819,47 @@ components:
         user_id:
           type: string
           description: The `user_id` corresponding to the user the webhook has fired for.
-        result:
-          $ref: '#/components/schemas/CraPartnerInsightsCompleteResult'
         environment:
           $ref: '#/components/schemas/WebhookEnvironmentValues'
       required:
       - webhook_type
       - webhook_code
       - user_id
-      - result
       - environment
       x-examples:
         example-1:
           webhook_type: CRA_INSIGHTS
           webhook_code: PARTNER_INSIGHTS_COMPLETE
           user_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
-          result: SUCCESS
           environment: production
-    CraPartnerInsightsCompleteResult:
-      type: string
-      enum:
-      - SUCCESS
-      - FAILURE
-      - PARTIAL_SUCCESS
-      description: |-
-        The result of the partner insights report generation
-
-        `SUCCESS`: All insights in the partner insights report were successfully generated and can be retrieved via `/cra/partner_insights/get`.
-
-        `FAILURE`: The partner insights report failed to be generated.
-
-        `PARTIAL_SUCCESS`: Some, but not all, insights in the partner insights report were successfully generated and can be retrieved via `/cra/partner_insights/get`.
+    CraPartnerInsightsErrorWebhook:
+      type: object
+      title: CraPartnerInsightsErrorWebhook
+      description: Fired when a partner insights report has failed to generate
+      additionalProperties: true
+      properties:
+        webhook_type:
+          type: string
+          description: '`CRA_INSIGHTS`'
+        webhook_code:
+          type: string
+          description: '`PARTNER_INSIGHTS_ERROR`'
+        user_id:
+          type: string
+          description: The `user_id` corresponding to the user the webhook has fired for.
+        environment:
+          $ref: '#/components/schemas/WebhookEnvironmentValues'
+      required:
+      - webhook_type
+      - webhook_code
+      - user_id
+      - environment
+      x-examples:
+        example-1:
+          webhook_type: CRA_INSIGHTS
+          webhook_code: PARTNER_INSIGHTS_ERROR
+          user_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
+          environment: production
     IncomeVerificationRefreshReconnectNeededWebhook:
       type: object
       title: IncomeVerificationRefreshReconnectNeededWebhook
@@ -39468,6 +39506,43 @@ components:
           $ref: '#/components/schemas/RequestID'
       required:
       - removed
+      - request_id
+    BaseReportCreateRequest:
+      type: object
+      x-hidden-from-docs: true
+      description: BaseReportCreateRequest defines the request schema for `/cra/base_report/create`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        user_token:
+          $ref: '#/components/schemas/UserToken'
+        days_requested:
+          type: integer
+          maximum: 731
+          minimum: 0
+          description: The duration of transaction history you requested
+        webhook:
+          type: string
+          description: URL to which Plaid will send Assets webhooks, for example when the requested Asset Report is ready.
+          nullable: true
+        consumer_report_permissible_purpose:
+          $ref: '#/components/schemas/ConsumerReportPermissiblePurpose'
+      required:
+      - user_token
+      - days_requested
+      - webhook
+      - consumer_report_permissible_purpose
+    BaseReportCreateResponse:
+      type: object
+      x-hidden-from-docs: true
+      additionalProperties: true
+      description: BaseReportCreateResponse defines the response schema for `cra/base_report/create`
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
       - request_id
     BaseReportGetRequest:
       type: object
@@ -40386,7 +40461,6 @@ components:
       - transactions
       - owners
       - ownership_type
-      - historical_balances
     BaseReportAccountBalances:
       title: BaseReportAccountBalances
       description: Base Report information about an account's balances
