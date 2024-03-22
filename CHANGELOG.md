@@ -1,3 +1,6 @@
+### 2020-09-14_1.503.0
+- Add new `/cra/base_report/create` endpoint
+
 ### 2020-09-14_1.502.4
 - Add `sms_microdeposits_verification_enabled` to `auth` object inside `/link/token/create` calls.
 
