@@ -1,3 +1,18 @@
+### 2020-09-14_1.503.5
+- Improve description for `RiskCheckIdentityAbuseSignals`
+
+### 2020-09-14_1.503.4
+- Improve description for `TransferNetworkTraceID`
+
+### 2020-09-14_1.503.3
+- Update description for `TransferNetworkTraceID`
+
+### 2020-09-14_1.503.2
+- Change `forecasted_average_monthly_income_prediction_intervals` to plural.
+
+### 2020-09-14_1.503.1
+- Add `has_more` field to /transfer/event/list and /transfer/event/sync to indicate there are more events to be pulled
+
 ### 2020-09-14_1.503.0
 - Add new `/cra/base_report/create` endpoint
 
