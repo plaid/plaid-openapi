@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.503.0
+  version: 2020-09-14_1.503.5
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -866,7 +866,7 @@ paths:
                           historical_average_monthly_gross_income: 390
                           historical_average_monthly_income: 300
                           forecasted_average_monthly_income: 300
-                          forecasted_average_monthly_income_prediction_interval:
+                          forecasted_average_monthly_income_prediction_intervals:
                           - lower_bound: 200
                             upper_bound: 400
                             probability: 0.8
@@ -1480,6 +1480,7 @@ paths:
                         postal_code: "41006"
                         country: US
                       email: leslie@knope.com
+                      phone: "+14151234567"
                       date_of_birth: "1975-01-18"
                       ssn: "987654321"
                       ssn_last_4: "4321"
@@ -1806,7 +1807,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/PlaidError'
           description: Error response
-      description: "`/transactions/refresh` is an optional endpoint that initiates an on-demand extraction to fetch the newest transactions for an Item. The on-demand extraction takes place in addition to the periodic extractions that automatically occur one or more times per day for any Transactions-enabled Item. The Item must already have Transactions added as a product in order to call `/transactions/refresh`. \n\nIf changes to transactions are discovered after calling `/transactions/refresh`, Plaid will fire a webhook: for `/transactions/sync` users, [`SYNC_UPDATES_AVAILABLE`](https://plaid.com/docs/api/products/transactions/#sync_updates_available) will be fired if there are any transactions updated, added, or removed. For users of both `/transactions/sync` and `/transactions/get`, [`TRANSACTIONS_REMOVED`](https://plaid.com/docs/api/products/transactions/#transactions_removed) will be fired if any removed transactions are detected, and [`DEFAULT_UPDATE`](https://plaid.com/docs/api/products/transactions/#default_update) will be fired if any new transactions are detected. New transactions can be fetched by calling `/transactions/get` or `/transactions/sync`. \n\nNote that the `/transactions/refresh` endpoint is not supported for Capital One (`ins_128026`) and will result in a `PRODUCTS_NOT_SUPPORTED` error if called on an Item from that institution. \n\n\nAs this endpoint triggers a synchronous request for fresh data, latency may be higher than for other Plaid endpoints (typically less than 10 seconds, but occasionally up to 30 seconds or more); if you encounter errors, you may find it necessary to adjust your timeout period when making requests.\n\n`/transactions/refresh` is offered as an optional add-on to Transactions and has a separate [fee model](/docs/account/billing/#per-request-flat-fee). To request access to this endpoint, submit a [product access request](https://dashboard.plaid.com/team/products) or contact your Plaid account manager."
+      description: |-
+        `/transactions/refresh` is an optional endpoint that initiates an on-demand extraction to fetch the newest transactions for an Item. The on-demand extraction takes place in addition to the periodic extractions that automatically occur one or more times per day for any Transactions-enabled Item. The Item must already have Transactions added as a product in order to call `/transactions/refresh`.
+
+        If changes to transactions are discovered after calling `/transactions/refresh`, Plaid will fire a webhook: for `/transactions/sync` users, [`SYNC_UPDATES_AVAILABLE`](https://plaid.com/docs/api/products/transactions/#sync_updates_available) will be fired if there are any transactions updated, added, or removed. For users of both `/transactions/sync` and `/transactions/get`, [`TRANSACTIONS_REMOVED`](https://plaid.com/docs/api/products/transactions/#transactions_removed) will be fired if any removed transactions are detected, and [`DEFAULT_UPDATE`](https://plaid.com/docs/api/products/transactions/#default_update) will be fired if any new transactions are detected. New transactions can be fetched by calling `/transactions/get` or `/transactions/sync`.
+
+        Note that the `/transactions/refresh` endpoint is not supported for Capital One (`ins_128026`) and will result in a `PRODUCTS_NOT_SUPPORTED` error if called on an Item from that institution.
+
+
+        As this endpoint triggers a synchronous request for fresh data, latency may be higher than for other Plaid endpoints (typically less than 10 seconds, but occasionally up to 30 seconds or more); if you encounter errors, you may find it necessary to adjust your timeout period when making requests.
+
+        `/transactions/refresh` is offered as an optional add-on to Transactions and has a separate [fee model](/docs/account/billing/#per-request-flat-fee). To request access to this endpoint, submit a [product access request](https://dashboard.plaid.com/team/products) or contact your Plaid account manager.
       requestBody:
         required: true
         content:
@@ -10016,6 +10027,7 @@ paths:
                       sweep_amount: null
                       sweep_id: null
                       timestamp: "2019-12-09T17:27:15Z"
+                    has_more: true
                     request_id: mdqfuVxeoza6mhu
         default:
           description: Error response
@@ -10109,6 +10121,7 @@ paths:
                       sweep_amount: null
                       sweep_id: null
                       timestamp: "2019-12-09T17:27:15Z"
+                    has_more: true
                     request_id: mdqfuVxeoza6mhu
         default:
           description: Error response
@@ -17290,6 +17303,9 @@ components:
           $ref: '#/components/schemas/ProfileIdentityName'
         address:
           $ref: '#/components/schemas/ProfileIdentityAddress'
+        phone_number:
+          type: string
+          description: The user's phone number in [E.164](https://en.wikipedia.org/wiki/E.164) format
         email:
           description: The user's email address.
           type: string
@@ -26857,8 +26873,8 @@ components:
         The trace identifier for the transfer based on its network. This will only be set after the transfer has posted.
 
         For `ach` or `same-day-ach` transfers, this is the ACH trace number.
+        For `rtp` transfers, this is the Transaction Identification number.
         For `wire` transfers, this is the IMAD (Input Message Accountability Data) number.
-        The field will remain null for transfers on other rails.
       nullable: true
     TransferIntentGetFailureReason:
       title: TransferIntentGetFailureReason
@@ -28701,10 +28717,14 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/TransferEvent'
+        has_more:
+          type: boolean
+          description: Whether there are more events to be pulled from the endpoint that have not already been returned
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
       - transfer_events
+      - has_more
       - request_id
     BankTransferEventListResponse:
       title: BankTransferEventListResponse
@@ -28790,10 +28810,14 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/TransferEvent'
+        has_more:
+          type: boolean
+          description: Whether there are more events to be pulled from the endpoint that have not already been returned
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
       - transfer_events
+      - has_more
       - request_id
     BankTransferSweepGetRequest:
       title: BankTransferSweepGetRequest
@@ -44291,7 +44315,7 @@ components:
       - no_data
     RiskCheckIdentityAbuseSignals:
       type: object
-      description: Result summary object capturing abuse signals related to `identity abuse`, e.g. stolen and synthetic identity fraud.
+      description: Result summary object capturing abuse signals related to `identity abuse`, e.g. stolen and synthetic identity fraud. These attributes are only available for US identities and some signals may not be available depending on what information was collected.
       properties:
         synthetic_identity:
           $ref: '#/components/schemas/RiskCheckSyntheticIdentity'
@@ -46105,7 +46129,7 @@ components:
           type: number
           description: The predicted average monthly net income amount for the income source(s).
           nullable: true
-        forecasted_average_monthly_income_prediction_interval:
+        forecasted_average_monthly_income_prediction_intervals:
           type: array
           description: The prediction interval(s) for the forecasted average monthly income.
           items:
@@ -46117,7 +46141,7 @@ components:
           items:
             $ref: '#/components/schemas/CraBankIncomeHistoricalSummary'
       required:
-      - forecasted_average_monthly_income_prediction_interval
+      - forecasted_average_monthly_income_prediction_intervals
     CraPredictionInterval:
       description: The object containing prediction interval data.
       type: object
@@ -46267,6 +46291,18 @@ components:
           $ref: '#/components/schemas/CreditIsoCurrencyCode'
         unofficial_currency_code:
           $ref: '#/components/schemas/CreditUnofficialCurrencyCode'
+        bonus_type:
+          $ref: '#/components/schemas/CraBankIncomeBonusType'
+    CraBankIncomeBonusType:
+      type: string
+      description: |-
+        The type of bonus that this transaction represents, if it is a bonus
+        `BONUS_INCLUDED`: Bonus is included in this transaction along with the normal pay
+        `BONUS_ONLY`: This transaction is a standalone bonus
+      enum:
+      - BONUS_INCLUDED
+      - BONUS_ONLY
+      nullable: true
     CraBankIncomeWarning:
       type: object
       description: The warning associated with the data that was unavailable for the Bank Income Report.
