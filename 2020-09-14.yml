@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.503.5
+  version: 2020-09-14_1.508.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -940,6 +940,18 @@ paths:
                         - amount: 300
                           iso_currency_code: USD
                           unofficial_currency_code: null
+                        historical_annual_gross_income:
+                        - amount: 4680
+                          iso_currency_code: USD
+                          unofficial_currency_code: null
+                        historical_annual_income:
+                        - amount: 3600
+                          iso_currency_code: USD
+                          unofficial_currency_code: null
+                        forecasted_annual_income:
+                        - amount: 3600
+                          iso_currency_code: USD
+                          unofficial_currency_code: null
                         historical_summary:
                         - start_date: "2021-11-02"
                           end_date: "2021-11-30"
@@ -1151,7 +1163,7 @@ paths:
     post:
       tags:
       - plaid
-      summary: Retrieve a list of all statements associated with the provided item.
+      summary: Retrieve a list of all statements associated with an item.
       externalDocs:
         url: /api/products/statements#statementslist
       responses:
@@ -1180,7 +1192,7 @@ paths:
                         year: 2023
                     request_id: eYupqX1mZkEuQRx
       operationId: statementsList
-      description: The `/statements/list` endpoint retrieves a list of all statements associated with the provided item.
+      description: The `/statements/list` endpoint retrieves a list of all statements associated with an item.
       requestBody:
         required: true
         content:
@@ -1984,6 +1996,19 @@ paths:
               examples:
                 example-1:
                   value:
+                    accounts:
+                    - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
+                      balances:
+                        available: 110.94
+                        current: 110.94
+                        iso_currency_code: USD
+                        limit: null
+                        unofficial_currency_code: null
+                      mask: "0000"
+                      name: Plaid Checking
+                      official_name: Plaid Gold Standard 0% Interest Checking
+                      subtype: checking
+                      type: depository
                     added:
                     - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
                       account_owner: null
@@ -2104,10 +2129,12 @@ paths:
                       transaction_code: null
                       transaction_type: digital
                     removed:
-                    - transaction_id: CmdQTNgems8BT1B7ibkoUXVPyAeehT3Tmzk0l
+                    - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
+                      transaction_id: CmdQTNgems8BT1B7ibkoUXVPyAeehT3Tmzk0l
                     next_cursor: tVUUL15lYQN5rBnfDIc1I8xudpGdIlw9nsgeXWvhOfkECvUeR663i3Dt1uf/94S8ASkitgLcIiOSqNwzzp+bh89kirazha5vuZHBb2ZA5NtCDkkV
                     has_more: false
                     request_id: Wvhy9PZHQLV8njG
+                    transactions_update_status: HISTORICAL_UPDATE_COMPLETE
         default:
           content:
             application/json:
@@ -2134,8 +2161,6 @@ paths:
         For newly created Items, data may not be immediately available to `/transactions/sync`. Plaid begins preparing transactions data when the Item is created, but the process can take anywhere from a few seconds to several minutes to complete, depending on the number of transactions available.
 
         To be alerted when new data is available, listen for the [`SYNC_UPDATES_AVAILABLE`](https://plaid.com/docs/api/products/transactions/#sync_updates_available) webhook.
-
-        `/transactions/sync` does not directly return balance data. To get the balance for an account, call `/accounts/get`, which is a free-to-use endpoint that will return the cached balance as of the last successful transactions update.
       requestBody:
         required: true
         content:
@@ -3169,6 +3194,151 @@ paths:
             schema:
               $ref: '#/components/schemas/IdentityGetRequest'
         description: ""
+  /identity/documents/uploads/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
+    x-hidden-from-docs: true
+    post:
+      tags:
+      - plaid
+      summary: Returns uploaded document identity
+      externalDocs:
+        url: none
+      operationId: identityDocumentsUploadsGet
+      description: Use `/identity/documents/uploads/get` to retrieve document uploaded identity.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityDocumentsUploadsGetResponse'
+              examples:
+                example-1:
+                  value:
+                    accounts:
+                    - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
+                      balances:
+                        available: 100
+                        current: 110
+                        iso_currency_code: USD
+                        limit: null
+                        unofficial_currency_code: null
+                      mask: "0000"
+                      name: Plaid Checking
+                      official_name: Plaid Gold Standard 0% Interest Checking
+                      owners:
+                      - addresses:
+                        - data:
+                            city: Malakoff
+                            country: US
+                            postal_code: "14236"
+                            region: NY
+                            street: 2992 Cameron Road
+                          primary: true
+                        - data:
+                            city: San Matias
+                            country: US
+                            postal_code: 93405-2255
+                            region: CA
+                            street: 2493 Leisure Lane
+                          primary: false
+                        emails:
+                        - data: accountholder0@example.com
+                          primary: true
+                          type: primary
+                        - data: accountholder1@example.com
+                          primary: false
+                          type: secondary
+                        - data: extraordinarily.long.email.username.123456@reallylonghostname.com
+                          primary: false
+                          type: other
+                        names:
+                        - Alberta Bobbeth Charleson
+                        phone_numbers:
+                        - data: "1112223333"
+                          primary: false
+                          type: home
+                        - data: "1112224444"
+                          primary: false
+                          type: work
+                        - data: "1112225555"
+                          primary: false
+                          type: mobile
+                      subtype: checking
+                      type: depository
+                    - account_id: 3gE5gnRzNyfXpBK5wEEKcymJ5albGVUqg77gr
+                      balances:
+                        available: 200
+                        current: 210
+                        iso_currency_code: USD
+                        limit: null
+                        unofficial_currency_code: null
+                      mask: "1111"
+                      name: Plaid Saving
+                      official_name: Plaid Silver Standard 0.1% Interest Saving
+                      owners:
+                      - addresses:
+                        - data:
+                            city: Malakoff
+                            country: US
+                            postal_code: "14236"
+                            region: NY
+                            street: 2992 Cameron Road
+                          primary: true
+                        - data:
+                            city: San Matias
+                            country: US
+                            postal_code: 93405-2255
+                            region: CA
+                            street: 2493 Leisure Lane
+                          primary: false
+                        emails:
+                        - data: accountholder0@example.com
+                          primary: true
+                          type: primary
+                        - data: accountholder1@example.com
+                          primary: false
+                          type: secondary
+                        - data: extraordinarily.long.email.username.123456@reallylonghostname.com
+                          primary: false
+                          type: other
+                        names:
+                        - Alberta Bobbeth Charleson
+                        phone_numbers:
+                        - data: "1112223333"
+                          primary: false
+                          type: home
+                        - data: "1112224444"
+                          primary: false
+                          type: work
+                        - data: "1112225555"
+                          primary: false
+                          type: mobile
+                      subtype: savings
+                      type: depository
+                    item:
+                      available_products:
+                      - balance
+                      - investments
+                      billed_products:
+                      - assets
+                      - auth
+                      - identity
+                      - liabilities
+                      - transactions
+                      consent_expiration_time: null
+                      error: null
+                      institution_id: ins_3
+                      item_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBFL9DrE6
+                      update_type: background
+                      webhook: https://www.genericwebhookurl.com/webhook
+                    request_id: 3nARps6TOYtbACO
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentityDocumentsUploadsGetRequest'
   /identity/match:
     x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
@@ -5846,6 +6016,19 @@ paths:
               examples:
                 example-1:
                   value:
+                    account:
+                      account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
+                      balances:
+                        available: 110.94
+                        current: 110.94
+                        iso_currency_code: USD
+                        limit: null
+                        unofficial_currency_code: null
+                      mask: "0000"
+                      name: Plaid Checking
+                      official_name: Plaid Gold Standard 0% Interest Checking
+                      subtype: checking
+                      type: depository
                     added:
                     - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
                       account_owner: null
@@ -5970,6 +6153,7 @@ paths:
                     next_cursor: tVUUL15lYQN5rBnfDIc1I8xudpGdIlw9nsgeXWvhOfkECvUeR663i3Dt1uf/94S8ASkitgLcIiOSqNwzzp+bh89kirazha5vuZHBb2ZA5NtCDkkV
                     has_more: false
                     request_id: 45QSn
+                    transactions_update_status: HISTORICAL_UPDATE_COMPLETE
         default:
           content:
             application/json:
@@ -8714,6 +8898,39 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/DepositSwitchTokenCreateRequest'
+  /link/profile/eligibility/check:
+    x-hidden-from-docs: true
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
+    post:
+      tags:
+      - plaid
+      summary: Check profile eligibility
+      externalDocs:
+        url: /api/link/#profileeligibilitycheck
+      operationId: linkProfileEligibilityCheck
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LinkProfileEligibilityCheckResponse'
+              examples:
+                example-1:
+                  value:
+                    profile_matches: true
+                    request_id: XQVgFigpGHXkb0b
+      description: |-
+        The `/link/profile/eligibility/check` endpoint can be used to check whether a user with the
+        supplied phone number has a saved profile that satisfies customer-defined eligibility
+        requirements.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LinkProfileEligibilityCheckRequest'
+        description: ""
   /link/token/create:
     x-plaid-business-unit-context: BUSINESS_UNIT_UNDETERMINED
     post:
@@ -9155,7 +9372,8 @@ paths:
   /transfer/balance/get:
     x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
-      summary: Retrieve a balance held with Plaid
+      summary: (Deprecated) Retrieve a balance held with Plaid
+      deprecated: true
       tags:
       - plaid
       externalDocs:
@@ -9181,7 +9399,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
-      description: Use the `/transfer/balance/get` endpoint to view a balance held with Plaid.
+      description: (Deprecated) Use the `/transfer/balance/get` endpoint to view a balance held with Plaid.
       requestBody:
         required: true
         content:
@@ -15592,7 +15810,6 @@ components:
           $ref: '#/components/schemas/TransactionsUpdateStatus'
         accounts:
           type: array
-          x-hidden-from-docs: true
           description: An array of accounts at a financial institution associated with the transactions in this response.
           items:
             $ref: '#/components/schemas/AccountBase'
@@ -15620,12 +15837,14 @@ components:
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
+      - accounts
       - added
       - modified
       - removed
       - next_cursor
       - has_more
       - request_id
+      - transactions_update_status
     InstitutionsGetRequest:
       type: object
       description: InstitutionsGetRequest defines the request schema for `/institutions/get`
@@ -16085,6 +16304,8 @@ components:
           $ref: '#/components/schemas/SandboxOverridePassword'
         transactions:
           $ref: '#/components/schemas/SandboxPublicTokenCreateRequestOptionsTransactions'
+        statements:
+          $ref: '#/components/schemas/SandboxPublicTokenCreateRequestOptionsStatements'
         income_verification:
           $ref: '#/components/schemas/SandboxPublicTokenCreateRequestOptionsIncomeVerification'
     SandboxPublicTokenCreateRequestOptionsTransactions:
@@ -16107,6 +16328,23 @@ components:
           default: 90
           x-hidden-from-docs: true
       title: SandboxPublicTokenCreateRequestOptionsTransactions
+    SandboxPublicTokenCreateRequestOptionsStatements:
+      title: SandboxPublicTokenCreateRequestOptionsStatements
+      type: object
+      nullable: true
+      description: An optional set of parameters corresponding to statements options.
+      properties:
+        start_date:
+          type: string
+          format: date
+          description: The earliest date for which to fetch statements history. Dates should be formatted as YYYY-MM-DD.
+        end_date:
+          type: string
+          format: date
+          description: The most recent date for which to fetch statements history. Dates should be formatted as YYYY-MM-DD.
+      required:
+      - start_date
+      - end_date
     SandboxPublicTokenCreateRequestOptionsIncomeVerification:
       type: object
       description: A set of parameters for income verification options. This field is required if `income_verification` is included in the `initial_products` array.
@@ -16559,6 +16797,10 @@ components:
       additionalProperties: true
       description: ProcessorTransactionsSyncResponse defines the response schema for `/processor/transactions/sync`
       properties:
+        transactions_update_status:
+          $ref: '#/components/schemas/TransactionsUpdateStatus'
+        account:
+          $ref: '#/components/schemas/AccountBase'
         added:
           type: array
           description: Transactions that have been added to the Item since `cursor` ordered by ascending last modified time.
@@ -16583,12 +16825,14 @@ components:
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
+      - account
       - added
       - modified
       - removed
       - next_cursor
       - has_more
       - request_id
+      - transactions_update_status
     ProcessorTransactionsRefreshRequest:
       type: object
       description: ProcessorTransactionsRefreshRequest defines the request schema for `/processor/transactions/refresh`
@@ -18736,7 +18980,7 @@ components:
           description: The name of the Link customization from the Plaid Dashboard to be applied to Link. If not specified, the `default` customization will be used. When using a Link customization, the language in the customization must match the language selected via the `language` parameter, and the countries in the customization should match the country codes selected via `country_codes`.
         redirect_uri:
           type: string
-          description: A URI indicating the destination where a user should be forwarded after completing the Link flow; used to support OAuth authentication flows when launching Link in the browser or via a webview. The `redirect_uri` should not contain any query parameters. When used in Production or Development, must be an https URI. To specify any subdomain, use `*` as a wildcard character, e.g. `https://*.example.com/oauth.html`. Note that any redirect URI must also be added to the Allowed redirect URIs list in the [developer dashboard](https://dashboard.plaid.com/team/api). If initializing on Android, `android_package_name` must be specified instead and `redirect_uri` should be left blank. If using Hosted Link (beta) the `redirect_uri` must be set to `https://hosted.plaid.com/oauth/redirect`.
+          description: A URI indicating the destination where a user should be forwarded after completing the Link flow; used to support OAuth authentication flows when launching Link in the browser or another app. The `redirect_uri` should not contain any query parameters. When used in Production or Development, must be an https URI. To specify any subdomain, use `*` as a wildcard character, e.g. `https://*.example.com/oauth.html`. Note that any redirect URI must also be added to the Allowed redirect URIs list in the [developer dashboard](https://dashboard.plaid.com/team/api). If initializing on Android, `android_package_name` must be specified instead and `redirect_uri` should be left blank. If using Hosted Link, the `redirect_uri` must be set to `https://hosted.plaid.com/oauth/redirect`.
         android_package_name:
           type: string
           description: The name of your app's Android package. Required if using the `link_token` to initialize Link on Android. Any package name specified here must also be added to the Allowed Android package names setting on the [developer dashboard](https://dashboard.plaid.com/team/api). When creating a `link_token` for initializing Link on other platforms, `android_package_name` must be left blank and `redirect_uri` should be used instead.
@@ -18861,7 +19105,7 @@ components:
           maximum: 730
           default: 90
     LinkTokenCreateHostedLink:
-      description: Configuration parameters for Hosted Link (beta). Only available for participants in the Hosted Link beta program.
+      description: Configuration parameters for Hosted Link. To request access to Hosted Link, contact your account manager.
       additionalProperties: true
       type: object
       properties:
@@ -18876,14 +19120,13 @@ components:
     HostedLinkDeliveryMethod:
       type: string
       description: |
-        How Plaid should deliver the Plaid Link session to the customer.
+        How Plaid should deliver the Plaid Link session to the customer. Only available to customers enabled for Link Delivery (beta). To request Link Delivery access, contact your account manager.
         'sms' will deliver via SMS. Must pass `user.phone_number`.
-        'email' will deliver via email. Must pass `user.email_address`. In the Sandbox environment, this field will be ignored; use the Production or Development environment to test Hosted Link session delivery instead.
+        'email' will deliver via email. Must pass `user.email_address`. In the Sandbox environment, this field will be ignored; use the Production or Development environment to test Link Delivery instead.
       enum:
       - sms
       - email
     HostedLinkCompletionRedirectURI:
-      x-hidden-from-docs: true
       type: string
       description: |
         URI that Hosted Link will redirect to upon completion of the Link flow. This will only occur in Hosted Link sessions, not in other implementation methods.
@@ -18895,7 +19138,7 @@ components:
       type: boolean
       default: false
       description: |
-        This indicates whether the client is opening hosted Link in a mobile app in an out of process web view (OOPWV).
+        This indicates whether the client is opening hosted Link in a mobile app in an out of process web view (OOPWV) (i.e., an `AsWebAuthenticationSession` / `SFSafariViewController` or Android Custom Tab).
     LinkTokenCreateIdentity:
       type: object
       description: Identity object used to specify document upload
@@ -18962,16 +19205,19 @@ components:
           $ref: '#/components/schemas/UserStatedIncomeSourceFrequency'
     LinkTokenCreateRequestStatements:
       type: object
-      description: Specifies options for initializing Link for use with the Statements product.
+      description: Specifies options for initializing Link for use with the Statements product. This field is required for the statements product.
       properties:
         start_date:
           type: string
           format: date
-          description: The start date for statements, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) “YYYY-MM-DD” format, e.g. "2020-10-30". If no value is provided, this will default to 3 months prior to the current date.
+          description: The start date for statements, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) “YYYY-MM-DD” format, e.g. "2020-10-30".
         end_date:
           type: string
           format: date
-          description: The end date for statements, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) “YYYY-MM-DD” format, e.g. "2020-10-30". If no value is provided, this will default to the current date. You can request up to two years of data.
+          description: The end date for statements, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) “YYYY-MM-DD” format, e.g. "2020-10-30". You can request up to two years of data.
+      required:
+      - start_date
+      - end_date
     UserStatedIncomeSourceCategory:
       type: string
       description: The income category for a specified income source
@@ -19052,44 +19298,42 @@ components:
       properties:
         auth_type_select_enabled:
           type: boolean
-          description: Specifies whether Auth Type Select is enabled for the Link session, allowing the end user to choose between linking instantly or manually prior to selecting their financial institution. Note that this can only be true if `same_day_microdeposits_enabled` is set to true.
-          default: false
+          description: Specifies whether Auth Type Select is enabled for the Link session, allowing the end user to choose between linking via a credentials-based flow (i.e. Instant Auth, Instant Match, Automated Micro-deposits) or a manual flow that does not require login (all other Auth flows) prior to selecting their financial institution. Default behavior is `false`.
         automated_microdeposits_enabled:
           type: boolean
           description: Specifies whether the Link session is enabled for the Automated Micro-deposits flow. Default behavior is `false`.
         instant_match_enabled:
           type: boolean
-          description: Specifies whether the Link session is enabled for the Instant Match flow. As of November 2022, Instant Match will be enabled by default. Instant Match can be disabled by setting this field to `false`.
+          description: Specifies whether the Link session is enabled for the Instant Match flow. Instant Match is enabled by default. Instant Match can be disabled by setting this field to `false`.
         same_day_microdeposits_enabled:
           type: boolean
           description: Specifies whether the Link session is enabled for the Same Day Micro-deposits flow.  Default behavior is `false`.
         instant_microdeposits_enabled:
           type: boolean
-          description: Specifies whether the Link session is enabled for the Instant Micro-deposits flow.  Default behavior is `true`.
+          description: Specifies whether the Link session is enabled for the Instant Micro-deposits flow.  Default behavior for Plaid teams created after November 2023 is `false`; default behavior for Plaid teams created before that date is `true`.
         reroute_to_credentials:
           type: string
           enum:
           - "OFF"
           - OPTIONAL
           - FORCED
-          description: Specifies what type of [Reroute to Credentials](https://plaid.com/docs/auth/coverage/same-day/#reroute-to-credentials) pane should be used in the Link session for the Same Day Micro-deposits flow. As of October 15 2023, the default setting is `OPTIONAL`.
+          description: Specifies what type of [Reroute to Credentials](https://plaid.com/docs/auth/coverage/same-day/#reroute-to-credentials) pane should be used in the Link session for the Same Day Micro-deposits flow. Default behavior is `OPTIONAL`.
         database_match_enabled:
           type: boolean
-          description: Specifies whether the Link session is enabled for the Database Match flow.
-          x-hidden-from-docs: true
+          description: Specifies whether the Link session is enabled for the Database Match flow. Default behavior is `false`.
         database_insights_enabled:
           type: boolean
-          description: Specifies whether the Link session is enabled for the Database Insights flow.
-          x-hidden-from-docs: true
+          description: Specifies whether the Link session is enabled for the Database Insights flow. Database Insights is currently in closed beta; for access, contact your Account Manager. Default behavior is `false`.
         flow_type:
           type: string
           enum:
           - FLEXIBLE_AUTH
           description: This field has been deprecated in favor of `auth_type_select_enabled`.
           deprecated: true
+          x-plaid-hidden-from-docs: true
         sms_microdeposits_verification_enabled:
           type: boolean
-          description: Specifies whether the Link session is enabled for SMS microdeposits verification. If omitted, behavior defaults to as if this was set to `true`.
+          description: Specifies whether the Link session is enabled for SMS micro-deposits verification. Default behavior is `true`.
     LinkTokenCreateRequestIdentityVerification:
       type: object
       description: Specifies option for initializing Link for use with the Identity Verification product.
@@ -19145,6 +19389,7 @@ components:
           format: date-time
           type: string
           deprecated: true
+          x-hidden-from-docs: true
           description: |
             The date and time the phone number was verified in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (`YYYY-MM-DDThh:mm:ssZ`). This was previously an optional field used in the [returning user experience](https://plaid.com/docs/link/returning-user). This field is no longer required to enable the returning user experience.
 
@@ -19159,6 +19404,7 @@ components:
           type: string
           format: date-time
           deprecated: true
+          x-hidden-from-docs: true
           description: |-
             The date and time the email address was verified in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (`YYYY-MM-DDThh:mm:ssZ`). This was previously an optional field used in the [returning user experience](https://plaid.com/docs/link/returning-user). This field is no longer required to enable the returning user experience.
 
@@ -19169,6 +19415,7 @@ components:
           type: string
           deprecated: true
           description: Deprecated and not currently used, use the `id_number` field instead.
+          x-hidden-from-docs: true
         date_of_birth:
           type: string
           nullable: true
@@ -19279,7 +19526,7 @@ components:
           description: The expiration timestamp for the `link_token`, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format.
         link_sessions:
           type: array
-          description: Information about Link sessions created using this `link_token`. This field will only be present if your client is enabled for Hosted Link (beta). Session data will be provided for up to six hours after the session has ended.
+          description: Information about Link sessions created using this `link_token`. This field will only be present if your client is enabled for Hosted Link. Session data will be provided for up to six hours after the session has ended.
           items:
             $ref: '#/components/schemas/LinkTokenGetSessionsResponse'
         metadata:
@@ -19294,7 +19541,7 @@ components:
       - request_id
     LinkTokenGetSessionsResponse:
       type: object
-      description: An object containing information about a link session. This field will only be present if your client is enabled for Hosted Link (beta). Session data will be provided for up to six hours after the session has ended.
+      description: An object containing information about a link session.Session data will be provided for up to six hours after the session has ended.
       additionalProperties: true
       properties:
         link_session_id:
@@ -19400,13 +19647,13 @@ components:
 
             `verification_failed`: The Item failed manual micro-deposit verification because the user exhausted all 3 verification attempts. Users may retry by submitting their information again through Link.
 
-            `database_matched`: The Item has successfully been verified using Plaid's data sources. Note: Database Match is currently a beta feature, please contact your account manager for more information.
+            `database_matched`: The Item has successfully been verified using Plaid's data sources.
 
-            `database_insights_pass`: The Item's ACH numbers have been verified using Plaid's data sources and have strong signal for being valid. Note: Database Insights is currently a beta feature, please contact your account manager for more information.
+            `database_insights_pass`: The Item's account and routing number pair has been verified against a known account using Plaid's data sources and has strong signal for being valid. Note: Database Insights is currently a beta feature, please contact your account manager for more information.
 
-            `database_insights_pass_with_caution`: The Item's ACH numbers have been verified using Plaid's data sources and have some signal for being valid. Note: Database Insights is currently a beta feature, please contact your account manager for more information.
+            `database_insights_pass_with_caution`: The Item's account and routing number pair was unable to be verified against a known account using Plaid's data sources. However, the routing number has strong signal for being valid, and the account number format is consistent with other known account numbers used with the given routing number. Note: Database Insights is currently a beta feature, please contact your account manager for more information.
 
-            `database_insights_fail`: The Item's ACH numbers have been verified using Plaid's data sources and have signal for being invalid and/or have no signal for being valid. Note: Database Insights is currently a beta feature, please contact your account manager for more information.
+            `database_insights_fail`: The Item's account and routing number pair has been checked using Plaid's data sources and has signal for being invalid and/or has no signal for being valid. Note: Database Insights is currently a beta feature, please contact your account manager for more information.
 
             `null`: micro-deposit-based verification is not being used for the Item.
         class_type:
@@ -19554,13 +19801,13 @@ components:
           $ref: '#/components/schemas/RequestID'
         hosted_link_url:
           type: string
-          description: A URL of a Plaid-hosted Link flow that will use the Link token returned by this request. Only present if the client is enabled for Hosted Link (beta).
+          description: A URL of a Plaid-hosted Link flow that will use the Link token returned by this request. Only present if the client is enabled for Hosted Link.
       required:
       - link_token
       - expiration
       - request_id
     PlaidError:
-      description: We use standard HTTP response codes for success and failure notifications, and our errors are further classified by `error_type`. In general, 200 HTTP codes correspond to success, 40X codes are for developer- or user-related failures, and 50X codes are for Plaid-related issues. An Item with a non-`null` error object will only be part of an API response when calling `/item/get` to view Item status. Otherwise, error fields will be `null` if no error has occurred; if an error has occurred, an error code will be returned instead.
+      description: 'Errors are identified by `error_code` and categorized by `error_type`. Use these in preference to HTTP status codes to identify and handle specific errors. HTTP status codes are set and provide the broadest categorization of errors: 4xx codes are for developer- or user-related errors, and 5xx codes are for Plaid-related errors, and the status will be 2xx in non-error cases. An Item with a non-`null` error object will only be part of an API response when calling `/item/get` to view Item status. Otherwise, error fields will be `null` if no error has occurred; if an error has occurred, an error code will be returned instead.'
       type: object
       additionalProperties: true
       title: Error
@@ -19896,7 +20143,6 @@ components:
       type: object
       additionalProperties: true
       description: Insights from performing database verification for the account.
-      x-hidden-from-docs: true
       properties:
         network_status:
           $ref: '#/components/schemas/AccountVerificationInsightsNetworkStatus'
@@ -19910,7 +20156,6 @@ components:
     AccountVerificationInsightsAccountNumberFormat:
       title: VerificationInsightsAccountNumberFormat
       type: string
-      x-hidden-from-docs: true
       enum:
       - valid
       - invalid
@@ -19927,7 +20172,6 @@ components:
       title: VerificationInsightsNetworkStatus
       type: object
       additionalProperties: true
-      x-hidden-from-docs: true
       description: Status information about the account and routing number in the Plaid network.
       properties:
         has_numbers_match:
@@ -19943,7 +20187,6 @@ components:
       title: VerificationInsightsNetworkStatus
       type: object
       additionalProperties: true
-      x-hidden-from-docs: true
       description: Information about known ACH returns for the account and routing number.
       properties:
         has_previous_administrative_return:
@@ -20343,15 +20586,14 @@ components:
         additionalProperties: true
     TransactionsUpdateStatus:
       title: TransactionsUpdateStatus
-      x-hidden-from-docs: true
       type: string
       description: |-
-        A description of the update status for transaction pulls of an item.
+        A description of the update status for transaction pulls of an Item.
 
-        `TRANSACTIONS_UPDATE_STATUS_UNKNOWN`: Unable to fetch transactions update status for item.
-        `NOT_READY`: The item is pending transaction pull.
-        `INITIAL_UPDATE_COMPLETE`: Initial pull for the item is complete, pending Historical pull.
-        `HISTORICAL_UPDATE_COMPLETE`: Both Initial and Historical pull for item is complete.
+        `TRANSACTIONS_UPDATE_STATUS_UNKNOWN`: Unable to fetch transactions update status for Item.
+        `NOT_READY`: The Item is pending transaction pull.
+        `INITIAL_UPDATE_COMPLETE`: Initial pull for the Item is complete, historical pull is pending.
+        `HISTORICAL_UPDATE_COMPLETE`: Both initial and historical pull for Item are complete.
       enum:
       - TRANSACTIONS_UPDATE_STATUS_UNKNOWN
       - NOT_READY
@@ -20368,7 +20610,6 @@ components:
           description: The ID of the removed transaction.
         account_id:
           type: string
-          x-hidden-from-docs: true
           description: The ID of the account of the removed transaction.
     RequestID:
       title: RequestID
@@ -22529,8 +22770,8 @@ components:
         minimum_payment_amount:
           description: |-
             The minimum payment due for the next billing cycle. There are some exceptions:
-            Some institutions require a minimum payment across all loans associated with an account number. Our API presents that same minimum payment amount on each loan. The institutions that do this are: Great Lakes ( `ins_116861`), Firstmark (`ins_116295`), Commonbond Firstmark Services (`ins_116950`), Nelnet (`ins_116528`), EdFinancial Services (`ins_116304`), Granite State (`ins_116308`), and Oklahoma Student Loan Authority (`ins_116945`).
-            Firstmark (`ins_116295` ) and Navient (`ins_116248`) will display as $0 if there is an autopay program in effect.
+            Some institutions require a minimum payment across all loans associated with an account number. Our API presents that same minimum payment amount on each loan. The institutions that do this are: Great Lakes ( `ins_116861`), Firstmark (`ins_116295`), Commonbond Firstmark Services (`ins_116950`), EdFinancial Services (`ins_116304`), Granite State (`ins_116308`), and Oklahoma Student Loan Authority (`ins_116945`).
+            Firstmark (`ins_116295` ), EdFinancial Services (`ins_116304`),  and Navient (`ins_116248`) will display as $0 if there is an autopay program in effect.
           type: number
           format: double
           nullable: true
@@ -23341,6 +23582,7 @@ components:
       - statements
       - processor_payments
       - processor_identity
+      - profile
       description: A list of products that an institution can support. All Items must be initialized with at least one product. The Balance product is always available and does not need to be specified during initialization.
       type: string
     ProductStatus:
@@ -23903,6 +24145,145 @@ components:
           description: A list of paystubs associated with the account.
           items:
             $ref: '#/components/schemas/PaystubOverride'
+        w2s:
+          type: array
+          description: A list of w2s associated with the account.
+          items:
+            $ref: '#/components/schemas/W2Override'
+    W2Override:
+      title: W2Override
+      type: object
+      additionalProperties: true
+      description: W2 is an object that represents income data taken from a W2 tax document.
+      properties:
+        employer:
+          $ref: '#/components/schemas/PaystubOverrideEmployer'
+        employee:
+          $ref: '#/components/schemas/PaystubOverrideEmployee'
+        tax_year:
+          type: string
+          description: The tax year of the W2 document.
+          nullable: true
+        employer_id_number:
+          type: string
+          description: An employee identification number or EIN.
+          nullable: true
+        wages_tips_other_comp:
+          type: string
+          description: Wages from tips and other compensation.
+          nullable: true
+        federal_income_tax_withheld:
+          type: string
+          description: Federal income tax withheld for the tax year.
+          nullable: true
+        social_security_wages:
+          type: string
+          description: Wages from social security.
+          nullable: true
+        social_security_tax_withheld:
+          type: string
+          description: Social security tax withheld for the tax year.
+          nullable: true
+        medicare_wages_and_tips:
+          type: string
+          description: Wages and tips from medicare.
+          nullable: true
+        medicare_tax_withheld:
+          type: string
+          description: Medicare tax withheld for the tax year.
+          nullable: true
+        social_security_tips:
+          type: string
+          description: Tips from social security.
+          nullable: true
+        allocated_tips:
+          type: string
+          description: Allocated tips.
+          nullable: true
+        box_9:
+          type: string
+          description: Contents from box 9 on the W2.
+          nullable: true
+        dependent_care_benefits:
+          type: string
+          description: Dependent care benefits.
+          nullable: true
+        nonqualified_plans:
+          type: string
+          description: Nonqualified plans.
+          nullable: true
+        box_12:
+          type: array
+          items:
+            $ref: '#/components/schemas/W2Box12Override'
+        statutory_employee:
+          type: string
+          description: Statutory employee.
+          nullable: true
+        retirement_plan:
+          type: string
+          description: Retirement plan.
+          nullable: true
+        third_party_sick_pay:
+          type: string
+          description: Third party sick pay.
+          nullable: true
+        other:
+          type: string
+          description: Other.
+          nullable: true
+        state_and_local_wages:
+          type: array
+          items:
+            $ref: '#/components/schemas/W2StateAndLocalWagesOverride'
+    W2Box12Override:
+      title: W2Box12Override
+      description: Data on the W2 Box 12
+      type: object
+      additionalProperties: true
+      properties:
+        code:
+          type: string
+          description: W2 Box 12 code.
+          nullable: true
+        amount:
+          type: string
+          description: W2 Box 12 amount.
+          nullable: true
+    W2StateAndLocalWagesOverride:
+      title: W2StateAndLocalWagesOverride
+      description: W2 state and local wages
+      type: object
+      additionalProperties: true
+      properties:
+        state:
+          type: string
+          description: State associated with the wage.
+          nullable: true
+        employer_state_id_number:
+          type: string
+          description: State identification number of the employer.
+          nullable: true
+        state_wages_tips:
+          type: string
+          description: Wages and tips from the specified state.
+          nullable: true
+        state_income_tax:
+          type: string
+          description: Income tax from the specified state.
+          nullable: true
+        local_wages_tips:
+          type: string
+          description: Wages and tips from the locality.
+          nullable: true
+        local_income_tax:
+          type: string
+          description: Income tax from the locality.
+          nullable: true
+        locality_name:
+          type: string
+          description: Name of the locality.
+          nullable: true
     PaystubOverride:
       title: PaystubOverride
       type: object
@@ -23913,11 +24294,155 @@ components:
         employee:
           $ref: '#/components/schemas/PaystubOverrideEmployee'
         income_breakdown:
+          x-hidden-from-docs: true
+          deprecated: true
           type: array
           items:
             $ref: '#/components/schemas/IncomeBreakdown'
+        net_pay:
+          $ref: '#/components/schemas/PaystubOverrideNetPay'
+        deductions:
+          $ref: '#/components/schemas/PaystubOverrideDeductions'
+        earnings:
+          $ref: '#/components/schemas/PaystubOverrideEarnings'
         pay_period_details:
           $ref: '#/components/schemas/PaystubOverridePayPeriodDetails'
+    PaystubOverrideEarnings:
+      title: PaystubOverrideEarnings
+      type: object
+      description: An object representing both a breakdown of earnings on a paystub and the total earnings.
+      additionalProperties: true
+      properties:
+        breakdown:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaystubOverrideEarningsBreakdown'
+        total:
+          $ref: '#/components/schemas/PaystubOverrideEarningsTotal'
+    PaystubOverrideEarningsBreakdown:
+      title: PaystubOverrideEarningsBreakdown
+      type: object
+      additionalProperties: true
+      description: An object representing the earnings line items for the pay period.
+      properties:
+        canonical_description:
+          $ref: '#/components/schemas/EarningsBreakdownCanonicalDescription'
+        current_amount:
+          type: number
+          format: double
+          description: Raw amount of the earning line item.
+          nullable: true
+        description:
+          type: string
+          description: Description of the earning line item.
+          nullable: true
+        hours:
+          type: number
+          description: Number of hours applicable for this earning.
+          nullable: true
+        currency:
+          type: string
+          description: The ISO-4217 currency code of the line item.
+          nullable: true
+        rate:
+          type: number
+          format: double
+          description: Hourly rate applicable for this earning.
+          nullable: true
+        ytd_amount:
+          type: number
+          format: double
+          description: The year-to-date amount of the deduction.
+          nullable: true
+    PaystubOverrideEarningsTotal:
+      title: PaystubOverrideEarningsTotal
+      type: object
+      description: An object representing both the current pay period and year to date amount for an earning category.
+      additionalProperties: true
+      properties:
+        hours:
+          type: number
+          description: Total number of hours worked for this pay period
+          nullable: true
+        currency:
+          type: string
+          description: The ISO-4217 currency code of the line item
+          nullable: true
+    PaystubOverrideDeductions:
+      title: PaystubOverrideDeductions
+      type: object
+      description: An object with the deduction information found on a paystub.
+      additionalProperties: true
+      properties:
+        breakdown:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaystubOverrideDeductionsBreakdown'
+        total:
+          $ref: '#/components/schemas/PaystubOverrideDeductionsTotal'
+    PaystubOverrideDeductionsBreakdown:
+      title: PaystubOverrideDeductionsBreakdown
+      type: object
+      additionalProperties: true
+      description: An object representing the deduction line items for the pay period
+      properties:
+        current_amount:
+          type: number
+          format: double
+          description: Raw amount of the deduction
+          nullable: true
+        description:
+          type: string
+          description: Description of the deduction line item
+          nullable: true
+        currency:
+          type: string
+          description: The ISO-4217 currency code of the line item.
+          nullable: true
+        ytd_amount:
+          type: number
+          format: double
+          description: The year-to-date amount of the deduction
+          nullable: true
+    PaystubOverrideDeductionsTotal:
+      title: PaystubOverrideDeductionsTotal
+      type: object
+      description: An object representing the total deductions for the pay period
+      additionalProperties: true
+      properties:
+        current_amount:
+          type: number
+          format: double
+          description: Raw amount of the deduction
+          nullable: true
+        currency:
+          type: string
+          description: The ISO-4217 currency code of the line item.
+          nullable: true
+        ytd_amount:
+          type: number
+          format: double
+          description: The year-to-date total amount of the deductions
+          nullable: true
+    PaystubOverrideNetPay:
+      title: PaystubOverrideNetPay
+      type: object
+      description: An object representing information about the net pay amount on the paystub.
+      additionalProperties: true
+      properties:
+        description:
+          type: string
+          description: Description of the net pay
+          nullable: true
+        currency:
+          type: string
+          description: The ISO-4217 currency code of the net pay.
+          nullable: true
+        ytd_amount:
+          type: number
+          format: double
+          description: The year-to-date amount of the net pay
+          nullable: true
     PaystubOverrideEmployer:
       type: object
       description: The employer on the paystub.
@@ -23925,6 +24450,32 @@ components:
         name:
           type: string
           description: The name of the employer.
+          nullable: true
+        address:
+          $ref: '#/components/schemas/PaystubOverrideEmployerAddress'
+    PaystubOverrideEmployerAddress:
+      type: object
+      description: The address of the employer.
+      properties:
+        city:
+          type: string
+          description: The full city name.
+        region:
+          type: string
+          description: |-
+            The region or state
+            Example: `"NC"`
+        street:
+          type: string
+          description: |-
+            The full street address
+            Example: `"564 Main Street, APT 15"`
+        postal_code:
+          type: string
+          description: 5 digit postal code.
+        country:
+          type: string
+          description: The country of the address.
     PaystubOverrideEmployee:
       type: object
       description: The employee on the paystub.
@@ -23934,6 +24485,29 @@ components:
           description: The name of the employee.
         address:
           $ref: '#/components/schemas/PaystubOverrideEmployeeAddress'
+        marital_status:
+          type: string
+          description: Marital status of the employee - either `single` or `married`.
+          nullable: true
+          x-override-enum-values-shown:
+          - single
+          - married
+        taxpayer_id:
+          $ref: '#/components/schemas/PaystubOverrideTaxpayerID'
+    PaystubOverrideTaxpayerID:
+      title: PaystubOverrideTaxpayerID
+      type: object
+      additionalProperties: true
+      description: Taxpayer ID of the individual receiving the paystub.
+      properties:
+        id_type:
+          type: string
+          description: Type of ID, e.g. 'SSN'
+          nullable: true
+        id_mask:
+          type: string
+          description: ID mask; i.e. last 4 digits of the taxpayer ID
+          nullable: true
     PaystubOverrideEmployeeAddress:
       type: object
       description: The address of the employee.
@@ -25025,7 +25599,7 @@ components:
       - other
     DepositoryAccount:
       title: DepositoryAccount
-      description: 'An account type holding cash, in which funds are deposited. Supported products for `depository` accounts are: Auth (`checking` and `savings` types only), Balance, Transactions, Identity, Payment Initiation, Assets, and Investments (`cash management` type only).'
+      description: 'An account type holding cash, in which funds are deposited. Supported products for `depository` accounts are: Auth (`checking` and `savings` types only), Transfer, Balance, Signal, Income, Transactions, Identity, Payment Initiation, Assets, and Investments (`cash management` type only).'
       type: string
       properties:
         checking:
@@ -25068,7 +25642,7 @@ components:
     CreditAccount:
       title: CreditAccount
       type: string
-      description: 'A credit card type account. Supported products for `credit` accounts are: Balance, Transactions, Identity, and Liabilities.'
+      description: 'A credit card type account. Supported products for `credit` accounts are: Balance, Transactions, Identity, Assets, and Liabilities.'
       properties:
         credit card:
           type: string
@@ -25082,7 +25656,7 @@ components:
     LoanAccount:
       title: LoanAccount
       type: string
-      description: 'A loan type account. Supported products for `loan` accounts are: Balance, Liabilities, and Transactions.'
+      description: 'A loan type account. Supported products for `loan` accounts are: Balance, Liabilities, Assets, and Transactions.'
       properties:
         auto:
           type: string
@@ -25136,7 +25710,7 @@ components:
     InvestmentAccountSubtypeStandalone:
       title: InvestmentAccountSubtype
       type: string
-      description: 'An investment account. Supported products for `investment` accounts are: Balance and Investments. In API versions 2018-05-22 and earlier, this type is called `brokerage`.'
+      description: 'An investment account. Supported products for `investment` accounts are: Balance, Assets, and Investments. In API versions 2018-05-22 and earlier, this type is called `brokerage`.'
       properties:
         "529":
           type: string
@@ -26644,7 +27218,7 @@ components:
         ach_class:
           $ref: '#/components/schemas/ACHClass'
         network:
-          $ref: '#/components/schemas/TransferACHNetwork'
+          $ref: '#/components/schemas/TransferRecurringNetwork'
         origination_account_id:
           type: string
           description: Plaid’s unique identifier for the origination account that was used for this transfer.
@@ -27337,7 +27911,8 @@ components:
           description: |-
             A date in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (YYYY-MM-DD). The recurring transfer will begin on the first `interval_execution_day` on or after the `start_date`.
 
-            If the first `interval_execution_day` on or after the start date is also the same day that `/transfer/recurring/create` was called, the bank *may* make the first payment on that day, but it is not guaranteed to do so.
+            For `rtp` recurring transfers, `start_date` must be in the future.
+            Otherwise, if the first `interval_execution_day` on or after the start date is also the same day that `/transfer/recurring/create` was called, the bank *may* make the first payment on that day, but it is not guaranteed to do so.
         end_date:
           format: date
           type: string
@@ -27432,6 +28007,7 @@ components:
         `pending`: A new transfer was created; it is in the pending state.
         `posted`: The transfer has been successfully submitted to the payment network.
         `settled`: Credits are available to be withdrawn or debits have been deducted from the Plaid linked account.
+        `funds_available`: Funds from the transfer have been released from hold and applied to the ledger's available balance. (Only applicable to ACH debits.)
         `cancelled`: The transfer was cancelled by the client.
         `failed`: The transfer failed, no funds were moved.
         `returned`: A posted transfer was returned.
@@ -27439,6 +28015,7 @@ components:
       - pending
       - posted
       - settled
+      - funds_available
       - cancelled
       - failed
       - returned
@@ -27541,6 +28118,14 @@ components:
       enum:
       - ach
       - same-day-ach
+    TransferRecurringNetwork:
+      type: string
+      title: TransferRecurrinngNetwork
+      description: Networks eligible for recurring transfers.
+      enum:
+      - ach
+      - same-day-ach
+      - rtp
     BankTransferNetwork:
       type: string
       title: BankTransferNetwork
@@ -27786,7 +28371,7 @@ components:
         type:
           $ref: '#/components/schemas/TransferType'
         network:
-          $ref: '#/components/schemas/TransferACHNetwork'
+          $ref: '#/components/schemas/TransferRecurringNetwork'
         ach_class:
           $ref: '#/components/schemas/ACHClass'
         amount:
@@ -27995,7 +28580,7 @@ components:
 
         A decision regarding the proposed transfer.
 
-        `approved` – The proposed transfer has received the end user's consent and has been approved for processing by Plaid. The `decision_rationale` field is set if Plaid was unable to fetch the account information. You may proceed with the transfer, but further review is recommended (i.e., use Link in update to re-authenticate your user when `decision_rationale.code` is `ITEM_LOGIN_REQUIRED`). Refer to the `code` field in the `decision_rationale` object for details.
+        `approved` – The proposed transfer has received the end user's consent and has been approved for processing by Plaid. The `decision_rationale` field is set if Plaid was unable to fetch the account information. You may proceed with the transfer, but further review is recommended (i.e., use Link in update mode to re-authenticate your user when `decision_rationale.code` is `ITEM_LOGIN_REQUIRED`). Refer to the `code` field in the `decision_rationale` object for details.
 
         `declined` – Plaid reviewed the proposed transfer and declined processing. Refer to the `code` field in the `decision_rationale` object for details.
       enum:
@@ -28505,6 +29090,8 @@ components:
 
         `settled`: Credits are available to be withdrawn or debits have been deducted from the Plaid linked account.
 
+        `funds_available`: Funds from the transfer have been released from hold and applied to the ledger's available balance. (Only applicable to ACH debits.)
+
         `returned`: A posted transfer was returned.
 
         `swept`: The transfer was swept to / from the sweep account.
@@ -28544,6 +29131,7 @@ components:
       - failed
       - posted
       - settled
+      - funds_available
       - returned
       - swept
       - swept_settled
@@ -30143,7 +30731,7 @@ components:
 
         A decision regarding the proposed transfer.
 
-        `APPROVED` – The proposed transfer has received the end user's consent and has been approved for processing by Plaid. The `decision_rationale` field is set if Plaid was unable to fetch the account information. You may proceed with the transfer, but further review is recommended (i.e., use Link in update to re-authenticate your user when `decision_rationale.code` is `ITEM_LOGIN_REQUIRED`). Refer to the `code` field in the `decision_rationale` object for details.
+        `APPROVED` – The proposed transfer has received the end user's consent and has been approved for processing by Plaid. The `decision_rationale` field is set if Plaid was unable to fetch the account information. You may proceed with the transfer, but further review is recommended (i.e., use Link in update mode to re-authenticate your user when `decision_rationale.code` is `ITEM_LOGIN_REQUIRED`). Refer to the `code` field in the `decision_rationale` object for details.
 
         `DECLINED` – Plaid reviewed the proposed transfer and declined processing. Refer to the `code` field in the `decision_rationale` object for details.
       nullable: true
@@ -37583,6 +38171,7 @@ components:
     RecurringFrequency:
       type: string
       title: RecurringFrequency
+      x-hidden-from-docs: true
       nullable: true
       enum:
       - UNKNOWN
@@ -38070,7 +38659,7 @@ components:
         assets_under_management:
           $ref: '#/components/schemas/PartnerEndCustomerAssetsUnderManagement'
         redirect_uris:
-          description: A list of URIs indicating the destination(s) where a user can be forwarded after completing the Link flow; used to support OAuth authentication flows when launching Link in the browser or via a webview. URIs should not contain any query parameters. When used in Production or Development, URIs must use https. To specify any subdomain, use `*` as a wildcard character, e.g. `https://*.example.com/oauth.html`. To modify redirect URIs for an end customer after creating them, go to the end customer's [API page](https://dashboard.plaid.com/team/api) in the Dashboard.
+          description: A list of URIs indicating the destination(s) where a user can be forwarded after completing the Link flow; used to support OAuth authentication flows when launching Link in the browser or another app. URIs should not contain any query parameters. When used in Production or Development, URIs must use https. To specify any subdomain, use `*` as a wildcard character, e.g. `https://*.example.com/oauth.html`. To modify redirect URIs for an end customer after creating them, go to the end customer's [API page](https://dashboard.plaid.com/team/api) in the Dashboard.
           type: array
           items:
             type: string
@@ -40569,6 +41158,18 @@ components:
           type: string
           description: The name of the account owner. This field is not typically populated and only relevant when dealing with sub-accounts.
           nullable: true
+        transaction_type:
+          $ref: '#/components/schemas/BaseReportTransactionType'
+        category:
+          type: array
+          x-hidden-from-docs: true
+          description: A hierarchical array of the categories to which this transaction belongs. For a full list of categories, see [`/categories/get`](https://plaid.com/docs/api/products/transactions/#categoriesget).
+          nullable: true
+          items:
+            type: string
+        category_id:
+          x-hidden-from-docs: true
+          description: The ID of the category to which this transaction belongs. For a full list of categories, see [`/categories/get`](https://plaid.com/docs/api/products/transactions/#categoriesget).
       required:
       - pending
       - date
@@ -40576,6 +41177,24 @@ components:
       - iso_currency_code
       - amount
       - original_description
+    BaseReportTransactionType:
+      title: BaseReportTransactionType
+      type: string
+      nullable: true
+      x-hidden-from-docs: true
+      enum:
+      - digital
+      - place
+      - special
+      - unresolved
+      description: |
+        `digital:` transactions that took place online.
+
+        `place:` transactions that were made at a physical location.
+
+        `special:` transactions that relate to banks, e.g. fees or deposits.
+
+        `unresolved:` transactions that do not fit into the other types.
     BaseReportAccountInsights:
       title: BaseReportAccountInsights
       description: Calculated insights derived from transaction-level data.
@@ -40929,10 +41548,6 @@ components:
           type: integer
           description: The number of days since the first time the Item was connected to an application via Plaid
           nullable: true
-        days_since_account_creation:
-          type: integer
-          description: The age of the account as reported by the FI, when available.
-          nullable: true
         is_account_closed:
           type: boolean
           description: Indicates if the account has been closed by the financial institution or the consumer, or is at risk of being closed
@@ -41032,6 +41647,10 @@ components:
         phone_change_count_90d:
           type: integer
           description: The number of times the account's phone numbers on file have changed over the past 90 days
+          nullable: true
+        days_since_account_opening:
+          type: integer
+          description: The number of days since the bank account was opened, as reported by the financial institution
           nullable: true
     AddressPurposeLabel:
       description: |-
@@ -41995,12 +42614,12 @@ components:
       type: string
       example: Pawnee
       title: CityName
-      description: City from the end user's address
+      description: City from the end user's address. A string with at least one non-whitespace alphabetical character, with a max length of 100 characters."
     CityNullable:
       type: string
       example: Pawnee
       title: CityName
-      description: City from the end user's address
+      description: City from the end user's address. A string with at least one non-whitespace alphabetical character, with a max length of 100 characters."
       nullable: true
     ClientUserID:
       type: string
@@ -42846,7 +43465,7 @@ components:
       type: string
       example: "123456789"
       title: IDNumberValue
-      description: Value of identity document value typed in by user. Alpha-numeric, with all formatting characters stripped.
+      description: Value of identity document value typed in by user. Alpha-numeric, with all formatting characters stripped. For specific format requirements by ID type, see [Hybrid Input Validation](https://plaid.com/docs/identity-verification/hybrid-input-validation/).
     IPAddress:
       description: An IPv4 or IPV6 address.
       type: string
@@ -44678,18 +45297,18 @@ components:
       type: string
       example: 123 Main St.
       title: Street
-      description: The primary street portion of an address. If an address is provided, this field will always be filled.
+      description: The primary street portion of an address. If an address is provided, this field will always be filled. A string with at least one non-whitespace alphabetical character, with a max length of 80 characters.
     Street2:
       type: string
       example: Unit 42
       title: Street2
-      description: Extra street information, like an apartment or suite number.
+      description: Extra street information, like an apartment or suite number. If provided, a string with at least one non-whitespace character, with a max length of 20 characters.
       nullable: true
     StreetNullable:
       type: string
       example: 123 Main St.
       title: Street
-      description: The primary street portion of an address. If an address is provided, this field will always be filled.
+      description: The primary street portion of an address. If an address is provided, this field will always be filled. A string with at least one non-whitespace alphabetical character, with a max length of 80 characters.
       nullable: true
     Timestamp:
       description: An ISO8601 formatted timestamp.
@@ -46220,6 +46839,24 @@ components:
           description: The predicted average monthly income amount for the income source(s).
           items:
             $ref: '#/components/schemas/CreditAmountWithCurrency'
+        historical_annual_gross_income:
+          type: array
+          x-hidden-from-docs: true
+          description: An estimate of the annual gross income based on the historical net amount and income category for the income source(s).
+          items:
+            $ref: '#/components/schemas/CreditAmountWithCurrency'
+        historical_annual_income:
+          type: array
+          x-hidden-from-docs: true
+          description: The annual income amount estimated based on the historical data for the income source(s).
+          items:
+            $ref: '#/components/schemas/CreditAmountWithCurrency'
+        forecasted_annual_income:
+          type: array
+          x-hidden-from-docs: true
+          description: The predicted average annual income amount for the income source(s).
+          items:
+            $ref: '#/components/schemas/CreditAmountWithCurrency'
         historical_summary:
           type: array
           items:
@@ -47602,6 +48239,150 @@ components:
       - FirstName
       - LastName
       - MiddleName
+    IdentityDocumentsUploadsGetRequest:
+      title: IdentityDocumentsUploadsGetRequest
+      description: IdentityDocumentsUploadsGetRequest defines the request schema for `/identity/documents/uploads/get`
+      x-hidden-from-docs: true
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+        options:
+          $ref: '#/components/schemas/IdentityDocumentsUploadsGetRequestOptions'
+      required:
+      - access_token
+    IdentityDocumentsUploadsGetRequestOptions:
+      type: object
+      description: An optional object to filter `/identity/documents/uploads/get` results.
+      properties:
+        account_ids:
+          type: array
+          description: |-
+            A list of `account_ids` to retrieve for the Item.
+            Note: An error will be returned if a provided `account_id` is not associated with the Item.
+          items:
+            type: string
+    IdentityDocumentsUploadsGetResponse:
+      type: object
+      additionalProperties: true
+      description: IdentityDocumentsUploadsGetResponse defines the response schema for `/identity/documents/uploads/get`
+      properties:
+        accounts:
+          type: array
+          description: The accounts for which Identity data has been requested
+          items:
+            $ref: '#/components/schemas/AccountIdentityDocumentUpload'
+        item:
+          $ref: '#/components/schemas/Item'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - accounts
+      - item
+      - request_id
+    AccountIdentityDocumentUpload:
+      description: Identity information about an account
+      title: AccountIdentityDocumentUpload
+      allOf:
+      - $ref: '#/components/schemas/AccountBase'
+      - type: object
+        additionalProperties: true
+        properties:
+          owners:
+            type: array
+            description: Data returned by the financial institution about the account owner or owners. Only returned by Identity or Assets endpoints. For business accounts, the name reported may be either the name of the individual or the name of the business, depending on the institution; detecting whether the linked account is a business account is not currently supported. Multiple owners on a single account will be represented in the same `owner` object, not in multiple owner objects within the array. In API versions 2018-05-22 and earlier, the `owners` object is not returned, and instead identity information is returned in the top level `identity` object. For more details, see [Plaid API versioning](https://plaid.com/docs/api/versioning/#version-2019-05-29)
+            items:
+              $ref: '#/components/schemas/Owner'
+          documents:
+            type: array
+            description: An array of document with which the Identity data is derived from.
+            items:
+              $ref: '#/components/schemas/IdentityDocumentUpload'
+            nullable: true
+            x-hidden-from-docs: true
+        required:
+        - owners
+    IdentityDocumentUpload:
+      title: IdentityDocumentUpload
+      type: object
+      description: Document object with metadata of the uploaded document
+      properties:
+        document_id:
+          type: string
+        metadata:
+          $ref: '#/components/schemas/IdentityDocumentUploadMetadata'
+        risk_insights:
+          $ref: '#/components/schemas/IdentityDocumentUploadRiskInsights'
+      x-hidden-from-docs: true
+    IdentityDocumentUploadMetadata:
+      title: IdentityDocumentUploadMetadata
+      type: object
+      additionalProperties: true
+      description: In closed beta. Object representing metadata pertaining to the document.
+      properties:
+        document_type:
+          type: string
+          description: String enumeration of the submitted document type.
+          nullable: true
+        is_account_number_match:
+          type: boolean
+          description: Boolean field indicating if the uploaded document's account number matches the account number we have on file
+          nullable: true
+        page_count:
+          type: integer
+          nullable: true
+        last_updated:
+          type: string
+          format: date-time
+        uploaded_at:
+          type: string
+          format: date-time
+      x-hidden-from-docs: true
+    IdentityDocumentUploadRiskInsights:
+      title: IdentityDocumentUploadRiskInsights
+      type: object
+      additionalProperties: true
+      description: In closed beta. Object representing fraud risk data of the document
+      properties:
+        risk_summary:
+          $ref: '#/components/schemas/IdentityDocumentUploadRiskSummary'
+        risk_signals:
+          title: RiskSignals
+          type: array
+          description: an array of risk signals
+          items:
+            $ref: '#/components/schemas/IdentityDocumentUploadRiskSignal'
+    IdentityDocumentUploadRiskSummary:
+      title: IdentityDocumentUploadRiskSummary
+      type: object
+      additionalProperties: true
+      description: Risk summary of an uploaded document
+      properties:
+        risk_score:
+          type: integer
+          description: Integer value representing the risk score of the document
+          nullable: true
+    IdentityDocumentUploadRiskSignal:
+      title: IdentityDocumentUploadRiskSignal
+      type: object
+      additionalProperties: true
+      description: Risk signals tied to the document
+      properties:
+        type:
+          type: string
+          nullable: true
+        has_fraud_risk:
+          type: boolean
+          nullable: true
+        signal_description:
+          type: string
+          nullable: true
+        page_number:
+          type: integer
+          nullable: true
     ItemGetRequest:
       description: ItemGetRequest defines the request schema for `/item/get`
       type: object
@@ -49153,6 +49934,10 @@ components:
         distinct_ssl_tls_connection_sessions_count_90d:
           type: integer
           description: The number of distinct SSL/TLS connection sessions linked to the same bank account during Plaid authentication in the last 90 days
+          nullable: true
+        days_since_account_opening:
+          type: integer
+          description: The number of days since the bank account was opened, as reported by the financial institution
           nullable: true
     StatementsListRequest:
       title: StatementsListRequest
