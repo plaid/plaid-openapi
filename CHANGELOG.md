@@ -1,3 +1,18 @@
+### 2020-09-14_1.517.0
+- [Breaking] Update `/link/token/get` response structure
+
+### 2020-09-14_1.516.0
+- Internal changes only
+
+### 2020-09-14_1.515.0
+- Added `/cra/loans/applications/register`
+- Added `/cra/loans/register`
+- Added `/cra/loans/update`
+- Added `/cra/loans/unregister`
+
+### 2020-09-14_1.514.2
+- Added `days_since_first_observed transaction` as a field in the Account Risk Insights response.
+
 ### 2020-09-14_1.514.1
 - Update `risk_profile_key`and `RiskProfile` description
 
