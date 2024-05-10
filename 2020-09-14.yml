@@ -8,7 +8,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.514.1
+  version: 2020-09-14_1.517.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -1158,6 +1158,114 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CraPartnerInsightsGetRequest'
+  /cra/loans/applications/register:
+    x-plaid-business-unit-context: BUSINESS_UNIT_CRA
+    post:
+      tags:
+      - plaid
+      summary: Register loan applications and decisions.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CraLoansApplicationsRegisterResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: LhQf0THi8SH1yJm
+      operationId: craLoansApplicationsRegister
+      externalDocs:
+        url: /none/
+      description: '`/cra/loans/applications/register` registers loan applications and decisions.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CraLoansApplicationsRegisterRequest'
+  /cra/loans/register:
+    x-plaid-business-unit-context: BUSINESS_UNIT_CRA
+    post:
+      tags:
+      - plaid
+      summary: Register a list of loans to their applicants.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CraLoansRegisterResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: LhQf0THi8SH1yJm
+      operationId: craLoansRegister
+      externalDocs:
+        url: /none/
+      description: '`/cra/loans/register` registers a list of loans to their applicants.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CRALoansRegisterRequest'
+  /cra/loans/update:
+    x-plaid-business-unit-context: BUSINESS_UNIT_CRA
+    post:
+      tags:
+      - plaid
+      summary: Updates loan data.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CraLoansUpdateResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: LhQf0THi8SH1yJm
+      operationId: craLoansUpdate
+      externalDocs:
+        url: /none/
+      description: '`/cra/loans/update` updates loan information such as the status and payment history.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CraLoansUpdateRequest'
+  /cra/loans/unregister:
+    x-plaid-business-unit-context: BUSINESS_UNIT_CRA
+    post:
+      tags:
+      - plaid
+      summary: Unregister a list of loans.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CraLoanUnregisterResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: LhQf0THi8SH1yJm
+      operationId: craLoansUnregister
+      externalDocs:
+        url: /none/
+      description: '`/cra/loans/unregister` indicates the loans have reached a final status and no further updates are expected.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CraLoansUnregisterRequest'
   /consumer_report/pdf/get:
     x-plaid-business-unit-context: BUSINESS_UNIT_CRA
     post:
@@ -19627,7 +19735,7 @@ components:
         on_success:
           $ref: '#/components/schemas/LinkSessionSuccess'
         on_exit:
-          $ref: '#/components/schemas/LinkSessionExit'
+          $ref: '#/components/schemas/LinkSessionExitDeprecated'
         exit:
           $ref: '#/components/schemas/LinkSessionExit'
         events:
@@ -19642,7 +19750,6 @@ components:
     LinkSessionResults:
       type: object
       description: The set of results for a Link session.
-      x-hidden-from-docs: true
       nullable: true
       additionalProperties: true
       properties:
@@ -19651,21 +19758,11 @@ components:
           description: The set of Item adds for the Link session.
           items:
             $ref: '#/components/schemas/LinkSessionItemAddResult'
-        cra_item_add_results:
-          type: array
-          description: The set of CRA Item adds for the Link session.
-          items:
-            $ref: '#/components/schemas/LinkSessionCRAItemAddResult'
         bank_income_results:
           type: array
           description: The set of bank income verifications for the Link session.
           items:
             $ref: '#/components/schemas/LinkSessionBankIncomeResult'
-        bank_employment_results:
-          type: array
-          description: The set of bank employment verifications for the Link session.
-          items:
-            $ref: '#/components/schemas/LinkSessionBankEmploymentResult'
         payroll_income_results:
           type: array
           description: The set of payroll income verifications for the Link session.
@@ -19673,13 +19770,6 @@ components:
             $ref: '#/components/schemas/LinkSessionPayrollIncomeResult'
         document_income_results:
           $ref: '#/components/schemas/CreditSessionDocumentIncomeResult'
-      required:
-      - item_add_results
-      - cra_item_add_results
-      - bank_income_results
-      - bank_employment_results
-      - payroll_income_results
-      - document_income_results
     LinkSessionItemAddResult:
       type: object
       description: The details of an Item add in Link.
@@ -19688,27 +19778,16 @@ components:
         public_token:
           description: Returned once a user has successfully linked their Item.
           type: string
-        item_id:
-          description: The Plaid Item ID. The `item_id` is always unique; linking the same account at the same institution twice will result in two Items with different `item_id` values. Like all Plaid identifiers, the `item_id` is case-sensitive.
-          type: string
+        accounts:
+          type: array
+          description: A list of accounts attached to the connected Item. If Account Select is enabled via the developer dashboard, `accounts` will only include selected accounts.
+          items:
+            $ref: '#/components/schemas/LinkSessionSuccessMetadataAccount'
         institution:
           $ref: '#/components/schemas/LinkSessionSuccessMetadataInstitution'
       required:
       - public_token
-      - item_id
-      - institution
-    LinkSessionCRAItemAddResult:
-      type: object
-      description: The details of a CRA Item add in Link.
-      additionalProperties: true
-      properties:
-        item_id:
-          description: The Plaid Item ID. The `item_id` is always unique; linking the same account at the same institution twice will result in two Items with different `item_id` values. Like all Plaid identifiers, the `item_id` is case-sensitive.
-          type: string
-        institution:
-          $ref: '#/components/schemas/LinkSessionSuccessMetadataInstitution'
-      required:
-      - item_id
+      - accounts
       - institution
     LinkSessionBankIncomeResult:
       type: object
@@ -19760,6 +19839,7 @@ components:
       - num_w2s_retrieved
       - institution
     LinkSessionSuccess:
+      deprecated: true
       type: object
       description: An object representing an [onSuccess](https://plaid.com/docs/link/web/#onsuccess) callback from Link.
       nullable: true
@@ -19861,7 +19941,21 @@ components:
       - INCOMPLETE
     LinkSessionExit:
       type: object
-      description: An object representing an [onExit](https://plaid.com/docs/link/web/#onexit) callback from Link. Note the `exit` field on the `/link/token/get` response is in beta and may not be populated.
+      description: An object representing an [onExit](https://plaid.com/docs/link/web/#onexit) callback from Link.
+      additionalProperties: true
+      nullable: true
+      properties:
+        error:
+          $ref: '#/components/schemas/PlaidError'
+        metadata:
+          $ref: '#/components/schemas/LinkSessionExitMetadata'
+      required:
+      - error
+      - metadata
+    LinkSessionExitDeprecated:
+      type: object
+      deprecated: true
+      description: An object representing an [onExit](https://plaid.com/docs/link/web/#onexit) callback from Link.
       additionalProperties: true
       nullable: true
       properties:
@@ -39902,6 +39996,45 @@ components:
       - events
       - link_session_id
       - link_token
+    ItemAddResultWebhook:
+      x-hidden-from-docs: true
+      title: ItemAddResultWebhook
+      type: object
+      additionalProperties: true
+      description: Fired when a user successfully adds a Plaid item during a Link session. Contains the public token for the item.
+      properties:
+        webhook_type:
+          type: string
+          description: '`LINK`'
+        webhook_code:
+          type: string
+          description: '`ITEM_ADD_RESULT`'
+        link_session_id:
+          type: string
+          description: The identifier for the Link session.
+        link_token:
+          type: string
+          description: The link token used to create the Link session.
+        public_token:
+          type: string
+          description: The public token corresponding to the item that was added.
+        environment:
+          $ref: '#/components/schemas/WebhookEnvironmentValues'
+      required:
+      - webhook_type
+      - webhook_code
+      - link_session_id
+      - link_token
+      - public_token
+      - environment
+      x-examples:
+        example-1:
+          webhook_type: LINK
+          webhook_code: ITEM_ADD_RESULT
+          link_session_id: 356dbb28-7f98-44d1-8e6d-0cec580f3171
+          link_token: link-sandbox-af1a0311-da53-4636-b754-dd15cc058176
+          public_token: public-sandbox-b0e2c4ee-a763-4df5-bfe9-46a46bce993d
+          environment: sandbox
     LinkSessionFinishedWebhook:
       title: LinkSessionFinishedWebhook
       type: object
@@ -39926,6 +40059,12 @@ components:
         public_token:
           type: string
           description: The public token generated by the Link session.
+        public_tokens:
+          x-hidden-from-docs: true
+          type: array
+          description: The public tokens generated by the Link session.
+          items:
+            type: string
         environment:
           $ref: '#/components/schemas/WebhookEnvironmentValues'
       required:
@@ -41874,6 +42013,10 @@ components:
         days_since_account_opening:
           type: integer
           description: The number of days since the bank account was opened, as reported by the financial institution
+          nullable: true
+        days_since_first_observed_transaction:
+          type: integer
+          description: The number of days since the oldest transaction available to Plaid for this account. This measure, combined with Plaid connection history, can be used to infer the age of the account
           nullable: true
     AddressPurposeLabel:
       description: |-
@@ -47485,6 +47628,330 @@ components:
       required:
       - version
       - score
+    CraLoansApplicationsRegisterRequest:
+      type: object
+      description: CraLoansApplicationsRegisterRequest defines the request schema for `/cra/loans/applications/register`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        applications:
+          type: array
+          description: A list of loan applications to register.
+          items:
+            $ref: '#/components/schemas/CraLoanApplication'
+      required:
+      - applications
+    CraLoansApplicationsRegisterResponse:
+      title: CraLoansApplicationsRegisterResponse
+      additionalProperties: true
+      type: object
+      description: CraLoansApplicationsRegisterResponse defines the response schema for `/cra/loans/applications/register`.
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
+    CraLoanApplication:
+      type: object
+      description: Contains loan application data.
+      additionalProperties: true
+      properties:
+        user_token:
+          $ref: '#/components/schemas/CraLoanUserToken'
+        application_id:
+          $ref: '#/components/schemas/CraLoanApplicationID'
+        type:
+          $ref: '#/components/schemas/CraLoanType'
+        decision:
+          $ref: '#/components/schemas/CraLoanApplicationDecision'
+        application_date:
+          type: string
+          format: date
+          description: The date the user applied for the loan. The date should be in ISO 8601 format (YYYY-MM-DD).
+        decision_date:
+          type: string
+          format: date
+          description: The date when the loan application's decision was made. The date should be in ISO 8601 format (YYYY-MM-DD).
+      required:
+      - user_token
+      - application_id
+      - type
+      - decision
+    CraLoanApplicationDecision:
+      type: string
+      description: The decision of the loan application.
+      enum:
+      - APPROVED
+      - DECLINED
+      - OTHER
+    CRALoansRegisterRequest:
+      type: object
+      description: CraLoansRegisterRequest defines the request schema for `/cra/loans/register`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        loans:
+          type: array
+          description: A list of loans to register.
+          items:
+            $ref: '#/components/schemas/CraLoanRegister'
+      required:
+      - loans
+    CraLoansRegisterResponse:
+      title: CraLoansRegisterResponse
+      additionalProperties: true
+      type: object
+      description: CraLoansRegisterResponse defines the response schema for `/cra/loans/register`.
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
+    CraLoanRegister:
+      type: object
+      description: Contains loan data to register.
+      additionalProperties: true
+      properties:
+        user_token:
+          $ref: '#/components/schemas/CraLoanUserToken'
+        loan_id:
+          $ref: '#/components/schemas/CraLoanID'
+        type:
+          $ref: '#/components/schemas/CraLoanType'
+        payment_schedule:
+          $ref: '#/components/schemas/CraLoanPaymentSchedule'
+        opened_date:
+          type: string
+          format: date
+          description: The date the loan account was opened. The date should be in ISO 8601 format (YYYY-MM-DD).
+        opened_with_status:
+          $ref: '#/components/schemas/CraLoanOpenedStatus'
+        loan_amount:
+          type: number
+          description: The total amount of the approved loan.
+        application:
+          $ref: '#/components/schemas/CraLoanRegisterApplication'
+      required:
+      - user_token
+      - loan_id
+      - type
+      - opened_date
+      - payment_schedule
+      - opened_with_status
+    CraLoanRegisterApplication:
+      type: object
+      description: Contains loan application data to register.
+      additionalProperties: true
+      properties:
+        application_id:
+          $ref: '#/components/schemas/CraLoanApplicationID'
+        application_date:
+          type: string
+          format: date
+          description: The date the user applied for the loan. The date should be in ISO 8601 format (YYYY-MM-DD).
+    CraLoansUpdateRequest:
+      type: object
+      description: CraLoansUpdateRequest defines the request schema for `/cra/loans/update`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        loans:
+          type: array
+          description: A list of loans to update.
+          items:
+            $ref: '#/components/schemas/CraLoanUpdate'
+      required:
+      - loans
+    CraLoansUpdateResponse:
+      title: CraLoansUpdateResponse
+      additionalProperties: true
+      type: object
+      description: CraLoansUpdateResponse defines the response schema for `/cra/loans/update`.
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
+    CraLoanUpdate:
+      type: object
+      description: Contains loan data to update.
+      additionalProperties: true
+      properties:
+        loan_id:
+          $ref: '#/components/schemas/CraLoanID'
+        status_history:
+          type: array
+          description: A list of status update history of the loan.
+          items:
+            $ref: '#/components/schemas/CraLoanStatusHistoryUpdate'
+        payment_history:
+          type: array
+          description: The updates to the payment history for the loan.
+          items:
+            $ref: '#/components/schemas/CraLoanPaymentHistory'
+    CraLoanStatusHistoryUpdate:
+      type: object
+      description: Contains the status and date of an update to the loan.
+      additionalProperties: true
+      properties:
+        status:
+          $ref: '#/components/schemas/CraLoanStatus'
+        date:
+          $ref: '#/components/schemas/CraLoanStatusEffectiveDate'
+      required:
+      - status
+      - date
+    CraLoanPaymentHistory:
+      type: object
+      description: Contains the payment information for a loan payment period.
+      additionalProperties: true
+      properties:
+        period:
+          type: integer
+          description: |-
+            The index to identify the loan's payment period, starting from 1.
+            For example:
+              1 means the period between the loan's opening date and the 1st payment due date.
+              2 means the period between the loan's 1st payment due date and 2nd payment due date.
+        due_date:
+          type: string
+          format: date
+          description: The payment due date or end date of the payment period. The date should be in ISO 8601 format (YYYY-MM-DD).
+        days_past_due:
+          type: integer
+          description: |-
+            The number of days the loan was delinquent at the end of the pay period.
+            If specified, should be greater of equal to 0.
+        amount_past_due:
+          type: number
+          description: The amount past due or the charge-off amount of the loan at the end of the payment period.
+        balance_remaining:
+          type: number
+          description: The balance remaining on the loan at the end of the payment period.
+      required:
+      - period
+      - due_date
+      - days_past_due
+    CraLoansUnregisterRequest:
+      type: object
+      description: CraLoansUnregisterRequest defines the request schema for `/cra/loans/unregister`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        loans:
+          type: array
+          description: A list of loans to unregister.
+          items:
+            $ref: '#/components/schemas/CraLoanUnregister'
+      required:
+      - loans
+    CraLoanUnregisterResponse:
+      title: CraLoanUnregisterResponse
+      additionalProperties: true
+      type: object
+      description: CraLoanUnregisterResponse defines the response schema for `/cra/loans/unregister`.
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
+    CraLoanUnregister:
+      type: object
+      description: Contains loan data for the loan being unregistered.
+      additionalProperties: true
+      properties:
+        loan_id:
+          $ref: '#/components/schemas/CraLoanID'
+        closed_with_status:
+          $ref: '#/components/schemas/CraLoanClosedStatus'
+      required:
+      - loan_id
+      - closed_with_status
+    CraLoanType:
+      type: string
+      description: The type of loan the user applied for.
+      enum:
+      - PERSONAL
+      - CREDIT_CARD
+      - BUSINESS
+      - MORTGAGE
+      - AUTO
+      - PAYDAY
+      - STUDENT
+      - HOME_EQUITY
+      - OTHER
+    CraLoanPaymentSchedule:
+      type: string
+      description: |-
+        The frequency of a loan's payment schedule.
+        `BIWEEKLY` represents one payment every two weeks.
+      enum:
+      - DAILY
+      - WEEKLY
+      - BIWEEKLY
+      - MONTHLY
+      - QUARTERLY
+      - ANNUALLY
+      - OTHER
+    CraLoanStatus:
+      type: string
+      description: The status of the loan.
+      enum:
+      - APPROVED
+      - DECLINED
+      - BOOKED
+      - CURRENT
+      - DELINQUENT
+      - DEFAULT
+      - CHARGED_OFF
+      - TRANSFERRED
+      - PAID_OFF
+      - OTHER
+    CraLoanStatusEffectiveDate:
+      type: string
+      format: date
+      description: The effective date for the status of the loan. The date should be in ISO 8601 format (YYYY-MM-DD).
+    CraLoanUserToken:
+      type: string
+      description: The user token for the user associated with the loan.
+    CraLoanApplicationID:
+      type: string
+      description: "A unique identifier for the loan application. \nPersonally identifiable information, such as an email address or phone number, should not be used in the `application_id`."
+    CraLoanID:
+      type: string
+      description: "A unique identifier for the loan. \nPersonally identifiable information, such as an email address or phone number, should not be used in the `loan_id`."
+    CraLoanOpenedStatus:
+      type: object
+      description: Contains the status and date information of the loan when registering.
+      additionalProperties: true
+      properties:
+        status:
+          $ref: '#/components/schemas/CraLoanStatus'
+        date:
+          $ref: '#/components/schemas/CraLoanStatusEffectiveDate'
+      required:
+      - status
+      - date
+    CraLoanClosedStatus:
+      type: object
+      description: Contains the status and date information of the loan when unregistering.
+      additionalProperties: true
+      properties:
+        status:
+          $ref: '#/components/schemas/CraLoanStatus'
+        date:
+          $ref: '#/components/schemas/CraLoanStatusEffectiveDate'
+      required:
+      - status
+      - date
     AssetReportFreddieGetRequest:
       title: AssetReportFreddieGetRequest
       type: object
@@ -49254,7 +49721,7 @@ components:
           $ref: '#/components/schemas/SignalDevice'
         risk_profile_key:
           type: string
-          description: The key of the risk profile to use for this transaction. A risk profile can be configured using via the Plaid Dashboard. If not provided, no risk profile will be used. This feature is currently in closed beta; to request access, contact your account manager.
+          description: The key of the risk profile to use for this transaction. You can configure a risk profile using the Signal dashboard located within the Plaid Dashboard. If not provided, no risk profile will be used. This feature is currently in closed beta; to request access, contact your account manager.
           minLength: 1
           maxLength: 64
           nullable: true
@@ -49761,7 +50228,7 @@ components:
           description: The key of the risk profile used for this transaction.
         outcome:
           type: string
-          description: The key of the evaluated outcome for this transaction.
+          description: The evaluated outcome for this transaction. You can configure a list of outcomes, such as "accept", "review", and "decline" using the Signal dashboard located within the Plaid Dashboard.
     SignalDecisionOutcome:
       type: string
       enum:
