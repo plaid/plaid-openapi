@@ -1,170 +1,331 @@
+### 2020-09-14_1.524.1
+
+- Remove `minLength` validations from several attributes. Fixes multiple validation bugs in the ruby client libraries which do not handle `nil` gracefully before this change.
+
+### 2020-09-14_1.524.0
+
+- Add transfer refund event types to TransferEventType enum.
+
+### 2020-09-14_1.523.0
+
+- Added support for the `layer` product.
+
+### 2020-09-14_1.522.0
+
+- Added support for the `/user_account/session/get` API.
+
+### 2020-09-14_1.521.0
+
+- Internal changes only
+
+### 2020-09-14_1.520.0
+
+- [Breaking] Contains fixes to Balance Plus (beta):
+  - [Breaking] Convert `risk_level` string to an enum object `RiskLevel`.
+  - [Breaking] Adds missing `required` labels to certain fields within `BalancePlusAttributes`, `AccountsBalanceGetResponsePaymentRiskAssessment`, `AccountsBalanceGetRequestPaymentDetails`, and `RiskReason`.
+  - Adds missing `additionalProperties` field to `BalancePlusAttributes`
+  - Fix incorrect response example for Balance Plus
+  - Docs updates for Balance Plus
+
+### 2020-09-14_1.519.0
+
+- Add `rtp` to network options in `/transfer/intent/create`
+- Added `access_tokens` field to `/beacon/user/create` and `/beacon/user/update` requests
+- Added `item_ids` to `/beacon/user/*` responses
+
+### 2020-09-14_1.518.9
+
+- Update `description` field for `decision_rationale` in `transfer/authorization/create` response
+
+### 2020-09-14_1.518.8
+
+- Fix incorrect documentation for ENTITY_SCREENING: STATUS_UPDATED webhook which wrongly documented `screening_id` instead of `entity_screening_id` in the payload.
+
+### 2020-09-14_1.518.7
+
+- Internal changes only
+
+### 2020-09-14_1.518.6
+
+- Add `add_ons` in cra/check_report/pdf/get
+
+### 2020-09-14_1.518.5
+
+- Internal changes only
+
+### 2020-09-14_1.518.4
+
+- Add `Recall` as a possible Virtual Account wallet transaction type
+
+### 2020-09-14_1.518.3
+
+- Internal changes only
+
+### 2020-09-14_1.518.2
+
+- Documentation edits to cra endpoints
+- Add `income-sensitive repayment` to StudentRepaymentPlan and update description for repayment plan type
+
+### 2020-09-14_1.518.1
+
+- Documentation edits to cra endpoints
+- Add item, account, and transaction IDs to `/cra/base_report/get` response
+
+### 2020-09-14_1.518.0
+
+- Add several cra related properties to `/user/create` and `/link/token/create`
+
+### 2020-09-14_1.517.7
+
+- Add `cra/check_report/pdf/get` endpoint
+
+### 2020-09-14_1.517.6
+
+- Add `cra/check_report/base_report/get` endpoint
+
+### 2020-09-14_1.517.5
+
+- Add `error_message` to `document_metadata` object for `credit/payroll_income/get` and `credit/bank_statements/uploads/get`
+
+### 2020-09-14_1.517.4
+
+- Add `production` to the `secrets` object in `/partner/customer/create` response and deprecate `development`
+
+### 2020-09-14_1.517.3
+
+- Add new enums to `canonical_description` in `credit/payroll_income/get`: `RETIREMENT`, `GIG ECONOMY`, and `STOCK COMPENSATION`
+
+### 2020-09-14_1.517.2
+
+- Added `ITEM: EVENTS` webhook and example to documentation
+
+### 2020-09-14_1.517.1
+
+- Added `public_tokens` on `SESSION_FINISHED` webhook
+- Deprecated `public_token` on `SESSION_FINISHED` webhook
+- Added `ITEM_ADD_RESULT` webhook
+
 ### 2020-09-14_1.517.0
+
 - [Breaking] Update `/link/token/get` response structure
 
 ### 2020-09-14_1.516.0
+
 - Internal changes only
 
 ### 2020-09-14_1.515.0
+
 - Added `/cra/loans/applications/register`
 - Added `/cra/loans/register`
 - Added `/cra/loans/update`
 - Added `/cra/loans/unregister`
 
 ### 2020-09-14_1.514.2
+
 - Added `days_since_first_observed transaction` as a field in the Account Risk Insights response.
 
 ### 2020-09-14_1.514.1
+
 - Update `risk_profile_key`and `RiskProfile` description
 
 ### 2020-09-14_1.514.0
+
 - Added `transfer/authorization/cancel` endpoint
 
 ### 2020-09-14_1.513.0
+
 - Added `consumer_report/pdf/get` endpoint
 
 ### 2020-09-14_1.512.0
+
 - Added support for address and date of birth in `/payment_initiation/payment/reverse` request.
 
 ### 2020-09-14_1.511.0
+
 - Added `user_token` to `link/token/get` response metadata
 - Internal changes
 
 ### 2020-09-14_1.510.2
+
 - Added `include_insights` to `/credit/relay/get` request
 -
+
 ### 2020-09-14_1.510.1
+
 - Add `database_insights_pending` as a potential enum value to `LinkDeliveryVerificationStatus` and `LinkSessionSuccessMetadataAccount.VerificationStatus`.
 - Remove `database_insights_pass`, `database_insights_pass_with_caution` and `database_insights_fail` as potential values from `LinkDeliveryVerificationStatus` and `LinkSessionSuccessMetadataAccount.VerificationStatus`
 
 ### 2020-09-14_1.510.0
+
 - Internal changes only
 
 ### 2020-09-14_1.509.4
+
 - Internal changes only
 
 ### 2020-09-14_1.509.3
+
 - Update description of transfer authorization decision code `MANUALLY_VERIFIED_ITEM`
 
 ### 2020-09-14_1.509.2
+
 - Fixes to `RemovedTransaction` object definition: set `additionalProperties` explicitly to true and list `account_id` and `transaction_id` as `required`.
 
 ### 2020-09-14_1.509.1
+
 - add `SMS_MICRODEPOSITS_VERIFICATION` to the `webhook_code` field of `/sandbox/item/fire_webhook`
 
 ### 2020-09-14_1.509.0
+
 - Add `supports_payment_consents` to institution's `payment_initiation_metadata`.
 
 ### 2020-09-14_1.508.0
+
 - Add new fields to `/cra/bank_income/get` endpoint
 
 ### 2020-09-14_1.507.3
+
 - Add `paystub` and `w2` values to custom sandbox configuration schema
 
 ### 2020-09-14_1.507.2
+
 - Mark `/transfer/balance/get` endpoint deprecated
 
 ### 2020-09-14_1.507.1
+
 - Update `funds_available` description
 
 ### 2020-09-14_1.507.0
+
 - Add `funds_available` transfer status and transfer event type
 
 ### 2020-09-14_1.506.0
+
 - Add `statements` to the `options` field in the request object for `/sandbox/public_token/create` endpoint
 
 ### 2020-09-14_1.505.1
+
 - Internal changes only
 
 ### 2020-09-14_1.505.0
+
 - Add `profile` product
 
 ### 2020-09-14_1.504.2
+
 - [Breaking] Update `network` field type in `/transfer/recurring/create` request from `TransferACHNetwork` to `TransferRecurringNetwork` as recurring now supports rtp.
 - [Breaking] Update `network` field type in `RecurringTransfer` and `RecurringTransferNullable` from `TransferACHNetwork` to `TransferRecurringNetwork` as recurring now supports rtp.
 
 ### 2020-09-14_1.504.1
+
 - Documentation updates for `/transactions/sync` and Database Match / Database Insights (beta).
 
 ### 2020-09-14_1.504.0
+
 - Add new fields to `/transactions/sync` and `/processor/transactions/sync` endpoints
 
 ### 2020-09-14_1.503.6
+
 - [Breaking change for Go client library] Make `start_date` and `end_date` required in the `statements` object for the `/link/token/create` endpoint
 
 ### 2020-09-14_1.503.5
+
 - Improve description for `RiskCheckIdentityAbuseSignals`
 
 ### 2020-09-14_1.503.4
+
 - Improve description for `TransferNetworkTraceID`
 
 ### 2020-09-14_1.503.3
+
 - Update description for `TransferNetworkTraceID`
 
 ### 2020-09-14_1.503.2
+
 - Change `forecasted_average_monthly_income_prediction_intervals` to plural.
 
 ### 2020-09-14_1.503.1
+
 - Add `has_more` field to /transfer/event/list and /transfer/event/sync to indicate there are more events to be pulled
 
 ### 2020-09-14_1.503.0
+
 - Add new `/cra/base_report/create` endpoint
 
 ### 2020-09-14_1.502.4
+
 - Add `sms_microdeposits_verification_enabled` to `auth` object inside `/link/token/create` calls.
 
 ### 2020-09-14_1.502.3
+
 - Added descriptions for `vested_quantity` and `vested_amount` fields for `investments/holdings/get`
 - Removed description for `vested_quantity` and `vested_amount` fields for `HoldingsOverride` object (for sandbox)
 
 ### 2020-09-14_1.502.2
+
 - [Breaking] Update `network` field type in `/transfer/recurring/create` request from `TransferNetwork` to `TransferACHNetwork` since recurring currently only works for ACH.
 - [Breaking] Update `network` field type in `RecurringTransfer` and `RecurringTransferNullable` from `TransferNetwork` to `TransferACHNetwork` since recurring currently only works for ACH.
 
 ### 2020-09-14_1.502.1
+
 - Update description for `/item/remove` and `/asset_report/remove`
 
 ### 2020-09-14_1.502.0
+
 - Add `client_report_id` fields to `/link/token/create` and `/cra/base_report/get`
 
 ### 2020-09-14_1.501.2
+
 - Updating `insights` field in `/cra/partner_insights/get` response to contain both numerical and string values
 
 ### 2020-09-14_1.501.1
+
 - Enable original description for all customers on `/transactions/get` endpoint
 
 ### 2020-09-14_1.501.0
+
 [Breaking change for Go client library] Mark `address` field in `/beacon/user/create` as optional
 
 ### 2020-09-14_1.500.0
+
 - Remove `prime_trust` processor partner
 
 ### 2020-09-14_1.499.2
+
 - Fix broken link from previous update
 
 ### 2020-09-14_1.499.1
+
 - Updated doc url for some Transfer and processor endpoints to support documentation reorganization
 - Minor documentation updates and clarifications
 
 ### 2020-09-14_1.499.0
+
 - [Breaking change for Go client library] Make `account_id` optional in `/transactions/recurring/get` endpoint
 
 ### 2020-09-14_1.489.3
+
 - Update description of `network_trace_id`
 
 ### 2020-09-14_1.489.2
+
 - Correct documentation to indicate that `assets` is not supported in the `additional_consented_products` field
 - Remove `additionalProperties: true` incorrectly applied to `transferIntentGet` object and missed in `2020-09-14_1.352.0`. This will result in more strict type checking for this object, but should not be a breaking change.
 
 ### 2020-09-14_1.498.1
+
 - Enable original description for all customers
 
 ### 2020-09-14_1.498.0
+
 - Add `POST /beacon/account_risk/v1/evaluate` endpoint
 
 ### 2020-09-14_1.497.0
+
 - Add `institution_id` to `processor/account/get` endpoint.
 
 ### 2020-09-14_1.496.5
+
 - Update the description and enum values for `linked_services` in the response of all of the identity verification endpoints:
   - `identity_verification/create`
   - `identity_verification/get`
@@ -172,51 +333,66 @@
   - `identity_verification/retry`
 
 ### 2020-09-14_1.496.4
-  Add `POST /beacon/user/history/list`
+
+Add `POST /beacon/user/history/list`
 
 ### 2020-09-14_1.496.3
+
 - Add `timestamp` to the beacon user's `audit_trail` object
 - Add `version` to the beacon user object.
 
 ### 2020-09-14_1.496.2
+
 - Adds prediction interval to `/cra/bank_income/get`
 
 ### 2020-09-14_1.496.1
+
 - Update the descriptions for `risk_level` and `score` in `/accounts/balance/get`
 
 ### 2020-09-14_1.496.0
+
 - Add `verification_insights` object to `Account` (closed beta feature - Database Insights)
 - Add `database_insights_pass`, `database_insights_pass_with_caution`, and `database_insights_fail` as new values for `verification_status` field (closed beta feature - Database Insights)
 
 ### 2020-09-14_1.495.2
+
 - Add `pending idr` to student loan liability statuses
 
 ### 2020-09-14_1.495.1
+
 - Add `processor_identity` product
 
 ### 2020-09-14_1.494.1
+
 - Mark `wire_details` as nullable in the transfer object
 
 ### 2020-09-14_1.494.0
+
 - Add `vested_quantity` and `vested_value` fields to the `Holding` object.
 
 ### 2020-09-14_1.493.0
+
 - Add `POST /cra/partner_insights/get`
 
 ### 2020-09-14_1.492.1
+
 - Added documentation for the `HOSTED_VERIFICATION` webhook.
 - Add `wire` to request and response of `/transfer/authorization/create`
 
 ### 2020-09-14_1.492.0
+
 - Remove `page_count`, `name`, and `status` fields from Identity Document Upload's document metadata.
 
 ### 2020-09-14_1.491.3
+
 - Increase max length of description field on `/transfer/intent/create` from 8 to 15
 
 ### 2020-09-14_1.491.2
+
 - Added documentation for the `securities.type` field in `investments/holdings/get` and `investments/transactions/get` endpoints.
 
 ### 2020-09-14_1.491.1
+
 - Add new `no_data` type to `name` and `date_of_birth` fields in `documentary_verification.documents[].analysis.extracted_data` in the response of all of the identity verification endpoints:
   - `identity_verification/create`
   - `identity_verification/get`
@@ -224,124 +400,163 @@
   - `identity_verification/retry`
 
 ### 2020-09-14_1.491.0
+
 - Add `identity` object to `link/token/create` request body
 
 ### 2020-09-14_1.490.0
+
 - Add `events` field to the `sessions` parameter in the `/link/token/get` response
 
 ### 2020-09-14_1.489.1
+
 - Mark optional `scope` and `reference` fields in `/payment_initiation/consent/payment/execute` as nullable
 
 ### 2020-09-14_1.489.0
+
 - Add optional `scope` and `reference` fields to `/payment_initiation/consent/payment/execute`
 
 ### 2020-09-14_1.488.0
+
 - Add optional `item_ids` field to the request of `credit/payroll_income/get` and `credit/bank_statements/uploads/get`
 
 ### 2020-09-14_1.487.2
+
 - Add `num_1099s_uploaded` to `document_income_results` object in `/credit/sessions/get` response
 
 ### 2020-09-14_1.487.1
+
 - Correct the Document Income Verification `parsing_config` enum used by `/link/token/create` to contain `risk_signals` instead of `fraud_risk` to match the actual API implementation.
 - Dcumentation updates to reflect updates to Signal, including that new Items with Signal should now be created with `signal` in `/link/token/create` instead of using `/signal/prepare`.
 
 ### 2020-09-14_1.487.0
+
 - [Breaking] Introduce a new `AssetReportAccountBalance` object which duplicates the existing `AccountBalance` object with an additional `margin_loan_amount` field. Updated `AccountAssets.balances` to return the new `AssetReportAccountBalance` object instead of the existing `AccountBalance` object.
 - Add `vested_quantity` and `vested_value` fields to the `AssetReportInvestments` object.
 
 ### 2020-09-14_1.486.1
+
 - Update `bank_income_sources` in CRA Bank Income Get to be required in response since the empty array is being omitted.
 
 ### 2020-09-14_1.486.0
+
 - Add `requires_real_time_balance_refresh`, `risk_reasons`, `attributes`, `balance_last_updated`, and `score` fields to `/accounts/balance/get` endpoint
 
 ### 2020-09-14_1.485.1
+
 - Update `legal_name` description in `user` object in `/link/token.create` request
 
 ### 2020-09-14_1.485.0
+
 - Add `/processor/liabilities/get` endpoint
 
 ### 2020-09-14_1.484.1
+
 - Add `/identity_verification/autofill/create` (closed beta)
 
 ### 2020-09-14_1.484.0
+
 - Add `/statements/refresh` endpoint
 
 ### 2020-09-14_1.483.2
+
 - Add `/beacon/duplicate/get` route
 
 ### 2020-09-14_1.483.1
+
 - Internal changes only
 
 ### 2020-09-14_1.483.0
+
 - Added net new fields to StatementsAccount object: `account_mask`, `account_subtype`, `account_official_name`
 
 ### 2020-09-14_1.482.3
+
 - Update `description` description for `/transfer/create`
 
 ### 2020-09-14_1.482.2
+
 - Update /credit/relay/get response example
 
 ### 2020-09-14_1.482.1
+
 - Update `funding_account_id` description for `/transfer/intent/create`
 
 ### 2020-09-14_1.482.0
+
 - Adds a new field `payment_details` to `/accounts/balance/get` request
 - Adds a new field `payment_risk_assessment` to `/accounts/balance/get` response
 
 ### 2020-09-14_1.481.1
+
 - Update `USER_ACCOUNT_REVOKED` description and set to visible
 
 ### 2020-09-14_1.481.0
+
 - Add `available` to balance object in `wallet/get` and `wallet/list` response
 
 ### 2020-09-14_1.480.1
+
 - Documentation-only change to Investments `Security` object for new fields and sandbox availability
 
 ### 2020-09-14_1.480.0
+
 - Add `phone_number` to `/transactions/enrich` response
 
 ### 2020-09-14_1.479.0
+
 - [Breaking change for Go client library] Make `street` and `city` optional in the address attribute of `identity_verification/create`
 
 ### 2020-09-14_1.478.4
+
 - Add `registration_number` to `/partner/customer/create` request
 
 ### 2020-09-14_1.478.3
+
 - Update `/identity/get` response for identity document upload beta customers
 
 ### 2020-09-14_1.478.2
+
 - Deprecate `funding_account_id` from `/transfer/recurring/create` request
 
 ### 2020-09-14_1.478.1
+
 - Description-only changes to support Hosted Link (beta)
 
 ### 2020-09-14_1.478.0
+
 - Add `market_identifier_code` and `option_contract` fields in the Security (investment) object
 - `option_contract` object contains `contract_type`, `expiration_date`, `strike_price`, and `underlying_security_ticker`
 
 ### 2020-09-14_1.477.1
+
 - Changes `last_user_modified_date` to `last_user_modified_datetime` on transaction stream object.
 
 ### 2020-09-14_1.477.0
+
 - Bug fix nullability definitions for `/beacon/user/create` and `/beacon/user/update` request payloads
 
 ### 2020-09-14_1.476.1
+
 - Update Recurring Transaction description
 
 ### 2020-09-14_1.476.0
+
 - Add `/beacon/user/update`
 
 ### 2020-09-14_1.475.0
+
 - Add `/beacon/report_syndication/get` route
 
 ### 2020-09-14_1.474.4
+
 - Add Statements Refresh webhook
 
 ### 2020-09-14_1.474.3
+
 - Internal changes only
 
 ### 2020-09-14_1.474.2
+
 - Deprecate `credit_funds_source` in `/transfer/authorization/create` request
 
 ### 2020-09-14_1.474.1
@@ -349,6 +564,7 @@
 - Added `identity_match` to Products schema object
 
 ### 2020-09-14_1.474.0
+
 - Added `statements/refresh` endpoint
 
 ### 2020-09-14_1.473.0
