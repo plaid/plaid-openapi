@@ -2,13 +2,11 @@ openapi: 3.0.0
 servers:
 - description: Production
   url: https://production.plaid.com
-- description: Development
-  url: https://development.plaid.com
 - description: Sandbox
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.525.1
+  version: 2020-09-14_1.534.3
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -1659,7 +1657,7 @@ paths:
                 example-1:
                   value: JVBERi0xLjQKJeLjz9MKMyAwIG9iaiA8PC9MZW5ndGggNDY2MS9GaWx0ZXIvRmxhdGVEZWNvZGU+PnN0cmVhbQp4nF2SyY4cMRBF94VdzI0O...
       externalDocs:
-        url: /none/
+        url: /check/api/#cracheck_reportpdfget
       operationId: craCheckReportPdfGet
       x-hidden-from-docs: true
       description: '`/cra/check_report/pdf/get` retrieve the most recent Bank Income report (if it exists) followed by the most recent Base Report (if it exists) in PDF format'
@@ -1822,6 +1820,53 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CraCheckReportPartnerInsightsGetRequest'
+  /cra/check_report/network_insights/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_CRA
+    post:
+      summary: Retrieve network attributes for the user
+      tags:
+      - plaid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CraCheckReportNetworkAttributesGetResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: LhQf0THi8SH1yJm
+                    report:
+                      report_id: abc123
+                      generated_time: "2022-01-31T22:47:53Z"
+                      network_attributes:
+                        plaid_conn_user_lifetime__lending_count: 5
+                        plaid_conn_user_lifetime__personal_lending_flag: true
+                        plaid_conn_user_lifetime__cash_advance_primary_count: 0
+                      items:
+                      - institution_id: ins_0
+                        institution_name: Plaid Bank
+                        item_id: ABC123
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      externalDocs:
+        url: /check/api/#cracheck_reportnetwork_attributesget
+      operationId: craCheckReportNetworkAttributesGet
+      description: |-
+        This endpoint allows you to retrieve the Network Attributes product for your user. You should call this endpoint after you've received the `CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`. If the most recent consumer report for the user doesn’t have sufficient data to generate the report, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.
+
+        If you did not initialize Link with the `cra_network_attributes` product or have generated a report using `/cra/check_report/create`, we will generate the attributes when you call this endpoint.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CraCheckReportNetworkAttributesGetRequest'
   /cra/loans/applications/register:
     x-plaid-business-unit-context: BUSINESS_UNIT_CRA
     post:
@@ -2265,9 +2310,9 @@ paths:
       - plaid
       summary: Retrieve User Account
       externalDocs:
-        url: /api/user_account/#sessionget
-      operationId: sessionGet
-      description: Returns user permissioned account data including identity and item access tokens.
+        url: /api/products/layer/#user_accountsessionget
+      operationId: userAccountSessionGet
+      description: Returns user permissioned account data including identity and Item access tokens.
       responses:
         "200":
           description: success
@@ -3771,7 +3816,7 @@ paths:
 
         `ERROR`: Assets webhook to be fired when asset report generation has failed. If the Item does not support Assets, a `SANDBOX_PRODUCT_NOT_ENABLED` error will result.
 
-        Note that this endpoint is provided for developer ease-of-use and is not required for testing webhooks; webhooks will also fire in Sandbox under the same conditions that they would in Production or Development (except for webhooks of type `TRANSFER`).
+        Note that this endpoint is provided for developer ease-of-use and is not required for testing webhooks; webhooks will also fire in Sandbox under the same conditions that they would in Production (except for webhooks of type `TRANSFER`).
       responses:
         "200":
           description: success
@@ -6493,9 +6538,9 @@ paths:
                     request_id: saKrIBuEB9qJZng
       operationId: beaconUserUpdate
       description: |-
-        Update the identity data for a Beacon User in your Beacon Program.
+        Update the identity data for a Beacon User in your Beacon Program or add new accounts to the Beacon User.
 
-        Similar to `/beacon/user/create`, several checks are performed immediately when you submit a change to `/beacon/user/update`:
+        Similar to `/beacon/user/create`, several checks are performed immediately when you submit an identity data change to `/beacon/user/update`:
 
           - The user's updated PII is searched against all other users within the Beacon Program you specified. If a match is found that violates your program's "Duplicate Information Filtering" settings, the user will be returned with a status of `pending_review`.
 
@@ -6662,6 +6707,71 @@ paths:
       description: List all changes to the Beacon User in reverse-chronological order.
       externalDocs:
         url: /api/products/beacon/#beaconuserhistorylist
+  /beacon/user/account_insights/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
+    post:
+      summary: Get Account Insights for a Beacon User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BeaconUserAccountInsightsGetRequest'
+        required: true
+      tags:
+      - plaid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BeaconUserAccountInsightsGetResponse'
+              examples:
+                example-1:
+                  value:
+                    beacon_user_id: becusr_42cF1MNo42r9Xj
+                    created_at: "2020-07-24T03:26:02Z"
+                    updated_at: "2020-07-24T03:26:02Z"
+                    bank_account_insights:
+                      item_id: 515cd85321d3649aecddc015
+                      accounts:
+                      - account_id: blgvvBlXw3cq5GMPwqB6s6q4dLKB9WcVqGDGo
+                        type: depository
+                        subtype: checking
+                        attributes:
+                          days_since_first_plaid_connection: 1
+                          is_account_closed: false
+                          is_account_frozen_or_restricted: false
+                          total_plaid_connections_count: 1
+                          plaid_connections_count_7d: 1
+                          plaid_connections_count_30d: 1
+                          failed_plaid_non_oauth_authentication_attempts_count_3d: 1
+                          plaid_non_oauth_authentication_attempts_count_3d: 1
+                          failed_plaid_non_oauth_authentication_attempts_count_7d: 1
+                          plaid_non_oauth_authentication_attempts_count_7d: 1
+                          failed_plaid_non_oauth_authentication_attempts_count_30d: 1
+                          plaid_non_oauth_authentication_attempts_count_30d: 1
+                          distinct_ip_addresses_count_3d: 1
+                          distinct_ip_addresses_count_7d: 1
+                          distinct_ip_addresses_count_30d: 1
+                          distinct_ip_addresses_count_90d: 1
+                          distinct_user_agents_count_3d: 1
+                          distinct_user_agents_count_7d: 1
+                          distinct_user_agents_count_30d: 1
+                          distinct_user_agents_count_90d: 1
+                          address_change_count_28d: 1
+                          email_change_count_28d: 2
+                          phone_change_count_28d: 1
+                          address_change_count_90d: 3
+                          email_change_count_90d: 4
+                          phone_change_count_90d: 2
+                          days_since_account_opening: 365
+                          days_since_first_observed_transaction: 180
+                    request_id: saKrIBuEB9qJZng
+      operationId: beaconUserAccountInsightsGet
+      description: Get Account Insights for all Accounts linked to this Beacon User. The insights for each account are computed based on the information that was last retrieved from the financial institution.
+      externalDocs:
+        url: /api/products/beacon/#beaconuseraccount_insightsget
   /processor/auth/get:
     x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
@@ -7836,7 +7946,7 @@ paths:
       - plaid
       summary: Invalidate access_token
       externalDocs:
-        url: /api/tokens/#itemaccess_tokeninvalidate
+        url: /api/items/#itemaccess_tokeninvalidate
       operationId: itemAccessTokenInvalidate
       responses:
         "200":
@@ -8250,12 +8360,7 @@ paths:
                     payment_id: payment-id-sandbox-feca8a7a-5591-4aef-9297-f3062bb735d3
                     status: PAYMENT_STATUS_INPUT_NEEDED
                     request_id: 4ciYVmesrySiUAB
-      description: |-
-        After creating a payment recipient, you can use the `/payment_initiation/payment/create` endpoint to create a payment to that recipient.  Payments can be one-time or standing order (recurring) and can be denominated in either EUR, GBP or other chosen [currency](https://plaid.com/docs/api/products/payment-initiation/#payment_initiation-payment-create-request-amount-currency).  If making domestic GBP-denominated payments, your recipient must have been created with BACS numbers. In general, EUR-denominated payments will be sent via SEPA Credit Transfer, GBP-denominated payments will be sent via the Faster Payments network and for non-Eurozone markets typically via the local payment scheme, but the payment network used will be determined by the institution. Payments sent via Faster Payments will typically arrive immediately, while payments sent via SEPA Credit Transfer or other local payment schemes will typically arrive in one business day.
-
-        Standing orders (recurring payments) must be denominated in GBP and can only be sent to recipients in the UK. Once created, standing order payments cannot be modified or canceled via the API. An end user can cancel or modify a standing order directly on their banking application or website, or by contacting the bank. Standing orders will follow the payment rules of the underlying rails (Faster Payments in UK). Payments can be sent Monday to Friday, excluding bank holidays. If the pre-arranged date falls on a weekend or bank holiday, the payment is made on the next working day. It is not possible to guarantee the exact time the payment will reach the recipient’s account, although at least 90% of standing order payments are sent by 6am.
-
-        In the Development environment, payments must be below 5 GBP or other chosen [currency](https://plaid.com/docs/api/products/payment-initiation/#payment_initiation-payment-create-request-amount-currency). For details on any payment limits in Production, contact your Plaid Account Manager.
+      description: "After creating a payment recipient, you can use the `/payment_initiation/payment/create` endpoint to create a payment to that recipient.  Payments can be one-time or standing order (recurring) and can be denominated in either EUR, GBP or other chosen [currency](https://plaid.com/docs/api/products/payment-initiation/#payment_initiation-payment-create-request-amount-currency).  If making domestic GBP-denominated payments, your recipient must have been created with BACS numbers. In general, EUR-denominated payments will be sent via SEPA Credit Transfer, GBP-denominated payments will be sent via the Faster Payments network and for non-Eurozone markets typically via the local payment scheme, but the payment network used will be determined by the institution. Payments sent via Faster Payments will typically arrive immediately, while payments sent via SEPA Credit Transfer or other local payment schemes will typically arrive in one business day.\n\nStanding orders (recurring payments) must be denominated in GBP and can only be sent to recipients in the UK. Once created, standing order payments cannot be modified or canceled via the API. An end user can cancel or modify a standing order directly on their banking application or website, or by contacting the bank. Standing orders will follow the payment rules of the underlying rails (Faster Payments in UK). Payments can be sent Monday to Friday, excluding bank holidays. If the pre-arranged date falls on a weekend or bank holiday, the payment is made on the next working day. It is not possible to guarantee the exact time the payment will reach the recipient’s account, although at least 90% of standing order payments are sent by 6am.\n\nIn Limited Production, payments must be below 5 GBP or other chosen [currency](https://plaid.com/docs/api/products/payment-initiation/#payment_initiation-payment-create-request-amount-currency), and standing orders, variable recurring payments, and Virtual Accounts are not supported. "
       requestBody:
         required: true
         content:
@@ -8493,6 +8598,38 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SandboxItemSetVerificationStatusRequest'
+  /sandbox/user/reset_login:
+    x-plaid-business-unit-context: BUSINESS_UNIT_CRA
+    post:
+      tags:
+      - plaid
+      summary: Force item(s) for a Sandbox User into an error state
+      externalDocs:
+        url: /api/sandbox/#sandboxuserreset_login
+      operationId: sandboxUserResetLogin
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SandboxUserResetLoginResponse'
+              examples:
+                example-1:
+                  value:
+                    reset_login: true
+                    request_id: n7XQnv8ozwyFPBC
+      description: |-
+        `/sandbox/user/reset_login/` functions the same as `/sandbox/item/reset_login`, but will modify Items related to a User. This endpoint forces each Item into an `ITEM_LOGIN_REQUIRED` state in order to simulate an Item whose login is no longer valid. This makes it easy to test Link's [update mode](https://plaid.com/docs/link/update-mode) flow in the Sandbox environment.  After calling `/sandbox/user/reset_login`, You can then use Plaid Link update mode to restore Items associated with the User to a good state. An `ITEM_LOGIN_REQUIRED` webhook will also be fired after a call to this endpoint, if one is associated with the Item.
+
+
+        In the Sandbox, Items will transition to an `ITEM_LOGIN_REQUIRED` error state automatically after 30 days, even if this endpoint is not called.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SandboxUserResetLoginRequest'
   /item/public_token/exchange:
     x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
@@ -8500,7 +8637,7 @@ paths:
       - plaid
       summary: Exchange public token for an access token
       externalDocs:
-        url: /api/tokens/#itempublic_tokenexchange
+        url: /api/items/#itempublic_tokenexchange
       operationId: itemPublicTokenExchange
       responses:
         "200":
@@ -8625,6 +8762,87 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UserUpdateRequest'
+  /user/remove:
+    x-plaid-business-unit-context: BUSINESS_UNIT_UNDETERMINED
+    post:
+      tags:
+      - plaid
+      summary: Remove user
+      externalDocs:
+        url: /api/products/income/#userremove
+      operationId: userRemove
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRemoveResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: Aim3b
+      description: "This endpoint is used to remove a user and any relevant data related to the user based on the provided user token. \nAny subsequent calls to retrieve information using the same user token will result in an error stating the user does not exist."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRemoveRequest'
+  /user/items/get:
+    x-plaid-business-unit-context: BUSINESS_UNIT_UNDETERMINED
+    post:
+      tags:
+      - plaid
+      summary: Get Items associated with a User
+      externalDocs:
+        url: /api/products/income/#useritemsget
+      operationId: userItemsGet
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserItemsGetResponse'
+              examples:
+                example-1:
+                  value:
+                    items:
+                    - available_products:
+                      - balance
+                      - auth
+                      billed_products:
+                      - identity
+                      - transactions
+                      error: null
+                      institution_id: ins_109508
+                      item_id: Ed6bjNrDLJfGvZWwnkQlfxwoNz54B5C97ejBr
+                      update_type: background
+                      webhook: https://plaid.com/example/hook
+                      consent_expiration_time: null
+                    - available_products:
+                      - balance
+                      - identity
+                      - payment_initiation
+                      - transactions
+                      billed_products:
+                      - assets
+                      - auth
+                      error: null
+                      institution_id: ins_109508
+                      item_id: DWVAAPWq4RHGlEaNyGKRTAnPLaEmo8Cvq7na6
+                      update_type: background
+                      webhook: https://plaid.com/example/hook
+                      consent_expiration_time: null
+                    request_id: m8MDnv9okwxFNBV
+      description: Returns Items associated with a User along with their corresponding statuses.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserItemsGetRequest'
   /credit/sessions/get:
     x-plaid-business-unit-context: BUSINESS_UNIT_PLAID
     post:
@@ -9893,9 +10111,9 @@ paths:
                     expiration: "2020-03-27T12:56:34Z"
                     request_id: XQVgFigpGHXkb0b
       description: |-
-        The `/link/token/create` endpoint creates a `link_token`, which is required as a parameter when initializing Link. Once Link has been initialized, it returns a `public_token`, which can then be exchanged for an `access_token` via `/item/public_token/exchange` as part of the main Link flow.
+        The `/link/token/create` endpoint creates a `link_token`, which is required as a parameter when initializing Link. Once Link has been initialized, it returns a `public_token`. For most Plaid products, the `public_token` is saved and exchanged for an `access_token` via `/item/public_token/exchange` as part of the main Link flow. For more details, see the [Link flow overview](https://plaid.com/docs/link/#link-flow-overview).
 
-        A `link_token` generated by `/link/token/create` is also used to initialize other Link flows, such as the update mode flow for tokens with expired credentials, or the Payment Initiation (Europe) flow.
+        A `link_token` generated by `/link/token/create` is also used to initialize other Link flows, such as the [update mode](https://plaid.com/docs/link/update-mode) flow for tokens with expired credentials, or the Identity Verification flow.
       requestBody:
         required: true
         content:
@@ -15818,7 +16036,6 @@ paths:
                       status: ACTIVE
                       secrets:
                         sandbox: b60b5201d006ca5a7081d27c824d77
-                        development: 95e56a510204f293d3bebd4b9cf5c7
                         production: 79g03eoofwl8240v776r2h667442119
                     request_id: 4zlKapIkTm8p5KM
         default:
@@ -15922,7 +16139,7 @@ paths:
       summary: Enables a Plaid reseller's end customer in the Production environment.
       externalDocs:
         url: /api/partner/#partnercustomerenable
-      description: The `/partner/customer/enable` endpoint is used by reseller partners to enable an end customer in the Production environment.
+      description: The `/partner/customer/enable` endpoint is used by reseller partners to enable an end customer in the full Production environment.
       operationId: partnerCustomerEnable
       responses:
         "200":
@@ -15962,7 +16179,7 @@ paths:
       summary: Removes a Plaid reseller's end customer.
       externalDocs:
         url: /api/partner/#partnercustomerremove
-      description: The `/partner/customer/remove` endpoint is used by reseller partners to remove an end customer. Removing an end customer will remove it from view in the Plaid Dashboard and deactivate its API keys. This endpoint can only be used to remove an end customer that has not yet been enabled in Production.
+      description: The `/partner/customer/remove` endpoint is used by reseller partners to remove an end customer. Removing an end customer will remove it from view in the Plaid Dashboard and deactivate its API keys. This endpoint can only be used to remove an end customer that has not yet been enabled in full Production.
       operationId: partnerCustomerRemove
       responses:
         "200":
@@ -16020,14 +16237,12 @@ paths:
                       institution_id: ins_56
                       environments:
                         production: PROCESSING
-                        development: PROCESSING
                       production_enablement_date: null
                       classic_disablement_date: "2022-06-30"
                     - name: Capital One
                       institution_id: ins_128026
                       environments:
                         production: ENABLED
-                        development: ENABLED
                       production_enablement_date: "2022-12-19"
                       classic_disablement_date: null
                     request_id: 4zlKapIkTm8p5KM
@@ -16210,7 +16425,6 @@ components:
       type: string
       description: The Plaid environment the webhook was sent from
       enum:
-      - development
       - sandbox
       - production
     AuthGetRequest:
@@ -16889,7 +17103,7 @@ components:
       properties:
         products:
           type: array
-          description: 'Filter the Institutions based on which products they support. '
+          description: Filter the Institutions based on which products they support. Will only return institutions that support all listed products. When filtering based on `auth`, an institution must support Instant Auth to match the criterion.
           nullable: true
           minItems: 1
           items:
@@ -18435,6 +18649,33 @@ components:
       required:
       - reset_login
       - request_id
+    SandboxUserResetLoginRequest:
+      type: object
+      description: SandboxUserResetLoginRequest defines the request schema for `/sandbox/user/reset_login`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        user_token:
+          $ref: '#/components/schemas/UserToken'
+        item_ids:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemId'
+          nullable: true
+          description: An array of `item_id`s associated with the User to be reset.  If empty or `null`, this field will default to resetting all Items associated with the User.
+      required:
+      - user_token
+    SandboxUserResetLoginResponse:
+      type: object
+      additionalProperties: true
+      description: SandboxUserResetLoginResponse defines the response schema for `/sandbox/user/reset_login`
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
     SandboxPaymentProfileResetLoginRequest:
       type: object
       description: SandboxPaymentProfileResetLoginRequest defines the request schema for `/sandbox/payment_profile/reset_login`
@@ -18549,11 +18790,58 @@ components:
           $ref: '#/components/schemas/RequestID'
       required:
       - request_id
+    UserRemoveRequest:
+      type: object
+      description: UserRemoveRequest defines the request schema for `/user/remove`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        user_token:
+          $ref: '#/components/schemas/UserToken'
+      required:
+      - user_token
+    UserRemoveResponse:
+      type: object
+      additionalProperties: true
+      description: UserRemoveResponse defines the response schema for `/user/remove`
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
+    UserItemsGetRequest:
+      type: object
+      description: UserItemsGetRequest defines the request schema for `/user/items/get`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        user_token:
+          $ref: '#/components/schemas/UserToken'
+      required:
+      - user_token
+    UserItemsGetResponse:
+      type: object
+      additionalProperties: true
+      description: UserItemsGetResponse defines the response schema for `/user/items/get`
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Item'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - items
+      - request_id
     UserAccountIdentity:
       type: object
       nullable: true
       additionalProperties: true
-      description: UserAccountIdentity defines the identity data permissioned by the end user during the authorization flow.
+      description: The identity data permissioned by the end user during the authorization flow.
       properties:
         name:
           $ref: '#/components/schemas/UserAccountIdentityName'
@@ -18582,14 +18870,14 @@ components:
       type: object
       nullable: true
       additionalProperties: true
-      description: UserAccountIdentityName defines the user's first name and last name.
+      description: The user's first name and last name.
       properties:
         first_name:
           type: string
         last_name:
           type: string
     UserAccountIdentityAddress:
-      description: UserAccountIdentityAddress defines the user's address.
+      description: The user's address.
       additionalProperties: true
       nullable: true
       type: object
@@ -18623,7 +18911,7 @@ components:
           description: The ISO 3166-1 alpha-2 country code
           nullable: true
     UserAccountItem:
-      description: UserAccountItem defines an Item created during a Layer authorization session.
+      description: An Item created during a Layer authorization session.
       type: object
       additionalProperties: true
       properties:
@@ -19669,6 +19957,7 @@ components:
           - sardine
           - alloy
           - finix
+          - nuvei
           - layer
           - boom
           - paynote
@@ -19959,11 +20248,11 @@ components:
 
             If using Identity Verification, `country_codes` should be set to the country where your company is based, not the country where your user is located. For all other products, `country_codes` represents the location of your user's financial institution.
 
-            If Link is launched with multiple country codes, only products that you are enabled for in all countries will be used by Link. Note that while all countries are enabled by default in Sandbox and Development, in Production only US and Canada are enabled by default. Access to European institutions requires additional compliance steps. To request access to European institutions in the Production environment, [file a product access Support ticket](https://dashboard.plaid.com/support/new/product-and-development/product-troubleshooting/request-product-access) via the Plaid dashboard. If you initialize with a European country code, your users will see the European consent panel during the Link flow.
+            If Link is launched with multiple country codes, only products that you are enabled for in all countries will be used by Link. Note that while all countries are enabled by default in Sandbox, in Production only US and Canada are enabled by default. To request access to European institutions, [file a product access Support ticket](https://dashboard.plaid.com/support/new/product-and-development/product-troubleshooting/request-product-access) via the Plaid dashboard.
 
             If using a Link customization, make sure the country codes in the customization match those specified in `country_codes`, or the customization may not be applied.
 
-            If using the Auth features Instant Match, Same-day Micro-deposits, or Automated Micro-deposits, `country_codes` must be set to `['US']`.
+            If using the Auth features Instant Match, Instant Micro-deposits, Same-day Micro-deposits, Automated Micro-deposits, or Database Insights, `country_codes` must be set to `['US']`.
           items:
             $ref: '#/components/schemas/CountryCode'
           minItems: 1
@@ -19986,6 +20275,8 @@ components:
           x-override-enum-values-shown:
           - assets
           - auth
+          - balance_plus
+          - beacon
           - employment
           - identity
           - income_verification
@@ -20052,6 +20343,7 @@ components:
             $ref: '#/components/schemas/Products'
           x-override-enum-values-shown:
           - auth
+          - balance_plus
           - identity
           - investments
           - liabilities
@@ -20077,7 +20369,7 @@ components:
           description: The name of the Link customization from the Plaid Dashboard to be applied to Link. If not specified, the `default` customization will be used. When using a Link customization, the language in the customization must match the language selected via the `language` parameter, and the countries in the customization should match the country codes selected via `country_codes`.
         redirect_uri:
           type: string
-          description: A URI indicating the destination where a user should be forwarded after completing the Link flow; used to support OAuth authentication flows when launching Link in the browser or another app. The `redirect_uri` should not contain any query parameters. When used in Production or Development, must be an https URI. To specify any subdomain, use `*` as a wildcard character, e.g. `https://*.example.com/oauth.html`. Note that any redirect URI must also be added to the Allowed redirect URIs list in the [developer dashboard](https://dashboard.plaid.com/team/api). If initializing on Android, `android_package_name` must be specified instead and `redirect_uri` should be left blank. If using Hosted Link, the `redirect_uri` must be set to `https://secure.plaid.com/oauth/redirect`.
+          description: A URI indicating the destination where a user should be forwarded after completing the Link flow; used to support OAuth authentication flows when launching Link in the browser or another app. The `redirect_uri` should not contain any query parameters. When used in Production, must be an https URI. To specify any subdomain, use `*` as a wildcard character, e.g. `https://*.example.com/oauth.html`. Note that any redirect URI must also be added to the Allowed redirect URIs list in the [developer dashboard](https://dashboard.plaid.com/team/api). If initializing on Android, `android_package_name` must be specified instead and `redirect_uri` should be left blank. If using Hosted Link, the `redirect_uri` must be set to `https://secure.plaid.com/oauth/redirect`.
         android_package_name:
           type: string
           description: The name of your app's Android package. Required if using the `link_token` to initialize Link on Android. Any package name specified here must also be added to the Allowed Android package names setting on the [developer dashboard](https://dashboard.plaid.com/team/api). When creating a `link_token` for initializing Link on other platforms, `android_package_name` must be left blank and `redirect_uri` should be used instead.
@@ -20229,7 +20521,7 @@ components:
       description: |
         How Plaid should deliver the Plaid Link session to the customer. Only available to customers enabled for Link Delivery (beta). To request Link Delivery access, contact your account manager.
         'sms' will deliver via SMS. Must pass `user.phone_number`.
-        'email' will deliver via email. Must pass `user.email_address`. In the Sandbox environment, this field will be ignored; use the Production or Development environment to test Link Delivery instead.
+        'email' will deliver via email. Must pass `user.email_address`. In the Sandbox environment, this field will be ignored; use the Production environment to test Link Delivery instead.
       enum:
       - sms
       - email
@@ -20258,6 +20550,11 @@ components:
           description: An array of `account_ids`
           items:
             type: string
+        parsing_configs:
+          type: array
+          description: An array of parsing configurations. Valid parsing configurations are `ocr` and `risk_signals`. If parsing configurations are omitted, defaults to `ocr`
+          items:
+            $ref: '#/components/schemas/IncomeVerificationDocParsingConfig'
     LinkTokenCreateRequestPaymentInitiation:
       type: object
       description: Specifies options for initializing Link for use with the Payment Initiation (Europe) product. This field is required if `payment_initiation` is included in the `products` array. Either `payment_id` or `consent_id` must be provided.
@@ -20285,6 +20582,9 @@ components:
         intent_id:
           type: string
           description: The `id` returned by the `/transfer/intent/create` endpoint.
+        authorization_id:
+          type: string
+          description: The `id` returned by the `/transfer/authorization/create` endpoint. Used to indicate Link session to complete required user action in order to make a decision for the authorization. If set, `access_token` can be omitted.
         payment_profile_token:
           x-hidden-from-docs: true
           type: string
@@ -20544,7 +20844,7 @@ components:
       properties:
         account_selection_enabled:
           type: boolean
-          description: If `true`, enables [update mode with Account Select](https://plaid.com/docs/link/update-mode/#using-update-mode-to-request-new-accounts) for institutions that do not use OAuth, or that use OAuth but do not have their own account selection flow. For institutions that have an OAuth account selection flow (i.e. most OAuth-enabled institutions), update mode with Account Select will always be enabled, regardless of the value of this field.
+          description: If `true`, enables [update mode with Account Select](https://plaid.com/docs/link/update-mode/#using-update-mode-to-request-new-accounts) for institutions in the US and Canada that do not use OAuth, or that use OAuth but do not have their own account selection flow. For institutions in the US that have an OAuth account selection flow (i.e. most OAuth-enabled institutions), update mode with Account Select will always be enabled, regardless of the value of this field.
           default: false
         user:
           type: boolean
@@ -21192,7 +21492,7 @@ components:
           $ref: '#/components/schemas/AccountVerificationInsights'
         persistent_account_id:
           type: string
-          description: A unique and persistent identifier for accounts that can be used to trace multiple instances of the same account across different Items for depository accounts. This is currently only supported for Chase Items. Because Chase accounts have a different account number each time they are linked, this field may be used instead of the account number to uniquely identify a Chase account across multiple Items for payments use cases, helping to reduce duplicate Items or attempted fraud. In Sandbox, this field may be populated for any account; in Production and Development, it will only be populated for Chase accounts.
+          description: A unique and persistent identifier for accounts that can be used to trace multiple instances of the same account across different Items for depository accounts. This is currently only supported for Chase Items. Because Chase accounts have a different account number each time they are linked, this field may be used instead of the account number to uniquely identify a Chase account across multiple Items for payments use cases, helping to reduce duplicate Items or attempted fraud. In Sandbox, this field may be populated for any account; in Production, it will only be populated for Chase accounts.
         holder_category:
           $ref: '#/components/schemas/AccountHolderCategory'
       required:
@@ -23858,11 +24158,6 @@ components:
           description: Data about the various addresses associated with the account by the financial institution. May be an empty array if no relevant information is returned from the financial institution.
           items:
             $ref: '#/components/schemas/Address'
-        document_id:
-          type: string
-          description: document_id is the id of the document that this identity belongs to
-          nullable: true
-          x-hidden-from-docs: true
       required:
       - names
       - phone_numbers
@@ -24727,7 +25022,7 @@ components:
       description: |-
         A random key provided by the client, per unique consent payment. Maximum of 128 characters.
 
-        The API supports idempotency for safely retrying requests without accidentally performing the same operation twice. If a request to execute a consent payment fails due to a network connection error, you can retry the request with the same idempotency key to guarantee that only a single payment is created. If the request was successfully processed, it will prevent any payment that uses the same idempotency key, and was received within 24 hours of the first request, from being processed.
+        The API supports idempotency for safely retrying requests without accidentally performing the same operation twice. If a request to execute a consent payment fails due to a network connection error, you can retry the request with the same idempotency key to guarantee that only a single payment is created. If the request was successfully processed, it will prevent any payment that uses the same idempotency key, and was received within 48 hours of the first request, from being processed.
     ExternalPaymentOptions:
       title: PaymentOptions
       description: Additional payment options
@@ -24786,6 +25081,8 @@ components:
       - assets
       - auth
       - balance
+      - balance_plus
+      - beacon
       - identity
       - identity_match
       - investments
@@ -27960,7 +28257,7 @@ components:
       type: object
       additionalProperties: true
       description: |-
-        The `USER_PERMISSION_REVOKED` webhook may be fired when an end user has used either the [my.plaid.com portal](https://my.plaid.com) or the financial institution’s OAuth consent portal to revoke the permission that they previously granted to access an Item. This webhook is not guaranteed to always be fired upon consent revocation, since some institutions’ consent portals do not trigger this webhook. Once access to an Item has been revoked, it cannot be restored. If the user subsequently returns to your application, a new Item must be created for the user.
+        The `USER_PERMISSION_REVOKED` webhook may be fired when an end user has used either the [my.plaid.com portal](https://my.plaid.com) or the financial institution’s OAuth consent portal to revoke the permission that they previously granted to access an Item. This webhook is not guaranteed to always be fired upon consent revocation, since some institutions’ consent portals do not trigger this webhook. Once access to an Item has been revoked, it cannot be restored. If the user subsequently returns to your application, a new Item must be created for the user. Upon receiving this webhook, it is recommended to call `/item/remove` to delete the underlying Item and to delete any stored data from Plaid associated with the Item.
 
         Note that when using ACH flows with Chase Items specifically, the account number provided by Plaid will no longer work for creating transfers once user permission has been revoked. If you receive this webhook for a Chase Item, you should not create any new ACH transfers for that Item, as they will be returned.
       x-examples:
@@ -29926,9 +30223,12 @@ components:
         `approved` – The proposed transfer has received the end user's consent and has been approved for processing by Plaid. The `decision_rationale` field is set if Plaid was unable to fetch the account information. You may proceed with the transfer, but further review is recommended (i.e., use Link in update mode to re-authenticate your user when `decision_rationale.code` is `ITEM_LOGIN_REQUIRED`). Refer to the `code` field in the `decision_rationale` object for details.
 
         `declined` – Plaid reviewed the proposed transfer and declined processing. Refer to the `code` field in the `decision_rationale` object for details.
+
+        `user_action_required` – An action is required before Plaid can assess the transfer risk and make a decision. The most common scenario is to update authentication for an Item. To complete the required action, initialize Link by setting `transfer.authorization_id` in the request of `/link/token/create`.
       enum:
       - approved
       - declined
+      - user_action_required
     TransferAuthorization:
       title: TransferAuthorization
       type: object
@@ -32730,24 +33030,8 @@ components:
             description: Data returned by the financial institution about the account owner or owners. Only returned by Identity or Assets endpoints. For business accounts, the name reported may be either the name of the individual or the name of the business, depending on the institution; detecting whether the linked account is a business account is not currently supported. Multiple owners on a single account will be represented in the same `owner` object, not in multiple owner objects within the array. In API versions 2018-05-22 and earlier, the `owners` object is not returned, and instead identity information is returned in the top level `identity` object. For more details, see [Plaid API versioning](https://plaid.com/docs/api/versioning/#version-2019-05-29)
             items:
               $ref: '#/components/schemas/Owner'
-          documents:
-            type: array
-            description: Array of documents that identity data is dervied from. This array will be empty if none of the account identity is from a document.
-            items:
-              $ref: '#/components/schemas/IdentityDocument'
-            x-hidden-from-docs: true
         required:
         - owners
-    IdentityDocument:
-      title: IdentityDocument
-      type: object
-      description: Document object with metadata of the document uploaded
-      properties:
-        metadata:
-          $ref: '#/components/schemas/IdentityDocumentMetadata'
-        document_id:
-          type: string
-      x-hidden-from-docs: true
     AccountIdentityMatchScore:
       description: Identity match scores for an account
       title: AccountIdentityMatchScore
@@ -38631,7 +38915,7 @@ components:
     NewAccountsAvailableWebhook:
       title: NewAccountsAvailableWebhook
       type: object
-      description: Fired when Plaid detects a new account for Items created or updated with [Account Select v2](https://plaid.com/docs/link/customization/#account-select). Upon receiving this webhook, you can prompt your users to share new accounts with you through [Account Select v2 update mode](https://plaid.com/docs/link/update-mode/#using-update-mode-to-request-new-accounts).
+      description: Fired when Plaid detects a new account for Items created or updated with [Account Select v2](https://plaid.com/docs/link/customization/#account-select). Upon receiving this webhook, you can prompt your users to share new accounts with you through [Account Select v2 update mode](https://plaid.com/docs/link/update-mode/#using-update-mode-to-request-new-accounts) (US/CA only). For end user accounts in the EU and UK, upon receiving this webhook, you can prompt your user to re-link their account and then delete the old Item via `/item/remove`.
       x-examples:
         example-1:
           webhook_type: ITEM
@@ -40082,7 +40366,7 @@ components:
         assets_under_management:
           $ref: '#/components/schemas/PartnerEndCustomerAssetsUnderManagement'
         redirect_uris:
-          description: A list of URIs indicating the destination(s) where a user can be forwarded after completing the Link flow; used to support OAuth authentication flows when launching Link in the browser or another app. URIs should not contain any query parameters. When used in Production or Development, URIs must use https. To specify any subdomain, use `*` as a wildcard character, e.g. `https://*.example.com/oauth.html`. To modify redirect URIs for an end customer after creating them, go to the end customer's [API page](https://dashboard.plaid.com/team/api) in the Dashboard.
+          description: A list of URIs indicating the destination(s) where a user can be forwarded after completing the Link flow; used to support OAuth authentication flows when launching Link in the browser or another app. URIs should not contain any query parameters. When used in Production, URIs must use https. To specify any subdomain, use `*` as a wildcard character, e.g. `https://*.example.com/oauth.html`. To modify redirect URIs for an end customer after creating them, go to the end customer's [API page](https://dashboard.plaid.com/team/api) in the Dashboard.
           type: array
           items:
             type: string
@@ -40259,7 +40543,7 @@ components:
         status:
           $ref: '#/components/schemas/PartnerEndCustomerStatus'
     PartnerEndCustomerWithSecrets:
-      description: The details for the newly created end customer, including secrets for non-Production environments.
+      description: The details for the newly created end customer, including secrets for Sandbox and Limited Production.
       type: object
       additionalProperties: true
       allOf:
@@ -40278,15 +40562,15 @@ components:
       description: |-
         The status of the given end customer.
 
-        `UNDER_REVIEW`: The end customer has been created and enabled in the non-Production environments. The end customer must be manually reviewed by the Plaid team before it can be enabled in production, at which point its status will automatically transition to `PENDING_ENABLEMENT` or `DENIED`.
+        `UNDER_REVIEW`: The end customer has been created and enabled in Sandbox and Limited Production. The end customer must be manually reviewed by the Plaid team before it can be enabled in full production, at which point its status will automatically transition to `PENDING_ENABLEMENT` or `DENIED`.
 
-        `PENDING_ENABLEMENT`: The end customer is ready to be enabled in the Production environment. Call the `/partner/customer/enable` endpoint to enable the end customer in Production.
+        `PENDING_ENABLEMENT`: The end customer is ready to be fully enabled in the Production environment. Call the `/partner/customer/enable` endpoint to enable the end customer in full Production.
 
-        `ACTIVE`: The end customer has been enabled in all environments.
+        `ACTIVE`: The end customer has been fully enabled in all environments.
 
-        `DENIED`: The end customer has been created and enabled in the non-Production environments, but it did not pass review by the Plaid team and therefore cannot be enabled in the Production environment. Talk to your Account Manager for more information.
+        `DENIED`: The end customer has been created and enabled in Sandbox and Limited Production, but it did not pass review by the Plaid team and therefore cannot be enabled for full Production access. Talk to your Account Manager for more information.
     PartnerEndCustomerSecrets:
-      description: The secrets for the newly created end customer in non-Production environments.
+      description: The secrets for the newly created end customer.
       type: object
       additionalProperties: true
       properties:
@@ -40294,9 +40578,10 @@ components:
           description: The end customer's secret key for the Sandbox environment.
           type: string
         development:
-          description: The end customer's secret key for the Development environment. The Development environment will be decommissioned on June 20, 2024.
+          description: The end customer's secret key for the Development environment. The Development environment has been removed.
           type: string
           deprecated: true
+          x-hidden-from-docs: true
         production:
           description: The end customer's secret key for the Production environment. The end customer will be provided with a limited number of credits to test in the Production environment before full enablement.
           type: string
@@ -40583,7 +40868,7 @@ components:
       type: object
       additionalProperties: true
       description: |-
-        The `USER_ACCOUNT_REVOKED` webhook is fired when an end user has revoked access to their account on the Data Provider's portal. This webhook is currently sent only for Chase Items, but may be sent in the future for other financial institutions that allow account-level permissions revocation through their portals.
+        The `USER_ACCOUNT_REVOKED` webhook is fired when an end user has revoked access to their account on the Data Provider's portal. This webhook is currently sent only for Chase Items, but may be sent in the future for other financial institutions that allow account-level permissions revocation through their portals. Upon receiving this webhook, it is recommended to delete any Plaid-derived data you have stored that is associated with the revoked account.
 
         If you are using Auth and receive this webhook for a Chase Item, this webhook indicates that the TAN associated with the revoked account is no longer valid and cannot be used to create new transfers. You should not create new ACH transfers for the account that was revoked until access has been re-granted.
 
@@ -40859,6 +41144,13 @@ components:
         user_id:
           type: string
           description: The `user_id` corresponding to the user the webhook has fired for.
+        item_ids:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemId'
+          description: A list of `item_ids` that is included in the Check Report.
+          x-hidden-from-docs: true
+          nullable: true
         environment:
           $ref: '#/components/schemas/WebhookEnvironmentValues'
       required:
@@ -41058,7 +41350,7 @@ components:
     LinkEventMetadata:
       type: object
       title: LinkEventMetadata
-      description: Metadata about an event that occured while the user was going through Link
+      description: Metadata about an event that occurred while the user was going through Link
       additionalProperties: true
       properties:
         error_code:
@@ -41773,7 +42065,6 @@ components:
     CraCheckReportPDFGetRequest:
       title: CraCheckReportPDFGetRequest
       type: object
-      x-hidden-from-docs: true
       description: CraCheckReportPDFGetRequest defines the request schema for `/cra/check_report/pdf/get`.
       properties:
         client_id:
@@ -41801,7 +42092,6 @@ components:
     CraCheckReportPDFGetResponse:
       format: binary
       type: string
-      x-hidden-from-docs: true
       description: CraCheckReportPDFGetResponse defines the response schema for `/cra/check_report/pdf/get`
     CraCheckReportBaseReportGetRequest:
       title: CraCheckReportBaseReportGetRequest
@@ -41814,6 +42104,13 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_token:
           $ref: '#/components/schemas/UserToken'
+        item_ids:
+          type: array
+          description: The item IDs to include in the Base Report. If not provided, all items associated with the user will be included.
+          nullable: true
+          x-hidden-from-docs: true
+          items:
+            $ref: '#/components/schemas/ItemId'
       required:
       - user_token
     CraCheckReportBaseReportGetResponse:
@@ -42902,10 +43199,12 @@ components:
         oldest_transaction_date:
           type: string
           format: date
+          nullable: true
           description: Date of the earliest transaction in the base report for the account.
         most_recent_transaction_date:
           type: string
           format: date
+          nullable: true
           description: Date of the most recent transaction in the base report for the account.
         days_available:
           type: integer
@@ -43408,114 +43707,171 @@ components:
           type: integer
           description: The number of days since the first time the Item was connected to an application via Plaid
           nullable: true
+          example: 1
         is_account_closed:
           type: boolean
           description: Indicates if the account has been closed by the financial institution or the consumer, or is at risk of being closed
           nullable: true
+          example: false
         is_account_frozen_or_restricted:
           type: boolean
           description: Indicates whether the account has withdrawals and transfers disabled or if access to the account is restricted. This could be due to a freeze by the credit issuer, legal restrictions (e.g., sanctions), or regulatory requirements limiting monthly withdrawals, among other reasons
           nullable: true
+          example: false
         total_plaid_connections_count:
           type: integer
           description: The total number of times the item has been connected to applications via Plaid
           nullable: true
+          example: 1
         plaid_connections_count_7d:
           type: integer
           description: The number of times the Item has been connected to applications via Plaid over the past 7 days
           nullable: true
+          example: 1
         plaid_connections_count_30d:
           type: integer
           description: The number of times the Item has been connected to applications via Plaid over the past 30 days
           nullable: true
+          example: 1
         failed_plaid_non_oauth_authentication_attempts_count_3d:
           type: integer
           description: The number of failed non-OAuth authentication attempts via Plaid for this bank account over the past 3 days
           nullable: true
+          example: 1
         plaid_non_oauth_authentication_attempts_count_3d:
           type: integer
           description: The number of non-OAuth authentication attempts via Plaid for this bank account over the past 3 days
           nullable: true
+          example: 1
         failed_plaid_non_oauth_authentication_attempts_count_7d:
           type: integer
           description: The number of failed non-OAuth authentication attempts via Plaid for this bank account over the past 7 days
           nullable: true
+          example: 1
         plaid_non_oauth_authentication_attempts_count_7d:
           type: integer
           description: The number of non-OAuth authentication attempts via Plaid for this bank account over the past 7 days
           nullable: true
+          example: 1
         failed_plaid_non_oauth_authentication_attempts_count_30d:
           type: integer
           description: The number of failed non-OAuth authentication attempts via Plaid for this bank account over the past 30 days
           nullable: true
+          example: 1
         plaid_non_oauth_authentication_attempts_count_30d:
           type: integer
           description: The number of non-OAuth authentication attempts via Plaid for this bank account over the past 30 days
           nullable: true
+          example: 1
         distinct_ip_addresses_count_3d:
           type: integer
           description: The number of distinct IP addresses linked to the same bank account during Plaid authentication in the last 3 days
           nullable: true
+          example: 1
         distinct_ip_addresses_count_7d:
           type: integer
           description: The number of distinct IP addresses linked to the same bank account during Plaid authentication in the last 7 days
           nullable: true
+          example: 1
         distinct_ip_addresses_count_30d:
           type: integer
           description: The number of distinct IP addresses linked to the same bank account during Plaid authentication in the last 30 days
           nullable: true
+          example: 1
         distinct_ip_addresses_count_90d:
           type: integer
           description: The number of distinct IP addresses linked to the same bank account during Plaid authentication in the last 90 days
           nullable: true
+          example: 1
         distinct_user_agents_count_3d:
           type: integer
           description: The number of distinct user agents linked to the same bank account during Plaid authentication in the last 3 days
           nullable: true
+          example: 1
         distinct_user_agents_count_7d:
           type: integer
           description: The number of distinct user agents linked to the same bank account during Plaid authentication in the last 7 days
           nullable: true
+          example: 1
         distinct_user_agents_count_30d:
           type: integer
           description: The number of distinct user agents linked to the same bank account during Plaid authentication in the last 30 days
           nullable: true
+          example: 1
         distinct_user_agents_count_90d:
           type: integer
           description: The number of distinct user agents linked to the same bank account during Plaid authentication in the last 90 days
           nullable: true
+          example: 1
         address_change_count_28d:
           type: integer
           description: The number of times the account's addresses on file have changed over the past 28 days
           nullable: true
+          example: 1
         email_change_count_28d:
           type: integer
           description: The number of times the account's email addresses on file have changed over the past 28 days
           nullable: true
+          example: 2
         phone_change_count_28d:
           type: integer
           description: The number of times the account's phone numbers on file have changed over the past 28 days
           nullable: true
+          example: 1
         address_change_count_90d:
           type: integer
           description: The number of times the account's addresses on file have changed over the past 90 days
           nullable: true
+          example: 3
         email_change_count_90d:
           type: integer
           description: The number of times the account's email addresses on file have changed over the past 90 days
           nullable: true
+          example: 4
         phone_change_count_90d:
           type: integer
           description: The number of times the account's phone numbers on file have changed over the past 90 days
           nullable: true
+          example: 2
         days_since_account_opening:
           type: integer
           description: The number of days since the bank account was opened, as reported by the financial institution
           nullable: true
+          example: 365
         days_since_first_observed_transaction:
           type: integer
           description: The number of days since the oldest transaction available to Plaid for this account. This measure, combined with Plaid connection history, can be used to infer the age of the account
           nullable: true
+          example: 180
+      required:
+      - days_since_first_plaid_connection
+      - is_account_closed
+      - is_account_frozen_or_restricted
+      - total_plaid_connections_count
+      - plaid_connections_count_7d
+      - plaid_connections_count_30d
+      - failed_plaid_non_oauth_authentication_attempts_count_3d
+      - plaid_non_oauth_authentication_attempts_count_3d
+      - failed_plaid_non_oauth_authentication_attempts_count_7d
+      - plaid_non_oauth_authentication_attempts_count_7d
+      - failed_plaid_non_oauth_authentication_attempts_count_30d
+      - plaid_non_oauth_authentication_attempts_count_30d
+      - distinct_ip_addresses_count_3d
+      - distinct_ip_addresses_count_7d
+      - distinct_ip_addresses_count_30d
+      - distinct_ip_addresses_count_90d
+      - distinct_user_agents_count_3d
+      - distinct_user_agents_count_7d
+      - distinct_user_agents_count_30d
+      - distinct_user_agents_count_90d
+      - address_change_count_28d
+      - email_change_count_28d
+      - phone_change_count_28d
+      - address_change_count_90d
+      - email_change_count_90d
+      - phone_change_count_90d
+      - days_since_account_opening
+      - days_since_first_observed_transaction
       additionalProperties: true
     BeaconAuditTrail:
       type: object
@@ -43551,6 +43907,44 @@ components:
         `system` - The resource was created or updated automatically by a part of the Plaid Beacon system. For example, if another business using Plaid Beacon created a fraud report that matched one of your users, your matching user's status would automatically be updated and the audit trail source would be `system`.
 
         `bulk_import` - The resource was created or updated as part of a bulk import process. For example, if your company provided a CSV of user data as part of your initial onboarding, the audit trail source would be `bulk_import`.
+    BeaconBankAccountInsights:
+      type: object
+      title: BeaconBankAccountInsights
+      description: Bank Account Insights encapsulate the risk insights for a single Bank Account linked to an Item that is assocaited with a Beacon User.
+      properties:
+        account_id:
+          type: string
+          description: The Plaid `account_id`
+          example: blgvvBlXw3cq5GMPwqB6s6q4dLKB9WcVqGDGo
+        type:
+          $ref: '#/components/schemas/AccountType'
+        subtype:
+          $ref: '#/components/schemas/AccountSubtype'
+        attributes:
+          $ref: '#/components/schemas/BeaconAccountRiskAttributes'
+      required:
+      - account_id
+      - type
+      - subtype
+      - attributes
+      additionalProperties: true
+    BeaconBankAccounts:
+      type: object
+      title: BeaconBankAccounts
+      description: A collection of Bank Accounts linked to an Item that is associated with this Beacon User.
+      properties:
+        item_id:
+          type: string
+          description: The Plaid Item ID the Bank Accounts belong to.
+          example: 515cd85321d3649aecddc015
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/BeaconBankAccountInsights'
+      required:
+      - item_id
+      - accounts
+      additionalProperties: true
     BeaconDuplicateGetRequest:
       description: Request input for getting a Beacon Duplicate
       type: object
@@ -44031,6 +44425,42 @@ components:
       - audit_trail
       - item_ids
       additionalProperties: true
+    BeaconUserAccountInsightsGetRequest:
+      description: Request input for fetching the risk insights for a Beacon User's Bank Accounts
+      type: object
+      properties:
+        beacon_user_id:
+          $ref: '#/components/schemas/BeaconUserID'
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+      required:
+      - beacon_user_id
+      - access_token
+    BeaconUserAccountInsightsGetResponse:
+      description: The response schema for `/beacon/user/account/insights/get`
+      additionalProperties: true
+      properties:
+        beacon_user_id:
+          $ref: '#/components/schemas/BeaconUserID'
+        created_at:
+          $ref: '#/components/schemas/Timestamp'
+        updated_at:
+          $ref: '#/components/schemas/UpdatedAtTimestamp'
+        bank_account_insights:
+          $ref: '#/components/schemas/BeaconBankAccounts'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - beacon_user_id
+      - created_at
+      - updated_at
+      - bank_account_insights
+      - request_id
+      type: object
     BeaconUserAddress:
       type: object
       title: BeaconUserAddress
@@ -44083,6 +44513,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AccessToken'
+          description: "Send this array of access tokens to link accounts to the Beacon User and have them evaluated for Account Insights. \nA maximum of 50 accounts total can be added to a single Beacon User."
           nullable: true
         client_id:
           $ref: '#/components/schemas/APIClientID'
@@ -44438,6 +44869,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AccessToken'
+          description: |-
+            Send this array of access tokens to add accounts to this user for evaluation.
+            This will add accounts to this Beacon User. If left null only existing accounts will be returned in response.
+            A maximum of 50 accounts total can be added to a Beacon User.
           nullable: true
         client_id:
           $ref: '#/components/schemas/APIClientID'
@@ -44445,11 +44880,10 @@ components:
           $ref: '#/components/schemas/APISecret'
       required:
       - beacon_user_id
-      - user
     BeaconUserUpdateRequestData:
       type: object
       title: BeaconUserUpdateRequestData
-      description: A subset of a Beacon User's data which is used to patch the existing identity data associated with a Beacon User. At least one field must be provided,.
+      description: A subset of a Beacon User's data which is used to patch the existing identity data associated with a Beacon User. At least one field must be provided. If left unset or null, user data will not be patched.
       properties:
         date_of_birth:
           $ref: '#/components/schemas/ISO8601Date'
@@ -44465,6 +44899,7 @@ components:
           $ref: '#/components/schemas/BeaconUserIDNumber'
         ip_address:
           $ref: '#/components/schemas/IPAddress'
+      nullable: true
       additionalProperties: true
     BeaconUserUpdateResponse:
       description: A Beacon User represents an end user that has been scanned against the Beacon Network.
@@ -49010,13 +49445,26 @@ components:
           description: The number of days of data to request for the report
           minimum: 1
           maximum: 731
+        products:
+          type: array
+          x-hidden-from-docs: true
+          description: Products that will be retrieved in this report. This configuration will determine what data types to fetch from the user's financial institution. If omitted, the data types needed to support all products will be fetched.
+          items:
+            $ref: '#/components/schemas/CraCheckReportProduct'
         consumer_report_permissible_purpose:
           $ref: '#/components/schemas/ConsumerReportPermissiblePurpose'
       required:
       - user_token
       - webhook
-      - days_requested
       - consumer_report_permissible_purpose
+    CraCheckReportProduct:
+      type: string
+      description: A product supported by Plaid Check.
+      enum:
+      - cra_base_report
+      - cra_income_insights
+      - cra_partner_insights
+      - cra_network_insights
     CraCheckReportCreateResponse:
       title: CraCheckReportCreateResponse
       additionalProperties: true
@@ -49304,6 +49752,77 @@ components:
       required:
       - version
       - score
+    CraCheckReportNetworkAttributesGetRequest:
+      title: CraCheckReportNetworkAttributesGetRequest
+      type: object
+      description: CraCheckReportNetworkAttributesGetRequest defines the request schema for `/cra/check_report/network_attributes/get`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        user_token:
+          $ref: '#/components/schemas/UserToken'
+      required:
+      - user_token
+    CraCheckReportNetworkAttributesGetResponse:
+      title: CraCheckReportNetworkAttributesGetResponse
+      additionalProperties: true
+      type: object
+      description: CraCheckReportNetworkAttributesGetResponse defines the response schema for `/cra/check_report/network_attributes/get`.
+      properties:
+        report:
+          $ref: '#/components/schemas/CraNetworkAttributesReport'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - report
+      - request_id
+    CraNetworkAttributesReport:
+      type: object
+      description: Contains data for the CRA Network Attributes Report.
+      additionalProperties: true
+      properties:
+        report_id:
+          type: string
+          description: The unique identifier associated with the Network Attributes report object.
+        generated_time:
+          type: string
+          description: The time when the Network Attributes Report was generated.
+          format: date-time
+        network_attributes:
+          $ref: '#/components/schemas/NetworkAttributesSchema'
+        items:
+          type: array
+          description: The Items the end user connected in Link.
+          items:
+            $ref: '#/components/schemas/CraNetworkAttributesItem'
+      required:
+      - report_id
+      - generated_time
+      - network_attributes
+      - items
+    NetworkAttributesSchema:
+      type: object
+      title: NetworkAttributes
+      description: A map of network attributes, where the key is a string, and the value is a float, int, or boolean.
+    CraNetworkAttributesItem:
+      type: object
+      description: Contains data about the connected Item.
+      properties:
+        institution_id:
+          type: string
+          description: The ID for the institution the user linked.
+        institution_name:
+          type: string
+          description: The name of the institution the user linked.
+        item_id:
+          type: string
+          description: The identifier for the Item.
+      required:
+      - institution_id
+      - institution_name
+      - item_id
     CraLoansApplicationsRegisterRequest:
       type: object
       description: CraLoansApplicationsRegisterRequest defines the request schema for `/cra/loans/applications/register`.
