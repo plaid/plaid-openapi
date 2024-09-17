@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.556.0
+  version: 2020-09-14_1.565.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -2471,7 +2471,7 @@ paths:
       externalDocs:
         url: /check/api/#cracheck_reportpdfget
       operationId: craCheckReportPdfGet
-      description: '`/cra/check_report/pdf/get` retrieves the most recent Bank Income report (if it exists) followed by the most recent Base Report (if it exists) in PDF format.'
+      description: '`/cra/check_report/pdf/get` retrieves the most recent Consumer Report in PDF format. By default, the most recent Base Report (if it exists) for the user will be returned. To request that the most recent Income Insights report be included in the PDF as well, use the `add-ons` field.'
       requestBody:
         required: true
         content:
@@ -2497,7 +2497,10 @@ paths:
       externalDocs:
         url: /check/api/#cracheck_reportcreate
       operationId: craCheckReportCreate
-      description: '`/cra/check_report/create` creates a Consumer Report powered by Plaid Check. Plaid Check automatically starts creating Consumer Report data after the user completes the Link process with a Plaid Check product, so you typically would only call this endpoint if you wish to generate an updated report, some time after the initial report was generated.'
+      description: |-
+        `/cra/check_report/create` creates a Consumer Report powered by Plaid Check. You can call this endpoint to create a new report if `consumer_report_permissible_purpose` was omitted during Link token creation. If you did provide a `consumer_report_permissible_purpose` during Link token creation, then Plaid Check will automatically begin creating a Consumer Report once the user completes the Link process, and it is not necessary to call `/cra/check_report/create` before retrieving the report.
+
+         `/cra/check_report/create` can also be used to refresh data in an existing report. A Consumer Report will last for 24 hours before expiring; you should call any `/get` endpoints on the report before it expires. If a report expires, you can call `/cra/check_report/create` again to re-generate it. Note that refreshing or regenerating a report is a billable event."
       requestBody:
         required: true
         content:
@@ -2896,6 +2899,90 @@ paths:
             schema:
               $ref: '#/components/schemas/StatementsRefreshRequest'
         description: ""
+  /consent/events/get:
+    post:
+      tags:
+      - plaid
+      summary: List a historical log of item consent events
+      externalDocs:
+        url: /api/consent/#consenteventsget
+      operationId: consentEventsGet
+      description: List a historical log of item consent events
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentEventsGetResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: m8MDnv9okwxFNBV
+                    consent_events:
+                    - item_id: Ed6bjNrDLJfGvZWwnkQlfxwoNz54B5C97ejBr
+                      event_type: CONSENT_GRANTED
+                      event_code: PLAID_END_USER_PRIVACY_POLICY
+                      institution_id: ins_123456
+                      institution_name: Platypus bank
+                      initiator: END_USER
+                      created_at: "2019-02-15T15:52:39Z"
+                      consented_use_cases: []
+                      consented_data_scopes: []
+                      consented_accounts: []
+                    - item_id: Ed6bjNrDLJfGvZWwnkQlfxwoNz54B5C97ejBr
+                      event_type: CONSENT_GRANTED
+                      event_code: USE_CASES
+                      institution_id: ins_123456
+                      institution_name: Platypus bank
+                      initiator: END_USER
+                      created_at: "2019-02-15T15:52:39Z"
+                      consented_use_cases:
+                      - Send and receive money
+                      - Track and manage your finances
+                      consented_data_scopes: []
+                      consented_accounts: []
+                    - item_id: Ed6bjNrDLJfGvZWwnkQlfxwoNz54B5C97ejBr
+                      event_type: CONSENT_GRANTED
+                      event_code: DATA_SCOPES
+                      institution_id: ins_123456
+                      institution_name: Platypus bank
+                      initiator: END_USER
+                      created_at: "2019-02-15T15:52:39Z"
+                      consented_use_cases: []
+                      consented_data_scopes:
+                      - Account and balance info
+                      - Contact info
+                      - Account and routing number
+                      consented_accounts: []
+                    - item_id: Ed6bjNrDLJfGvZWwnkQlfxwoNz54B5C97ejBr
+                      event_type: CONSENT_GRANTED
+                      event_code: ACCOUNT_SCOPES
+                      institution_id: ins_123456
+                      institution_name: Platypus bank
+                      initiator: END_USER
+                      created_at: "2019-02-15T15:52:39Z"
+                      consented_use_cases: []
+                      consented_data_scopes: []
+                      consented_accounts:
+                      - account_id: blgvvBlXw3cq5GMPwqB6s6q4dLKB9WcVqGDGo
+                        mask: "0000"
+                        name: Plaid Checking
+                        official_name: Plaid Gold Standard 0% Interest Checking
+                        type: depository
+                        subtype: checking
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsentEventsGetRequest'
   /item/activity/list:
     post:
       tags:
@@ -3064,6 +3151,7 @@ paths:
                 example-1:
                   value:
                     item:
+                      created_at: "2019-01-22T04:32:00Z"
                       available_products:
                       - balance
                       - auth
@@ -3078,7 +3166,17 @@ paths:
                       item_id: Ed6bjNrDLJfGvZWwnkQlfxwoNz54B5C97ejBr
                       update_type: background
                       webhook: https://plaid.com/example/hook
-                      consent_expiration_time: null
+                      consented_products:
+                      - identity
+                      - transactions
+                      consented_data_scopes:
+                      - Account and balance info
+                      - Contact info
+                      - Transactions
+                      consented_use_cases:
+                      - Verify your account
+                      - Track and manage your finances
+                      consent_expiration_time: "2024-03-16T15:53:00Z"
                     status:
                       transactions:
                         last_successful_update: "2019-02-15T15:52:39Z"
@@ -5274,7 +5372,7 @@ paths:
                     status: active
                     request_id: saKrIBuEB9qJZng
       operationId: dashboardUserGet
-      description: Retrieve information about a dashboard user.
+      description: The `/dashboard_user/get` endpoint provides details (such as email address) about a specific Dashboard user based on the `dashboard_user_id` field, which is returned in the `audit_trail` object of certain Monitor and Beacon endpoints. This can be used to identify the specific reviewer who performed a Dashboard action.
       requestBody:
         content:
           application/json:
@@ -5306,7 +5404,7 @@ paths:
                     next_cursor: eyJkaXJlY3Rpb24iOiJuZXh0Iiwib2Zmc2V0IjoiMTU5NDM
                     request_id: saKrIBuEB9qJZng
       operationId: dashboardUserList
-      description: List all dashboard users associated with your account.
+      description: The `/dashboard_user/list` endpoint provides details (such as email address) all Dashboard users associated with your account. This can use used to audit or track the list of reviewers for Monitor, Beacon, and Identity Verification products.
       requestBody:
         content:
           application/json:
@@ -5417,6 +5515,7 @@ paths:
                           video_url: https://example.plaid.com/verifications/idv_52xR9LKo77r1Np/selfie/liveness.webm
                         analysis:
                           document_comparison: match
+                          liveness_check: success
                     kyc_check:
                       status: success
                       address:
@@ -5571,6 +5670,7 @@ paths:
                           video_url: https://example.plaid.com/verifications/idv_52xR9LKo77r1Np/selfie/liveness.webm
                         analysis:
                           document_comparison: match
+                          liveness_check: success
                     kyc_check:
                       status: success
                       address:
@@ -5727,6 +5827,7 @@ paths:
                             video_url: https://example.plaid.com/verifications/idv_52xR9LKo77r1Np/selfie/liveness.webm
                           analysis:
                             document_comparison: match
+                            liveness_check: success
                       kyc_check:
                         status: success
                         address:
@@ -5889,6 +5990,7 @@ paths:
                           video_url: https://example.plaid.com/verifications/idv_52xR9LKo77r1Np/selfie/liveness.webm
                         analysis:
                           document_comparison: match
+                          liveness_check: success
                     kyc_check:
                       status: success
                       address:
@@ -9143,7 +9245,12 @@ paths:
                     payment_id: payment-id-sandbox-feca8a7a-5591-4aef-9297-f3062bb735d3
                     status: PAYMENT_STATUS_INPUT_NEEDED
                     request_id: 4ciYVmesrySiUAB
-      description: "After creating a payment recipient, you can use the `/payment_initiation/payment/create` endpoint to create a payment to that recipient.  Payments can be one-time or standing order (recurring) and can be denominated in either EUR, GBP or other chosen [currency](https://plaid.com/docs/api/products/payment-initiation/#payment_initiation-payment-create-request-amount-currency).  If making domestic GBP-denominated payments, your recipient must have been created with BACS numbers. In general, EUR-denominated payments will be sent via SEPA Credit Transfer, GBP-denominated payments will be sent via the Faster Payments network and for non-Eurozone markets typically via the local payment scheme, but the payment network used will be determined by the institution. Payments sent via Faster Payments will typically arrive immediately, while payments sent via SEPA Credit Transfer or other local payment schemes will typically arrive in one business day.\n\nStanding orders (recurring payments) must be denominated in GBP and can only be sent to recipients in the UK. Once created, standing order payments cannot be modified or canceled via the API. An end user can cancel or modify a standing order directly on their banking application or website, or by contacting the bank. Standing orders will follow the payment rules of the underlying rails (Faster Payments in UK). Payments can be sent Monday to Friday, excluding bank holidays. If the pre-arranged date falls on a weekend or bank holiday, the payment is made on the next working day. It is not possible to guarantee the exact time the payment will reach the recipient’s account, although at least 90% of standing order payments are sent by 6am.\n\nIn Limited Production, payments must be below 5 GBP or other chosen [currency](https://plaid.com/docs/api/products/payment-initiation/#payment_initiation-payment-create-request-amount-currency), and standing orders, variable recurring payments, and Virtual Accounts are not supported. "
+      description: |-
+        After creating a payment recipient, you can use the `/payment_initiation/payment/create` endpoint to create a payment to that recipient.  Payments can be one-time or standing order (recurring) and can be denominated in either EUR, GBP or other chosen [currency](https://plaid.com/docs/api/products/payment-initiation/#payment_initiation-payment-create-request-amount-currency).  If making domestic GBP-denominated payments, your recipient must have been created with BACS numbers. In general, EUR-denominated payments will be sent via SEPA Credit Transfer, GBP-denominated payments will be sent via the Faster Payments network and for non-Eurozone markets typically via the local payment scheme, but the payment network used will be determined by the institution. Payments sent via Faster Payments will typically arrive immediately, while payments sent via SEPA Credit Transfer or other local payment schemes will typically arrive in one business day.
+
+        Standing orders (recurring payments) must be denominated in GBP and can only be sent to recipients in the UK. Once created, standing order payments cannot be modified or canceled via the API. An end user can cancel or modify a standing order directly on their banking application or website, or by contacting the bank. Standing orders will follow the payment rules of the underlying rails (Faster Payments in UK). Payments can be sent Monday to Friday, excluding bank holidays. If the pre-arranged date falls on a weekend or bank holiday, the payment is made on the next working day. It is not possible to guarantee the exact time the payment will reach the recipient’s account, although at least 90% of standing order payments are sent by 6am.
+
+        In Limited Production, payments must be below 5 GBP or other chosen [currency](https://plaid.com/docs/api/products/payment-initiation/#payment_initiation-payment-create-request-amount-currency), and standing orders, variable recurring payments, and Virtual Accounts are not supported.
       requestBody:
         required: true
         content:
@@ -10287,13 +10394,12 @@ paths:
             schema:
               $ref: '#/components/schemas/InvestmentsRefreshRequest'
   /investments/auth/get:
-    x-hidden-from-docs: true
     post:
       tags:
       - plaid
       summary: Get data needed to authorize an investments transfer
       externalDocs:
-        url: /api/products/investments/#investmentsauth
+        url: /api/products/investments-move/#investmentsauthget
       responses:
         "200":
           description: OK
@@ -10305,7 +10411,7 @@ paths:
                 example-1:
                   value:
                     accounts:
-                    - account_id: 5Bvpj4QknlhVWk7GygpwfVKdd133GoCxB814g
+                    - account_id: 31qEA6LPwGumkA4Z5mGbfyGwr4mL6nSZlQqpZ
                       balances:
                         available: 43200
                         current: 43200
@@ -10317,10 +10423,10 @@ paths:
                       official_name: Plaid Platinum Standard 1.85% Interest Money Market
                       subtype: money market
                       type: depository
-                    - account_id: JqMLm4rJwpF6gMPJwBqdh9ZjjPvvpDcb7kDK1
+                    - account_id: xlP8npRxwgCj48LQbjxWipkeL3gbyXf64knoy
                       balances:
                         available: null
-                        current: 110.01
+                        current: 320.76
                         iso_currency_code: USD
                         limit: null
                         unofficial_currency_code: null
@@ -10329,253 +10435,170 @@ paths:
                       official_name: null
                       subtype: ira
                       type: investment
-                    - account_id: k67E4xKvMlhmleEa4pg9hlwGGNnnEeixPolGm
-                      balances:
-                        available: null
-                        current: 23631.9805
-                        iso_currency_code: USD
-                        limit: null
-                        unofficial_currency_code: null
-                      mask: "6666"
-                      name: Plaid Roth IRA
-                      official_name: null
-                      subtype: roth
-                      type: investment
                     holdings:
-                    - account_id: JqMLm4rJwpF6gMPJwBqdh9ZjjPvvpDcb7kDK1
+                    - account_id: xlP8npRxwgCj48LQbjxWipkeL3gbyXf64knoy
                       cost_basis: 1
                       institution_price: 1
-                      institution_price_as_of: "2021-04-13"
+                      institution_price_as_of: "2021-05-25"
                       institution_price_datetime: null
                       institution_value: 0.01
                       iso_currency_code: USD
                       quantity: 0.01
                       security_id: d6ePmbPxgWCWmMVv66q9iPV94n91vMtov5Are
                       unofficial_currency_code: null
-                    - account_id: k67E4xKvMlhmleEa4pg9hlwGGNnnEeixPolGm
-                      cost_basis: 1.5
-                      institution_price: 2.11
-                      institution_price_as_of: "2021-04-13"
-                      institution_price_datetime: null
-                      institution_value: 2.11
-                      iso_currency_code: USD
-                      quantity: 1
-                      security_id: KDwjlXj1Rqt58dVvmzRguxJybmyQL8FgeWWAy
-                      unofficial_currency_code: null
-                    - account_id: k67E4xKvMlhmleEa4pg9hlwGGNnnEeixPolGm
-                      cost_basis: 10
-                      institution_price: 10.42
-                      institution_price_as_of: "2021-04-13"
-                      institution_price_datetime: null
-                      institution_value: 20.84
-                      iso_currency_code: USD
-                      quantity: 2
-                      security_id: NDVQrXQoqzt5v3bAe8qRt4A7mK7wvZCLEBBJk
-                      unofficial_currency_code: null
-                    - account_id: JqMLm4rJwpF6gMPJwBqdh9ZjjPvvpDcb7kDK1
+                      vested_quantity: 1
+                      vested_value: 1
+                    - account_id: xlP8npRxwgCj48LQbjxWipkeL3gbyXf64knoy
                       cost_basis: 0.01
                       institution_price: 0.011
-                      institution_price_as_of: "2021-04-13"
+                      institution_price_as_of: "2021-05-25"
                       institution_price_datetime: null
                       institution_value: 110
                       iso_currency_code: USD
                       quantity: 10000
                       security_id: 8E4L9XLl6MudjEpwPAAgivmdZRdBPJuvMPlPb
                       unofficial_currency_code: null
-                    - account_id: k67E4xKvMlhmleEa4pg9hlwGGNnnEeixPolGm
-                      cost_basis: 23
-                      institution_price: 27
-                      institution_price_as_of: "2021-04-13"
+                      vested_quantity: null
+                      vested_value: null
+                    - account_id: xlP8npRxwgCj48LQbjxWipkeL3gbyXf64knoy
+                      cost_basis: 40
+                      institution_price: 42.15
+                      institution_price_as_of: "2021-05-25"
                       institution_price_datetime: null
-                      institution_value: 636.309
+                      institution_value: 210.75
                       iso_currency_code: USD
-                      quantity: 23.567
-                      security_id: JDdP7XPMklt5vwPmDN45t3KAoWAPmjtpaW7DP
+                      quantity: 5
+                      security_id: abJamDazkgfvBkVGgnnLUWXoxnomp5up8llg4
                       unofficial_currency_code: null
-                    - account_id: k67E4xKvMlhmleEa4pg9hlwGGNnnEeixPolGm
-                      cost_basis: 15
-                      institution_price: 13.73
-                      institution_price_as_of: "2021-04-13"
-                      institution_price_datetime: null
-                      institution_value: 1373.6865
-                      iso_currency_code: USD
-                      quantity: 100.05
-                      security_id: nnmo8doZ4lfKNEDe3mPJipLGkaGw3jfPrpxoN
-                      unofficial_currency_code: null
-                    - account_id: k67E4xKvMlhmleEa4pg9hlwGGNnnEeixPolGm
-                      cost_basis: 1
-                      institution_price: 1
-                      institution_price_as_of: "2021-04-13"
-                      institution_price_datetime: null
-                      institution_value: 12345.67
-                      iso_currency_code: USD
-                      quantity: 12345.67
-                      security_id: d6ePmbPxgWCWmMVv66q9iPV94n91vMtov5Are
-                      unofficial_currency_code: null
+                      vested_quantity: 7
+                      vested_value: 66
                     item:
                       available_products:
+                      - assets
                       - balance
+                      - beacon
+                      - cra_base_report
+                      - cra_income_insights
+                      - signal
                       - identity
-                      - liabilities
+                      - identity_match
+                      - income
+                      - income_verification
+                      - investments
+                      - processor_identity
+                      - recurring_transactions
                       - transactions
                       billed_products:
-                      - assets
-                      - auth
                       - investments_auth
                       consent_expiration_time: null
                       error: null
-                      institution_id: ins_3
-                      item_id: 4z9LPae1nRHWy8pvg9jrsgbRP4ZNQvIdbLq7g
+                      institution_id: ins_115616
+                      item_id: 7qBnDwLP3aIZkD7NKZ5ysk5X9xVxDWHg65oD5
+                      products:
+                      - investments_auth
                       update_type: background
                       webhook: https://www.genericwebhookurl.com/webhook
                     numbers:
                       acats:
-                      - account: TR4444
-                        account_id: 5Bvpj4QknlhVWk7GygpwfVKdd133GoCxB814g
-                        dtc_numbers: []
                       - account: TR5555
-                        account_id: JqMLm4rJwpF6gMPJwBqdh9ZjjPvvpDcb7kDK1
-                        dtc_numbers: []
-                      - account: TR6666
-                        account_id: k67E4xKvMlhmleEa4pg9hlwGGNnnEeixPolGm
-                        dtc_numbers: []
-                      aton: []
-                    request_id: l68wb8zpS0hqmsJ
+                        account_id: xlP8npRxwgCj48LQbjxWipkeL3gbyXf64knoy
+                        dtc_numbers:
+                        - "1111"
+                        - "2222"
+                        - "3333"
                     owners:
-                    - account_id: 5Bvpj4QknlhVWk7GygpwfVKdd133GoCxB814g
+                    - account_id: 31qEA6LPwGumkA4Z5mGbfyGwr4mL6nSZlQqpZ
                       names:
                       - Alberta Bobbeth Charleson
-                    - account_id: JqMLm4rJwpF6gMPJwBqdh9ZjjPvvpDcb7kDK1
+                    - account_id: xlP8npRxwgCj48LQbjxWipkeL3gbyXf64knoy
                       names:
                       - Alberta Bobbeth Charleson
-                    - account_id: k67E4xKvMlhmleEa4pg9hlwGGNnnEeixPolGm
-                      names:
-                      - Alberta Bobbeth Charleson
+                    request_id: hPCXou4mm9Qwzzu
                     securities:
                     - close_price: 0.011
-                      close_price_as_of: "2021-04-13"
+                      close_price_as_of: null
                       cusip: null
+                      industry: null
                       institution_id: null
                       institution_security_id: null
                       is_cash_equivalent: false
                       isin: null
                       iso_currency_code: USD
+                      market_identifier_code: null
                       name: Nflx Feb 01'18 $355 Call
+                      option_contract: null
                       proxy_security_id: null
+                      sector: null
                       security_id: 8E4L9XLl6MudjEpwPAAgivmdZRdBPJuvMPlPb
                       sedol: null
                       ticker_symbol: NFLX180201C00355000
                       type: derivative
                       unofficial_currency_code: null
                       update_datetime: null
-                      market_identifier_code: XNAS
-                      sector: Technology Services
-                      industry: Internet Software or Services
-                      option_contract:
-                        contract_type: call
-                        expiration_date: "2018-02-01"
-                        strike_price: 355
-                        underlying_security_ticker: NFLX
-                    - close_price: 27
-                      close_price_as_of: null
-                      cusip: "577130834"
-                      institution_id: null
-                      institution_security_id: null
-                      is_cash_equivalent: false
-                      isin: US5771308344
-                      iso_currency_code: USD
-                      name: Matthews Pacific Tiger Fund Insti Class
-                      proxy_security_id: null
-                      security_id: JDdP7XPMklt5vwPmDN45t3KAoWAPmjtpaW7DP
-                      sedol: null
-                      ticker_symbol: MIPTX
-                      type: mutual fund
-                      unofficial_currency_code: null
-                      update_datetime: null
-                      market_identifier_code: XNAS
-                      sector: Miscellaneous
+                    - close_price: 9.08
+                      close_price_as_of: "2024-09-09"
+                      cusip: null
                       industry: Investment Trusts or Mutual Funds
-                      option_contract: null
-                    - close_price: 2.11
-                      close_price_as_of: null
-                      cusip: 00448Q201
                       institution_id: null
                       institution_security_id: null
                       is_cash_equivalent: false
-                      isin: US00448Q2012
+                      isin: null
                       iso_currency_code: USD
-                      name: Achillion Pharmaceuticals Inc.
-                      proxy_security_id: null
-                      security_id: KDwjlXj1Rqt58dVvmzRguxJybmyQL8FgeWWAy
-                      sedol: null
-                      ticker_symbol: ACHN
-                      type: equity
-                      unofficial_currency_code: null
-                      update_datetime: null
-                      market_identifier_code: XNAS
-                      sector: Health Technology
-                      industry: Major Pharmaceuticals
+                      market_identifier_code: null
+                      name: DoubleLine Total Return Bond I
                       option_contract: null
-                    - close_price: 10.42
-                      close_price_as_of: null
-                      cusip: "258620103"
-                      institution_id: null
-                      institution_security_id: null
-                      is_cash_equivalent: false
-                      isin: US2586201038
-                      iso_currency_code: USD
-                      name: DoubleLine Total Return Bond Fund
                       proxy_security_id: null
-                      security_id: NDVQrXQoqzt5v3bAe8qRt4A7mK7wvZCLEBBJk
-                      sedol: null
+                      sector: Miscellaneous
+                      security_id: AE5rBXra1AuZLE34rkvvIyG8918m3wtRzElnJ
+                      sedol: B5ND9B4
                       ticker_symbol: DBLTX
                       type: mutual fund
                       unofficial_currency_code: null
                       update_datetime: null
-                      market_identifier_code: XNAS
-                      sector: null
+                    - close_price: 42.15
+                      close_price_as_of: null
+                      cusip: null
                       industry: null
+                      institution_id: null
+                      institution_security_id: null
+                      is_cash_equivalent: false
+                      isin: null
+                      iso_currency_code: USD
+                      market_identifier_code: null
+                      name: iShares Inc MSCI Brazil
                       option_contract: null
+                      proxy_security_id: null
+                      sector: null
+                      security_id: abJamDazkgfvBkVGgnnLUWXoxnomp5up8llg4
+                      sedol: null
+                      ticker_symbol: EWZ
+                      type: etf
+                      unofficial_currency_code: null
+                      update_datetime: null
                     - close_price: 1
                       close_price_as_of: null
                       cusip: null
+                      industry: null
                       institution_id: null
                       institution_security_id: null
                       is_cash_equivalent: true
                       isin: null
                       iso_currency_code: USD
+                      market_identifier_code: null
                       name: U S Dollar
+                      option_contract: null
                       proxy_security_id: null
+                      sector: null
                       security_id: d6ePmbPxgWCWmMVv66q9iPV94n91vMtov5Are
                       sedol: null
-                      ticker_symbol: USD
+                      ticker_symbol: null
                       type: cash
                       unofficial_currency_code: null
                       update_datetime: null
-                      market_identifier_code: null
-                      sector: null
-                      industry: null
-                      option_contract: null
-                    - close_price: 13.73
-                      close_price_as_of: null
-                      cusip: null
-                      institution_id: ins_3
-                      institution_security_id: NHX105509
-                      is_cash_equivalent: false
-                      isin: null
-                      iso_currency_code: USD
-                      name: NH PORTFOLIO 1055 (FIDELITY INDEX)
-                      proxy_security_id: null
-                      security_id: nnmo8doZ4lfKNEDe3mPJipLGkaGw3jfPrpxoN
-                      sedol: null
-                      ticker_symbol: NHX105509
-                      type: etf
-                      unofficial_currency_code: null
-                      update_datetime: null
-                      market_identifier_code: XNAS
-                      sector: null
-                      industry: null
-                      option_contract: null
+                    data_sources:
+                      numbers: INSTITUTION
+                      owners: INSTITUTION
+                      holdings: INSTITUTION
       operationId: investmentsAuthGet
       description: The `/investments/auth/get` endpoint allows developers to receive user-authorized data to facilitate the transfer of holdings
       requestBody:
@@ -10755,7 +10778,8 @@ paths:
     post:
       tags:
       - plaid
-      summary: Create a deposit switch
+      summary: (Deprecated) Create a deposit switch
+      deprecated: true
       externalDocs:
         url: /deposit-switch/reference#deposit_switchcreate
       responses:
@@ -10811,7 +10835,8 @@ paths:
     post:
       tags:
       - plaid
-      summary: Create a deposit switch token
+      summary: (Deprecated) Create a deposit switch token
+      deprecated: true
       externalDocs:
         url: /deposit-switch/reference#deposit_switchtokencreate
       responses:
@@ -11151,7 +11176,8 @@ paths:
         description: ""
   /deposit_switch/get:
     post:
-      summary: Retrieve a deposit switch
+      summary: (Deprecated) Retrieve a deposit switch
+      deprecated: true
       externalDocs:
         url: /deposit-switch/reference#deposit_switchget
       tags:
@@ -11213,6 +11239,7 @@ paths:
                     transfer:
                       account_id: 3gE5gnRzNyfXpBK5wEEKcymJ5albGVUqg77gr
                       funding_account_id: 8945fedc-e703-463d-86b1-dc0607b55460
+                      ledger_id: 563db5f8-4c95-4e17-8c3e-cb988fb9cf1a
                       ach_class: ppd
                       amount: "12.34"
                       cancellable: true
@@ -11259,7 +11286,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
-      description: The `/transfer/get` endpoint fetches information about the transfer corresponding to the given `transfer_id`.
+      description: The `/transfer/get` endpoint fetches information about the transfer corresponding to the given `transfer_id` or `authorization_id`. One of `transfer_id` or `authorization_id` must be populated but not both.
       requestBody:
         required: true
         content:
@@ -11425,6 +11452,7 @@ paths:
                         ach_class: ppd
                         account_id: 3gE5gnRzNyfXpBK5wEEKcymJ5albGVUqg77gr
                         funding_account_id: 8945fedc-e703-463d-86b1-dc0607b55460
+                        ledger_id: 563db5f8-4c95-4e17-8c3e-cb988fb9cf1a
                         type: credit
                         user:
                           legal_name: Anne Charleston
@@ -11552,7 +11580,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
-      description: Use the `/transfer/capabilities/get` endpoint to determine the RTP eligibility information of a transfer. To simulate RTP eligibility in Sandbox, log in using the username `user_good` and password `pass_good` and use the first two checking and savings accounts in the "First Platypus Bank" institution (ending in 0000 or 1111), which will return `true`. Any other account will return `false`.
+      description: Use the `/transfer/capabilities/get` endpoint to determine the RTP eligibility information of an account to be used with Transfer. This endpoint works on all Transfer-capable Items, including those created by `/transfer/migrate_account`. To simulate RTP eligibility in Sandbox, log in using the username `user_good` and password `pass_good` and use the first two checking and savings accounts in the "First Platypus Bank" institution (ending in 0000 or 1111), which will return `true`. Any other account will return `false`.
       requestBody:
         required: true
         content:
@@ -11618,6 +11646,9 @@ paths:
               examples:
                 example-1:
                   value:
+                    ledger_id: 563db5f8-4c95-4e17-8c3e-cb988fb9cf1a
+                    name: Default
+                    is_default: true
                     balance:
                       available: "1721.70"
                       pending: "123.45"
@@ -11688,6 +11719,7 @@ paths:
                     sweep:
                       id: 8c2fda9a-aa2f-4735-a00f-f4e0d2d2faee
                       funding_account_id: 8945fedc-e703-463d-86b1-dc0607b55460
+                      ledger_id: 563db5f8-4c95-4e17-8c3e-cb988fb9cf1a
                       created: "2020-08-06T17:27:15Z"
                       amount: "-12.34"
                       iso_currency_code: USD
@@ -11731,6 +11763,7 @@ paths:
                     sweep:
                       id: 8c2fda9a-aa2f-4735-a00f-f4e0d2d2faee
                       funding_account_id: 8945fedc-e703-463d-86b1-dc0607b55460
+                      ledger_id: 563db5f8-4c95-4e17-8c3e-cb988fb9cf1a
                       created: "2020-08-06T17:27:15Z"
                       amount: "12.34"
                       iso_currency_code: USD
@@ -11857,6 +11890,7 @@ paths:
                       ach_class: ppd
                       account_id: 3gE5gnRzNyfXpBK5wEEKcymJ5albGVUqg77gr
                       funding_account_id: 8945fedc-e703-463d-86b1-dc0607b55460
+                      ledger_id: 563db5f8-4c95-4e17-8c3e-cb988fb9cf1a
                       type: credit
                       user:
                         legal_name: Anne Charleston
@@ -12047,6 +12081,7 @@ paths:
                     transfers:
                     - account_id: 3gE5gnRzNyfXpBK5wEEKcymJ5albGVUqg77gr
                       funding_account_id: 8945fedc-e703-463d-86b1-dc0607b55460
+                      ledger_id: 563db5f8-4c95-4e17-8c3e-cb988fb9cf1a
                       ach_class: ppd
                       amount: "12.34"
                       cancellable: true
@@ -12343,6 +12378,7 @@ paths:
                     transfer_events:
                     - account_id: 3gE5gnRzNyfXpBK5wEEKcymJ5albGVUqg77gr
                       funding_account_id: 8945fedc-e703-463d-86b1-dc0607b55460
+                      ledger_id: 563db5f8-4c95-4e17-8c3e-cb988fb9cf1a
                       transfer_amount: "12.34"
                       transfer_id: 460cbe92-2dcc-8eae-5ad6-b37d0ec90fd9
                       transfer_type: credit
@@ -12435,6 +12471,7 @@ paths:
                     transfer_events:
                     - account_id: 3gE5gnRzNyfXpBK5wEEKcymJ5albGVUqg77gr
                       funding_account_id: 8945fedc-e703-463d-86b1-dc0607b55460
+                      ledger_id: 563db5f8-4c95-4e17-8c3e-cb988fb9cf1a
                       transfer_amount: "12.34"
                       transfer_id: 460cbe92-2dcc-8eae-5ad6-b37d0ec90fd9
                       transfer_type: credit
@@ -12528,6 +12565,7 @@ paths:
                     sweep:
                       id: 8c2fda9a-aa2f-4735-a00f-f4e0d2d2faee
                       funding_account_id: 8945fedc-e703-463d-86b1-dc0607b55460
+                      ledger_id: 563db5f8-4c95-4e17-8c3e-cb988fb9cf1a
                       created: "2020-08-06T17:27:15Z"
                       amount: "12.34"
                       iso_currency_code: USD
@@ -12612,6 +12650,7 @@ paths:
                     sweeps:
                     - id: d5394a4d-0b04-4a02-9f4a-7ca5c0f52f9d
                       funding_account_id: 8945fedc-e703-463d-86b1-dc0607b55460
+                      ledger_id: 563db5f8-4c95-4e17-8c3e-cb988fb9cf1a
                       created: "2019-12-09T17:27:15Z"
                       amount: "-12.34"
                       iso_currency_code: USD
@@ -12991,6 +13030,40 @@ paths:
                   start_time: "2022-01-10T12:34:56Z"
                   count: 1
                   repayment_id: d4bfce70-2470-4298-ae87-5e9b3e18bfaf
+      parameters: []
+  /transfer/platform/requirement/submit:
+    post:
+      summary: Submit onboarding requirements for Scaled Platform originators
+      tags:
+      - plaid
+      externalDocs:
+        url: /api/products/transfer/platform-payments/#transferplatformrequirementsubmit
+      operationId: transferPlatformRequirementSubmit
+      responses:
+        "200":
+          description: OK
+          headers: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferPlatformRequirementSubmitResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: saKrIBuEB9qJZno
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      description: The `/transfer/platform/requirement/submit` endpoint allows platforms to submit onboarding requirements for an originator as part of the Scaled Platform Transfer offering.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferPlatformRequirementSubmitRequest'
       parameters: []
   /transfer/originator/create:
     post:
@@ -14237,7 +14310,8 @@ paths:
               $ref: '#/components/schemas/EmploymentVerificationGetRequest'
   /deposit_switch/alt/create:
     post:
-      summary: Create a deposit switch without using Plaid Exchange
+      summary: (Deprecated) Create a deposit switch without using Plaid Exchange
+      deprecated: true
       tags:
       - plaid
       externalDocs:
@@ -16823,6 +16897,141 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/TransactionsUserInsightsGetRequest'
+  /issues/search:
+    x-hidden-from-docs: true
+    post:
+      tags:
+      - plaid
+      summary: Search for an Issue
+      x-hidden-from-docs: true
+      externalDocs:
+        url: /api/products/link/#supportapi
+      operationId: issuesSearch
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IssuesSearchResponse'
+              examples:
+                example-1:
+                  value:
+                    issues:
+                    - issue_id: "000001"
+                      institution_names:
+                      - Bank of Example
+                      - Example Credit Union
+                      institution_ids:
+                      - ins_1
+                      - ins_2
+                      created_at: "2023-09-01T14:35:00Z"
+                      summary: Link session failed to complete
+                      detailed_description: The Link session was unable to retrieve account information due to a network timeout.
+                      status: Fix In Progress
+                    - issue_id: "000002"
+                      institution_names:
+                      - Example National Bank
+                      institution_ids:
+                      - ins_3
+                      created_at: "2023-09-02T11:20:00Z"
+                      summary: Account sync error
+                      detailed_description: The account synchronization failed due to an API rate limit issue.
+                      status: Awaiting Resolution
+                    request_id: "123456"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+          description: Error response
+      description: "Search for an issue associated with one of the following identifiers:  `item_id`, `link_session_id` or Link session `request_id`. \nThis endpoint returns a list of `Issue` objects, with an empty list indicating that no issues are associated with the\nprovided identifier. At least one of the identifiers must be provided to perform the search."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IssuesSearchRequest'
+  /issues/get:
+    x-hidden-from-docs: true
+    post:
+      tags:
+      - plaid
+      summary: Get an Issue
+      x-hidden-from-docs: true
+      externalDocs:
+        url: /api/products/link/#supportapi
+      operationId: issuesGet
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IssuesGetResponse'
+              examples:
+                example-1:
+                  value:
+                    issue:
+                      issue_id: "000001"
+                      institution_names:
+                      - Bank of Example
+                      - Example Credit Union
+                      institution_ids:
+                      - ins_1
+                      - ins_2
+                      created_at: "2023-09-01T14:35:00Z"
+                      summary: Link session failed to complete
+                      detailed_description: The Link session was unable to retrieve account information due to a network timeout.
+                      status: Fix In Progress
+                    request_id: "123456"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+          description: Error response
+      description: Retrieve detailed information about a specific `Issue`. This endpoint returns a single `Issue` object.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IssuesGetRequest'
+  /issues/subscribe:
+    x-hidden-from-docs: true
+    post:
+      tags:
+      - plaid
+      summary: Subscribe to an Issue
+      x-hidden-from-docs: true
+      externalDocs:
+        url: /api/products/link/#supportapi
+      operationId: issuesSubscribe
+      responses:
+        "200":
+          description: Subscription was successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IssuesSubscribeResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: "123456"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+          description: Error response
+      description: Allows a user to subscribe to updates on a specific `Issue` using a POST method. Subscribers will receive webhook notifications when the issue status changes, particularly when resolved.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IssuesSubscribeRequest'
   /payment_profile/create:
     post:
       deprecated: true
@@ -17668,7 +17877,7 @@ components:
           deprecated: true
           x-hidden-from-docs: true
         days_requested:
-          description: "This field only applies to calls for Items where the Transactions product has not already been initialized (i.e. by specifying `transactions` in the `products`, `optional_products`, or `required_if_consented_products` array when calling `/link/token/create` or by making a previous call to `/transactions/sync` or `/transactions/get`). In those cases, the field controls the maximum number of days of transaction history that Plaid will request from the financial institution. The more transaction history is requested, the longer the historical update poll will take. If no value is specified, 90 days of history will be requested by default. If a value under 30 is provided, a minimum of 30 days of history will be requested.\n\nIf you are initializing your Items with transactions during the `/link/token/create` call (e.g. by including `transactions` in the `/link/token/create` `products` array), you must use the [`transactions.days_requested`](https://plaid.com/docs/api/link/#link-token-create-request-transactions-days-requested) field in the `/link/token/create` request instead of in the `/transactions/get` request.\n\nIf the Item has already been initialized with the Transactions product, this field will have no effect. The maximum amount of transaction history to request on an Item cannot be updated if Transactions has already been added to the Item. To request older transaction history on an Item where Transactions has already been added, you must delete the Item via `/item/remove` and send the user through Link to create a new Item. \n\nCustomers using [Recurring Transactions](https://plaid.com/docs/api/products/transactions/#transactionsrecurringget) should request at least 180 days of history for optimal results.          "
+          description: "This field only applies to calls for Items where the Transactions product has not already been initialized (i.e. by specifying `transactions` in the `products`, `optional_products`, or `required_if_consented_products` array when calling `/link/token/create` or by making a previous call to `/transactions/sync` or `/transactions/get`). In those cases, the field controls the maximum number of days of transaction history that Plaid will request from the financial institution. The more transaction history is requested, the longer the historical update poll will take. If no value is specified, 90 days of history will be requested by default. If a value under 30 is provided, a minimum of 30 days of history will be requested.\n\nIf you are initializing your Items with transactions during the `/link/token/create` call (e.g. by including `transactions` in the `/link/token/create` `products` array), you must use the [`transactions.days_requested`](https://plaid.com/docs/api/link/#link-token-create-request-transactions-days-requested) field in the `/link/token/create` request instead of in the `/transactions/get` request.\n\nIf the Item has already been initialized with the Transactions product, this field will have no effect. The maximum amount of transaction history to request on an Item cannot be updated if Transactions has already been added to the Item. To request older transaction history on an Item where Transactions has already been added, you must delete the Item via `/item/remove` and send the user through Link to create a new Item. \n\nCustomers using [Recurring Transactions](https://plaid.com/docs/api/products/transactions/#transactionsrecurringget) should request at least 180 days of history for optimal results."
           type: integer
           minimum: 1
           maximum: 730
@@ -18069,7 +18278,7 @@ components:
           deprecated: true
           x-hidden-from-docs: true
         days_requested:
-          description: "This field only applies to calls for Items where the Transactions product has not already been initialized (i.e., by specifying `transactions` in the `products`, `required_if_supported_products`, or `optional_products` array when calling `/link/token/create` or by making a previous call to `/transactions/sync` or `/transactions/get`). In those cases, the field controls the maximum number of days of transaction history that Plaid will request from the financial institution. The more transaction history is requested, the longer the historical update poll will take. If no value is specified, 90 days of history will be requested by default.\n\nIf you are initializing your Items with transactions during the `/link/token/create` call (e.g. by including `transactions` in the `/link/token/create` `products` array), you must use the [`transactions.days_requested`](https://plaid.com/docs/api/link/#link-token-create-request-transactions-days-requested) field in the `/link/token/create` request instead of in the `/transactions/sync` request.\n\nIf the Item has already been initialized with the Transactions product, this field will have no effect. The maximum amount of transaction history to request on an Item cannot be updated if Transactions has already been added to the Item. To request older transaction history on an Item where Transactions has already been added, you must delete the Item via `/item/remove` and send the user through Link to create a new Item. \n\nCustomers using [Recurring Transactions](https://plaid.com/docs/api/products/transactions/#transactionsrecurringget) should request at least 180 days of history for optimal results.          "
+          description: "This field only applies to calls for Items where the Transactions product has not already been initialized (i.e., by specifying `transactions` in the `products`, `required_if_supported_products`, or `optional_products` array when calling `/link/token/create` or by making a previous call to `/transactions/sync` or `/transactions/get`). In those cases, the field controls the maximum number of days of transaction history that Plaid will request from the financial institution. The more transaction history is requested, the longer the historical update poll will take. If no value is specified, 90 days of history will be requested by default.\n\nIf you are initializing your Items with transactions during the `/link/token/create` call (e.g. by including `transactions` in the `/link/token/create` `products` array), you must use the [`transactions.days_requested`](https://plaid.com/docs/api/link/#link-token-create-request-transactions-days-requested) field in the `/link/token/create` request instead of in the `/transactions/sync` request.\n\nIf the Item has already been initialized with the Transactions product, this field will have no effect. The maximum amount of transaction history to request on an Item cannot be updated if Transactions has already been added to the Item. To request older transaction history on an Item where Transactions has already been added, you must delete the Item via `/item/remove` and send the user through Link to create a new Item. \n\nCustomers using [Recurring Transactions](https://plaid.com/docs/api/products/transactions/#transactionsrecurringget) should request at least 180 days of history for optimal results."
           type: integer
           minimum: 1
           maximum: 730
@@ -18451,7 +18660,7 @@ components:
             $ref: '#/components/schemas/RiskReason'
         exceeds_balance_threshold:
           type: boolean
-          description: "Whether the proposed transaction exceeds the balance threshold set in the request. `true` indicates higher risk; `false` indicates lower risk. If the `amount` multiplied by the `balance_threshold_percentage` (as a percentage) exceeds the balance in the account, then `exceeds_balance_threshold` will be true, otherwise, it will be false. For example, if the `amount` is 200 and the `balance_threshold_percentage` is 90, then the account balance must be at least 180 for `exceeds_balance_threshold` to be false. \n\nBy default, the available balance will be used for this calculation; if it cannot be obtained, the current balance will be used. \n\nThis field is particularly useful for customers using indirect Items and who do not have direct access to raw balance data. "
+          description: "Whether the proposed transaction exceeds the balance threshold set in the request. `true` indicates higher risk; `false` indicates lower risk. If the `amount` multiplied by the `balance_threshold_percentage` (as a percentage) exceeds the balance in the account, then `exceeds_balance_threshold` will be true, otherwise, it will be false. For example, if the `amount` is 200 and the `balance_threshold_percentage` is 90, then the account balance must be at least 180 for `exceeds_balance_threshold` to be false. \n\nBy default, the available balance will be used for this calculation; if it cannot be obtained, the current balance will be used. \n\nThis field is particularly useful for customers using indirect Items and who do not have direct access to raw balance data."
       required:
       - risk_level
       - attributes
@@ -18739,7 +18948,7 @@ components:
           type: integer
           minimum: 1
           default: 90
-          description: "If the `amount` multiplied by the `balance_threshold_percentage` (as a percentage) exceeds the balance in the account, then [`payment_risk_assessment.exceeds_balance_threshold`](https://plaid.com/docs/balance/balance-plus/#accounts-balance-get-response-payment-risk-assessment-exceeds-balance-threshold) in the response will be true, otherwise, it will be false. For example, if the `amount` is 200 and the `balance_threshold_percentage` is 90, then the account balance must be at least 180 for `exceeds_balance_threshold` to be false. \n\nBy default, the available balance will be used for this calculation; if it cannot be obtained, the current balance will be used. \n\nThis field is particularly useful for customers using indirect Items and who do not have direct access to raw balance data. "
+          description: "If the `amount` multiplied by the `balance_threshold_percentage` (as a percentage) exceeds the balance in the account, then [`payment_risk_assessment.exceeds_balance_threshold`](https://plaid.com/docs/balance/balance-plus/#accounts-balance-get-response-payment-risk-assessment-exceeds-balance-threshold) in the response will be true, otherwise, it will be false. For example, if the `amount` is 200 and the `balance_threshold_percentage` is 90, then the account balance must be at least 180 for `exceeds_balance_threshold` to be false. \n\nBy default, the available balance will be used for this calculation; if it cannot be obtained, the current balance will be used. \n\nThis field is particularly useful for customers using indirect Items and who do not have direct access to raw balance data."
         requires_real_time_balance_refresh:
           type: boolean
           description: A boolean that determines whether the balance has to be refreshed in real time as part of the API call when using Balance Plus. Setting this to field to `true` will result in more recent balances, but latency may be up to 30 seconds or more. If making a regular (non-Balance Plus) Balance call, without the `payment_details` object present, `/accounts/balance/get` will always return real-time balances.
@@ -20068,6 +20277,12 @@ components:
         last_name:
           type: string
           description: The user's last name
+        date_of_birth:
+          x-hidden-from-docs: true
+          type: string
+          nullable: true
+          format: date
+          description: To be provided in the format "yyyy-mm-dd".
         phone_numbers:
           description: 'The user''s phone number, in E.164 format: +{countrycode}{number}. For example: "+14157452130". Phone numbers provided in other formats will be parsed on a best-effort basis. Phone number input is validated against valid number ranges; number strings that do not match a real-world phone numbering scheme may cause the request to fail, even in the Sandbox test environment.'
           type: array
@@ -20847,7 +21062,6 @@ components:
       - request_id
     InvestmentsAuthGetRequest:
       type: object
-      x-hidden-from-docs: true
       description: InvestmentsAuthGetRequest defines the request schema for `/investments/auth/get`
       properties:
         client_id:
@@ -20862,7 +21076,6 @@ components:
       - access_token
     InvestmentsAuthGetRequestOptions:
       type: object
-      x-hidden-from-docs: true
       description: An optional object to filter `/investments/auth/get` results.
       properties:
         account_ids:
@@ -20873,7 +21086,6 @@ components:
     InvestmentsAuthGetResponse:
       type: object
       additionalProperties: true
-      x-hidden-from-docs: true
       description: InvestmentsAuthGetResponse defines the response schema for `/investments/auth/get`
       properties:
         accounts:
@@ -20898,6 +21110,8 @@ components:
             $ref: '#/components/schemas/InvestmentsAuthOwner'
         numbers:
           $ref: '#/components/schemas/InvestmentsAuthGetNumbers'
+        data_sources:
+          $ref: '#/components/schemas/InvestmentsAuthDataSources'
         item:
           $ref: '#/components/schemas/Item'
         request_id:
@@ -20909,6 +21123,7 @@ components:
       - item
       - numbers
       - owners
+      - data_sources
       - request_id
     InvestmentsTransactionsGetRequest:
       type: object
@@ -21230,7 +21445,8 @@ components:
       - account_id
     DepositSwitchCreateRequest:
       type: object
-      description: DepositSwitchCreateRequest defines the request schema for `/deposit_switch/create`
+      deprecated: true
+      description: (Deprecated) DepositSwitchCreateRequest defines the request schema for `/deposit_switch/create`
       properties:
         client_id:
           $ref: '#/components/schemas/APIClientID'
@@ -21258,7 +21474,8 @@ components:
     DepositSwitchCreateRequestOptions:
       type: object
       title: DepositSwitchCreateRequestOptions
-      description: Options to configure the `/deposit_switch/create` request. If provided, cannot be `null`.
+      deprecated: true
+      description: (Deprecated) Options to configure the `/deposit_switch/create` request. If provided, cannot be `null`.
       x-private-visibility: false
       properties:
         webhook:
@@ -21276,7 +21493,8 @@ components:
     DepositSwitchCreateResponse:
       type: object
       additionalProperties: true
-      description: DepositSwitchCreateResponse defines the response schema for `/deposit_switch/create`
+      deprecated: true
+      description: (Deprecated) DepositSwitchCreateResponse defines the response schema for `/deposit_switch/create`
       properties:
         deposit_switch_id:
           type: string
@@ -21288,7 +21506,8 @@ components:
       - request_id
     DepositSwitchTokenCreateRequest:
       type: object
-      description: DepositSwitchTokenCreateRequest defines the request schema for `/deposit_switch/token/create`
+      deprecated: true
+      description: (Deprecated) DepositSwitchTokenCreateRequest defines the request schema for `/deposit_switch/token/create`
       properties:
         client_id:
           $ref: '#/components/schemas/APIClientID'
@@ -21302,7 +21521,8 @@ components:
     DepositSwitchTokenCreateResponse:
       type: object
       additionalProperties: true
-      description: DepositSwitchTokenCreateResponse defines the response schema for `/deposit_switch/token/create`
+      deprecated: true
+      description: (Deprecated) DepositSwitchTokenCreateResponse defines the response schema for `/deposit_switch/token/create`
       properties:
         deposit_switch_token:
           type: string
@@ -21516,7 +21736,27 @@ components:
         cra_options:
           $ref: '#/components/schemas/LinkTokenCreateRequestCraOptions'
         consumer_report_permissible_purpose:
-          $ref: '#/components/schemas/ConsumerReportPermissiblePurpose'
+          allOf:
+          - $ref: '#/components/schemas/ConsumerReportPermissiblePurpose'
+          - type: string
+            description: |-
+              Describes the reason you are generating a Consumer Report for this user. This parameter is required if you want to generate a Consumer Report for the user automatically after the Link session. If you omit this parameter during Link token creation, you can later call the `/cra/check_report/create` endpoint to generate a report.
+
+              `ACCOUNT_REVIEW_CREDIT`: In connection with a consumer credit transaction for the review or collection of an account pursuant to FCRA Section 604(a)(3)(A).
+
+              `ACCOUNT_REVIEW_NON_CREDIT`: For a legitimate business need of the information to review a non-credit account provided primarily for personal, family, or household purposes to determine whether the consumer continues to meet the terms of the account pursuant to FCRA Section 604(a)(3)(F)(2).
+
+              `EMPLOYMENT`: For employment purposes pursuant to FCRA 604(a)(3)(B), including hiring, retention and promotion purposes.
+
+              `EXTENSION_OF_CREDIT`: In connection with a credit transaction initiated by and involving the consumer pursuant to FCRA Section 604(a)(3)(A).
+
+              `LEGITIMATE_BUSINESS_NEED_TENANT_SCREENING`: For a legitimate business need in connection with a business transaction initiated by the consumer primarily for personal, family, or household purposes in connection with a property rental assessment pursuant to FCRA Section 604(a)(3)(F)(i).
+
+              `LEGITIMATE_BUSINESS_NEED_OTHER`: For a legitimate business need in connection with a business transaction made primarily for personal, family, or household initiated by the consumer pursuant to FCRA Section 604(a)(3)(F)(i).
+
+              `WRITTEN_INSTRUCTION_PREQUALIFICATION`: In accordance with the written instructions of the consumer pursuant to FCRA Section 604(a)(2), to evaluate an application’s profile to make an offer to the consumer.
+
+              `WRITTEN_INSTRUCTION_OTHER`: In accordance with the written instructions of the consumer pursuant to FCRA Section 604(a)(2), such as when an individual agrees to act as a guarantor or assumes personal liability for a consumer, business, or commercial loan.
         auth:
           $ref: '#/components/schemas/LinkTokenCreateRequestAuth'
         transfer:
@@ -21592,8 +21832,7 @@ components:
           type: boolean
           description: If `true`, allow users to manually enter Investments account and holdings information. Defaults to `false`.
     LinkTokenInvestmentsAuth:
-      x-hidden-from-docs: true
-      description: Configuration parameters for the Investments Auth Product
+      description: Configuration parameters for the Investments Move product
       type: object
       properties:
         manual_entry_enabled:
@@ -21689,7 +21928,8 @@ components:
     LinkTokenCreateRequestDepositSwitch:
       type: object
       x-hidden-from-docs: true
-      description: Specifies options for initializing Link for use with the Deposit Switch (beta) product. This field is required if `deposit_switch` is included in the `products` array.
+      deprecated: true
+      description: (Deprecated) Specifies options for initializing Link for use with the Deposit Switch (beta) product. This field is required if `deposit_switch` is included in the `products` array.
       properties:
         deposit_switch_id:
           type: string
@@ -21746,6 +21986,23 @@ components:
       required:
       - start_date
       - end_date
+    TrustedDeviceData:
+      type: object
+      description: Trusted Device data associated with the previous Link session.
+      properties:
+        trust_level:
+          type: integer
+        device_id:
+          $ref: '#/components/schemas/DeviceId'
+    DeviceId:
+      type: object
+      description: Device Id associated with the device used during the previous link session
+      properties:
+        type:
+          type: integer
+        id:
+          type: string
+          description: Identifier for the device
     UserStatedIncomeSourceCategory:
       type: string
       description: The income category for a specified income source
@@ -22741,7 +22998,7 @@ components:
           description: |-
             Timestamp in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format (`YYYY-MM-DDTHH:mm:ssZ`) indicating the oldest acceptable balance when making a request to `/accounts/balance/get`.
 
-            This field is only used and expected when the institution is `ins_128026` (Capital One) and the Item contains one or more accounts with a non-depository account type, in which case a value must be provided or an `INVALID_REQUEST` error with the code of `INVALID_FIELD` will be returned. For Capital One depository accounts as well as all other account types on all other institutions, this field is ignored. See [account type schema](https://en.wikipedia.org/wiki/ISO_8601) for a full list of account types.
+            This field is only used and expected when the institution is `ins_128026` (Capital One) and the Item contains one or more accounts with a non-depository account type, in which case a value must be provided or an `INVALID_REQUEST` error with the code of `INVALID_FIELD` will be returned. For Capital One depository accounts as well as all other account types on all other institutions, this field is ignored. See [account type schema](https://plaid.com/docs/api/accounts/#account-type-schema) for a full list of account types.
 
             If the balance that is pulled is older than the given timestamp for Items with this field required, an `INVALID_REQUEST` error with the code of `LAST_UPDATED_DATETIME_OUT_OF_RANGE` will be returned with the most recent timestamp for the requested account contained in the response.
           nullable: true
@@ -23190,7 +23447,6 @@ components:
       allOf:
       - $ref: '#/components/schemas/NumbersIBAN'
     InvestmentsAuthGetNumbers:
-      x-hidden-from-docs: true
       type: object
       additionalProperties: true
       description: Identifying information for transferring holdings to an investments account.
@@ -23204,7 +23460,6 @@ components:
           items:
             $ref: '#/components/schemas/NumbersATON'
     NumbersACATS:
-      x-hidden-from-docs: true
       title: NumbersACATS
       type: object
       additionalProperties: true
@@ -23218,7 +23473,7 @@ components:
           description: The full account number for the account
         dtc_numbers:
           type: array
-          description: Identifiers for the clearinghouses that are assocciated with the account in order of relevance. This array will be empty if we can't provide any account level data. Institution level data can be retrieved from the institutions/get endpoints.
+          description: Identifiers for the clearinghouses that are associated with the account in order of relevance. This array will be empty if we can't provide any account level data. Institution level data can be retrieved from the institutions/get endpoints.
           items:
             type: string
       required:
@@ -23226,7 +23481,6 @@ components:
       - account
       - dtc_numbers
     NumbersATON:
-      x-hidden-from-docs: true
       title: NumbersATON
       type: object
       additionalProperties: true
@@ -23765,7 +24019,6 @@ components:
       - EARLY_DETECTION
       - TOMBSTONED
     InvestmentsAuthOwner:
-      x-hidden-from-docs: true
       title: InvestmentsAuthOwner
       type: object
       description: Information on the ownership of an investments account
@@ -23782,6 +24035,30 @@ components:
           type: array
           items:
             type: string
+    InvestmentsAuthDataSources:
+      title: InvestmentsAuthDataSources
+      type: object
+      description: Object with metadata pertaining to the source of data for the account numbers, owners, and holdings that are returned.
+      additionalProperties: true
+      properties:
+        numbers:
+          $ref: '#/components/schemas/DataSources'
+        owners:
+          $ref: '#/components/schemas/DataSources'
+        holdings:
+          $ref: '#/components/schemas/DataSources'
+    DataSources:
+      type: string
+      description: |-
+        A description of the source of data for a given product/data type.
+
+        `INSTITUTION`: The institution supports this product, and the data was provided by the institution.
+        `INSTITUTION_MASK`: The user manually provided the full account number, which was matched to the account mask provided by the institution. Only applicable to the `numbers` data type.
+        `USER`: The institution does not support this product, and the data was manually provided by the user.
+      enum:
+      - INSTITUTION
+      - INSTITUTION_MASK
+      - USER
     Institution:
       title: Institution
       type: object
@@ -23971,7 +24248,7 @@ components:
       - LEGITIMATE_BUSINESS_NEED_OTHER
       - WRITTEN_INSTRUCTION_PREQUALIFICATION
       - WRITTEN_INSTRUCTION_OTHER
-      description: "This enum describes the reason you are generating a Consumer Report for this user. \n\n`ACCOUNT_REVIEW_CREDIT`: In connection with a consumer credit transaction for the review or collection of an account pursuant to FCRA Section 604(a)(3)(A).\n\n`ACCOUNT_REVIEW_NON_CREDIT`: For a legitimate business need of the information to review a non-credit account provided primarily for personal, family, or household purposes to determine whether the consumer continues to meet the terms of the account pursuant to FCRA Section 604(a)(3)(F)(2).\n\n`EMPLOYMENT`: For employment purposes pursuant to FCRA 604(a)(3)(B), including hiring, retention and promotion purposes.\n\n`EXTENSION_OF_CREDIT`: In connection with a credit transaction initiated by and involving the consumer pursuant to FCRA Section 604(a)(3)(A).\n\n`LEGITIMATE_BUSINESS_NEED_TENANT_SCREENING`: For a legitimate business need in connection with a business transaction initiated by the consumer primarily for personal, family, or household purposes in connection with a property rental assessment pursuant to FCRA Section 604(a)(3)(F)(i).\n\n`LEGITIMATE_BUSINESS_NEED_OTHER`: For a legitimate business need in connection with a business transaction made primarily for personal, family, or household initiated by the consumer pursuant to FCRA Section 604(a)(3)(F)(i).\n\n`WRITTEN_INSTRUCTION_PREQUALIFICATION`: In accordance with the written instructions of the consumer pursuant to FCRA Section 604(a)(2), to evaluate an application’s profile to make an offer to the consumer.\n\n`WRITTEN_INSTRUCTION_OTHER`: In accordance with the written instructions of the consumer pursuant to FCRA Section 604(a)(2), such as when an individual agrees to act as a guarantor or assumes personal liability for a consumer, business, or commercial loan."
+      description: "Describes the reason you are generating a Consumer Report for this user. \n\n`ACCOUNT_REVIEW_CREDIT`: In connection with a consumer credit transaction for the review or collection of an account pursuant to FCRA Section 604(a)(3)(A).\n\n`ACCOUNT_REVIEW_NON_CREDIT`: For a legitimate business need of the information to review a non-credit account provided primarily for personal, family, or household purposes to determine whether the consumer continues to meet the terms of the account pursuant to FCRA Section 604(a)(3)(F)(2).\n\n`EMPLOYMENT`: For employment purposes pursuant to FCRA 604(a)(3)(B), including hiring, retention and promotion purposes.\n\n`EXTENSION_OF_CREDIT`: In connection with a credit transaction initiated by and involving the consumer pursuant to FCRA Section 604(a)(3)(A).\n\n`LEGITIMATE_BUSINESS_NEED_TENANT_SCREENING`: For a legitimate business need in connection with a business transaction initiated by the consumer primarily for personal, family, or household purposes in connection with a property rental assessment pursuant to FCRA Section 604(a)(3)(F)(i).\n\n`LEGITIMATE_BUSINESS_NEED_OTHER`: For a legitimate business need in connection with a business transaction made primarily for personal, family, or household initiated by the consumer pursuant to FCRA Section 604(a)(3)(F)(i).\n\n`WRITTEN_INSTRUCTION_PREQUALIFICATION`: In accordance with the written instructions of the consumer pursuant to FCRA Section 604(a)(2), to evaluate an application’s profile to make an offer to the consumer.\n\n`WRITTEN_INSTRUCTION_OTHER`: In accordance with the written instructions of the consumer pursuant to FCRA Section 604(a)(2), such as when an individual agrees to act as a guarantor or assumes personal liability for a consumer, business, or commercial loan."
     PaymentMeta:
       title: PaymentMeta
       type: object
@@ -26309,7 +26586,6 @@ components:
       - credit_details
       - income
       - income_verification
-      - deposit_switch
       - standing_orders
       - transfer
       - employment
@@ -26324,6 +26600,7 @@ components:
       - cra_partner_insights
       - cra_cashflow_insights
       - layer
+      - pay_by_bank
       description: A list of products that an institution can support. All Items must be initialized with at least one product. The Balance product is always available and does not need to be specified during initialization.
       type: string
     ProductStatus:
@@ -28144,7 +28421,7 @@ components:
       title: PendingDisconnectWebhook
       type: object
       additionalProperties: true
-      description: Fired when an Item is expected to be disconnected. This can be resolved by having the user go through Link’s update mode.
+      description: Fired when an Item is expected to be disconnected. This can be resolved by having the user go through Link’s [update mode](http://plaid.com/docs/link/update-mode).
       properties:
         webhook_type:
           type: string
@@ -28421,7 +28698,7 @@ components:
       - ZRX
     StandaloneAccountType:
       title: StandaloneAccountType
-      description: The schema below describes the various `types` and corresponding `subtypes` that Plaid recognizes and reports for financial institution accounts.
+      description: The schema below describes the various `types` and corresponding `subtypes` that Plaid recognizes and reports for financial institution accounts. For a mapping of supported types and subtypes to Plaid products, see the [Account type / product support matrix](https://plaid.com/docs/api/accounts/#account-type--product-support-matrix).
       type: object
       additionalProperties: true
       properties:
@@ -28435,7 +28712,7 @@ components:
           $ref: '#/components/schemas/InvestmentAccountSubtypeStandalone'
         other:
           type: string
-          description: 'Other or unknown account type. Supported products for `other` accounts are: Balance, Identity.'
+          description: Other or unknown account type.
       required:
       - depository
       - credit
@@ -28444,7 +28721,7 @@ components:
       - other
     DepositoryAccount:
       title: DepositoryAccount
-      description: 'An account type holding cash, in which funds are deposited. Supported products for `depository` accounts are: Auth (`checking` and `savings` subtypes only), Transfer, Balance, Signal, Income, Transactions, Identity, Payment Initiation, Assets, and Investments (`cash management` subtype only).'
+      description: An account type holding cash, in which funds are deposited.
       type: string
       properties:
         checking:
@@ -28487,7 +28764,7 @@ components:
     CreditAccount:
       title: CreditAccount
       type: string
-      description: 'A credit card type account. Supported products for `credit` accounts are: Balance, Transactions, Identity, Assets, and Liabilities.'
+      description: A credit card type account.
       properties:
         credit card:
           type: string
@@ -28501,7 +28778,7 @@ components:
     LoanAccount:
       title: LoanAccount
       type: string
-      description: 'A loan type account. Supported products for `loan` accounts are: Balance, Liabilities (`student` and `mortgage` subtypes only), Identity.'
+      description: A loan type account.
       properties:
         auto:
           type: string
@@ -28555,7 +28832,7 @@ components:
     InvestmentAccountSubtypeStandalone:
       title: InvestmentAccountSubtype
       type: string
-      description: 'An investment account. Supported products for `investment` accounts are: Balance, Assets, Investments, and Investment Transactions. In API versions 2018-05-22 and earlier, this type is called `brokerage`.'
+      description: An investment account. In API versions 2018-05-22 and earlier, this type is called `brokerage`.
       properties:
         "529":
           type: string
@@ -29568,7 +29845,8 @@ components:
       - environment
     DepositSwitchGetRequest:
       title: DepositSwitchGetRequest
-      description: DepositSwitchGetRequest defines the request schema for `/deposit_switch/get`
+      deprecated: true
+      description: (Deprecated) DepositSwitchGetRequest defines the request schema for `/deposit_switch/get`
       type: object
       x-examples: {}
       properties:
@@ -29585,7 +29863,8 @@ components:
       title: DepositSwitchGetResponse
       type: object
       additionalProperties: true
-      description: DepositSwitchGetResponse defines the response schema for `/deposit_switch/get`
+      deprecated: true
+      description: (Deprecated) DepositSwitchGetResponse defines the response schema for `/deposit_switch/get`
       properties:
         deposit_switch_id:
           type: string
@@ -29694,7 +29973,8 @@ components:
     DepositSwitchStateUpdateWebhook:
       title: DepositSwitchStateUpdateWebhook
       type: object
-      description: Fired when the status of a deposit switch request has changed.
+      deprecated: true
+      description: (Deprecated) Fired when the status of a deposit switch request has changed.
       x-examples:
         example-1:
           webhook_type: DEPOSIT_SWITCH
@@ -29798,14 +30078,14 @@ components:
           $ref: '#/components/schemas/APISecret'
         transfer_id:
           $ref: '#/components/schemas/TransferID'
+        authorization_id:
+          $ref: '#/components/schemas/TransferAuthorizationID'
         originator_client_id:
           deprecated: true
           x-hidden-from-docs: true
           type: string
           nullable: true
           description: The Plaid client ID of the transfer originator. Should only be present if `client_id` is a third-party sender (TPS).
-      required:
-      - transfer_id
     TransferRecurringGetRequest:
       title: TransferRecurringGetRequest
       type: object
@@ -32784,12 +33064,24 @@ components:
       additionalProperties: true
       description: Defines the response schema for `/transfer/ledger/get`
       properties:
+        ledger_id:
+          type: string
+          description: The unique identifier of the Ledger that was returned.
         balance:
           $ref: '#/components/schemas/TransferLedgerBalance'
+        name:
+          type: string
+          description: The name of the Ledger
+        is_default:
+          type: boolean
+          description: Whether this Ledger is the client's default ledger.
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
+      - ledger_id
       - balance
+      - name
+      - is_default
       - request_id
     TransferLedgerDistributeRequest:
       title: TransferLedgerDistributeRequest
@@ -32800,12 +33092,12 @@ components:
           $ref: '#/components/schemas/APIClientID'
         secret:
           $ref: '#/components/schemas/APISecret'
-        from_client_id:
+        from_ledger_id:
           type: string
-          description: The client to pull money from. Must be the platform itself or its originator. One of `from_client_id` and `to_client_id` must be the platform's `client_id`.
-        to_client_id:
+          description: The Ledger to pull money from.
+        to_ledger_id:
           type: string
-          description: The client to credit money to. Must be the platform itself or its originator. One of `from_client_id` and `to_client_id` must be the platform's `client_id`.
+          description: The Ledger to credit money to.
         amount:
           type: string
           description: The amount to move (decimal string with two digits of precision e.g. "10.00"). Amount must be positive.
@@ -32815,8 +33107,8 @@ components:
           type: string
           description: An optional description for the ledger distribute operation.
       required:
-      - from_client_id
-      - to_client_id
+      - from_ledger_id
+      - to_ledger_id
       - amount
       - idempotency_key
     TransferLedgerDistributeResponse:
@@ -33551,6 +33843,58 @@ components:
       - event_id
       - amount
       - iso_currency_code
+    TransferPlatformRequirementSubmitRequest:
+      title: TransferPlatformRequirementSubmitRequest
+      type: object
+      description: Defines the request schema for `/transfer/platform/requirement/submit`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        originator_client_id:
+          type: string
+          description: The client ID of the originator
+        requirement_submissions:
+          type: array
+          description: A list of requirement submissions that all relate to the originator. Must contain between 1 and 50 requirement submissions.
+          items:
+            $ref: '#/components/schemas/TransferPlatformRequirementSubmission'
+          maxItems: 50
+          minItems: 1
+      required:
+      - originator_client_id
+      - requirement_submissions
+    TransferPlatformRequirementSubmission:
+      title: RequirementSubmission
+      type: object
+      x-hidden-from-docs: true
+      description: A single requirement submission
+      properties:
+        requirement_type:
+          type: string
+          description: The type of requirement being submitted
+        value:
+          type: string
+          description: The value of the requirement, which can be a string or an object depending on the `requirement_type`. If it is an object, the object should be JSON marshaled into a string. See the documentation on this endpoint for more information and examples.
+        person_id:
+          type: string
+          format: uuid
+          description: The `person_id` of the person the requirement submission is related to. A `person_id` is returned by `/transfer/platform/person/create`. This field should not be included for requirements that are not related to a person.
+      required:
+      - requirement_type
+      - value
+    TransferPlatformRequirementSubmitResponse:
+      title: TransferPlatformRequirementSubmitResponse
+      type: object
+      x-hidden-from-docs: true
+      additionalProperties: true
+      description: Defines the response schema for `/transfer/platform/requirement/submit`
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
     TransferIntentCreateRequest:
       title: TransferIntentCreateRequest
       type: object
@@ -36550,7 +36894,8 @@ components:
     DepositSwitchAltCreateRequest:
       title: DepositSwitchAltCreateRequest
       type: object
-      description: DepositSwitchAltCreateRequest defines the request schema for `/deposit_switch/alt/create`
+      deprecated: true
+      description: (Deprecated) DepositSwitchAltCreateRequest defines the request schema for `/deposit_switch/alt/create`
       properties:
         client_id:
           $ref: '#/components/schemas/APIClientID'
@@ -36576,6 +36921,7 @@ components:
     DepositSwitchAltCreateResponse:
       title: DepositSwitchAltCreateResponse
       type: object
+      deprecated: true
       additionalProperties: true
       properties:
         deposit_switch_id:
@@ -36586,10 +36932,11 @@ components:
       required:
       - deposit_switch_id
       - request_id
-      description: DepositSwitchAltCreateResponse defines the response schema for `/deposit_switch/alt/create`
+      description: (Deprecated) DepositSwitchAltCreateResponse defines the response schema for `/deposit_switch/alt/create`
     DepositSwitchTargetAccount:
       title: DepositSwitchTargetAccount
-      description: The deposit switch destination account
+      deprecated: true
+      description: (Deprecated) The deposit switch destination account
       type: object
       additionalProperties: true
       properties:
@@ -36615,7 +36962,8 @@ components:
       - account_subtype
     DepositSwitchTargetUser:
       title: DepositSwitchTargetUser
-      description: The deposit switch target user
+      description: (Deprecated) The deposit switch target user
+      deprecated: true
       type: object
       additionalProperties: true
       properties:
@@ -36644,8 +36992,9 @@ components:
     DepositSwitchAddressData:
       title: DepositSwitchAddressData
       type: object
+      deprecated: true
       additionalProperties: true
-      description: The user's address.
+      description: (Deprecated) The user's address.
       properties:
         city:
           type: string
@@ -39982,6 +40331,33 @@ components:
       items:
         type: string
         description: List of account subtypes.
+    ConsentEventsGetRequest:
+      description: Request to list a historical log of item consent events.
+      type: object
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+      required:
+      - access_token
+    ConsentEventsGetResponse:
+      description: Describes a historical log of item consent events.
+      additionalProperties: true
+      type: object
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+        consent_events:
+          type: array
+          description: A list of consent events.
+          items:
+            $ref: '#/components/schemas/ConsentEvent'
+      required:
+      - consent_events
+      - request_id
     ItemActivityListRequest:
       description: Request to list a historical log of user consent events.
       type: object
@@ -40090,6 +40466,94 @@ components:
       - investments
       - payroll_info
       - transaction_risk_info
+    ConsentEvent:
+      description: Describes a consent event.
+      additionalProperties: true
+      type: object
+      properties:
+        item_id:
+          type: string
+          description: The Plaid Item ID. The `item_id` is always unique; linking the same account at the same institution twice will result in two Items with different `item_id` values. Like all Plaid identifiers, the `item_id` is case-sensitive.
+        created_at:
+          type: string
+          format: date-time
+          description: The date and time when the consent event occurred, in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format.
+        event_type:
+          $ref: '#/components/schemas/ConsentEventType'
+        event_code:
+          $ref: '#/components/schemas/ConsentEventCode'
+        institution_id:
+          description: Unique identifier for the institution associated with the Item. Field is `null` for Items created via Same Day Micro-deposits.
+          nullable: true
+          type: string
+        institution_name:
+          description: The full name of the institution associated with the Item. Field is `null` for Items created via Same Day Micro-deposits.
+          nullable: true
+          type: string
+        initiator:
+          $ref: '#/components/schemas/ConsentEventInitiator'
+        consented_use_cases:
+          description: |-
+            A list of strings containing the full list of use cases the end user has consented to for the Item.
+
+            See the [full list](/docs/link/data-transparency-messaging-migration-guide/#updating-link-customizations) of use cases.
+          type: array
+          items:
+            type: string
+        consented_data_scopes:
+          description: A list of strings containing the full list of data scopes the end user has consented to for the Item. These correspond to consented products; see the [full mapping](/docs/link/data-transparency-messaging-migration-guide/#data-scopes-by-product) of data scopes and products.
+          type: array
+          items:
+            type: string
+        consented_accounts:
+          description: An array containing the accounts associated with the Item for which authorizations are granted.
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsentedAccount'
+    ConsentEventInitiator:
+      type: string
+      description: The entity that initiated collection of consent.
+      enum:
+      - PLAID
+      - DATA_PROVIDER
+      - CUSTOMER
+      - END_USER
+    ConsentEventType:
+      type: string
+      description: A broad categorization of the consent event.
+      enum:
+      - CONSENT_GRANTED
+      - CONSENT_REVOKED
+      - CONSENT_UPDATED
+    ConsentEventCode:
+      type: string
+      description: Codes describing the object of a consent event.
+      enum:
+      - PLAID_END_USER_PRIVACY_POLICY
+      - USE_CASES
+      - DATA_SCOPES
+      - ACCOUNT_SCOPES
+    ConsentedAccount:
+      type: object
+      additionalProperties: true
+      description: A financial institution account.
+      properties:
+        account_id:
+          type: string
+          description: Plaid’s unique identifier for the account. Like all Plaid identifiers, the `account_id` is case sensitive.
+        mask:
+          type: string
+          description: The last 2-4 alphanumeric characters of an account's official account number
+        name:
+          type: string
+          description: The name of the account, either assigned by the user or by the financial institution itself
+        official_name:
+          type: string
+          description: The official name of the account as given by the financial institution
+        type:
+          $ref: '#/components/schemas/AccountType'
+        subtype:
+          $ref: '#/components/schemas/AccountSubtype'
     Activity:
       description: Describes a consent activity.
       type: object
@@ -40265,7 +40729,7 @@ components:
             The codes are from PL01 to PL08 and from BK01 to BK07. For a full listing of risk reason codes, see [Risk codes](https://plaid.com/docs/balance/balance-plus/#risk-codes).
           type: string
         description:
-          description: 'A human-readable description explaining the risk code associated with the proposed transaction and some recommended actions. This field is subject to change; any programmatic logic should be based on the `code` field instead. '
+          description: A human-readable description explaining the risk code associated with the proposed transaction and some recommended actions. This field is subject to change; any programmatic logic should be based on the `code` field instead.
           type: string
       required:
       - code
@@ -41657,6 +42121,126 @@ components:
       - merchant_name
       - average_days_apart
       - is_active
+    IssuesSearchRequest:
+      type: object
+      description: IssuesSearchRequest defines the request schema for `/issues/search`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        item_id:
+          type: string
+          description: A unique identifier for the Plaid Item.
+        link_session_id:
+          type: string
+          description: A unique identifier for the Link session.
+        link_session_request_id:
+          type: string
+          description: The `request_id` for the Link session that might have had an institution connection issue.
+    IssuesSearchResponse:
+      type: object
+      description: IssuesSearchResponse defines the response schema for `/issues/search`.
+      additionalProperties: true
+      properties:
+        issues:
+          type: array
+          items:
+            $ref: '#/components/schemas/Issue'
+          description: A list of issues affecting the Item, session, or request passed in, conforming to the Issues data model. An empty list indicates that no matching issues were found.
+        request_id:
+          type: string
+          description: A unique identifier for the API request.
+    IssuesSubscribeRequest:
+      type: object
+      description: IssuesSubscribeRequest defines the request schema for `/issues/subscribe`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        issue_id:
+          type: string
+          description: The unique identifier of the issue to subscribe to.
+        webhook_url:
+          type: string
+          description: The webhook URL where notifications should be sent when the issue status changes.
+      required:
+      - issue_id
+      - webhook_url
+    IssuesSubscribeResponse:
+      type: object
+      description: IssuesSubscribeResponse defines the response schema for `/issues/subscribe`.
+      additionalProperties: true
+      properties:
+        request_id:
+          type: string
+          description: A unique identifier for the API request.
+      required:
+      - request_id
+    IssuesStatus:
+      type: string
+      enum:
+      - Reported
+      - Awaiting Resolution
+      - Fix In Progress
+      - Fix Pending Validation
+      - Cannot Fix
+      - Resolved
+      description: The current status of the issue.
+    Issue:
+      type: object
+      description: Information on an issue encountered with financial institutions interactions with financial institutions during Linking.
+      additionalProperties: true
+      properties:
+        issue_id:
+          type: string
+          description: The unique identifier of the issue.
+        institution_names:
+          type: array
+          items:
+            type: string
+          description: A list of names of the financial institutions affected.
+        institution_ids:
+          type: array
+          items:
+            type: string
+          description: A list of ids of the financial institutions affected.
+        created_at:
+          type: string
+          format: date-time
+          description: The creation time of the record tracking this issue.
+        summary:
+          type: string
+          description: A simple summary of the error for the end user.
+        detailed_description:
+          type: string
+          description: A more detailed description for the customer.
+        status:
+          $ref: '#/components/schemas/IssuesStatus'
+    IssuesGetRequest:
+      type: object
+      description: IssuesGetRequest defines the request schema for `/issues/get`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        issue_id:
+          type: string
+          description: The unique identifier of the issue to retrieve.
+      required:
+      - issue_id
+    IssuesGetResponse:
+      type: object
+      description: IssuesGetResponse defines the response schema for `/issues/get`.
+      additionalProperties: true
+      properties:
+        issue:
+          $ref: '#/components/schemas/Issue'
+        request_id:
+          type: string
+          description: A unique identifier for the API request.
     PaymentProfileCreateRequest:
       type: object
       description: PaymentProfileCreateRequest defines the request schema for `/payment_profile/create`
@@ -42580,7 +43164,7 @@ components:
     CraCheckReportReadyWebhook:
       type: object
       title: CraCheckReportReadyWebhook
-      description: Fired when products for the Check Report are ready to be retrieved
+      description: Fired when the Check Report are ready to be retrieved. Once this webhook has fired, the report will be available to retrieve for 24 hours.
       additionalProperties: true
       properties:
         webhook_type:
@@ -42827,7 +43411,7 @@ components:
           description: 'The request ID for the last request made by Link. This can be shared with Plaid Support to expedite investigation. Emitted by: all events.'
         mfa_type:
           type: string
-          description: 'If set, the user has encountered one of the following MFA types: code, device, questions, selections. Emitted by: `SUBMIT_MFA` and `TRANSITION_VIEW` when view_name is `MFA`.'
+          description: 'If set, the user has encountered one of the following MFA types: code, device, questions, selections. Emitted by: `SUBMIT_MFA` and `TRANSITION_VIEW` when `view_name` is `MFA`.'
         view_name:
           type: string
           description: 'The name of the view that is being transitioned to. Emitted by: `TRANSITION_VIEW`.'
@@ -44417,7 +45001,7 @@ components:
           description: |-
             Timestamp in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format (`YYYY-MM-DDTHH:mm:ssZ`) indicating the oldest acceptable balance when making a request to `/accounts/balance/get`.
 
-            This field is only used and expected when the institution is `ins_128026` (Capital One) and the Item contains one or more accounts with a non-depository account type, in which case a value must be provided or an `INVALID_REQUEST` error with the code of `INVALID_FIELD` will be returned. For Capital One depository accounts as well as all other account types on all other institutions, this field is ignored. See [account type schema](https://en.wikipedia.org/wiki/ISO_8601) for a full list of account types.
+            This field is only used and expected when the institution is `ins_128026` (Capital One) and the Item contains one or more accounts with a non-depository account type, in which case a value must be provided or an `INVALID_REQUEST` error with the code of `INVALID_FIELD` will be returned. For Capital One depository accounts as well as all other account types on all other institutions, this field is ignored. See [account type schema](https://plaid.com/docs/api/accounts/#account-type-schema) for a full list of account types.
 
             If the balance that is pulled is older than the given timestamp for Items with this field required, an `INVALID_REQUEST` error with the code of `LAST_UPDATED_DATETIME_OUT_OF_RANGE` will be returned with the most recent timestamp for the requested account contained in the response.
           nullable: true
@@ -44973,7 +45557,7 @@ components:
           description: |-
             Timestamp in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format (`YYYY-MM-DDTHH:mm:ssZ`) indicating the oldest acceptable balance when making a request to `/accounts/balance/get`.
 
-            This field is only used and expected when the institution is `ins_128026` (Capital One) and the Item contains one or more accounts with a non-depository account type, in which case a value must be provided or an `INVALID_REQUEST` error with the code of `INVALID_FIELD` will be returned. For Capital One depository accounts as well as all other account types on all other institutions, this field is ignored. See [account type schema](https://en.wikipedia.org/wiki/ISO_8601) for a full list of account types.
+            This field is only used and expected when the institution is `ins_128026` (Capital One) and the Item contains one or more accounts with a non-depository account type, in which case a value must be provided or an `INVALID_REQUEST` error with the code of `INVALID_FIELD` will be returned. For Capital One depository accounts as well as all other account types on all other institutions, this field is ignored. See [account type schema](https://plaid.com/docs/api/accounts/#account-type-schema) for a full list of account types.
 
             If the balance that is pulled is older than the given timestamp for Items with this field required, an `INVALID_REQUEST` error with the code of `LAST_UPDATED_DATETIME_OUT_OF_RANGE` will be returned with the most recent timestamp for the requested account contained in the response.
           nullable: true
@@ -47089,12 +47673,12 @@ components:
       type: string
       title: DashboardUserID
       example: 54350110fedcbaf01234ffee
-      description: ID of the associated user.
+      description: ID of the associated user. To retrieve the email address or other details of the person corresponding to this id, use `/dashboard_user/get`.
     DashboardUserIDNullable:
       type: string
       title: DashboardUserID
       example: 54350110fedcbaf01234ffee
-      description: ID of the associated user.
+      description: ID of the associated user. To retrieve the email address or other details of the person corresponding to this id, use `/dashboard_user/get`.
       nullable: true
     DashboardUserListRequest:
       description: Request input for listing dashboard users
@@ -48459,7 +49043,7 @@ components:
           type: boolean
           example: true
           title: EnableSharableLink
-          description: A flag specifying whether you would like Plaid to expose a shareable URL for the verification being retried.
+          description: A flag specifying whether you would like Plaid to expose a shareable URL for the verification being retried. If a value for this flag is not specified, the `is_shareable` setting from the original verification attempt will be used.
           nullable: true
         client_id:
           $ref: '#/components/schemas/APIClientID'
@@ -48488,7 +49072,7 @@ components:
           description: A boolean field specifying whether the new session should require or skip the `verify_sms` step.
           type: boolean
         kyc_check:
-          description: A boolean field specifying whether the new session should require or skip the `kyc_check` step.
+          description: A boolean field specifying whether the new session should require or skip the `kyc_check` (Data Source Verification) step.
           type: boolean
         documentary_verification:
           description: A boolean field specifying whether the new session should require or skip the `documentary_verification` step.
@@ -48923,7 +49507,7 @@ components:
       additionalProperties: true
     KYCCheckDetails:
       type: object
-      description: Additional information for the `kyc_check` step. This field will be `null` unless `steps.kyc_check` has reached a terminal state of either `success` or `failed`.
+      description: Additional information for the `kyc_check` (Data Source Verification) step. This field will be `null` unless `steps.kyc_check` has reached a terminal state of either `success` or `failed`.
       properties:
         status:
           type: string
@@ -49656,8 +50240,13 @@ components:
       properties:
         document_comparison:
           $ref: '#/components/schemas/SelfieAnalysisDocumentComparison'
+        liveness_check:
+          $ref: '#/components/schemas/SelfieAnalysisLivenessCheck'
+        facial_analysis:
+          $ref: '#/components/schemas/SelfieAnalysisFacialAnalysis'
       required:
       - document_comparison
+      - liveness_check
       additionalProperties: true
     SelfieAnalysisDocumentComparison:
       type: string
@@ -49666,6 +50255,62 @@ components:
       - no_match
       - no_input
       description: Information about the comparison between the selfie and the document (if documentary verification also ran).
+    SelfieAnalysisFacialAnalysis:
+      additionalProperties: true
+      nullable: true
+      x-hidden-from-docs: true
+      type: object
+      description: Analysis of the facial features of the selfie when compared to the face in the uploaded document, if one is present.
+      properties:
+        left_eye:
+          $ref: '#/components/schemas/SelfieAnalysisFacialAnalysisOutcome'
+        right_eye:
+          $ref: '#/components/schemas/SelfieAnalysisFacialAnalysisOutcome'
+        left_brow:
+          $ref: '#/components/schemas/SelfieAnalysisFacialAnalysisOutcome'
+        right_brow:
+          $ref: '#/components/schemas/SelfieAnalysisFacialAnalysisOutcome'
+        forehead:
+          $ref: '#/components/schemas/SelfieAnalysisFacialAnalysisOutcome'
+        middle_forehead:
+          $ref: '#/components/schemas/SelfieAnalysisFacialAnalysisOutcome'
+        nose:
+          $ref: '#/components/schemas/SelfieAnalysisFacialAnalysisOutcome'
+        philtrum:
+          $ref: '#/components/schemas/SelfieAnalysisFacialAnalysisOutcome'
+        mouth:
+          $ref: '#/components/schemas/SelfieAnalysisFacialAnalysisOutcome'
+        jaw:
+          $ref: '#/components/schemas/SelfieAnalysisFacialAnalysisOutcome'
+        left_cheek:
+          $ref: '#/components/schemas/SelfieAnalysisFacialAnalysisOutcome'
+        right_cheek:
+          $ref: '#/components/schemas/SelfieAnalysisFacialAnalysisOutcome'
+      required:
+      - left_eye
+      - right_eye
+      - left_brow
+      - right_brow
+      - forehead
+      - middle_forehead
+      - nose
+      - philtrum
+      - mouth
+      - jaw
+      - left_cheek
+      - right_cheek
+    SelfieAnalysisFacialAnalysisOutcome:
+      type: string
+      enum:
+      - success
+      - failed
+      description: Outcome of the facial analysis for a specific facial feature.
+    SelfieAnalysisLivenessCheck:
+      type: string
+      enum:
+      - success
+      - failed
+      description: Assessment of whether the selfie capture is of a real human being, as opposed to a picture of a human on a screen, a picture of a paper cut out, someone wearing a mask, or a deepfake.
     SelfieCapture:
       type: object
       description: The image or video capture of a selfie. Only one of image or video URL will be populated per selfie.
@@ -51700,7 +52345,6 @@ components:
       title: PrismVersions
       type: object
       nullable: true
-      x-hidden-from-docs: true
       description: The versions of Prism products to evaluate
       properties:
         firstdetect:
@@ -53778,6 +54422,10 @@ components:
           description: The Plaid Institution ID associated with the Item. Field is `null` for Items created via Same Day Micro-deposits.
           type: string
           nullable: true
+        created_at:
+          description: The date and time when the Item was created, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format.
+          type: string
+          format: date-time
         webhook:
           description: The URL registered to receive webhooks for the Item.
           type: string
@@ -53803,18 +54451,51 @@ components:
             $ref: '#/components/schemas/Products'
         consented_products:
           description: |
-            A list of products that have gone through consent collection for the Item. If the session is not enrolled in [Data Transparency Messaging](/docs/link/data-transparency-messaging-migration-guide), this field is not used.
+            A list of products that the user has consented to for the Item via [Data Transparency Messaging](/docs/link/data-transparency-messaging-migration-guide). This will consist of all products where both of the following are true: the user has consented to the required data scopes for that product and you have Production access for that product.
           type: array
           items:
             $ref: '#/components/schemas/Products'
+          x-override-enum-values-shown:
+          - assets
+          - auth
+          - balance
+          - balance_plus
+          - beacon
+          - identity
+          - identity_match
+          - investments
+          - investments_auth
+          - liabilities
+          - transactions
+          - income
+          - income_verification
+          - transfer
+          - employment
+          - recurring_transactions
+          - signal
+          - statements
+          - processor_payments
+          - processor_identity
+          - cra_base_report
+          - cra_income_insights
+          - cra_partner_insights
+          - cra_cashflow_insights
+          - layer
+        consented_use_cases:
+          type: array
+          description: "A list of use cases that the user has consented to for the Item via [Data Transparency Messaging](/docs/link/data-transparency-messaging-migration-guide). \n\nYou can see the full list of use cases or update the list of use cases to request at any time via the Link Customization section of the [Plaid Dashboard](https://dashboard.plaid.com/link/data-transparency-v5)."
+          items:
+            type: string
+        consented_data_scopes:
+          type: array
+          description: A list of data scopes that the user has consented to for the Item via [Data Transparency Messaging](/docs/link/data-transparency-messaging-migration-guide). These are based on the `consented_products`; see the [full mapping](/docs/link/data-transparency-messaging-migration-guide/#data-scopes-by-product) of data scopes and products.
+          items:
+            $ref: '#/components/schemas/ItemConsentedDataScope'
         consent_expiration_time:
-          description: |
-            The RFC 3339 timestamp after which the consent provided by the end user will expire. Upon consent expiration, the item will enter the `ITEM_LOGIN_REQUIRED` error state. To circumvent the `ITEM_LOGIN_REQUIRED` error and maintain continuous consent, the end user can reauthenticate via Link’s update mode in advance of the consent expiration time.
-
-            Note - This is only relevant for certain OAuth-based institutions. For all other institutions, this field will be null.
+          description: The date and time at which the Item's access consent will expire, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format
+          nullable: true
           type: string
           format: date-time
-          nullable: true
         update_type:
           type: string
           description: |-
@@ -53834,6 +54515,19 @@ components:
       - billed_products
       - consent_expiration_time
       - update_type
+    ItemConsentedDataScope:
+      title: Consented Data Scope
+      description: A data scope for the products that a user can consent to in [Data Transparency Messaging](/docs/link/data-transparency-messaging-migration-guide)
+      type: string
+      enum:
+      - account_and_balance_info
+      - contact_info
+      - account_and_routing_numbers
+      - transactions
+      - credit_and_loans
+      - investments
+      - bank_statements
+      - risk_info
     ItemStatus:
       description: An object with information about the status of the Item.
       type: object
