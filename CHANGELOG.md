@@ -1,3 +1,152 @@
+### 2020-09-14_1.575.0
+- Add `primary_account_score` and `is_primary_account` fields to the `cra/check_report/base_report/get` response
+
+### 2020-09-14_1.574.1
+- Add `FAILED` enum for Monitoring
+
+### 2020-09-14_1.574.0
+- Make `MonitoringInsights` nullable
+
+### 2020-09-14_1.573.2
+- Update session results array fields in `/link/token/get` response to be required
+
+### 2020-09-14_1.573.1
+- mark `category_id` in BaseReport transaction as nullable
+- Update `date_of_birth` description in `user/create`
+
+### 2020-09-14_1.573.0
+- Removed `is_missing_income` from `/cra/monitoring_insights/get`
+
+### 2020-09-14_1.572.0
+- Add `uuid` validation for `subscription_id` in `/cra/monitoring_insights/get`
+- Add `ConsumerReportPermissiblePurpose` to `CraMonitoringInsightsGetRequest`
+- Add `HistoricalAnnualIncome` insight
+
+### 2020-09-14_1.571.0
+- Add `attributes` and `nsf_overdraft_transactions_count` to `cra/check_report/base_report/get`
+
+### 2020-09-14_1.570.3
+- Update product list for `/partner/customer/create`
+
+### 2020-09-14_1.570.2
+- Add `predicted_next_date` field to `/transactions/recurring/get`
+
+### 2020-09-14_1.570.1
+- Add `end_customer` hidden field to `user/create` for client RealPage
+
+### 2020-09-14_1.569.5
+- Show `date_of_birth` on the open API doc
+
+### 2020-09-14_1.569.4
+- Add `ssn_last_4` to ConsumerReportUserIdentity
+
+### 2020-09-14_1.569.3
+- Add `USER_FRAUD_ALERT` to BaseReportWarningCode
+
+### 2020-09-14_1.569.2
+- Removed erroneous `required` attribute from `request_id` field in LinkMetadataEvent object.
+
+### 2020-09-14_1.569.1
+-  Add `processing_mode` field to the `PaymentInitiationConsentPaymentExecuteRequest` object for the `/payment_initiation/consent/payment/execute` endpoint
+
+### 2020-09-14_1.568.1
+- Updated description of CRA Base Report API fields with new deprecation date
+
+### 2020-09-14_1.568.0
+  -  Add `name` object to the `extracted_data` within each `documentary_verification.documents` object in the response of all of the identity verification endpoints:
+  - `identity_verification/create`
+  - `identity_verification/get`
+  - `identity_verification/list`
+  - `identity_verification/retry`
+
+### 2020-09-14_1.567.5
+- Add `error_reason` to `/cra/check_report/partner_insights/get`
+
+### 2020-09-14_1.567.4
+- [internal only] Hiding plaid_check_score_version from docs
+
+### 2020-09-14_1.567.3
+- Update description for `email` field in `/identity_verification/create` and `/identity_verification/retry` to include link to RFC specification on email format
+
+### 2020-09-14_1.567.2
+- Publish processor Paynote
+
+### 2020-09-14_1.567.1
+- Update description for `add_ons` field in `/asset_report/create`
+
+### 2020-09-14_1.567.0
+- [BREAKING] removed `products` field from `cra/check_report/create` request
+
+### 2020-09-14_1.566.0
+- Added `status` to the `MonitoringInsightsWebhook` object
+- Changed `webhook_code` to be deterministic
+
+### 2020-09-14_1.565.1
+- Update `days_available` field description for Asset Reports and CRA Base Reports.
+
+### 2020-09-14_1.565.0
+- Removed `deposit_switch` from the `products` field in the `/link/token/create` request
+- Deprecated DepositSwitch endpoints, requests and response
+
+### 2020-09-14_1.564.0
+- add `/issues/get`, `/issues/search`, and `/issues/subscribe` for Support API endpoints.
+
+### 2020-09-14_1.563.0
+- Update fields on `item` object in `/item/get` response
+  - Add `consented_use_cases` field
+  - Add `consented_data_scopes` field
+  - Add `created_at` field
+  - Update descriptions for `consented_products` and `consent_expiration_time` fields
+- Add `/consent/events/get` endpoint
+
+### 2020-09-14_1.157.1
+- Internal changes
+
+### 2020-09-14_1.157.0
+  - (pre-release) Add `facial_analysis` to the `analysis` within each `selfie_check.selfies` object in the response of all of the identity verification endpoints:
+  - `identity_verification/create`
+  - `identity_verification/get`
+  - `identity_verification/list`
+  - `identity_verification/retry`
+
+### 2020-09-14_1.156.2
+- [BREAKING] Remove `from_client_id` and `to_client_id` from `/transfer/ledger/distribute` request
+- Add `from_ledger_id` and `to_ledger_id` to `/transfer/ledger/distribute` request
+- Add `ledger_id` in transfer routes response examples
+
+### 2020-09-14_1.156.1
+- Update `account type schema` link to reference the correct URL.
+
+### 2020-09-14_1.562.0
+- Add `data_sources` object to the `/investments/auth/get` response
+    - `data_sources` object contains the `numbers`, `owners`, and `holdings` fields
+
+### 2020-09-14_1.561.0
+- [BREAKING] Add `authorization_id` to /transfer/get request and make `transfer_id` optional.
+
+### 2020-09-14_1.560.0
+- Add `pay_by_bank` to product enum list
+
+### 2020-09-14_1.559.0
+- Add `name`, `is_default` to /transfer/ledger/get response
+- [BREAKING] Move `ledger_id` from nested `balance` struct to top level in /transfer/ledger/get response
+
+### 2020-09-14_1.558.0
+- Add `liveness_check` to the `analysis` within each `selfie_check.selfies` object in the response of all of the identity verification endpoints:
+  - `identity_verification/create`
+  - `identity_verification/get`
+  - `identity_verification/list`
+  - `identity_verification/retry`
+
+### 2020-09-14_1.557.2
+- Internal changes only
+
+### 2020-09-14_1.557.1
+- Internal changes only
+
+### 2020-09-14_1.557.0
+- Add `ledger_id` to /transfer/ledger/get response
+
 ### 2020-09-14_1.556.0
 - Added plural named array fields to `BaseReportAccountInsights` in  /cra/base_report/get
 
@@ -116,14 +265,14 @@
 
 ### 2020-09-14_1.535.2
 - Make some `CraBankIncomeSummary` fields visible.
-- 
+
 ### 2020-09-14_1.535.1
 
 ### 2020-09-14_1.535.0
 - [Breaking for Go] Updated `consumer_report_user_identity` field in `/user/update` to be required to reflect actual API behavior.
 
 ### 2020-09-14_1.534.7
-- Add `stated_account_number_enabled` to `investments_auth` in `LinkTokenCreateRequest` 
+- Add `stated_account_number_enabled` to `investments_auth` in `LinkTokenCreateRequest`
 
 ### 2020-09-14_1.534.6
 - [Breaking] Updated base report endpoints and objects to include `cra` prefix
