@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.575.0
+  version: 2020-09-14_1.586.4
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -604,6 +604,9 @@ paths:
                             statement: I don't agree with the transaction amount
                           days_available: 365
                           mask: "4444"
+                          metadata:
+                            start_date: "2023-01-01"
+                            end_date: "2023-03-31"
                           name: Plaid Money Market
                           official_name: Plaid Platinum Standard 1.85% Interest Money Market
                           owners:
@@ -666,6 +669,9 @@ paths:
                           consumer_disputes: []
                           days_available: 365
                           mask: "0000"
+                          metadata:
+                            start_date: "2023-01-01"
+                            end_date: "2023-03-31"
                           name: Plaid Checking
                           official_name: Plaid Gold Standard 0% Interest Checking
                           owners:
@@ -783,7 +789,7 @@ paths:
       - plaid
       operationId: craMonitoringInsightsSubscribe
       externalDocs:
-        url: /none/
+        url: /check/api/#cramonitoring_insightssubscribe
       requestBody:
         required: true
         content:
@@ -810,7 +816,7 @@ paths:
       - plaid
       operationId: craMonitoringInsightsUnsubscribe
       externalDocs:
-        url: /none/
+        url: /check/api/#cramonitoring_insightsunsubscribe
       requestBody:
         required: true
         content:
@@ -836,7 +842,7 @@ paths:
       - plaid
       operationId: craMonitoringInsightsGet
       externalDocs:
-        url: /none/
+        url: /check/api/#cramonitoring_insightsget
       requestBody:
         required: true
         content:
@@ -942,6 +948,9 @@ paths:
                         bank_income_accounts:
                         - account_id: 1qKRXQjk8xUWDJojNwPXTj8gEmR48piqRNye8
                           mask: "8888"
+                          metadata:
+                            start_date: "2022-01-01"
+                            end_date: "2022-01-31"
                           name: Plaid Checking Account
                           official_name: Plaid Checking Account
                           type: depository
@@ -1201,6 +1210,9 @@ paths:
                         accounts:
                         - account_id: 1qKRXQjk8xUWDJojNwPXTj8gEmR48piqRNye8
                           mask: "8888"
+                          metadata:
+                            start_date: "2024-01-01"
+                            end_date: "2024-07-16"
                           name: Plaid Checking Account
                           official_name: Plaid Checking Account
                           type: depository
@@ -1325,6 +1337,9 @@ paths:
                         bank_income_accounts:
                         - account_id: 1qKRXQjk8xUWDJojNwPXTj8gEmR48piqRNye8
                           mask: "8888"
+                          metadata:
+                            start_date: "2024-01-01"
+                            end_date: "2024-07-16"
                           name: Plaid Checking Account
                           official_name: Plaid Checking Account
                           type: depository
@@ -1651,6 +1666,9 @@ paths:
                           consumer_disputes: []
                           days_available: 365
                           mask: "1208"
+                          metadata:
+                            start_date: "2024-01-01"
+                            end_date: "2024-07-16"
                           name: Checking
                           official_name: Plaid checking
                           owners:
@@ -2506,7 +2524,7 @@ paths:
       description: |-
         `/cra/check_report/create` creates a Consumer Report powered by Plaid Check. You can call this endpoint to create a new report if `consumer_report_permissible_purpose` was omitted during Link token creation. If you did provide a `consumer_report_permissible_purpose` during Link token creation, then Plaid Check will automatically begin creating a Consumer Report once the user completes the Link process, and it is not necessary to call `/cra/check_report/create` before retrieving the report.
 
-         `/cra/check_report/create` can also be used to refresh data in an existing report. A Consumer Report will last for 24 hours before expiring; you should call any `/get` endpoints on the report before it expires. If a report expires, you can call `/cra/check_report/create` again to re-generate it. Note that refreshing or regenerating a report is a billable event."
+         `/cra/check_report/create` can also be used to refresh data in an existing report. A Consumer Report will last for 24 hours before expiring; you should call any `/get` endpoints on the report before it expires. If a report expires, you can call `/cra/check_report/create` again to re-generate it. Note that refreshing or regenerating a report is a billable event.
       requestBody:
         required: true
         content:
@@ -2539,6 +2557,9 @@ paths:
                         accounts:
                         - account_id: 1qKRXQjk8xUWDJojNwPXTj8gEmR48piqRNye8
                           mask: "8888"
+                          metadata:
+                            start_date: "2022-01-01"
+                            end_date: "2022-01-31"
                           name: Plaid Checking Account
                           official_name: Plaid Checking Account
                           type: depository
@@ -2928,7 +2949,7 @@ paths:
                     consent_events:
                     - item_id: Ed6bjNrDLJfGvZWwnkQlfxwoNz54B5C97ejBr
                       event_type: CONSENT_GRANTED
-                      event_code: PLAID_END_USER_PRIVACY_POLICY
+                      event_code: USER_AGREEMENT
                       institution_id: ins_123456
                       institution_name: Platypus bank
                       initiator: END_USER
@@ -3235,7 +3256,7 @@ paths:
                         postal_code: "41006"
                         country: US
                       email: leslie@knope.com
-                      phone: "+14157452130"
+                      phone_number: "+14157452130"
                       date_of_birth: "1975-01-18"
                       ssn: "987654321"
                       ssn_last_4: "4321"
@@ -5492,7 +5513,19 @@ paths:
                           score: 0
                         stolen_identity:
                           score: 0
+                    verify_sms:
+                      status: success
+                      verifications:
+                      - status: success
+                        attempt: 1
+                        phone_number: "+12345678909"
+                        delivery_attempt_count: 1
+                        solve_attempt_count: 1
+                        initially_sent_at: "2020-07-24T03:26:02Z"
+                        last_sent_at: "2020-07-24T03:26:02Z"
+                        redacted_at: "2020-07-24T03:26:02Z"
                     watchlist_screening_id: scr_52xR9LKo77r1Np
+                    beacon_user_id: becusr_42cF1MNo42r9Xj
                     redacted_at: "2020-07-24T03:26:02Z"
                     request_id: saKrIBuEB9qJZng
       operationId: identityVerificationCreate
@@ -5647,7 +5680,19 @@ paths:
                           score: 0
                         stolen_identity:
                           score: 0
+                    verify_sms:
+                      status: success
+                      verifications:
+                      - status: success
+                        attempt: 1
+                        phone_number: "+12345678909"
+                        delivery_attempt_count: 1
+                        solve_attempt_count: 1
+                        initially_sent_at: "2020-07-24T03:26:02Z"
+                        last_sent_at: "2020-07-24T03:26:02Z"
+                        redacted_at: "2020-07-24T03:26:02Z"
                     watchlist_screening_id: scr_52xR9LKo77r1Np
+                    beacon_user_id: becusr_42cF1MNo42r9Xj
                     redacted_at: "2020-07-24T03:26:02Z"
                     request_id: saKrIBuEB9qJZng
       operationId: identityVerificationGet
@@ -5804,7 +5849,19 @@ paths:
                             score: 0
                           stolen_identity:
                             score: 0
+                      verify_sms:
+                        status: success
+                        verifications:
+                        - status: success
+                          attempt: 1
+                          phone_number: "+12345678909"
+                          delivery_attempt_count: 1
+                          solve_attempt_count: 1
+                          initially_sent_at: "2020-07-24T03:26:02Z"
+                          last_sent_at: "2020-07-24T03:26:02Z"
+                          redacted_at: "2020-07-24T03:26:02Z"
                       watchlist_screening_id: scr_52xR9LKo77r1Np
+                      beacon_user_id: becusr_42cF1MNo42r9Xj
                       redacted_at: "2020-07-24T03:26:02Z"
                     next_cursor: eyJkaXJlY3Rpb24iOiJuZXh0Iiwib2Zmc2V0IjoiMTU5NDM
                     request_id: saKrIBuEB9qJZng
@@ -5967,7 +6024,19 @@ paths:
                           score: 0
                         stolen_identity:
                           score: 0
+                    verify_sms:
+                      status: success
+                      verifications:
+                      - status: success
+                        attempt: 1
+                        phone_number: "+12345678909"
+                        delivery_attempt_count: 1
+                        solve_attempt_count: 1
+                        initially_sent_at: "2020-07-24T03:26:02Z"
+                        last_sent_at: "2020-07-24T03:26:02Z"
+                        redacted_at: "2020-07-24T03:26:02Z"
                     watchlist_screening_id: scr_52xR9LKo77r1Np
+                    beacon_user_id: becusr_42cF1MNo42r9Xj
                     redacted_at: "2020-07-24T03:26:02Z"
                     request_id: saKrIBuEB9qJZng
       operationId: identityVerificationRetry
@@ -8988,6 +9057,7 @@ paths:
                         last_payment_amount: 138.05
                         last_payment_date: "2019-04-22"
                         last_statement_issue_date: "2019-04-28"
+                        last_statement_balance: 1708.77
                         loan_name: Consolidation
                         loan_status:
                           end_date: "2032-07-28"
@@ -10632,7 +10702,7 @@ paths:
                     processor_token: processor-sandbox-0asd1-a92nc
                     request_id: xrQNYZ7Zoh6R7gV
       operationId: processorTokenCreate
-      description: Used to create a token suitable for sending to one of Plaid's partners to enable integrations. Note that Stripe partnerships use bank account tokens instead; see `/processor/stripe/bank_account_token/create` for creating tokens for use with Stripe integrations. Once created, a processor token for a given Item cannot be modified or updated. If the account must be linked to a new or different partner resource, create a new Item by having the user go through the Link flow again; a new processor token can then be created from the new `access_token`. Processor tokens can also be revoked, using `/item/remove`.
+      description: Used to create a token suitable for sending to one of Plaid's partners to enable integrations. Note that Stripe partnerships use bank account tokens instead; see `/processor/stripe/bank_account_token/create` for creating tokens for use with Stripe integrations. If using multiple processors, multiple different processor tokens can be created for a single access token. Once created, a processor token for a given Item cannot be modified or updated. To revoke the processor's access, the entire Item must be deleted by calling `/item/remove`.
       requestBody:
         required: true
         content:
@@ -10748,7 +10818,7 @@ paths:
 
         Note that the Stripe bank account token is a one-time use token. To store bank account information for later use, you can use a Stripe customer object and create an associated bank account from the token, or you can use a Stripe Custom account and create an associated external bank account from the token. This bank account information should work indefinitely, unless the user's bank account information changes or they revoke Plaid's permissions to access their account. Stripe bank account information cannot be modified once the bank account token has been created. If you ever need to change the bank account details used by Stripe for a specific customer, have the user go through Link again and create a new bank account token from the new `access_token`.
 
-        Bank account tokens can also be revoked, using `/item/remove`.
+        To revoke a bank account token, the entire underlying access token must be revoked using `/item/remove`.
       requestBody:
         required: true
         content:
@@ -16188,7 +16258,7 @@ paths:
       externalDocs:
         url: /api/products/signal#signaldecisionreport
       operationId: signalDecisionReport
-      description: After calling `/signal/evaluate` (or `/accounts/balance/get`, for participants in the [Balance Plus](http://plaid.com/docs/balance/balance-plus) beta), call `/signal/decision/report` to report whether the transaction was initiated.
+      description: After calling `/signal/evaluate`, call `/signal/decision/report` to report whether the transaction was initiated.
       responses:
         "200":
           description: OK
@@ -16220,7 +16290,7 @@ paths:
       externalDocs:
         url: /api/products/signal#signalreturnreport
       operationId: signalReturnReport
-      description: Call the `/signal/return/report` endpoint to report a returned transaction that was previously sent to the `/signal/evaluate` or (for participants in the [Balance Plus](http://plaid.com/docs/balance/balance-plus) beta) the `/accounts/balance/get` endpoint. Your feedback will be used by the model to incorporate the latest risk trend in your portfolio.
+      description: Call the `/signal/return/report` endpoint to report a returned transaction that was previously sent to the `/signal/evaluate` endpoint. Your feedback will be used by the model to incorporate the latest risk trend in your portfolio.
       responses:
         "200":
           description: OK
@@ -16253,7 +16323,7 @@ paths:
         url: /api/products/signal#signalprepare
       operationId: signalPrepare
       description: |-
-        When Link is not initialized with Signal, call `/signal/prepare` to opt-in that Item to the Signal data collection process, developing a Signal score.
+        When an Item is not initialized with Signal, call `/signal/prepare` to opt-in that Item to the Signal data collection process, developing a Signal score. This should be done on Items where Signal was added in the `additional_consented_products` array but not in the `products`, `optional_products`, or `required_if_supported_products` array. If `/signal/prepare` is skipped on an Item that is not initialized with Signal, the initial call to `/signal/evaluate` on that Item will be less accurate, because Signal will have access to less data for computing the Signal score.
 
         If run on an Item that is already initialized with Signal, this endpoint will return a 200 response and will not modify the Item.
       responses:
@@ -17182,7 +17252,7 @@ paths:
       summary: Creates a new end customer for a Plaid reseller.
       externalDocs:
         url: /api/partner/#partnercustomercreate
-      description: The `/partner/customer/create` endpoint is used by reseller partners to create end customers.
+      description: The `/partner/customer/create` endpoint is used by reseller partners to create end customers. To create end customers, it should be called in the Production environment only, even when creating Sandbox API keys. If called in the Sandbox environment, it will return a sample response, but no customer will be created and the API keys will not be valid.
       operationId: partnerCustomerCreate
       responses:
         "200":
@@ -18433,7 +18503,7 @@ components:
         include_optional_metadata:
           type: boolean
           description: |-
-            When `true`, return the institution's homepage URL, logo and primary brand color.
+            When `true`, return the institution's homepage URL, logo and primary brand color. Not all institutions' logos are available.
 
             Note that Plaid does not own any of the logos shared by the API, and that by accessing or using these logos, you agree that you are doing so at your own risk and will, if necessary, obtain all required permissions from the appropriate rights holders and adhere to any applicable usage guidelines. Plaid disclaims all express or implied warranties with respect to the logos.
         include_auth_metadata:
@@ -18494,6 +18564,7 @@ components:
           - identity_verification
           - payment_initiation
           - standing_orders
+          - statements
           - transactions
           - transfer
         country_codes:
@@ -20051,7 +20122,7 @@ components:
           description: A unique ID representing a CRA reseller's end customer. Maximum of 128 characters.
           type: string
           maxLength: 128
-          minLength: 1
+          minLength: 0
         consumer_report_user_identity:
           $ref: '#/components/schemas/ConsumerReportUserIdentity'
       required:
@@ -20218,7 +20289,10 @@ components:
           type: string
           description: The user's phone number in [E.164](https://en.wikipedia.org/wiki/E.164) format
         email:
-          description: The user's email address.
+          description: |-
+            The user's email address.
+
+            Note: email is currently not returned for users, and is an upcoming addition that will be live in early 2025.
           type: string
           nullable: true
         date_of_birth:
@@ -20404,7 +20478,7 @@ components:
           format: date
           description: |-
             To be provided in the format "yyyy-mm-dd".
-            This field is required as of Oct 21, 2024 for any clients who became Plaid Check customers on or after Oct 1, 2024.
+            This field is required for any clients who became Plaid Check customers on or after Oct 1, 2024.
             This field will be required for all Plaid Check customers as of Feb 1, 2025.
         primary_address:
           $ref: '#/components/schemas/AddressData'
@@ -20889,19 +20963,23 @@ components:
           maxLength: 18
         scopes:
           type: array
+          deprecated: true
           description: An array of payment consent scopes.
           minItems: 1
           uniqueItems: true
           items:
             $ref: '#/components/schemas/PaymentInitiationConsentScope'
+        type:
+          $ref: '#/components/schemas/PaymentInitiationConsentType'
         constraints:
           $ref: '#/components/schemas/PaymentInitiationConsentConstraints'
         options:
           $ref: '#/components/schemas/ExternalPaymentInitiationConsentOptions'
+        payer_details:
+          $ref: '#/components/schemas/PaymentInitiationConsentPayerDetails'
       required:
       - recipient_id
       - reference
-      - scopes
       - constraints
     PaymentInitiationConsentCreateResponse:
       type: object
@@ -20970,9 +21048,12 @@ components:
           $ref: '#/components/schemas/PaymentInitiationConsentConstraints'
         scopes:
           type: array
-          description: An array of payment consent scopes.
+          deprecated: true
+          description: Deprecated, use the 'type' field instead.
           items:
             $ref: '#/components/schemas/PaymentInitiationConsentScope'
+        type:
+          $ref: '#/components/schemas/PaymentInitiationConsentType'
       required:
       - consent_id
       - status
@@ -21047,10 +21128,11 @@ components:
           maxLength: 18
           nullable: true
         scope:
+          deprecated: true
           allOf:
           - $ref: '#/components/schemas/PaymentInitiationConsentScope'
           - type: string
-            description: A scope of the payment. Must be one of the scopes mentioned in the consent. Optional if the appropriate consent has only one scope defined, required otherwise.
+            description: "Deprecated, payments will be executed within the type of the consent. \n\nA scope of the payment. Must be one of the scopes mentioned in the consent. \nOptional if the appropriate consent has only one scope defined, required otherwise."
             nullable: true
         processing_mode:
           $ref: '#/components/schemas/PaymentInitiationConsentProcessingMode'
@@ -21689,6 +21771,7 @@ components:
             - Estonian (`'et'`)
             - French (`'fr'`)
             - German (`'de'`)
+            - Hindi (`'hi'`)
             - Italian (`'it'`)
             - Latvian (`'lv'`)
             - Lithuanian (`'lt'`)
@@ -21698,6 +21781,7 @@ components:
             - Romanian (`'ro'`)
             - Spanish (`'es'`)
             - Swedish (`'sv'`)
+            - Vietnamese (`'vi'`)
 
             When using a Link customization, the language configured here must match the setting in the customization, or the customization will not be applied.
           minLength: 1
@@ -21720,7 +21804,7 @@ components:
           $ref: '#/components/schemas/LinkTokenCreateRequestUser'
         products:
           type: array
-          description: "List of Plaid product(s) you wish to use. If launching Link in update mode, should be omitted (unless you are using update mode to add Income or Assets to an Item); required otherwise.\n\n`balance` is *not* a valid value, the Balance product does not require explicit initialization and will automatically be initialized when any other product is initialized.\n\nThe products specified here will determine which institutions will be available to your users in Link. Only institutions that support *all* requested products can be selected; a if a user attempts to select an institution that does not support a listed product, a \"Connectivity not supported\" error message will appear in Link. To maximize the number of institutions available, initialize Link with the minimal product set required for your use case. \n\nAdditional products can be included via the [`optional_products`](https://plaid.com/docs/api/link/#link-token-create-request-optional-products) or  [`required_if_supported_products`](https://plaid.com/docs/api/link/#link-token-create-request-required-if-supported-products) fields. Products can also be be initialized by calling the endpoint after obtaining an access token; this may require the product to be listed in the [`additional_consented_products`](https://plaid.com/docs/api/link/#link-token-create-request-additional-consented-products) array. For details, see [Choosing when to initialize products](https://plaid.com/docs/link/initializing-products/).\n\nNote that, unless you have opted to disable Instant Match support, institutions that support Instant Match will also be shown in Link if `auth` is specified as a product, even though these institutions do not contain `auth` in their product array.\n\nIn Production, you will be billed for each product that you specify when initializing Link. Note that a product cannot be removed from an Item once the Item has been initialized with that product. To stop billing on an Item for subscription-based products, such as Liabilities, Investments, and Transactions, remove the Item via `/item/remove`."
+          description: "List of Plaid product(s) you wish to use. If launching Link in update mode, should be omitted (unless you are using update mode to add Income or Assets to an Item); required otherwise.\n\n`balance` is *not* a valid value, the Balance product does not require explicit initialization and will automatically be initialized when any other product is initialized.\n\nThe products specified here will determine which institutions will be available to your users in Link. Only institutions that support *all* requested products can be selected; a if a user attempts to select an institution that does not support a listed product, a \"Connectivity not supported\" error message will appear in Link. To maximize the number of institutions available, initialize Link with the minimal product set required for your use case. \n\nAdditional products can be included via the [`optional_products`](https://plaid.com/docs/api/link/#link-token-create-request-optional-products) or  [`required_if_supported_products`](https://plaid.com/docs/api/link/#link-token-create-request-required-if-supported-products) fields. Products can also be initialized by calling the endpoint after obtaining an access token; this may require the product to be listed in the [`additional_consented_products`](https://plaid.com/docs/api/link/#link-token-create-request-additional-consented-products) array. For details, see [Choosing when to initialize products](https://plaid.com/docs/link/initializing-products/).\n\nNote that, unless you have opted to disable Instant Match support, institutions that support Instant Match will also be shown in Link if `auth` is specified as a product, even though these institutions do not contain `auth` in their product array.\n\nIn Production, you will be billed for each product that you specify when initializing Link. Note that a product cannot be removed from an Item once the Item has been initialized with that product. To stop billing on an Item for subscription-based products, such as Liabilities, Investments, and Transactions, remove the Item via `/item/remove`."
           items:
             $ref: '#/components/schemas/Products'
           x-override-enum-values-shown:
@@ -21742,6 +21826,7 @@ components:
           - cra_base_report
           - cra_income_insights
           - cra_partner_insights
+          - cra_network_insights
           - cra_cashflow_insights
           - layer
           nullable: true
@@ -21761,6 +21846,7 @@ components:
           - investments
           - liabilities
           - transactions
+          - signal
           - statements
           nullable: true
         optional_products:
@@ -21792,6 +21878,8 @@ components:
             Institutions that do not support these products will still be shown in Link.
 
             There should be no overlap between this array and the `products` or `required_if_supported_products` arrays.
+
+            If you include `signal` in `additional_consented_products`, you will need to call `/signal/prepare` before calling `/signal/evaluate` for the first time on an Item in order to get the most accurate results. For more details, see [Using `/signal/prepare`](/docs/signal/#using-signalprepare).
           items:
             $ref: '#/components/schemas/Products'
           x-override-enum-values-shown:
@@ -21805,7 +21893,7 @@ components:
           nullable: true
         webhook:
           type: string
-          description: The destination URL to which any webhooks should be sent. Note that webhooks for Payment Initiation (e-wallet transactions only), Transfer, Bank Transfer (including Auth micro-deposit notification webhooks) and Identity Verification are configured via the Dashboard instead.
+          description: The destination URL to which any webhooks should be sent. Note that webhooks for Payment Initiation (e-wallet transactions only), Transfer, Bank Transfer (including Auth micro-deposit notification webhooks), Monitor, Identity Verification, and Link Events are configured via the Dashboard instead. In update mode, this field will not have an effect; to update the webhook receiver endpoint for an existing Item, use `/item/webhook/update` instead.
         access_token:
           type: string
           description: The `access_token` associated with the Item to update or reference, used when updating, modifying, or accessing an existing `access_token`. Used when launching Link in update mode, when completing the Same-day (manual) Micro-deposit flow, or (optionally) when initializing Link for a returning user as part of the Transfer UI flow.
@@ -21982,7 +22070,7 @@ components:
           maximum: 730
           default: 90
     LinkTokenCreateHostedLink:
-      description: Configuration parameters for Hosted Link. To request access to Hosted Link, contact your account manager.
+      description: Configuration parameters for Hosted Link. To enable the session for Hosted Link, send this object in the request. It can be empty.
       additionalProperties: true
       type: object
       properties:
@@ -22041,6 +22129,10 @@ components:
         amount:
           type: string
           description: The amount of the transfer (decimal string with two digits of precision e.g. "10.00").
+          x-hidden-from-docs: true
+        description:
+          type: string
+          description: The description of the transfer that provides the payment context. The max length is 256.
           x-hidden-from-docs: true
       required:
       - amount
@@ -22862,12 +22954,12 @@ components:
         expiration:
           type: string
           format: date-time
-          description: The expiration date for the `link_token`, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format. A `link_token` created to generate a `public_token` that will be exchanged for a new `access_token` expires after 4 hours. A `link_token` created for an existing Item (such as when updating an existing `access_token` by launching Link in update mode) expires after 30 minutes.
+          description: The expiration date for the `link_token`, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format. By default, a `link_token` created to generate a `public_token` that will be exchanged for a new `access_token` expires after 4 hours, and a `link_token` created for an existing Item (such as when updating an existing `access_token` by launching Link in update mode) expires after 30 minutes. If using [Hosted Link](https://plaid.com/docs/link/hosted-link/), the `link_token` will expire at the same time as the Hosted Link URL, and you can customize the duration using the `hosted_link.url_lifetime_seconds` option in the request. If using Link Delivery (beta), the `link_token` will expire by default after 24 hours if sent via SMS and after 7 days if sent via email.
         request_id:
           $ref: '#/components/schemas/RequestID'
         hosted_link_url:
           type: string
-          description: A URL of a Plaid-hosted Link flow that will use the Link token returned by this request. Only present if the client is enabled for Hosted Link.
+          description: A URL of a Plaid-hosted Link flow that will use the Link token returned by this request. Only present if the session is enabled for Hosted Link. To enable the session for Hosted Link, send a `hosted_link` object in the request.
       required:
       - link_token
       - expiration
@@ -23050,7 +23142,7 @@ components:
           - database_insights_pass
           - database_insights_pass_with_caution
           - database_insights_fail
-          description: "The current verification status of an Auth Item initiated through Automated or Manual micro-deposits.  Returned for Auth Items only.\n\n`pending_automatic_verification`: The Item is pending automatic verification\n\n`pending_manual_verification`: The Item is pending manual micro-deposit verification. Items remain in this state until the user successfully verifies the micro-deposit.\n\n`automatically_verified`: The Item has successfully been automatically verified\t\n\n`manually_verified`: The Item has successfully been manually verified\n\n`verification_expired`: Plaid was unable to automatically verify the deposit within 7 calendar days and will no longer attempt to validate the Item. Users may retry by submitting their information again through Link.\n\n`verification_failed`: The Item failed manual micro-deposit verification because the user exhausted all 3 verification attempts. Users may retry by submitting their information again through Link.\n\n`database_matched`: The Item has successfully been verified using Plaid's data sources.\n\n`database_insights_pass`: The Item's ACH numbers have been verified using Plaid's data sources and have strong signal for being valid. Note: Database Insights is currently a beta feature, please contact your account manager for more information.\n\n`database_insights_pass_with_caution`: The Item's ACH numbers have been verified using Plaid's data sources and have some signal for being valid. Note: Database Insights is currently a beta feature, please contact your account manager for more information.\n\n`database_insights_fail`:  The Item's ACH numbers have been verified using Plaid's data sources and have signal for being invalid and/or have no signal for being valid. Note: Database Insights is currently a beta feature, please contact your account manager for more information.\t\n\t"
+          description: "The current verification status of an Auth Item initiated through micro-deposits or database verification. Returned for Auth Items only.\n\n`pending_automatic_verification`: The Item is pending automatic verification\n\n`pending_manual_verification`: The Item is pending manual micro-deposit verification. Items remain in this state until the user successfully verifies the micro-deposit.\n\n`automatically_verified`: The Item has successfully been automatically verified\t\n\n`manually_verified`: The Item has successfully been manually verified\n\n`verification_expired`: Plaid was unable to automatically verify the deposit within 7 calendar days and will no longer attempt to validate the Item. Users may retry by submitting their information again through Link.\n\n`verification_failed`: The Item failed manual micro-deposit verification because the user exhausted all 3 verification attempts. Users may retry by submitting their information again through Link.\n\n`database_matched`: The Item has successfully been verified using Plaid's data sources. Only returned for Auth Items created via Database Match.\n\n`database_insights_pass`: The Item's numbers have been verified using Plaid's data sources and have strong signal for being valid. Only returned for Auth Items created via Database Insights. Note: Database Insights is currently a beta feature, please contact your account manager for more information.\n\n`database_insights_pass_with_caution`: The Item's numbers have been verified using Plaid's data sources and have some signal for being valid. Only returned for Auth Items created via Database Insights. Note: Database Insights is currently a beta feature, please contact your account manager for more information.\n\n`database_insights_fail`:  The Item's numbers have been verified using Plaid's data sources and have signal for being invalid and/or have no signal for being valid. Only returned for Auth Items created via Database Insights. Note: Database Insights is currently a beta feature, please contact your account manager for more information.\t\n\t"
         verification_insights:
           $ref: '#/components/schemas/AccountVerificationInsights'
         persistent_account_id:
@@ -23232,7 +23324,7 @@ components:
       title: VerificationInsights
       type: object
       additionalProperties: true
-      description: Insights from performing database verification for the account.
+      description: Insights from performing database verification for the account. Only returned for Auth Items created via Database Insights.
       properties:
         network_status:
           $ref: '#/components/schemas/AccountVerificationInsightsNetworkStatus'
@@ -23830,7 +23922,7 @@ components:
           nullable: true
         original_description:
           type: string
-          description: The string returned by the financial institution to describe the transaction. For transactions returned by `/transactions/sync` or `/transactions/get`, this field will be omitted unless the client has set `options.include_original_description` to `true`.
+          description: The string returned by the financial institution to describe the transaction. For transactions returned by `/transactions/sync` or `/transactions/get`, this field will only be included if the client has set `options.include_original_description` to `true`.
           nullable: true
         payment_meta:
           $ref: '#/components/schemas/PaymentMeta'
@@ -25905,6 +25997,11 @@ components:
           format: date
           description: The date of the last payment. Dates are returned in an [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (YYYY-MM-DD).
           nullable: true
+        last_statement_balance:
+          description: The total amount owed as of the last statement issued
+          type: number
+          format: double
+          nullable: true
         last_statement_issue_date:
           type: string
           format: date
@@ -26605,12 +26702,19 @@ components:
       enum:
       - ME_TO_ME
       - EXTERNAL
+      description: "This field is deprecated in favor of the consent `type` field. Consents are required to have a single type. \n\nPayment consent scope. Defines possible directions for payments made with the given consent.\n\n`ME_TO_ME`: Allows moving money between accounts owned by the same user.\n\n`EXTERNAL`: Allows initiating payments from the user's account to third parties."
+    PaymentInitiationConsentType:
+      type: string
+      title: PaymentInitiationConsentType
+      enum:
+      - SWEEPING
+      - COMMERCIAL
       description: |-
-        Payment consent scope. Defines possible directions for payments made with the given consent.
+        Payment consent type. Defines possible use case for payments made with the given consent.
 
-        `ME_TO_ME`: Allows moving money between accounts owned by the same user.
+        `SWEEPING`: Allows moving money between accounts owned by the same user.
 
-        `EXTERNAL`: Allows initiating payments from the user's account to third parties.
+        `COMMERCIAL`: Allows initiating payments from the user's account to third parties.
     PaymentInitiationConsentProcessingMode:
       type: string
       title: PaymentInitiationConsentProcessingMode
@@ -26626,8 +26730,9 @@ components:
     ExternalPaymentInitiationConsentOptions:
       type: object
       title: ExternalPaymentInitiationConsentOptions
-      description: Additional payment consent options
+      description: (Deprecated) Additional payment consent options
       nullable: true
+      deprecated: true
       properties:
         request_refund_details:
           type: boolean
@@ -26659,6 +26764,49 @@ components:
       required:
       - max_payment_amount
       - periodic_amounts
+    PaymentInitiationConsentPayerDetails:
+      title: PaymentInitiationConsentPayerDetails
+      type: object
+      nullable: true
+      additionalProperties: true
+      description: "An object representing the payment consent payer details. \nPayer `name` and account `numbers` are required to lock the account to which the consent can be created."
+      properties:
+        name:
+          type: string
+          description: The name of the payer as it appears in their bank account
+          minLength: 1
+        numbers:
+          $ref: '#/components/schemas/PaymentInitiationConsentPayerNumbers'
+        address:
+          $ref: '#/components/schemas/PaymentInitiationAddress'
+        date_of_birth:
+          type: string
+          format: date
+          nullable: true
+          description: The payer's birthdate, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) (YYYY-MM-DD) format.
+        phone_numbers:
+          description: 'The payer''s phone numbers in E.164 format: +{countrycode}{number}'
+          type: array
+          items:
+            type: string
+        emails:
+          description: The payer's emails
+          type: array
+          items:
+            type: string
+      required:
+      - name
+      - numbers
+    PaymentInitiationConsentPayerNumbers:
+      title: PaymentInitiationConsentPayerNumbers
+      type: object
+      description: The counterparty's bank account numbers. Exactly one of IBAN or BACS data is required.
+      additionalProperties: true
+      properties:
+        bacs:
+          $ref: '#/components/schemas/PaymentInitiationOptionalRestrictionBacs'
+        iban:
+          $ref: '#/components/schemas/NumbersIBANNullable'
     PaymentConsentMaxPaymentAmount:
       description: Maximum amount of a single payment initiated using the payment consent.
       allOf:
@@ -26755,6 +26903,7 @@ components:
       - cra_base_report
       - cra_income_insights
       - cra_partner_insights
+      - cra_network_insights
       - cra_cashflow_insights
       - layer
       - pay_by_bank
@@ -27895,8 +28044,14 @@ components:
       properties:
         id:
           type: string
+        kid:
+          type: string
+        alg:
+          type: string
       required:
       - id
+      - kid
+      - alg
       description: A JWT Header, used for webhook validation
     VerificationExpiredWebhook:
       title: VerificationExpiredWebhook
@@ -27972,7 +28127,7 @@ components:
       title: PendingExpirationWebhook
       type: object
       additionalProperties: true
-      description: Fired when an Item’s access consent is expiring in 7 days. Some Items have explicit expiration times and we try to relay this when possible to reduce service disruption. This can be resolved by having the user go through Link’s update mode.
+      description: Fired when an Item’s access consent is expiring in 7 days. This can be resolved by having the user go through Link’s update mode. This webhook is fired only for Items associated with institutions in Europe (including the UK); for Items associated with institutions in the US or Canada, see [`PENDING_DISCONNECT`](https://plaid.com/docs/api/items/#pending_disconnect) instead.
       properties:
         webhook_type:
           type: string
@@ -28244,7 +28399,7 @@ components:
       title: TransferEventsUpdateWebhook
       type: object
       additionalProperties: true
-      description: Fired when new transfer events are available. Receiving this webhook indicates you should fetch the new events from `/transfer/event/sync`.
+      description: Fired when new transfer events are available. Receiving this webhook indicates you should fetch the new events from `/transfer/event/sync`. If multiple transfer events occur within a single minute, only one webhook will be fired, so a single webhook instance may correspond to multiple transfer events.
       x-examples:
         example-1:
           webhook_type: TRANSFER
@@ -28571,14 +28726,16 @@ components:
       type: string
       description: |-
         Reason why the item is about to be disconnected.
-        `INSTITUTION_MIGRATION`: When an institution migrates to API or a different integration, the `PENDING_DISCONNECT` webhook will be fired 7 days before the existing Item is scheduled for disconnection. It is recommended to send all Items associated with a given institution through update mode if any Item triggers a `PENDING_DISCONNECT` webhook  with a `reason` of `INSTITUTION_MIGRATION`.
+        `INSTITUTION_MIGRATION`: The institution is moving to API or to a different integration. For example, this can occur when an institution moves from a non-OAuth integration to an OAuth integration.
+        `INSTITUTION_TOKEN_EXPIRATION`: The consent on an Item associated with a US or CA institution is about to expire.
       enum:
       - INSTITUTION_MIGRATION
+      - INSTITUTION_TOKEN_EXPIRATION
     PendingDisconnectWebhook:
       title: PendingDisconnectWebhook
       type: object
       additionalProperties: true
-      description: Fired when an Item is expected to be disconnected. This can be resolved by having the user go through Link’s [update mode](http://plaid.com/docs/link/update-mode).
+      description: Fired when an Item is expected to be disconnected. The webhook will currently be fired 7 days before the existing Item is scheduled for disconnection. This can be resolved by having the user go through Link’s [update mode](http://plaid.com/docs/link/update-mode). Currently, this webhook is fired only for US or Canadian institutions; in the UK or EU, you should continue to listed for the [`PENDING_EXPIRATION`](https://plaid.com/docs/api/items/#pending_expiration) webhook instead.
       properties:
         webhook_type:
           type: string
@@ -28619,6 +28776,7 @@ components:
       title: Cause
       type: object
       additionalProperties: true
+      nullable: true
       allOf:
       - $ref: '#/components/schemas/PlaidError'
       - type: object
@@ -28738,6 +28896,8 @@ components:
       - CONSENT
       description: |-
         Where the payment consent period should start.
+
+        If the institution is Monzo, only `CONSENT` alignments are supported.
 
         `CALENDAR`: line up with a calendar.
 
@@ -29967,10 +30127,7 @@ components:
       title: UserPermissionRevokedWebhook
       type: object
       additionalProperties: true
-      description: |-
-        The `USER_PERMISSION_REVOKED` webhook may be fired when an end user has revoked the permission that they previously granted to access an Item. If the end user revoked their permissions through Plaid (such as via the Plaid Portal or by contacting Plaid Support), the webhook will fire. If the end user revoked their permissions directly through the institution, this webhook may not always fire, since some institutions’ consent portals do not trigger this webhook. Once access to an Item has been revoked, it cannot be restored. If the user subsequently returns to your application, a new Item must be created for the user. Upon receiving this webhook, it is recommended to call `/item/remove` to delete the underlying Item and to delete any stored data from Plaid associated with the Item.
-
-        Note that when working with tokenized account numbers with Auth or Transfer, the account number provided by Plaid will no longer work for creating transfers once user permission has been revoked.
+      description: "The `USER_PERMISSION_REVOKED` webhook may be fired when an end user has revoked the permission that they previously granted to access an Item. If the end user revoked their permissions through Plaid (such as via the Plaid Portal or by contacting Plaid Support), the webhook will fire. If the end user revoked their permissions directly through the institution, this webhook may not always fire, since some institutions’ consent portals do not trigger this webhook. Upon receiving this webhook, it is recommended to delete any stored data from Plaid associated with the Item. To restore the Item, it can be sent through [update mode](https://plaid.com/docs/link/update-mode). \n\nNote that when working with tokenized account numbers with Auth or Transfer, the account number provided by Plaid will no longer work for creating transfers once user permission has been revoked."
       x-examples:
         example-1:
           webhook_type: ITEM
@@ -30673,6 +30830,11 @@ components:
         company_name:
           type: string
           description: The company name of the end customer.
+        outstanding_requirements:
+          type: array
+          description: List of outstanding requirements for scaled platform originators. Only populated when `transfer_diligence_status` is `more_information_required`.
+          items:
+            $ref: '#/components/schemas/TransferPlatformRequirement'
       required:
       - client_id
       - transfer_diligence_status
@@ -30700,7 +30862,7 @@ components:
       - tel
       - web
       description: |-
-        Specifies the use case of the transfer. Required for transfers on an ACH network.
+        Specifies the use case of the transfer. Required for transfers on an ACH network. For more details, see [ACH SEC codes](https://plaid.com/docs/transfer/creating-transfers/#ach-sec-codes).
 
         Codes supported for credits: `ccd`, `ppd`
         Codes supported for debits: `ccd`, `tel`, `web`
@@ -31298,6 +31460,19 @@ components:
       enum:
       - debit
       - credit
+    TransferPlatformRequirement:
+      title: TransferPlatformRequirement
+      type: object
+      description: A piece of information that is outstanding for the scaled platform onboarding process.
+      additionalProperties: true
+      properties:
+        requirement_type:
+          type: string
+          description: The type of requirement.
+        person_id:
+          type: string
+          description: UUID of the person associated with the requirement. Only present for individual-scoped requirements.
+          nullable: true
     TransferDiligenceStatus:
       type: string
       title: TransferDiligenceStatus
@@ -31308,6 +31483,7 @@ components:
       - under_review
       - approved
       - denied
+      - more_information_required
     TransferStatus:
       type: string
       title: TransferStatus
@@ -31395,7 +31571,7 @@ components:
       description: |-
         The network or rails used for the transfer. Defaults to `same-day-ach`.
 
-        For transfers submitted using `ach`, the next-day cutoff is 5:30 PM Eastern Time.
+        For transfers submitted using `ach`, the next-day cutoff is 8:30 PM Eastern Time.
 
         For transfers submitted using `same-day-ach`, the same-day cutoff is 3:30 PM Eastern Time. If the transfer is submitted after this cutoff but before the next-day cutoff, it will be sent over next-day rails and will not incur same-day charges.
 
@@ -31411,7 +31587,7 @@ components:
       description: |-
         The network or rails used for the transfer.
 
-        For transfers submitted as `ach`, the next-day cutoff is 5:30 PM Eastern Time.
+        For transfers submitted as `ach`, the next-day cutoff is 8:30 PM Eastern Time.
 
         For transfers submitted as `same-day-ach`, the same-day cutoff is 3:30 PM Eastern Time. If the transfer is submitted after this cutoff but before the next-day cutoff, it will be sent over next-day rails and will not incur same-day charges; this will apply to both legs of the transfer if applicable.
 
@@ -31429,7 +31605,7 @@ components:
       description: |-
         The ACH networks used for the funds flow.
 
-        For requests submitted as either `ach` or `same-day-ach` the cutoff for same-day is 3:30 PM Eastern Time and the cutoff for next-day transfers is 5:30 PM Eastern Time. It is recommended to submit a request at least 15 minutes before the cutoff time in order to ensure that it will be processed before the cutoff. Any request that is indicated as `same-day-ach` and that misses the same-day cutoff, but is submitted in time for the next-day cutoff, will be sent over next-day rails and will not incur same-day charges.
+        For requests submitted as either `ach` or `same-day-ach` the cutoff for same-day is 3:30 PM Eastern Time and the cutoff for next-day transfers is 8:30 PM Eastern Time. It is recommended to submit a request at least 15 minutes before the cutoff time in order to ensure that it will be processed before the cutoff. Any request that is indicated as `same-day-ach` and that misses the same-day cutoff, but is submitted in time for the next-day cutoff, will be sent over next-day rails and will not incur same-day charges.
       enum:
       - ach
       - same-day-ach
@@ -34640,7 +34816,7 @@ components:
         event_type:
           type: string
           description: |
-            The asynchronous event to be simulated. May be: `posted`, `settled`, `failed`, or `returned`.
+            The asynchronous event to be simulated. May be: `posted`, `settled`, `failed`, `funds_available`, or `returned`.
 
             An error will be returned if the event type is incompatible with the current transfer status. Compatible status --> event type transitions include:
 
@@ -34651,8 +34827,13 @@ components:
             `posted` --> `returned`
 
             `posted` --> `settled`
+
+            `settled` --> `funds_available` (only applicable to ACH debits.)
         failure_reason:
           $ref: '#/components/schemas/TransferFailure'
+        webhook:
+          type: string
+          description: The webhook URL to which a `TRANSFER_EVENTS_UPDATE` webhook should be sent.
       required:
       - transfer_id
       - event_type
@@ -34689,6 +34870,9 @@ components:
             `refund.posted` events can only be simulated if the refunded transfer has been transitioned to settled. This mimics the ordering of events in Production.
         failure_reason:
           $ref: '#/components/schemas/TransferFailure'
+        webhook:
+          type: string
+          description: The webhook URL to which a `TRANSFER_EVENTS_UPDATE` webhook should be sent.
       required:
       - refund_id
       - event_type
@@ -34741,6 +34925,9 @@ components:
           type: string
           description: Plaid’s unique identifier for a test clock. If provided, the sweep to be simulated is created on the day of the `virtual_time` on the `test_clock`. If the date of `virtual_time` is on weekend or a federal holiday, the next available banking day is used.
           nullable: true
+        webhook:
+          type: string
+          description: The webhook URL to which a `TRANSFER_EVENTS_UPDATE` webhook should be sent.
     SandboxTransferLedgerSimulateAvailableRequest:
       title: SandboxTransferLedgerSimulateAvailableRequest
       type: object
@@ -34758,6 +34945,9 @@ components:
           type: string
           description: Plaid’s unique identifier for a test clock. If provided, only the pending balance that is due before the `virtual_timestamp` on the test clock will be converted.
           nullable: true
+        webhook:
+          type: string
+          description: The webhook URL to which a `TRANSFER_EVENTS_UPDATE` webhook should be sent.
     SandboxTransferTestClockCreateRequest:
       title: SandboxTransferTestClockCreateRequest
       type: object
@@ -35741,6 +35931,10 @@ components:
         days_requested:
           type: integer
           description: The number of days of history to include in Plaid Check products. Default value is 365; maximum is 730; minimum is 180. If a value lower than 180 is provided, a minimum of 180 days of history will be requested.
+          maximum: 730
+        days_required:
+          type: integer
+          description: The minimum number of days of data required for the report to be successfully generated.
           maximum: 730
         partner_insights:
           $ref: '#/components/schemas/LinkTokenCreateRequestCraOptionsPartnerInsights'
@@ -40790,7 +40984,7 @@ components:
       type: string
       description: Codes describing the object of a consent event.
       enum:
-      - PLAID_END_USER_PRIVACY_POLICY
+      - USER_AGREEMENT
       - USE_CASES
       - DATA_SCOPES
       - ACCOUNT_SCOPES
@@ -40838,6 +41032,8 @@ components:
           $ref: '#/components/schemas/ApplicationID'
         scopes:
           $ref: '#/components/schemas/ScopesNullable'
+        authentication:
+          $ref: '#/components/schemas/ItemCreateAuthentication'
       required:
       - activity
       - initiated_date
@@ -40867,6 +41063,13 @@ components:
       - SUCCESS
       - FAILURE
       - SKIPPED
+    ItemCreateAuthentication:
+      type: string
+      description: Enum representing the entity authenticating the user.
+      enum:
+      - UNKNOWN
+      - DATA_PARTNER
+      - PLAID
     SandboxIncomeFireWebhookRequest:
       title: SandboxIncomeFireWebhookRequest
       type: object
@@ -43248,6 +43451,42 @@ components:
         `SUCCESS`: The statements were successfully extracted and can be listed via `/statements/list/` and downloaded via `/statements/download/`.
 
         `FAILURE`: The statements failed to be extracted.
+    MonitoringInsightsWebhook:
+      title: MonitoringInsightsWebhook
+      type: object
+      additionalProperties: true
+      description: For each user enabled for Cash Flow Updates, this webhook will fire every 14 days with information on the status of the update. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
+      properties:
+        webhook_type:
+          type: string
+          description: '`CRA_MONITORING`'
+        webhook_code:
+          type: string
+          description: '`INSIGHTS_UPDATED`'
+        status:
+          $ref: '#/components/schemas/MonitoringInsightsStatus'
+        reason:
+          type: string
+          description: The reason for why insights may not be `AVAILABLE`
+          nullable: true
+        user_id:
+          type: string
+          description: The `user_id` that the report is associated with
+        environment:
+          $ref: '#/components/schemas/WebhookEnvironmentValues'
+      required:
+      - webhook_type
+      - webhook_code
+      - status
+      - user_id
+      - environment
+      x-examples:
+        example-1:
+          webhook_type: CRA_MONITORING
+          webhook_code: INSIGHTS_UPDATED
+          status: AVAILABLE
+          user_id: 9eaba3c2fdc916bc197f279185b986607dd21682a5b04eab04a5a03e8b3f3334
+          environment: production
     BaseReportsProductReadyWebhook:
       title: BaseReportsProductReadyWebhook
       type: object
@@ -43722,7 +43961,8 @@ components:
       additionalProperties: true
       description: |-
         This webhook contains a summary of the events from a Link session and will be fired after the user finishes going through Link. If the user abandons the Link flow (i.e., closes the hosted link webpage or leaves Link open for too long without taking any action), the webhook will be fired 5-15 minutes after the last user interaction. A single Link session may occasionally generate multiple `EVENTS` webhooks. If this occurs, the new webhook will contain all previous events for the session, as well as new events that occurred since the previous `EVENTS` webhook was sent. If this occurs, events can be grouped using the `link_session_id` field and, if necessary, de-duplicated using the `event_id` field.
-        By default, the `EVENTS` webhook is enabled only for clients that are enabled for Hosted Link. If you would like to receive this webhook and are not using Hosted Link, contact your Account Manager.
+
+        By default, the `EVENTS` webhook is sent only for sessions where the end user goes through a Hosted Link flow (including Link Recovery flows). If you would like to receive this webhook for sessions not using Hosted Link, contact your Account Manager or Support.
       properties:
         webhook_type:
           type: string
@@ -43875,7 +44115,8 @@ components:
       additionalProperties: true
       description: |-
         Contains the state of a completed Link session, along with the public token(s) if available.
-        By default, the `SESSION_FINISHED` webhook is enabled only for clients that are enabled for Hosted Link, or in sessions that are enabled for Multi-Item Link. If you would like to receive this webhook and are not using Hosted Link or Multi-Item Link, contact your Account Manager.
+
+        By default, the `EVENTS` webhook is sent only for sessions where the end user goes through a Hosted Link flow (including Link Recovery flows) or a Multi-Item Link flow. If you would like to receive this webhook for other sessions, contact your Account Manager or Support.
       properties:
         webhook_type:
           type: string
@@ -44340,41 +44581,6 @@ components:
       required:
       - user_token
       - webhook
-    MonitoringInsightsWebhook:
-      title: MonitoringInsightsWebhook
-      type: object
-      additionalProperties: true
-      description: Every 14 days, the webhook will be fired per item enabled for Monitoring Insights.
-      properties:
-        webhook_type:
-          type: string
-          description: '`CRA_MONITORING`'
-        webhook_code:
-          type: string
-          description: '`INSIGHTS_UPDATED`'
-        status:
-          $ref: '#/components/schemas/MonitoringInsightsStatus'
-        reason:
-          type: string
-          description: The reason for why insights may not be `AVAILABLE`
-          nullable: true
-        user_id:
-          type: string
-          description: The `user_id` that the report is associated with
-        environment:
-          $ref: '#/components/schemas/WebhookEnvironmentValues'
-      required:
-      - webhook_type
-      - webhook_code
-      - status
-      - user_id
-      - environment
-      x-examples:
-        example-1:
-          webhook_type: CRA_MONITORING
-          webhook_code: AVAILABLE
-          user_id: 9eaba3c2fdc916bc197f279185b986607dd21682a5b04eab04a5a03e8b3f3334
-          environment: production
     CraMonitoringInsightsSubscribeResponse:
       type: object
       additionalProperties: true
@@ -44390,7 +44596,7 @@ components:
     CraMonitoringInsightsSubscriptionID:
       title: CraMonitoringInsightsSubscriptionId
       type: string
-      description: A unique identifier for the subscription, which can be used for troubleshooting
+      description: A unique identifier for the subscription.
     CraMonitoringInsightsUnsubscribeRequest:
       type: object
       description: CraMonitoringInsightsUnsubscribeRequest defines the request schema for `/cra/monitoring_insights/unsubscribe`
@@ -44436,7 +44642,7 @@ components:
           $ref: '#/components/schemas/RequestID'
         items:
           type: array
-          description: An array of the Monitoring Insights Item
+          description: An array of Monitoring Insights Items associated with the user.
           items:
             $ref: '#/components/schemas/CraMonitoringInsightsItem'
       required:
@@ -44468,7 +44674,7 @@ components:
       title: MonitoringInsightsItemStatus
       type: object
       additionalProperties: true
-      description: An object representing the status of the Monitoring Insights Item and potential reasons in case of non-available statuses
+      description: An object with details of the Monitoring Insights Item's status.
       properties:
         status_code:
           $ref: '#/components/schemas/MonitoringItemStatusCode'
@@ -44550,7 +44756,7 @@ components:
       title: TotalMonthlyIncomeInsights
       type: object
       additionalProperties: true
-      description: An object representing the insights about the total monthly income
+      description: Details about about the total monthly income
       properties:
         baseline_amount:
           type: number
@@ -44565,7 +44771,7 @@ components:
       title: IncomeSourcesCounts
       type: object
       additionalProperties: true
-      description: An object representing insights about the number of income sources
+      description: Details about the number of income sources
       properties:
         baseline_count:
           type: number
@@ -44597,7 +44803,7 @@ components:
       title: LoanPaymentsMerchantCounts
       type: object
       additionalProperties: true
-      description: An object representing the insights in the number of unique loan payment merchants
+      description: Details regarding the number of unique loan payment merchants
       properties:
         baseline_count:
           type: number
@@ -44612,7 +44818,7 @@ components:
       title: LoanPaymentsCounts
       type: object
       additionalProperties: true
-      description: An object representing the insights in the number of loan payments
+      description: Details regarding the number of loan payments
       properties:
         baseline_count:
           type: number
@@ -45711,6 +45917,8 @@ components:
           type: string
           nullable: true
           description: The last 2-4 alphanumeric characters of an account's official account number. Note that the mask may be non-unique between an Item's accounts, and it may also not match the mask that the bank displays to the user.
+        metadata:
+          $ref: '#/components/schemas/BaseReportAccountMetadata'
         name:
           type: string
           description: The name of the account, either assigned by the user or by the financial institution itself
@@ -45752,6 +45960,7 @@ components:
       - balances
       - consumer_disputes
       - mask
+      - metadata
       - name
       - official_name
       - type
@@ -45884,6 +46093,24 @@ components:
       - limit
       - iso_currency_code
       - unofficial_currency_code
+    BaseReportAccountMetadata:
+      title: BaseReportAccountMetadata
+      description: Base Report metadata about the extracted account.
+      type: object
+      properties:
+        start_date:
+          type: string
+          format: date
+          description: The date of the earliest extracted transaction, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ("yyyy-mm-dd").
+          nullable: true
+        end_date:
+          type: string
+          format: date
+          description: The date of the most recent extracted transaction, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ("yyyy-mm-dd").
+          nullable: true
+      required:
+      - start_date
+      - end_date
     BaseReportId:
       title: BaseReportId
       description: A unique ID identifying an Base Report. Like all Plaid identifiers, this ID is case sensitive.
@@ -46017,7 +46244,7 @@ components:
             $ref: '#/components/schemas/BaseReportLongestGapInsights'
         longest_gaps_between_transactions:
           type: array
-          description: Customers must transition from `longest_gap_between_transactions` by October 31st 2024. Longest gap between sequential transactions in a time period. This array can include multiple time periods.
+          description: Customers must transition from `longest_gap_between_transactions` by January 31st 2025. Longest gap between sequential transactions in a time period. This array can include multiple time periods.
           items:
             $ref: '#/components/schemas/BaseReportLongestGapInsights'
         number_of_inflows:
@@ -46033,7 +46260,7 @@ components:
             $ref: '#/components/schemas/BaseReportAverageFlowInsights'
         average_inflow_amounts:
           type: array
-          description: Customers must transition from `average_inflow_amount` by October 31st 2024. Average amount of debit transactions into the account in a time period. This array will be empty for non-depository accounts. This field only takes into account USD transactions from the account.
+          description: Customers must transition from `average_inflow_amount` by January 31st 2025. Average amount of debit transactions into the account in a time period. This array will be empty for non-depository accounts. This field only takes into account USD transactions from the account.
           items:
             $ref: '#/components/schemas/BaseReportAverageFlowInsights'
         number_of_outflows:
@@ -46049,7 +46276,7 @@ components:
             $ref: '#/components/schemas/BaseReportAverageFlowInsights'
         average_outflow_amounts:
           type: array
-          description: Customers must transition from `average_outflow_amount` by October 31st 2024. Average amount of transactions out of the account in a time period. This array will be empty for non-depository accounts. This field only takes into account USD transactions from the account.
+          description: Customers must transition from `average_outflow_amount` by January 31st 2025. Average amount of transactions out of the account in a time period. This array will be empty for non-depository accounts. This field only takes into account USD transactions from the account.
           items:
             $ref: '#/components/schemas/BaseReportAverageFlowInsights'
         number_of_days_no_transactions:
@@ -46058,7 +46285,6 @@ components:
     BaseReportAttributes:
       title: BaseReportAttributes
       description: Calculated attributes derived from transaction-level data.
-      x-hidden-from-docs: true
       type: object
       additionalProperties: true
       properties:
@@ -46067,12 +46293,164 @@ components:
           description: The number of NSF and overdraft fee transactions in the time range for the report in the given account.
         is_primary_account:
           type: boolean
-          description: Our prediction on whether the account is a primary account. Only one account per account type across the items connected will have a value of true.
+          description: Prediction indicator of whether the account is a primary account. Only one account per account type across the items connected will have a value of true.
           nullable: true
         primary_account_score:
           type: number
           description: Value ranging from 0-1. The higher the score, the more confident we are of the account being the primary account.
           nullable: true
+        total_inflow_amount:
+          $ref: '#/components/schemas/TotalInflowAmount'
+        total_inflow_amount_30d:
+          $ref: '#/components/schemas/TotalInflowAmount30d'
+        total_inflow_amount_60d:
+          $ref: '#/components/schemas/TotalInflowAmount60d'
+        total_inflow_amount_90d:
+          $ref: '#/components/schemas/TotalInflowAmount90d'
+        total_outflow_amount:
+          $ref: '#/components/schemas/TotalOutflowAmount'
+        total_outflow_amount_30d:
+          $ref: '#/components/schemas/TotalOutflowAmount30d'
+        total_outflow_amount_60d:
+          $ref: '#/components/schemas/TotalOutflowAmount60d'
+        total_outflow_amount_90d:
+          $ref: '#/components/schemas/TotalOutflowAmount90d'
+    TotalInflowAmount:
+      type: object
+      description: Total amount of debit transactions into the account in the time period of the report. This field will be empty for non-depository accounts. This field only takes into account USD transactions from the account.
+      additionalProperties: true
+      nullable: true
+      properties:
+        amount:
+          type: number
+          description: Value of amount with up to 2 decimal places.
+        iso_currency_code:
+          $ref: '#/components/schemas/CreditIsoCurrencyCode'
+        unofficial_currency_code:
+          $ref: '#/components/schemas/CreditUnofficialCurrencyCode'
+      required:
+      - amount
+      - iso_currency_code
+      - unofficial_currency_code
+    TotalInflowAmount30d:
+      type: object
+      description: Total amount of debit transactions into the account in the last 30 days. This field will be empty for non-depository accounts. This field only takes into account USD transactions from the account.
+      additionalProperties: true
+      nullable: true
+      properties:
+        amount:
+          type: number
+          description: Value of amount with up to 2 decimal places.
+        iso_currency_code:
+          $ref: '#/components/schemas/CreditIsoCurrencyCode'
+        unofficial_currency_code:
+          $ref: '#/components/schemas/CreditUnofficialCurrencyCode'
+      required:
+      - amount
+      - iso_currency_code
+      - unofficial_currency_code
+    TotalInflowAmount60d:
+      type: object
+      description: Total amount of debit transactions into the account in the last 60 days. This field will be empty for non-depository accounts. This field only takes into account USD transactions from the account.
+      additionalProperties: true
+      nullable: true
+      properties:
+        amount:
+          type: number
+          description: Value of amount with up to 2 decimal places.
+        iso_currency_code:
+          $ref: '#/components/schemas/CreditIsoCurrencyCode'
+        unofficial_currency_code:
+          $ref: '#/components/schemas/CreditUnofficialCurrencyCode'
+      required:
+      - amount
+      - iso_currency_code
+      - unofficial_currency_code
+    TotalInflowAmount90d:
+      type: object
+      description: Total amount of debit transactions into the account in the last 90 days. This field will be empty for non-depository accounts. This field only takes into account USD transactions from the account.
+      additionalProperties: true
+      nullable: true
+      properties:
+        amount:
+          type: number
+          description: Value of amount with up to 2 decimal places.
+        iso_currency_code:
+          $ref: '#/components/schemas/CreditIsoCurrencyCode'
+        unofficial_currency_code:
+          $ref: '#/components/schemas/CreditUnofficialCurrencyCode'
+      required:
+      - amount
+      - iso_currency_code
+      - unofficial_currency_code
+    TotalOutflowAmount:
+      type: object
+      description: Total amount of credit transactions into the account in the time period of the report. This field will be empty for non-depository accounts. This field only takes into account USD transactions from the account.
+      additionalProperties: true
+      nullable: true
+      properties:
+        amount:
+          type: number
+          description: Value of amount with up to 2 decimal places.
+        iso_currency_code:
+          $ref: '#/components/schemas/CreditIsoCurrencyCode'
+        unofficial_currency_code:
+          $ref: '#/components/schemas/CreditUnofficialCurrencyCode'
+      required:
+      - amount
+      - iso_currency_code
+      - unofficial_currency_code
+    TotalOutflowAmount30d:
+      type: object
+      description: Total amount of credit transactions into the account in the last 30 days. This field will be empty for non-depository accounts. This field only takes into account USD transactions from the account.
+      additionalProperties: true
+      nullable: true
+      properties:
+        amount:
+          type: number
+          description: Value of amount with up to 2 decimal places.
+        iso_currency_code:
+          $ref: '#/components/schemas/CreditIsoCurrencyCode'
+        unofficial_currency_code:
+          $ref: '#/components/schemas/CreditUnofficialCurrencyCode'
+      required:
+      - amount
+      - iso_currency_code
+      - unofficial_currency_code
+    TotalOutflowAmount60d:
+      type: object
+      description: Total amount of credit transactions into the account in the last 60 days. This field will be empty for non-depository accounts. This field only takes into account USD transactions from the account.
+      additionalProperties: true
+      nullable: true
+      properties:
+        amount:
+          type: number
+          description: Value of amount with up to 2 decimal places.
+        iso_currency_code:
+          $ref: '#/components/schemas/CreditIsoCurrencyCode'
+        unofficial_currency_code:
+          $ref: '#/components/schemas/CreditUnofficialCurrencyCode'
+      required:
+      - amount
+      - iso_currency_code
+      - unofficial_currency_code
+    TotalOutflowAmount90d:
+      type: object
+      description: Total amount of credit transactions into the account in the last 90 days. This field will be empty for non-depository accounts. This field only takes into account USD transactions from the account.
+      additionalProperties: true
+      nullable: true
+      properties:
+        amount:
+          type: number
+          description: Value of amount with up to 2 decimal places.
+        iso_currency_code:
+          $ref: '#/components/schemas/CreditIsoCurrencyCode'
+        unofficial_currency_code:
+          $ref: '#/components/schemas/CreditUnofficialCurrencyCode'
+      required:
+      - amount
+      - iso_currency_code
+      - unofficial_currency_code
     BaseReportLongestGapInsights:
       title: BaseReportLongestGapInsights
       description: Largest number of days between sequential transactions per calendar month
@@ -47628,6 +48006,12 @@ components:
       title: BeaconUserID
       example: becusr_42cF1MNo42r9Xj
       description: ID of the associated Beacon User.
+    BeaconUserIDNullable:
+      type: string
+      title: BeaconUserID
+      example: becusr_42cF1MNo42r9Xj
+      description: ID of the associated Beacon User.
+      nullable: true
     BeaconUserIDNumber:
       type: object
       title: BeaconUserIDNumber
@@ -48859,8 +49243,12 @@ components:
           $ref: '#/components/schemas/KYCCheckDetails'
         risk_check:
           $ref: '#/components/schemas/RiskCheckDetails'
+        verify_sms:
+          $ref: '#/components/schemas/VerifySMSDetails'
         watchlist_screening_id:
           $ref: '#/components/schemas/WatchlistScreeningIndividualIDNullable'
+        beacon_user_id:
+          $ref: '#/components/schemas/BeaconUserIDNullable'
         redacted_at:
           $ref: '#/components/schemas/TimestampNullable'
       required:
@@ -48878,7 +49266,9 @@ components:
       - selfie_check
       - kyc_check
       - risk_check
+      - verify_sms
       - watchlist_screening_id
+      - beacon_user_id
       - redacted_at
     IdentityVerificationAutofillAddress:
       description: |-
@@ -49073,8 +49463,12 @@ components:
           $ref: '#/components/schemas/KYCCheckDetails'
         risk_check:
           $ref: '#/components/schemas/RiskCheckDetails'
+        verify_sms:
+          $ref: '#/components/schemas/VerifySMSDetails'
         watchlist_screening_id:
           $ref: '#/components/schemas/WatchlistScreeningIndividualIDNullable'
+        beacon_user_id:
+          $ref: '#/components/schemas/BeaconUserIDNullable'
         redacted_at:
           $ref: '#/components/schemas/TimestampNullable'
         request_id:
@@ -49094,7 +49488,9 @@ components:
       - selfie_check
       - kyc_check
       - risk_check
+      - verify_sms
       - watchlist_screening_id
+      - beacon_user_id
       - redacted_at
       - request_id
       type: object
@@ -49220,8 +49616,12 @@ components:
           $ref: '#/components/schemas/KYCCheckDetails'
         risk_check:
           $ref: '#/components/schemas/RiskCheckDetails'
+        verify_sms:
+          $ref: '#/components/schemas/VerifySMSDetails'
         watchlist_screening_id:
           $ref: '#/components/schemas/WatchlistScreeningIndividualIDNullable'
+        beacon_user_id:
+          $ref: '#/components/schemas/BeaconUserIDNullable'
         redacted_at:
           $ref: '#/components/schemas/TimestampNullable'
         request_id:
@@ -49241,7 +49641,9 @@ components:
       - selfie_check
       - kyc_check
       - risk_check
+      - verify_sms
       - watchlist_screening_id
+      - beacon_user_id
       - redacted_at
       - request_id
       type: object
@@ -49439,8 +49841,12 @@ components:
           $ref: '#/components/schemas/KYCCheckDetails'
         risk_check:
           $ref: '#/components/schemas/RiskCheckDetails'
+        verify_sms:
+          $ref: '#/components/schemas/VerifySMSDetails'
         watchlist_screening_id:
           $ref: '#/components/schemas/WatchlistScreeningIndividualIDNullable'
+        beacon_user_id:
+          $ref: '#/components/schemas/BeaconUserIDNullable'
         redacted_at:
           $ref: '#/components/schemas/TimestampNullable'
         request_id:
@@ -49460,7 +49866,9 @@ components:
       - selfie_check
       - kyc_check
       - risk_check
+      - verify_sms
       - watchlist_screening_id
+      - beacon_user_id
       - redacted_at
       - request_id
       type: object
@@ -50484,6 +50892,54 @@ components:
       type: string
       description: The routing number of the account.
       example: "021000021"
+    SMSVerification:
+      type: object
+      description: Additional information for the individual SMS verification.
+      properties:
+        status:
+          $ref: '#/components/schemas/SMSVerificationStatus'
+        attempt:
+          description: The attempt field begins with 1 and increments with each subsequent SMS verification.
+          type: integer
+          example: 1
+        phone_number:
+          type: string
+          description: A phone number in E.164 format.
+          example: "+12345678909"
+          nullable: true
+        delivery_attempt_count:
+          description: The number of delivery attempts made within the verification to send the SMS code to the user. Each delivery attempt represents the user taking action from the front end UI to request creation and delivery of a new SMS verification code, or to resend an existing SMS verification code. There is a limit of 3 delivery attempts per verification.
+          type: integer
+          example: 1
+        solve_attempt_count:
+          description: The number of attempts made by the user within the verification to verify the SMS code by entering it into the front end UI. There is a limit of 3 solve attempts per verification.
+          type: integer
+          example: 1
+        initially_sent_at:
+          $ref: '#/components/schemas/TimestampNullable'
+        last_sent_at:
+          $ref: '#/components/schemas/TimestampNullable'
+        redacted_at:
+          $ref: '#/components/schemas/TimestampNullable'
+      required:
+      - status
+      - attempt
+      - phone_number
+      - delivery_attempt_count
+      - solve_attempt_count
+      - initially_sent_at
+      - last_sent_at
+      - redacted_at
+      additionalProperties: true
+    SMSVerificationStatus:
+      description: The outcome status for the individual SMS verification.
+      type: string
+      example: success
+      enum:
+      - pending
+      - success
+      - failed
+      - canceled
     ScreeningHitAnalysis:
       description: Analysis information describing why a screening hit matched the provided user information
       type: object
@@ -50873,6 +51329,29 @@ components:
       - type
       nullable: true
       additionalProperties: true
+    VerifySMSDetails:
+      type: object
+      description: Additional information for the `verify_sms` step.
+      properties:
+        status:
+          $ref: '#/components/schemas/VerifySMSDetailsStatus'
+        verifications:
+          type: array
+          description: An array where each entry represents a verification attempt for the `verify_sms` step. Each entry represents one user-submitted phone number. Phone number edits, and in some cases error handling due to edge cases like rate limiting, may generate additional verifications.
+          items:
+            $ref: '#/components/schemas/SMSVerification'
+      required:
+      - status
+      - verifications
+      nullable: true
+      additionalProperties: true
+    VerifySMSDetailsStatus:
+      description: The outcome status for the associated Identity Verification attempt's `verify_sms` step. This field will always have the same value as `steps.verify_sms`.
+      type: string
+      example: success
+      enum:
+      - success
+      - failed
     WatchlistProgramID:
       type: string
       example: prg_2eRPsDnL66rZ7H
@@ -52199,6 +52678,8 @@ components:
             The last 2-4 alphanumeric characters of an account's official account number.
             Note that the mask may be non-unique between an Item's accounts, and it may also not match the mask that the bank displays to the user.
           nullable: true
+        metadata:
+          $ref: '#/components/schemas/CraBankIncomeAccountMetadata'
         name:
           type: string
           description: The name of the bank account.
@@ -52217,11 +52698,30 @@ components:
             $ref: '#/components/schemas/Owner'
       required:
       - mask
+      - metadata
       - name
       - official_name
       - subtype
       - type
       - owners
+    CraBankIncomeAccountMetadata:
+      title: CraBankIncomeAccountMetadata
+      description: An object containing metadata about the extracted account.
+      type: object
+      properties:
+        start_date:
+          type: string
+          format: date
+          description: The date of the earliest extracted transaction, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ("yyyy-mm-dd").
+          nullable: true
+        end_date:
+          type: string
+          format: date
+          description: The date of the most recent extracted transaction, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ("yyyy-mm-dd").
+          nullable: true
+      required:
+      - start_date
+      - end_date
     CraBankIncomeSource:
       type: object
       description: Detailed information for the income source.
@@ -52577,6 +53077,9 @@ components:
           type: integer
           description: The number of days of data to request for the report. Default value is 365; maximum is 731; minimum is 180. If a value lower than 180 is provided, a minimum of 180 days of history will be requested.
           maximum: 731
+        days_required:
+          type: integer
+          description: The minimum number of days of data required for the report to be successfully generated.
         consumer_report_permissible_purpose:
           $ref: '#/components/schemas/ConsumerReportPermissiblePurpose'
       required:
@@ -52750,6 +53253,8 @@ components:
             The last 2-4 alphanumeric characters of an account's official account number.
             Note that the mask may be non-unique between an Item's accounts, and it may also
             not match the mask that the bank displays to the user.
+        metadata:
+          $ref: '#/components/schemas/CraPartnerInsightsItemAccountMetadata'
         name:
           type: string
           description: The name of the account
@@ -52768,11 +53273,30 @@ components:
             $ref: '#/components/schemas/Owner'
       required:
       - mask
+      - metadata
       - name
       - official_name
       - subtype
       - type
       - owners
+    CraPartnerInsightsItemAccountMetadata:
+      title: CraPartnerInsightsItemAccountMetadata
+      description: An object containing metadata about the extracted account.
+      type: object
+      properties:
+        start_date:
+          type: string
+          format: date
+          description: The date of the earliest extracted transaction, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ("yyyy-mm-dd").
+          nullable: true
+        end_date:
+          type: string
+          format: date
+          description: The date of the most recent extracted transaction, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ("yyyy-mm-dd").
+          nullable: true
+      required:
+      - start_date
+      - end_date
     CraPartnerInsightsPrism:
       type: object
       additionalProperties: true
@@ -52816,6 +53340,10 @@ components:
       properties:
         version:
           type: integer
+          description: The version of Prism Data's cash score model used. This field is deprecated in favor of `model_version`.
+          deprecated: true
+        model_version:
+          type: string
           description: The version of Prism Data's cash score model used.
         score:
           type: integer
@@ -52896,6 +53424,10 @@ components:
       properties:
         version:
           type: integer
+          description: The version of Prism Data's FirstDetect model used. This field is deprecated in favor of `model_version`.
+          deprecated: true
+        model_version:
+          type: string
           description: The version of Prism Data's FirstDetect model used.
         score:
           type: integer
@@ -52962,11 +53494,16 @@ components:
         score:
           type: number
           description: The score returned by the Plaid Check Score model.
+          nullable: true
         reason_codes:
           type: array
           description: The reasons for an individual having risk according to the Plaid Check score.
           items:
             type: string
+        error_reason:
+          type: string
+          nullable: true
+          description: Human-readable description of why the Plaid Check score could not be computed.
     CashflowAttributesSchema:
       type: object
       title: CashflowAttributes
@@ -54558,7 +55095,7 @@ components:
       description: ItemGetResponse defines the response schema for `/item/get` and `/item/webhook/update`
       properties:
         item:
-          $ref: '#/components/schemas/Item'
+          $ref: '#/components/schemas/ItemWithConsentFields'
         status:
           $ref: '#/components/schemas/ItemStatusNullable'
         request_id:
@@ -54775,10 +55312,6 @@ components:
           description: The Plaid Institution ID associated with the Item. Field is `null` for Items created via Same Day Micro-deposits.
           type: string
           nullable: true
-        created_at:
-          description: The date and time when the Item was created, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format.
-          type: string
-          format: date-time
         webhook:
           description: The URL registered to receive webhooks for the Item.
           type: string
@@ -54834,16 +55367,6 @@ components:
           - cra_partner_insights
           - cra_cashflow_insights
           - layer
-        consented_use_cases:
-          type: array
-          description: "A list of use cases that the user has consented to for the Item via [Data Transparency Messaging](/docs/link/data-transparency-messaging-migration-guide). \n\nYou can see the full list of use cases or update the list of use cases to request at any time via the Link Customization section of the [Plaid Dashboard](https://dashboard.plaid.com/link/data-transparency-v5)."
-          items:
-            type: string
-        consented_data_scopes:
-          type: array
-          description: A list of data scopes that the user has consented to for the Item via [Data Transparency Messaging](/docs/link/data-transparency-messaging-migration-guide). These are based on the `consented_products`; see the [full mapping](/docs/link/data-transparency-messaging-migration-guide/#data-scopes-by-product) of data scopes and products.
-          items:
-            $ref: '#/components/schemas/ItemConsentedDataScope'
         consent_expiration_time:
           description: The date and time at which the Item's access consent will expire, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format
           nullable: true
@@ -54868,6 +55391,28 @@ components:
       - billed_products
       - consent_expiration_time
       - update_type
+    ItemWithConsentFields:
+      description: Metadata about the Item
+      type: object
+      additionalProperties: true
+      allOf:
+      - $ref: '#/components/schemas/Item'
+      - type: object
+        properties:
+          created_at:
+            description: The date and time when the Item was created, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format.
+            type: string
+            format: date-time
+          consented_use_cases:
+            type: array
+            description: "A list of use cases that the user has consented to for the Item via [Data Transparency Messaging](/docs/link/data-transparency-messaging-migration-guide). \n\nYou can see the full list of use cases or update the list of use cases to request at any time via the Link Customization section of the [Plaid Dashboard](https://dashboard.plaid.com/link/data-transparency-v5)."
+            items:
+              type: string
+          consented_data_scopes:
+            type: array
+            description: A list of data scopes that the user has consented to for the Item via [Data Transparency Messaging](/docs/link/data-transparency-messaging-migration-guide). These are based on the `consented_products`; see the [full mapping](/docs/link/data-transparency-messaging-migration-guide/#data-scopes-by-product) of data scopes and products.
+            items:
+              $ref: '#/components/schemas/ItemConsentedDataScope'
     ItemConsentedDataScope:
       title: Consented Data Scope
       description: A data scope for the products that a user can consent to in [Data Transparency Messaging](/docs/link/data-transparency-messaging-migration-guide)
@@ -54910,12 +55455,12 @@ components:
       nullable: true
       properties:
         last_successful_update:
-          description: '[ISO 8601](https://wikipedia.org/wiki/ISO_8601) timestamp of the last successful transactions update for the Item. The status will update each time Plaid successfully connects with the institution, regardless of whether any new data is available in the update.'
+          description: '[ISO 8601](https://wikipedia.org/wiki/ISO_8601) timestamp of the last successful transactions update for the Item. The status will update each time Plaid successfully connects with the institution, regardless of whether any new data is available in the update. This field does not reflect transactions updates performed by non-Transactions products (e.g. Signal). '
           type: string
           format: date-time
           nullable: true
         last_failed_update:
-          description: '[ISO 8601](https://wikipedia.org/wiki/ISO_8601) timestamp of the last failed transactions update for the Item. The status will update each time Plaid fails an attempt to connect with the institution, regardless of whether any new data is available in the update.'
+          description: '[ISO 8601](https://wikipedia.org/wiki/ISO_8601) timestamp of the last failed transactions update for the Item. The status will update each time Plaid fails an attempt to connect with the institution, regardless of whether any new data is available in the update. This field does not reflect transactions updates performed by non-Transactions products (e.g. Signal).'
           type: string
           format: date-time
           nullable: true
@@ -55641,6 +56186,7 @@ components:
       description: Risk scoring details broken down by risk category.
       type: object
       additionalProperties: true
+      nullable: true
       properties:
         customer_initiated_return_risk:
           $ref: '#/components/schemas/CustomerInitiatedReturnRisk'
