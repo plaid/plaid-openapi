@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.610.0
+  version: 2020-09-14_1.610.1
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -31704,6 +31704,7 @@ components:
         `swept`: The transfer was swept to the sweep account.
         `swept_settled`: Credits are available to be withdrawn or debits have been deducted from the customer’s business checking account.
         `return_swept`: The transfer was returned, funds were pulled back or pushed back to the sweep account.
+        `funds_available`: Funds from the transfer have been released from hold and applied to the ledger's available balance. This is only applicable to debits.
         `null`: The transfer will never be swept (e.g. if the transfer is cancelled or returned before being swept)
       enum:
       - null
@@ -31711,6 +31712,7 @@ components:
       - swept
       - swept_settled
       - return_swept
+      - funds_available
     TransferRefundStatus:
       type: string
       title: TransferRefundStatus
@@ -32863,6 +32865,8 @@ components:
 
         `sweep.failed`: The ledger sweep failed, no funds were moved.
 
+        `sweep.funds_available`: Funds from the ledger sweep have been released from hold and applied to the ledger's available balance. This is only applicable to debits.
+
         `refund.pending`: A new refund was created; it is in the pending state.
 
         `refund.cancelled`: The refund was cancelled.
@@ -32894,6 +32898,7 @@ components:
       - sweep.settled
       - sweep.returned
       - sweep.failed
+      - sweep.funds_available
       - refund.pending
       - refund.cancelled
       - refund.failed
@@ -44508,7 +44513,7 @@ components:
           description: The ID of the payment to simulate
         status:
           type: string
-          description: "The status to set the payment to. \n\nValid statuses include:\n- PAYMENT_STATUS_INITIATED\n- PAYMENT_STATUS_INSUFFICIENT_FUNDS\n- PAYMENT_STATUS_FAILED\n- PAYMENT_STATUS_EXECUTED\n- PAYMENT_STATUS_SETTLED\n- PAYMENT_STATUS_CANCELLED\n- PAYMENT_STATUS_REJECTED"
+          description: "The status to set the payment to. \n\nValid statuses include:\n- `PAYMENT_STATUS_INITIATED`\n- `PAYMENT_STATUS_INSUFFICIENT_FUNDS`\n- `PAYMENT_STATUS_FAILED`\n- `PAYMENT_STATUS_EXECUTED`\n- `PAYMENT_STATUS_SETTLED`\n- `PAYMENT_STATUS_CANCELLED`\n- `PAYMENT_STATUS_REJECTED`"
       required:
       - payment_id
       - status

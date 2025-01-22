@@ -1,3 +1,6 @@
+### 2020-09-14_1.610.1
+- Add `funds_available` sweep status and event type
+
 ### 2020-09-14_1.610.0
 - Add `PaymentInitiationConsentStatusUpdateWebhook` definition.
 
