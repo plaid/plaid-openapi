@@ -1,3 +1,21 @@
+### 2020-09-14_1.614.1
+- Update `owners` field description for empty case
+
+### 2020-09-14_1.614.0
+- Add model for the new `retirement_401k` numbers object to the `InvestmentsAuthGetNumbers` schema.
+
+### 2020-09-14_1.613.0
+- Add `POST /signal/schedule` endpoint
+
+### 2025-01-27_1.611.0
+- Add `end_to_end_id` to `/payment_initiation/payment/get`
+
+### 2020-09-14_1.611.0
+- Add RfP to /transfer/capabilities/get
+
+### 2020-09-14_1.610.2
+- Update `cashflow_updates` docs to reflect proper cadence
+
 ### 2020-09-14_1.610.1
 - Add `funds_available` sweep status and event type
 
