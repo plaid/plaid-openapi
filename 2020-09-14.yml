@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.610.1
+  version: 2020-09-14_1.614.1
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -2382,6 +2382,51 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CraCheckReportPartnerInsightsGetRequest'
+  /cra/check_report/cashflow_insights/get:
+    x-hidden-from-docs: true
+    post:
+      summary: Retrieve cash flow insights from your user's banking data
+      tags:
+      - plaid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CraCheckReportCashflowInsightsGetResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: LhQf0THi8SH1yJm
+                    report:
+                      report_id: vzeNDwK7KQIm4yEog683uElbp9GRLEFXGK98D
+                      generated_time: "2022-01-31T22:47:53Z"
+                      plaid_check_score:
+                        score: 900
+                        reason_codes:
+                        - Balance Volatility
+                      attributes:
+                        cash_reliance_atm_withdrawal_amt_cv_90d: 180.1
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      externalDocs:
+        url: /check/api/#cracheck_reportcashflow_insightsget
+      operationId: craCheckReportCashflowInsightsGet
+      description: |-
+        This endpoint allows you to retrieve the Cashflow Insights report for your user. You should call this endpoint after you've received the `CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`. If the most recent consumer report for the user doesn’t have sufficient data to generate the insights, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.
+
+        If you did not initialize Link with the `cra_cashflow_insights` product or have generated a report using `/cra/check_report/create`, we will generate the insights when you call this endpoint. In this case, you may optionally provide parameters under `options` to configure which insights you want to receive.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CraCheckReportCashflowInsightsGetRequest'
   /cra/check_report/network_insights/get:
     post:
       summary: Retrieve network attributes for the user
@@ -11317,7 +11362,7 @@ paths:
                       guarantee_decision: null
                       guarantee_decision_rationale: null
                       failure_reason:
-                        ach_return_code: R13
+                        failure_code: R13
                         description: Invalid ACH routing number
                       id: 460cbe92-2dcc-8eae-5ad6-b37d0ec90fd9
                       authorization_id: c9f90aa1-2949-c799-e2b6-ea05c89bb586
@@ -11642,6 +11687,8 @@ paths:
                     institution_supported_networks:
                       rtp:
                         credit: true
+                      rfp:
+                        debit: true
                     request_id: saKrIBuEB9qJZno
         default:
           description: Error response
@@ -12159,7 +12206,7 @@ paths:
                       guarantee_decision: null
                       guarantee_decision_rationale: null
                       failure_reason:
-                        ach_return_code: R13
+                        failure_code: R13
                         description: Invalid ACH routing number
                       id: 460cbe92-2dcc-8eae-5ad6-b37d0ec90fd9
                       authorization_id: c9f90aa1-2949-c799-e2b6-ea05c89bb586
@@ -16306,6 +16353,56 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SignalEvaluateRequest'
+  /signal/schedule:
+    post:
+      tags:
+      - plaid
+      summary: Schedule a planned ACH transaction
+      externalDocs:
+        url: none
+      operationId: signalSchedule
+      description: Use `/signal/schedule` to schedule a planned ACH transaction.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignalScheduleResponse'
+              examples:
+                example-1:
+                  value:
+                    optimal_date: "2025-01-17"
+                    recommendations:
+                    - date: "2025-01-15"
+                      recommendation: RECOMMENDED
+                      rank: 2
+                    - date: "2025-01-16"
+                      recommendation: NOT_RECOMMENDED
+                      rank: null
+                    - date: "2025-01-17"
+                      recommendation: RECOMMENDED
+                      rank: 1
+                    - date: "2025-01-20"
+                      recommendation: NOT_RECOMMENDED
+                      rank: null
+                    - date: "2025-01-21"
+                      recommendation: UNKNOWN
+                      rank: null
+                    warnings: []
+                    request_id: mdqfuVxeoza6mhu
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignalScheduleRequest'
   /signal/decision/report:
     post:
       tags:
@@ -20940,6 +21037,13 @@ components:
           type: string
           description: The transaction ID that this payment is associated with, if any. This is present only when a payment was initiated using virtual accounts.
           nullable: true
+        end_to_end_id:
+          type: string
+          description: |-
+            A unique identifier assigned by Plaid to each payment for tracking and reconcilliation purposes.
+
+            Note: Not all banks handle end_to_end_id consistently. To ensure accurate matching, clients should convert both the incoming end_to_end_id and the one provided by Plaid to the same case (either lower or upper) before comparison. For virtual account payments, Plaid manages this field automatically.
+          nullable: true
       required:
       - payment_id
       - amount
@@ -21591,6 +21695,7 @@ components:
           - ansa
           - scribeup
           - straddle
+          - loanpro
           description: The processor you are integrating with.
       required:
       - access_token
@@ -21903,7 +22008,6 @@ components:
           x-override-enum-values-shown:
           - assets
           - auth
-          - balance_plus
           - beacon
           - employment
           - identity
@@ -21913,9 +22017,10 @@ components:
           - liabilities
           - payment_initiation
           - standing_orders
+          - signal
+          - statements
           - transactions
           - transfer
-          - signal
           - cra_base_report
           - cra_income_insights
           - cra_partner_insights
@@ -23174,7 +23279,7 @@ components:
         mask:
           type: string
           nullable: true
-          description: The last 2-4 alphanumeric characters of an account's official account number. Note that the mask may be non-unique between an Item's accounts, and it may also not match the mask that the bank displays to the user.
+          description: The last 2-4 alphanumeric characters of either the account’s displayed mask or the account’s official account number. Note that the mask may be non-unique between an Item’s accounts.
         name:
           type: string
           description: The name of the account, either assigned by the user or by the financial institution itself
@@ -23746,6 +23851,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/NumbersATON'
+        retirement_401k:
+          type: array
+          items:
+            $ref: '#/components/schemas/NumbersRetirement401k'
     NumbersACATS:
       title: NumbersACATS
       type: object
@@ -23782,6 +23891,23 @@ components:
       required:
       - account_id
       - account
+    NumbersRetirement401k:
+      title: NumbersRetirement401k
+      type: object
+      additionalProperties: true
+      description: Identifying information for transferring holdings from a 401k account to another 401k account or IRA via the manual 401k rollover process.
+      properties:
+        account_id:
+          type: string
+          description: The Plaid account ID associated with the account numbers
+        plan:
+          type: string
+          description: The plan number for the employer's 401k retirement plan
+        account:
+          type: string
+          description: The full account number for the account
+      required:
+      - account_id
     RecipientBACS:
       title: RecipientBACS
       type: object
@@ -32378,12 +32504,15 @@ components:
       title: InstitutionSupportedNetworks
       type: object
       additionalProperties: true
-      description: Contains the RTP network and types supported by the linked Item's institution.
+      description: Contains the RTP and RfP network and types supported by the linked Item's institution.
       properties:
         rtp:
           $ref: '#/components/schemas/TransferCapabilitiesGetRTP'
+        rfp:
+          $ref: '#/components/schemas/TransferCapabilitiesGetRfP'
       required:
       - rtp
+      - rfp
     TransferCapabilitiesGetRTP:
       title: TransferCapabilitiesGetRTP
       type: object
@@ -32395,6 +32524,17 @@ components:
           default: false
           nullable: false
           description: When `true`, the linked Item's institution supports RTP credit transfer.
+    TransferCapabilitiesGetRfP:
+      title: TransferCapabilitiesGetRfP
+      type: object
+      additionalProperties: true
+      description: Contains the supported service types in RfP
+      properties:
+        debit:
+          type: boolean
+          default: false
+          nullable: false
+          description: When `true`, the linked Item's institution supports RfP debit transfer.
     TransferCreateResponse:
       title: TransferCreateResponse
       type: object
@@ -34738,7 +34878,7 @@ components:
           deprecated: true
           type: string
           nullable: true
-          description: The ACH return code, e.g. `R01`.  A return code will be provided if and only if the refund status is `returned`. For a full listing of ACH return codes, see [Transfer errors](https://plaid.com/docs/errors/transfer/#ach-return-codes).
+          description: The ACH return code, e.g. `R01`.  A return code will be provided if and only if the refund status is `returned`. For a full listing of ACH return codes, see [Transfer errors](https://plaid.com/docs/errors/transfer/#ach-return-codes). This field is deprecated in favor of the more versatile `failure_code`, which encompasses non-ACH failure codes as well.
         description:
           type: string
           description: A human-readable description of the reason for the failure or reversal.
@@ -43714,7 +43854,7 @@ components:
       title: MonitoringInsightsWebhook
       type: object
       additionalProperties: true
-      description: For each user enabled for Cash Flow Updates, this webhook will fire every 14 days with information on the status of the update. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
+      description: For each user enabled for Cash Flow Updates, this webhook will fire every day with information on the status of the update. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
       properties:
         webhook_type:
           type: string
@@ -46189,7 +46329,7 @@ components:
             $ref: '#/components/schemas/BaseReportTransaction'
         owners:
           type: array
-          description: Data returned by the financial institution about the account owner or owners. For business accounts, the name reported may be either the name of the individual or the name of the business, depending on the institution. Multiple owners on a single account will be represented in the same `owner` object, not in multiple owner objects within the array.
+          description: Data returned by the financial institution about the account owner or owners. For business accounts, the name reported may be either the name of the individual or the name of the business, depending on the institution. Multiple owners on a single account will be represented in the same `owner` object, not in multiple owner objects within the array. This array can also be empty if no owners are found.
           items:
             $ref: '#/components/schemas/Owner'
         ownership_type:
@@ -53480,6 +53620,25 @@ components:
         days_required:
           type: integer
           description: The minimum number of days of data required for the report to be successfully generated.
+        products:
+          type: array
+          description: Specifies a list of products that will be eagerly generated when creating the report. These products will be made available before a success webhook is sent. Use this option if you know which products you want in the report up-front, in order to optimize latency. The `cra_base_report` product will always be generated and needs not be specified here.
+          nullable: true
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Products'
+          x-override-enum-values-shown:
+          - cra_base_report
+          - cra_income_insights
+          - cra_cashflow_insights
+          - cra_partner_insights
+          - cra_network_insights
+        base_report:
+          $ref: '#/components/schemas/CraCheckReportCreateBaseReportOptions'
+        cashflow_insights:
+          $ref: '#/components/schemas/CraCheckReportCashflowInsightsGetOptions'
+        partner_insights:
+          $ref: '#/components/schemas/CraCheckReportPartnerInsightsGetOptions'
         consumer_report_permissible_purpose:
           $ref: '#/components/schemas/ConsumerReportPermissiblePurpose'
       required:
@@ -53848,6 +54007,32 @@ components:
     PrismErrorReason:
       type: string
       description: The error returned by Prism for this product.
+    CraCheckReportCashflowInsightsGetRequest:
+      title: CraCheckReportCashflowInsightsGetRequest
+      x-hidden-from-docs: true
+      type: object
+      description: CraCheckReportCashflowInsightsGetRequest defines the request schema for `/cra/check_report/cashflow_insights/get`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        user_token:
+          $ref: '#/components/schemas/UserToken'
+        third_party_user_token:
+          $ref: '#/components/schemas/ThirdPartyUserToken'
+        options:
+          $ref: '#/components/schemas/CraCheckReportCashflowInsightsGetOptions'
+    CraCheckReportCreateBaseReportOptions:
+      title: CraCheckReportCreateBaseReportOptions
+      type: object
+      nullable: true
+      description: Defines configuration options to generate a Base Report
+      properties:
+        client_report_id:
+          type: string
+          nullable: true
+          description: Client-generated identifier, which can be used by lenders to track loan applications.
     CraCheckReportCashflowInsightsGetOptions:
       title: CraCheckReportCashflowInsightsGetOptions
       type: object
@@ -53867,6 +54052,20 @@ components:
       nullable: true
       enum:
       - v1.0
+    CraCheckReportCashflowInsightsGetResponse:
+      title: CraCheckReportCashflowInsightsGetResponse
+      additionalProperties: true
+      x-hidden-from-docs: true
+      type: object
+      description: CraCheckReportCashflowInsightsGetResponse defines the response schema for `/cra/check_report/cashflow_insights/get`.
+      properties:
+        report:
+          $ref: '#/components/schemas/CraCashflowInsightsReport'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - report
+      - request_id
     CraCashflowInsightsReport:
       type: object
       description: Contains data for the CRA Cashflow Insights Report.
@@ -56316,6 +56515,72 @@ components:
       - request_id
       - scores
       - warnings
+    SignalScheduleRequest:
+      title: SignalScheduleRequest
+      description: SignalScheduleRequest defines the request schema for `/signal/schedule`
+      type: object
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+        account_id:
+          type: string
+          description: |-
+            The Plaid `account_id` of the account that is the funding source for the proposed transaction. The `account_id` is returned in the `/accounts/get` endpoint as well as the [`onSuccess`](/docs/link/ios/#link-ios-onsuccess-linkSuccess-metadata-accounts-id) callback metadata.
+
+            This will return an [`INVALID_ACCOUNT_ID`](/docs/errors/invalid-input/#invalid_account_id) error if the account has been removed at the bank or if the `account_id` is no longer valid.
+        client_transaction_id:
+          type: string
+          description: The unique ID that you would like to use to refer to this transaction. For your convenience mapping your internal data, you could use your internal ID/identifier for this transaction. The max length for this field is 36 characters.
+          minLength: 1
+          maxLength: 36
+        amount:
+          type: number
+          format: double
+          description: The transaction amount, in USD (e.g. `102.05`)
+        default_payment_method:
+          $ref: '#/components/schemas/SignalScheduleDefaultPaymentMethod'
+      required:
+      - access_token
+      - account_id
+      - client_transaction_id
+      - amount
+    SignalScheduleResponse:
+      title: SignalScheduleResponse
+      description: SignalScheduleResponse defines the response schema for `/signal/schedule`
+      type: object
+      additionalProperties: true
+      properties:
+        optimal_date:
+          type: string
+          format: date
+          description: |-
+            The recommended optimal date to submit the debit entry, formatted in ISO 8601 "YYYY-MM-DD" (e.g., "2024-03-30"). The `optimal_date` is derived from the date with rank = 1 in the following recommendations array.
+
+            NOTE: The `default_payment_method` field specified in the request will affect the recommendation, since we're accounting for debit settlement time.
+
+            The debit scheduling evaluation starts from the day the /signal/schedule request is submitted (Day 0) or the next banking day if the submission day is not a banking day, and extends through the following five banking days (Day 1 to Day 5). If no date within this period is considered likely to result in a successful debit attempt, `null` will be returned for the `optimal_date`.
+          nullable: true
+        recommendations:
+          type: array
+          description: This array provides a date-by-date evaluation of debit submission recommendations within the five banking day evaluation period. Each object in the array represents a retry recommendation for a specific date.
+          items:
+            $ref: '#/components/schemas/SignalScheduleRecommendation'
+        warnings:
+          type: array
+          description: If bank information was not available to be used in the Signal model, this array contains warnings describing why bank data is missing. If you want to receive an API error instead of Signal scores in the case of missing bank data, file a support ticket or contact your Plaid account manager.
+          items:
+            $ref: '#/components/schemas/SignalWarning'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - optimal_date
+      - recommendations
+      - warnings
+      - request_id
     SignalDecisionReportRequest:
       title: SignalDecisionReportRequest
       description: SignalDecisionReportRequest defines the request schema for `/signal/decision/report`
@@ -56688,6 +56953,51 @@ components:
       type: integer
       minimum: 1
       maximum: 8
+    SignalScheduleDefaultPaymentMethod:
+      title: SignalScheduleDefaultPaymentMethod
+      type: string
+      enum:
+      - SAME_DAY_ACH
+      - STANDARD_ACH
+      - REAL_TIME_PAYMENTS
+      - DEBIT_CARD
+      - MULTIPLE_PAYMENT_METHODS
+      description: |-
+        The payment method specified in the `default_payment_method` field directly impacts the timing recommendations provided by the API for submitting the debit entry to your processor or ODFI. If unspecified, Signal defaults to `STANDARD_ACH`.
+
+        `SAME_DAY_ACH`: Same Day ACH (as defined by Nacha). The Signal API assumes the settlement will occur on the same business day if the `/signal/schedule` request is submitted by 6:00 PM UTC. Note: The actual cutoff time can vary depending on your payment processor or ODFI. NACHA has established three processing windows for Same Day ACH (UTC): 2:30 PM, 6:45 PM, and 8:45 PM.
+
+        `STANDARD_ACH`: Standard ACH (as defined by Nacha), typically settled one to three business days after submission.
+
+        `REAL_TIME_PAYMENTS`: Real-time payments via Request for Payment through networks such as RTP (The Clearing House) and FedNow, where the consumer can authorize the payment in response to a RFP, and the transaction is processed and settled immediately.
+
+        `DEBIT_CARD`: Payments processed over debit card networks, leveraging the card-based infrastructure for real-time or near-real-time settlement.
+
+        `MULTIPLE_PAYMENT_METHODS`: Indicates that there is no default debit rail or multiple payment methods are available, and the transaction could use any of them based on customer policy or availability.
+    RecommendationString:
+      title: RecommendationString
+      type: string
+      enum:
+      - RECOMMENDED
+      - NOT_RECOMMENDED
+      - UNKNOWN
+      description: The recommendation result for that date.
+    SignalScheduleRecommendation:
+      title: SignalScheduleRecommendation
+      type: object
+      additionalProperties: true
+      description: Conveys information on if a retry is recommended on a given date
+      properties:
+        date:
+          type: string
+          format: date
+          description: The specific date for submitting the debit entry, formatted in ISO 8601 (e.g., "2025-01-17").
+        recommendation:
+          $ref: '#/components/schemas/RecommendationString'
+        rank:
+          type: integer
+          description: The rank of the recommendation based on the likelihood of debit success, with 1 representing the most optimal date. Dates with `NOT_RECOMMENDED` or `UNKNOWN` will have rank `null`.
+          nullable: true
     SignalWarning:
       title: SignalWarning
       type: object
