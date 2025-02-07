@@ -1,3 +1,15 @@
+### 2020-09-14_1.617.1
+- For Plaid Check: `date_of_birth` is now required within the `consumer_report_user_identity` object when creating or updating a user token.
+
+### 2020-09-14_1.617.0
+- [Breaking] Removed the deprecated longest_gap_between_transactions, average_inflow_amount, and average_outflow_amount fields from the BaseReportAccountInsights object in the /cra/check_report/base_report/get response.
+
+### 2020-09-14_1.616.0
+- Add `originating_fund_source` to `/wallet/transaction/execute` endpoint.
+
+### 2020-09-14_1.615.0
+- Add `account_details_401k` objects to `/investments/auth/get` endpoint.
+
 ### 2020-09-14_1.614.1
 - Update `owners` field description for empty case
 
@@ -51,10 +63,10 @@
 
 ### 2020-09-14_1.603.0
 - (pre-release) Add `fraud_analysis_details` and `image_quality_details` objects to the `analysis`  object within each `documentary_verification.documents` object. These changes affect the response of all of the identity verification endpoints:
-   - `identity_verification/create`
-   - `identity_verification/get`
-   - `identity_verification/list`
-   - `identity_verification/retry`
+    - `identity_verification/create`
+    - `identity_verification/get`
+    - `identity_verification/list`
+    - `identity_verification/retry`
 
 ### 2020-09-14_1.602.1
 - Documentation-only change to `/cra/monitoring_insights/subscribe` for cadence
@@ -70,12 +82,12 @@
 
 ### 2020-09-14_1.601.0
 - Clean up legacy `/cra/base_report/*` endpoints from libraries in favor of `/cra/check_report/*`
-endpoints.
+  endpoints.
 
 ### 2020-09-14_1.600.2
 - Update descriptions for `/network/status/get` request and response fields
 - Add `nullable: true` to mortgage `account_number` field in the `MortgageLiability` schema to reflect actual behavior.
-- Add `transactions_refresh` to `Products` array to reflect actual behavior; this field is not accepted as input to `/link/token/create` but can be part of supported products array in the `Institution` object. 
+- Add `transactions_refresh` to `Products` array to reflect actual behavior; this field is not accepted as input to `/link/token/create` but can be part of supported products array in the `Institution` object.
 
 ### 2020-09-14_1.600.1
 - `depository`+`cash management` Accounts are now eligible for Auth data for certain institutions
@@ -114,10 +126,10 @@ endpoints.
 
 ### 2020-09-14_1.591.0
 - (pre-release) Add overall `risk_level`, and in some cases `factors` to each type of `risk_check` object. Also add `first_party_synthentic_fraud` and `third_party_synthentic_fraud` objects to`risk_check.identity_abuse_signals.synthetic_identity`. These changes affect the response of all of the identity verification endpoints:
-   - `identity_verification/create`
-   - `identity_verification/get`
-   - `identity_verification/list`
-   - `identity_verification/retry`
+    - `identity_verification/create`
+    - `identity_verification/get`
+    - `identity_verification/list`
+    - `identity_verification/retry`
 
 ### 2020-09-14_1.590.0
 - Add `webhook` field to `TransferPlatformOriginatorCreateRequest`
@@ -185,10 +197,10 @@ endpoints.
 
 ### 2020-09-14_1.581.0
 -  Update `verify_sms` object in the response of all of the identity verification endpoints to add `redacted_at` timestamp:
-   - `identity_verification/create`
-   - `identity_verification/get`
-   - `identity_verification/list`
-   - `identity_verification/retry`
+    - `identity_verification/create`
+    - `identity_verification/get`
+    - `identity_verification/list`
+    - `identity_verification/retry`
 
 ### 2020-09-14_1.580.4
 - Fixed an incorrect example response in `/user_account/session/get`
@@ -200,24 +212,24 @@ endpoints.
 - Make `scores` nullable in `/signal/evaluate` and `/processor/signal/evaluate` response
 
 ### 2020-09-14_1.580.1
- - Add new `payer_details` field to `payment_initiation/consent/create` in preparation to new account restrictions
+- Add new `payer_details` field to `payment_initiation/consent/create` in preparation to new account restrictions
 
 ### 2020-09-14_1.579.1
- - Add new `type` field to `payment_initiation/consent/create` and deprecate the `scopes` field
+- Add new `type` field to `payment_initiation/consent/create` and deprecate the `scopes` field
 
 ### 2020-09-14_1.578.1
 -  Update `verify_sms` object in the response of all of the identity verification endpoints to support nullable `verification.phone_number` and expand allowed statuses for `verification.status`:
-   - `identity_verification/create`
-   - `identity_verification/get`
-   - `identity_verification/list`
-   - `identity_verification/retry`
+    - `identity_verification/create`
+    - `identity_verification/get`
+    - `identity_verification/list`
+    - `identity_verification/retry`
 
 ### 2020-09-14_1.578.0
 -  Add `verify_sms` object in the response of all of the identity verification endpoints:
-   - `identity_verification/create`
-   - `identity_verification/get`
-   - `identity_verification/list`
-   - `identity_verification/retry`
+    - `identity_verification/create`
+    - `identity_verification/get`
+    - `identity_verification/list`
+    - `identity_verification/retry`
 
 ### 2020-09-14_1.577.1
 - Added support for `signal` to `required_if_supported_products`.
@@ -295,10 +307,10 @@ endpoints.
 
 ### 2020-09-14_1.568.0
 -  Add `name` object to the `extracted_data` within each `documentary_verification.documents` object in the response of all of the identity verification endpoints:
-   - `identity_verification/create`
-   - `identity_verification/get`
-   - `identity_verification/list`
-   - `identity_verification/retry`
+    - `identity_verification/create`
+    - `identity_verification/get`
+    - `identity_verification/list`
+    - `identity_verification/retry`
 
 ### 2020-09-14_1.567.5
 - Add `error_reason` to `/cra/check_report/partner_insights/get`
@@ -334,10 +346,10 @@ endpoints.
 
 ### 2020-09-14_1.563.0
 - Update fields on `item` object in `/item/get` response
-  - Add `consented_use_cases` field
-  - Add `consented_data_scopes` field
-  - Add `created_at` field
-  - Update descriptions for `consented_products` and `consent_expiration_time` fields
+    - Add `consented_use_cases` field
+    - Add `consented_data_scopes` field
+    - Add `created_at` field
+    - Update descriptions for `consented_products` and `consent_expiration_time` fields
 - Add `/consent/events/get` endpoint
 
 ### 2020-09-14_1.157.1
@@ -345,10 +357,10 @@ endpoints.
 
 ### 2020-09-14_1.157.0
 - (pre-release) Add `facial_analysis` to the `analysis` within each `selfie_check.selfies` object in the response of all of the identity verification endpoints:
-  - `identity_verification/create`
-  - `identity_verification/get`
-  - `identity_verification/list`
-  - `identity_verification/retry`
+    - `identity_verification/create`
+    - `identity_verification/get`
+    - `identity_verification/list`
+    - `identity_verification/retry`
 
 ### 2020-09-14_1.156.2
 - [BREAKING] Remove `from_client_id` and `to_client_id` from `/transfer/ledger/distribute` request
@@ -374,10 +386,10 @@ endpoints.
 
 ### 2020-09-14_1.558.0
 - Add `liveness_check` to the `analysis` within each `selfie_check.selfies` object in the response of all of the identity verification endpoints:
-  - `identity_verification/create`
-  - `identity_verification/get`
-  - `identity_verification/list`
-  - `identity_verification/retry`
+    - `identity_verification/create`
+    - `identity_verification/get`
+    - `identity_verification/list`
+    - `identity_verification/retry`
 
 ### 2020-09-14_1.557.2
 - Internal changes only
@@ -608,11 +620,11 @@ endpoints.
 ### 2020-09-14_1.520.0
 
 - [Breaking] Contains fixes to Balance Plus (beta):
-  - [Breaking] Convert `risk_level` string to an enum object `RiskLevel`.
-  - [Breaking] Adds missing `required` labels to certain fields within `BalancePlusAttributes`, `AccountsBalanceGetResponsePaymentRiskAssessment`, `AccountsBalanceGetRequestPaymentDetails`, and `RiskReason`.
-  - Adds missing `additionalProperties` field to `BalancePlusAttributes`
-  - Fix incorrect response example for Balance Plus
-  - Docs updates for Balance Plus
+    - [Breaking] Convert `risk_level` string to an enum object `RiskLevel`.
+    - [Breaking] Adds missing `required` labels to certain fields within `BalancePlusAttributes`, `AccountsBalanceGetResponsePaymentRiskAssessment`, `AccountsBalanceGetRequestPaymentDetails`, and `RiskReason`.
+    - Adds missing `additionalProperties` field to `BalancePlusAttributes`
+    - Fix incorrect response example for Balance Plus
+    - Docs updates for Balance Plus
 
 ### 2020-09-14_1.519.0
 
@@ -914,10 +926,10 @@ endpoints.
 ### 2020-09-14_1.496.5
 
 - Update the description and enum values for `linked_services` in the response of all of the identity verification endpoints:
-  - `identity_verification/create`
-  - `identity_verification/get`
-  - `identity_verification/list`
-  - `identity_verification/retry`
+    - `identity_verification/create`
+    - `identity_verification/get`
+    - `identity_verification/list`
+    - `identity_verification/retry`
 
 ### 2020-09-14_1.496.4
 
@@ -981,10 +993,10 @@ Add `POST /beacon/user/history/list`
 ### 2020-09-14_1.491.1
 
 - Add new `no_data` type to `name` and `date_of_birth` fields in `documentary_verification.documents[].analysis.extracted_data` in the response of all of the identity verification endpoints:
-  - `identity_verification/create`
-  - `identity_verification/get`
-  - `identity_verification/list`
-  - `identity_verification/retry`
+    - `identity_verification/create`
+    - `identity_verification/get`
+    - `identity_verification/list`
+    - `identity_verification/retry`
 
 ### 2020-09-14_1.491.0
 
@@ -1570,7 +1582,7 @@ Add `BE` to the list of available countries
 ### 2020-09-14_1.419.0
 
 - Update `/signal/decision/report` description
-  - Overwriting `initiated` field is now supported and no longer returns an `INVALID_FIELD` error
+    - Overwriting `initiated` field is now supported and no longer returns an `INVALID_FIELD` error
 
 ### 2020-09-14_1.418.0
 
@@ -1706,16 +1718,16 @@ Add `BE` to the list of available countries
 ### 2020-09-14_1.393.0
 
 - Add `date_of_birth` and `address` fields to `documentary_verification.documents[].extracted_data` in the response of all of the identity verification endpoints:
-  - `identity_verification/create`
-  - `identity_verification/get`
-  - `identity_verification/list`
-  - `identity_verification/retry`
+    - `identity_verification/create`
+    - `identity_verification/get`
+    - `identity_verification/list`
+    - `identity_verification/retry`
 
 ### 2020-09-14_1.392.4
 
 - Update the following about identity/match name, phone number, email, and address score descriptions:
-  - Ensure consistent language across all fields
-  - Include score recommended "match" threshold for all fields.
+    - Ensure consistent language across all fields
+    - Include score recommended "match" threshold for all fields.
 
 ### 2020-09-14_1.392.3
 
@@ -1724,11 +1736,11 @@ Add `BE` to the list of available countries
 ### 2020-09-14_1.392.2
 
 - Mark a few response fields as always present in the identity verification API:
-  - `selfie_check.selfies[].capture.image_url`
-  - `selfie_check.selfies[].capture.video_url`
-  - `risk_check.identity_abuse_signals`
-  - `risk_check.identity_abuse_signals.synthetic_identity.score`
-  - `risk_check.identity_abuse_signals.stolen_identity.score`
+    - `selfie_check.selfies[].capture.image_url`
+    - `selfie_check.selfies[].capture.video_url`
+    - `risk_check.identity_abuse_signals`
+    - `risk_check.identity_abuse_signals.synthetic_identity.score`
+    - `risk_check.identity_abuse_signals.stolen_identity.score`
 
 ### 2020-09-14_1.392.1
 
@@ -1975,10 +1987,10 @@ Add `BE` to the list of available countries
 ### 2020-09-14_1.354.0
 
 - Adds a `selfie_check` object to the response schema of all the identity verification endpoints:
-  - `identity_verification/create`
-  - `identity_verification/get`
-  - `identity_verification/list`
-  - `identity_verification/retry`
+    - `identity_verification/create`
+    - `identity_verification/get`
+    - `identity_verification/list`
+    - `identity_verification/retry`
 
 ### 2020-09-14_1.353.1
 
@@ -2199,7 +2211,7 @@ Fix npm publish
 ### 2020-09-14_1.332.0
 
 - [Breaking] Remove `/wallet/transaction/list` endpoint
-  - [Note] Determined that `/wallet/transaction/list` is unused
+    - [Note] Determined that `/wallet/transaction/list` is unused
 
 ### 2020-09-14_1.331.0
 
@@ -2208,7 +2220,7 @@ Add `LinkDeliveryCallbackWebhook`, `LinkUserDeliveryStatusWebhook` for Link Deli
 ### 2020-09-14_1.330.0
 
 - [Breaking] Remove `options.wallet_id` field in `/payment_initiation/payment/create` and `/payment_initiation/consent/create` request.
-  - [Note] Determined that this field is unused.
+    - [Note] Determined that this field is unused.
 
 ### 2020-09-14_1.229.2
 
@@ -3755,21 +3767,21 @@ Add `nullable` property to `date_of_birth`, `phone_number_verified_time`, and `e
 ### 2020-09-14_1.64.15
 
 - De-anonymized enums:
-  - `PaymentInitiationPaymentReverseResponse.properties.status` => `PaymentInitiationRefundStatus`
-  - `PaymentInitiationPaymentCreateResponse.properties.status` => `PaymentInitiationPaymentCreateStatus`
-  - `PaymentInitiationRefund.properties.status` => `PaymentInitiationRefundStatus`
-  - `PaymentAmount.properties.currency` => `PaymentAmountCurrency`
-  - `InvestmentTransaction.properties.type` => `InvestmentTransactionType`
-  - `InvestmentTransaction.properties.subtype` => `InvestmentTransactionSubtype`
-  - `TransferAuthorizationDecisionRationale.properties.code` => `TransferAuthorizationDecisionRationaleCode`
-  - `TransferAuthorizationGuaranteeDecisionRationale.properties.code` => `TransferAuthorizationGuaranteeDecisionRationaleCode`
-  - `TransferAuthorization.properties.decision` => `TransferAuthorizationDecision`
-  - `TransferEventListRequest.properties.transfer_type` => `TransferEventListTransferType`
-  - `BankTransferEventListRequest.properties.bank_transfer_type` => `BankTransferEventListBankTransferType`
-  - `BankTransferEventListRequest.properties.direction` => `BankTransferEventListDirection`
-  - `TransferIntentCreate.properties.status` => `TransferIntentStatus`
-  - `TransferIntentGet.properties.status` => `TransferIntentStatus`
-  - `TransferIntentGet.properties.authorization_decision` => `TransferIntentAuthorizationDecision`
+    - `PaymentInitiationPaymentReverseResponse.properties.status` => `PaymentInitiationRefundStatus`
+    - `PaymentInitiationPaymentCreateResponse.properties.status` => `PaymentInitiationPaymentCreateStatus`
+    - `PaymentInitiationRefund.properties.status` => `PaymentInitiationRefundStatus`
+    - `PaymentAmount.properties.currency` => `PaymentAmountCurrency`
+    - `InvestmentTransaction.properties.type` => `InvestmentTransactionType`
+    - `InvestmentTransaction.properties.subtype` => `InvestmentTransactionSubtype`
+    - `TransferAuthorizationDecisionRationale.properties.code` => `TransferAuthorizationDecisionRationaleCode`
+    - `TransferAuthorizationGuaranteeDecisionRationale.properties.code` => `TransferAuthorizationGuaranteeDecisionRationaleCode`
+    - `TransferAuthorization.properties.decision` => `TransferAuthorizationDecision`
+    - `TransferEventListRequest.properties.transfer_type` => `TransferEventListTransferType`
+    - `BankTransferEventListRequest.properties.bank_transfer_type` => `BankTransferEventListBankTransferType`
+    - `BankTransferEventListRequest.properties.direction` => `BankTransferEventListDirection`
+    - `TransferIntentCreate.properties.status` => `TransferIntentStatus`
+    - `TransferIntentGet.properties.status` => `TransferIntentStatus`
+    - `TransferIntentGet.properties.authorization_decision` => `TransferIntentAuthorizationDecision`
 - `IncomeVerificationPrecheckMilitaryInfo.properties.branch` is now a string field (previously enum)
 
 ### 2020-09-14_1.64.15
@@ -3803,11 +3815,11 @@ Add `nullable` property to `date_of_birth`, `phone_number_verified_time`, and `e
 
 - De-anonymized the object filters under `LinkTokenCreateRequestAccountSubtypes`, as anonymous objects aren't compatible with the generated CLibs.
 - De-anonymized some misc. objects
-  - `PaymentInitiationMetadata/properties/maximum_payment_amount`
-  - `PaystubOverride/properties/employer`
-  - `PaystubOverride/properties/employee`
-  - `PaystubOverride/properties/employee/properties/address`
-  - `LiabilitiesDefaultUpdateWebhook/properties/account_ids_with_updated_liabilities`
+    - `PaymentInitiationMetadata/properties/maximum_payment_amount`
+    - `PaystubOverride/properties/employer`
+    - `PaystubOverride/properties/employee`
+    - `PaystubOverride/properties/employee/properties/address`
+    - `LiabilitiesDefaultUpdateWebhook/properties/account_ids_with_updated_liabilities`
 
 ### 2020-09-14_1.64.8
 
@@ -4508,11 +4520,11 @@ Add `nullable` property to `date_of_birth`, `phone_number_verified_time`, and `e
 ### 2020-09-14_1.19.6
 
 - Added the following response fields to the `/deposit_switch/get` docs:
-  - `switch_method`
-  - `employer_name`
-  - `employer_id`
-  - `institution_name`
-  - `institution_id`
+    - `switch_method`
+    - `employer_name`
+    - `employer_id`
+    - `institution_name`
+    - `institution_id`
 
 ### 2020-09-14_1.19.5
 
