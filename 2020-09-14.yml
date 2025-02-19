@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.617.1
+  version: 2020-09-14_1.619.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -511,7 +511,7 @@ paths:
       - plaid
       operationId: craMonitoringInsightsSubscribe
       externalDocs:
-        url: /check/api/#cramonitoring_insightssubscribe
+        url: /api/products/check/#cramonitoring_insightssubscribe
       requestBody:
         required: true
         content:
@@ -538,7 +538,7 @@ paths:
       - plaid
       operationId: craMonitoringInsightsUnsubscribe
       externalDocs:
-        url: /check/api/#cramonitoring_insightsunsubscribe
+        url: /api/products/check/#cramonitoring_insightsunsubscribe
       requestBody:
         required: true
         content:
@@ -564,7 +564,7 @@ paths:
       - plaid
       operationId: craMonitoringInsightsGet
       externalDocs:
-        url: /check/api/#cramonitoring_insightsget
+        url: /api/products/check/#cramonitoring_insightsget
       requestBody:
         required: true
         content:
@@ -1267,7 +1267,7 @@ paths:
                             unofficial_currency_code: null
                         warnings: []
       externalDocs:
-        url: /check/api/#cracheck_reportincome_insightsget
+        url: /api/products/check/#cracheck_reportincome_insightsget
       operationId: craCheckReportIncomeInsightsGet
       description: This endpoint allows you to retrieve the Income Insights report for your user.  You should call this endpoint after you've received a `CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`. If the most recent consumer report for the user doesn’t have sufficient data to generate the base report, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.
       requestBody:
@@ -1283,7 +1283,7 @@ paths:
       - plaid
       operationId: craCheckReportBaseReportGet
       externalDocs:
-        url: /check/api/#cracheck_reportbase_reportget
+        url: /api/products/check/#cracheck_reportbase_reportget
       requestBody:
         required: true
         content:
@@ -2216,7 +2216,7 @@ paths:
                 example-1:
                   value: JVBERi0xLjQKJeLjz9MKMyAwIG9iaiA8PC9MZW5ndGggNDY2MS9GaWx0ZXIvRmxhdGVEZWNvZGU+PnN0cmVhbQp4nF2SyY4cMRBF94VdzI0O...
       externalDocs:
-        url: /check/api/#cracheck_reportpdfget
+        url: /api/products/check/#cracheck_reportpdfget
       operationId: craCheckReportPdfGet
       description: '`/cra/check_report/pdf/get` retrieves the most recent Consumer Report in PDF format. By default, the most recent Base Report (if it exists) for the user will be returned. To request that the most recent Income Insights report be included in the PDF as well, use the `add-ons` field.'
       requestBody:
@@ -2242,7 +2242,7 @@ paths:
                   value:
                     request_id: LhQf0THi8SH1yJm
       externalDocs:
-        url: /check/api/#cracheck_reportcreate
+        url: /api/products/check/#cracheck_reportcreate
       operationId: craCheckReportCreate
       description: |-
         `/cra/check_report/create` creates a Consumer Report powered by Plaid Check. You can call this endpoint to create a new report if `consumer_report_permissible_purpose` was omitted during Link token creation. If you did provide a `consumer_report_permissible_purpose` during Link token creation, then Plaid Check will automatically begin creating a Consumer Report once the user completes the Link process, and it is not necessary to call `/cra/check_report/create` before retrieving the report.
@@ -2370,7 +2370,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PlaidError'
       externalDocs:
-        url: /check/api/#cracheck_reportpartner_insightsget
+        url: /api/products/check/#cracheck_reportpartner_insightsget
       operationId: craCheckReportPartnerInsightsGet
       description: |-
         This endpoint allows you to retrieve the Partner Insights report for your user. You should call this endpoint after you've received the `CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`. If the most recent consumer report for the user doesn’t have sufficient data to generate the base report, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.
@@ -2415,7 +2415,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PlaidError'
       externalDocs:
-        url: /check/api/#cracheck_reportcashflow_insightsget
+        url: /api/products/check/#cracheck_reportcashflow_insightsget
       operationId: craCheckReportCashflowInsightsGet
       description: |-
         This endpoint allows you to retrieve the Cashflow Insights report for your user. You should call this endpoint after you've received the `CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`. If the most recent consumer report for the user doesn’t have sufficient data to generate the insights, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.
@@ -2461,7 +2461,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PlaidError'
       externalDocs:
-        url: /check/api/#cracheck_reportnetwork_insightsget
+        url: /api/products/check/#cracheck_reportnetwork_insightsget
       operationId: craCheckReportNetworkInsightsGet
       description: |-
         This endpoint allows you to retrieve the Network Insights product for your user. You should call this endpoint after you've received the `CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`. If the most recent consumer report for the user doesn’t have sufficient data to generate the report, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.
@@ -3444,6 +3444,225 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/TransactionsRefreshRequest'
+  /cashflow_report/refresh:
+    x-hidden-from-docs: true
+    post:
+      tags:
+      - plaid
+      summary: Refresh transaction data in cashflow_report
+      externalDocs:
+        url: /api/products/transactions/#cashflowReportRefresh
+      operationId: cashflowReportRefresh
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashflowReportRefreshResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: 1vwmF5TBQwiqfwP
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+          description: Error response
+      description: "`/cashflow_report/refresh` is an endpoint that initiates an on-demand extraction to fetch the newest transactions for an item (given an `item_id`). The item must already have Cashflow Report added as a product in order to call `/cashflow_report/refresh`.\n\nAfter calling `/cashflow_report/refresh`, Plaid will fire a webhook `CASHFLOW_REPORT_READY` alerting clients that new transactions data can then be ingested via `/cashflow_report/get` or the webhook will contain an error code informing there was an error in refreshing transactions data. \n\nNote that the `/cashflow_report/refresh` endpoint is not supported for Capital One (`ins_128026`) non-depository accounts and will result in a `PRODUCTS_NOT_SUPPORTED` error if called on an Item that contains only non-depository accounts from that institution.\n\nAs this endpoint triggers a synchronous request for fresh data, latency may be higher than for other Plaid endpoints (typically less than 10 seconds, but up to 30 seconds or more). If you encounter errors, you may find it necessary to adjust your timeout period for requests."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CashflowReportRefreshRequest'
+  /cashflow_report/get:
+    x-hidden-from-docs: true
+    post:
+      tags:
+      - plaid
+      summary: Gets transaction data in cashflow_report
+      externalDocs:
+        url: /api/products/transactions/#cashflowReportGet
+      operationId: cashflowReportGet
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashflowReportGetResponse'
+              examples:
+                example-1:
+                  value:
+                    accounts:
+                    - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
+                      balances:
+                        available: 110.94
+                        current: 110.94
+                        iso_currency_code: USD
+                        limit: null
+                        unofficial_currency_code: null
+                      mask: "0000"
+                      name: Plaid Checking
+                      official_name: Plaid Gold Standard 0% Interest Checking
+                      subtype: checking
+                      type: depository
+                    transactions:
+                    - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
+                      account_owner: null
+                      amount: 28.34
+                      iso_currency_code: USD
+                      unofficial_currency_code: null
+                      category:
+                      - Food and Drink
+                      - Restaurants
+                      - Fast Food
+                      category_id: "13005032"
+                      check_number: null
+                      counterparties:
+                      - name: DoorDash
+                        type: marketplace
+                        logo_url: https://plaid-counterparty-logos.plaid.com/doordash_1.png
+                        website: doordash.com
+                        entity_id: YNRJg5o2djJLv52nBA1Yn1KpL858egYVo4dpm
+                        confidence_level: HIGH
+                      - name: Burger King
+                        type: merchant
+                        logo_url: https://plaid-merchant-logos.plaid.com/burger_king_155.png
+                        website: burgerking.com
+                        entity_id: mVrw538wamwdm22mK8jqpp7qd5br0eeV9o4a1
+                        confidence_level: VERY_HIGH
+                      date: "2023-09-28"
+                      datetime: "2023-09-28T15:10:09Z"
+                      authorized_date: "2023-09-27"
+                      authorized_datetime: "2023-09-27T08:01:58Z"
+                      location:
+                        address: null
+                        city: null
+                        region: null
+                        postal_code: null
+                        country: null
+                        lat: null
+                        lon: null
+                        store_number: null
+                      name: Dd Doordash Burgerkin
+                      merchant_name: Burger King
+                      merchant_entity_id: mVrw538wamwdm22mK8jqpp7qd5br0eeV9o4a1
+                      logo_url: https://plaid-merchant-logos.plaid.com/burger_king_155.png
+                      website: burgerking.com
+                      payment_meta:
+                        by_order_of: null
+                        payee: null
+                        payer: null
+                        payment_method: null
+                        payment_processor: null
+                        ppd_id: null
+                        reason: null
+                        reference_number: null
+                      payment_channel: online
+                      pending: true
+                      pending_transaction_id: null
+                      personal_finance_category:
+                        primary: FOOD_AND_DRINK
+                        detailed: FOOD_AND_DRINK_FAST_FOOD
+                        confidence_level: VERY_HIGH
+                      personal_finance_category_icon_url: https://plaid-category-icons.plaid.com/PFC_FOOD_AND_DRINK.png
+                      transaction_id: yhnUVvtcGGcCKU0bcz8PDQr5ZUxUXebUvbKC0
+                      transaction_code: null
+                      transaction_type: digital
+                    - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
+                      account_owner: null
+                      amount: 72.1
+                      iso_currency_code: USD
+                      unofficial_currency_code: null
+                      category:
+                      - Shops
+                      - Supermarkets and Groceries
+                      category_id: "19046000"
+                      check_number: null
+                      counterparties:
+                      - name: Walmart
+                        type: merchant
+                        logo_url: https://plaid-merchant-logos.plaid.com/walmart_1100.png
+                        website: walmart.com
+                        entity_id: O5W5j4dN9OR3E6ypQmjdkWZZRoXEzVMz2ByWM
+                        confidence_level: VERY_HIGH
+                      date: "2023-09-24"
+                      datetime: "2023-09-24T11:01:01Z"
+                      authorized_date: "2023-09-22"
+                      authorized_datetime: "2023-09-22T10:34:50Z"
+                      location:
+                        address: 13425 Community Rd
+                        city: Poway
+                        region: CA
+                        postal_code: "92064"
+                        country: US
+                        lat: 32.959068
+                        lon: -117.037666
+                        store_number: "1700"
+                      name: 'PURCHASE WM SUPERCENTER #1700'
+                      merchant_name: Walmart
+                      merchant_entity_id: O5W5j4dN9OR3E6ypQmjdkWZZRoXEzVMz2ByWM
+                      logo_url: https://plaid-merchant-logos.plaid.com/walmart_1100.png
+                      website: walmart.com
+                      payment_meta:
+                        by_order_of: null
+                        payee: null
+                        payer: null
+                        payment_method: null
+                        payment_processor: null
+                        ppd_id: null
+                        reason: null
+                        reference_number: null
+                      payment_channel: in store
+                      pending: false
+                      pending_transaction_id: no86Eox18VHMvaOVL7gPUM9ap3aR1LsAVZ5nc
+                      personal_finance_category:
+                        primary: GENERAL_MERCHANDISE
+                        detailed: GENERAL_MERCHANDISE_SUPERSTORES
+                        confidence_level: VERY_HIGH
+                      personal_finance_category_icon_url: https://plaid-category-icons.plaid.com/PFC_GENERAL_MERCHANDISE.png
+                      transaction_id: lPNjeW1nR6CDn5okmGQ6hEpMo4lLNoSrzqDje
+                      transaction_code: null
+                      transaction_type: place
+                    total_transactions: 2
+                    item:
+                      available_products:
+                      - balance
+                      - identity
+                      - investments
+                      billed_products:
+                      - assets
+                      - auth
+                      - liabilities
+                      - transactions
+                      consent_expiration_time: null
+                      error: null
+                      institution_id: ins_3
+                      institution_name: Chase
+                      item_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBFL9DrE6
+                      update_type: background
+                      webhook: https://www.genericwebhookurl.com/webhook
+                      auth_method: INSTANT_AUTH
+                    next_cursor: eu4rIDi328130dKJEoqieej
+                    has_more: true
+                    request_id: 45QSn
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+          description: Error response
+      description: "The `/cashflow_report/get` endpoint retrieves transactions data associated with an item. Transactions data is standardized across financial institutions. \nTransactions are returned in reverse-chronological order, and the sequence of transaction ordering is stable and will not shift. Transactions are not immutable and can also be removed altogether by the institution; a removed transaction will no longer appear in `/transactions/get`.  For more details, see [Pending and posted transactions](https://plaid.com/docs/transactions/transactions-data/#pending-and-posted-transactions).\nDue to the potentially large number of transactions associated with an Item, results are paginated. Manipulate the `count` and `cursor` parameters in conjunction with the `has_more` response body field to fetch all available transactions.\nNote that data isn't likely to be immediately available to `/cashflow_report/get`. Plaid will begin to prepare transactions data upon Item link, if Link was initialized with cashflow_report, or if it wasn't, upon the first call to /cashflow_report/refresh. To be alerted when transaction data is ready to be fetched, listen for the `CASHFLOW_REPORT_READY` webhook."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CashflowReportGetRequest'
+            examples: {}
   /transactions/recurring/get:
     post:
       tags:
@@ -4283,7 +4502,6 @@ paths:
                       mask: "0000"
                       name: Plaid Checking
                       official_name: Plaid Gold Standard 0% Interest Checking
-                      persistent_account_id: 8cfb8beb89b774ee43b090625f0d61d0814322b43bff984eaf60386e
                       subtype: checking
                       type: depository
                     - account_id: 6PdjjRP6LmugpBy5NgQvUqpRXMWxzktg3rwrk
@@ -4531,7 +4749,6 @@ paths:
                       mask: "0000"
                       name: Plaid Checking
                       official_name: Plaid Gold Standard 0% Interest Checking
-                      persistent_account_id: 8cfb8beb89b774ee43b090625f0d61d0814322b43bff984eaf60386e
                       subtype: checking
                       type: depository
                     - account_id: dVzbVMLjrxTnLjX4G66XUp5GLklm4oiZy88yK
@@ -4590,7 +4807,6 @@ paths:
                       mask: "0000"
                       name: Plaid Checking
                       official_name: Plaid Gold Standard 0% Interest Checking
-                      persistent_account_id: 8cfb8beb89b774ee43b090625f0d61d0814322b43bff984eaf60386e
                       subtype: checking
                       type: depository
                     - account_id: dVzbVMLjrxTnLjX4G66XUp5GLklm4oiZy88yK
@@ -7027,6 +7243,7 @@ paths:
                   value:
                     beacon_report_syndications:
                     - id: becrsn_11111111111111
+                      beacon_user_id: becusr_42cF1MNo42r9Xj
                       report:
                         id: becrpt_11111111111111
                         created_at: "2020-07-24T03:26:02Z"
@@ -7112,6 +7329,7 @@ paths:
                 example-1:
                   value:
                     id: becrsn_11111111111111
+                    beacon_user_id: becusr_42cF1MNo42r9Xj
                     report:
                       id: becrpt_11111111111111
                       created_at: "2020-07-24T03:26:02Z"
@@ -11287,6 +11505,36 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/LinkOAuthCorrelationIdExchangeRequest'
+        description: ""
+  /session/token/create:
+    post:
+      tags:
+      - plaid
+      summary: Create a Session Token
+      externalDocs:
+        url: /api/link/#sessiontokencreate
+      operationId: sessionTokenCreate
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionTokenCreateResponse'
+              examples:
+                example-1:
+                  value:
+                    link:
+                      link_token: link-sandbox-af1a0311-da53-4636-b754-dd15cc058176
+                      expiration: "2020-03-27T12:56:34Z"
+                    request_id: XQVgFigpGHXkb0b
+      description: "Any Plaid experience a user sees such as connecting a bank account, verifying identity, or sharing a credit report is considered a session. Today, most sessions happen through Link and the token to start these Link session is a link token created and configured via `link/token/create`.\nSessions are a higher level abstraction where configuration primarily happens in Plaid Dashboard. \nDepending on the template id provided, the session may a Link session, specified by a Link token, or may be another experience in the future. A primary benefit is that configuration changes can be done in Dashboard with no code changes required.\n\nCurrently, this endpoint is only supported for Layer templates and Link but is reserved in the future to initialize other end-user Plaid experiences. The returned Link token is used as an parameter when initializing the Link SDK. For more details, see the [Link flow overview](https://plaid.com/docs/link/#link-flow-overview)."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionTokenCreateRequest'
         description: ""
   /deposit_switch/get:
     post:
@@ -18197,6 +18445,100 @@ components:
           $ref: '#/components/schemas/RequestID'
       required:
       - request_id
+    CashflowReportRefreshRequest:
+      x-hidden-from-docs: true
+      type: object
+      description: CashflowReportRefreshRequest defines the reqest schema for `/cashflow_report/refresh`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        days_requested:
+          type: integer
+          description: Number of days to retrieve transactions data for (1 to 730)
+          minimum: 1
+          maximum: 730
+          default: 365
+      required:
+      - access_token
+      - days_requested
+    CashflowReportRefreshResponse:
+      x-hidden-from-docs: true
+      type: object
+      additionalProperties: true
+      description: CashflowReportRefreshResponse defines the response schema for `/cashflow_report/response`
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
+    CashflowReportGetRequest:
+      x-hidden-from-docs: true
+      type: object
+      description: CashflowReportGetRequest defines the reqest schema for `/cashflow_report/get`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        days_requested:
+          type: integer
+          description: Number of days to retrieve transactions data for (1 to 730)
+          minimum: 1
+          maximum: 730
+        count:
+          type: integer
+          description: Number of transactions to fetch per call
+          minimum: 1
+          maximum: 500
+          default: 100
+        cursor:
+          type: string
+          description: The cursor value represents the last update requested. Pass in the empty string "" in the first call.
+      required:
+      - access_token
+      - days_requested
+    CashflowReportGetResponse:
+      type: object
+      additionalProperties: true
+      description: CashflowReportGetResponse defines the response schema for `/cashflow_report/get`
+      properties:
+        accounts:
+          type: array
+          description: An array containing the `accounts` associated with the Item for which transactions are being returned. Each transaction can be mapped to its corresponding account via the `account_id` field.
+          items:
+            $ref: '#/components/schemas/AccountBase'
+        transactions:
+          type: array
+          description: An array containing transactions from the account. Transactions are returned in reverse chronological order, with the most recent at the beginning of the array. The maximum number of transactions returned is determined by the `count` parameter.
+          items:
+            $ref: '#/components/schemas/Transaction'
+        total_transactions:
+          type: integer
+          description: The total number of transactions available within the date range specified. If `total_transactions` is larger than the size of the `transactions` array, more transactions are available and can be fetched via manipulating the `offset` parameter.
+        item:
+          $ref: '#/components/schemas/Item'
+        next_cursor:
+          type: string
+          description: Cursor used for fetching any future updates after the latest update provided in this response.
+        has_more:
+          type: boolean
+          description: Represents if more than requested count of transactions exists to be fetched
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - accounts
+      - transactions
+      - total_transactions
+      - item
+      - next_cursor
+      - has_more
+      - request_id
     TransactionsRecurringUpdateRequest:
       type: object
       description: TransactionsRecurringUpdateRequest defined the request schema for `/transactions/recurring/streams/update` endpoint.
@@ -21039,9 +21381,9 @@ components:
         end_to_end_id:
           type: string
           description: |-
-            A unique identifier assigned by Plaid to each payment for tracking and reconcilliation purposes.
+            A unique identifier assigned by Plaid to each payment for tracking and reconciliation purposes.
 
-            Note: Not all banks handle end_to_end_id consistently. To ensure accurate matching, clients should convert both the incoming end_to_end_id and the one provided by Plaid to the same case (either lower or upper) before comparison. For virtual account payments, Plaid manages this field automatically.
+            Note: Not all banks handle `end_to_end_id` consistently. To ensure accurate matching, clients should convert both the incoming `end_to_end_id` and the one provided by Plaid to the same case (either lower or upper) before comparison. For virtual account payments, Plaid manages this field automatically.
           nullable: true
       required:
       - payment_id
@@ -22096,7 +22438,7 @@ components:
           nullable: true
         webhook:
           type: string
-          description: The destination URL to which any webhooks should be sent. Note that webhooks for Payment Initiation (e-wallet transactions only), Transfer, Bank Transfer (including Auth micro-deposit notification webhooks), Monitor, Identity Verification, and Link Events are configured via the Dashboard instead. In update mode, this field will not have an effect; to update the webhook receiver endpoint for an existing Item, use `/item/webhook/update` instead.
+          description: The destination URL to which any webhooks should be sent. Note that webhooks for Payment Initiation (e-wallet transactions only), Transfer, Bank Transfer (including Auth micro-deposit notification webhooks), Monitor, and Identity Verification are configured via the Dashboard instead. In update mode, this field will not have an effect; to update the webhook receiver endpoint for an existing Item, use `/item/webhook/update` instead.
         access_token:
           type: string
           description: The `access_token` associated with the Item to update or reference, used when updating, modifying, or accessing an existing `access_token`. Used when launching Link in update mode, when completing the Same-day (manual) Micro-deposit flow, or (optionally) when initializing Link for a returning user as part of the Transfer UI flow.
@@ -22187,6 +22529,8 @@ components:
           $ref: '#/components/schemas/LinkTokenCreateHostedLink'
         transactions:
           $ref: '#/components/schemas/LinkTokenTransactions'
+        cashflow_report:
+          $ref: '#/components/schemas/LinkTokenCashflowReport'
         cra_enabled:
           x-hidden-from-docs: true
           type: boolean
@@ -22284,7 +22628,7 @@ components:
       type: object
       properties:
         days_requested:
-          description: 'Number of days of transaction history to request in the Cashflow Report product. '
+          description: Number of days of transaction history to request in the Cashflow Report product.
           type: integer
           minimum: 1
           maximum: 730
@@ -22302,6 +22646,28 @@ components:
           $ref: '#/components/schemas/HostedLinkURLLifetimeSeconds'
         is_mobile_app:
           $ref: '#/components/schemas/HostedLinkIsMobileApp'
+    SessionTokenCreateRequest:
+      type: object
+      description: SessionTokenCreateRequest defines the request schema for `/session/token/create`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        template_id:
+          type: string
+          description: The id of a template defined in Plaid Dashboard
+        user:
+          $ref: '#/components/schemas/SessionTokenCreateRequestUser'
+      required:
+      - template_id
+    SessionTokenCreateRequestUser:
+      type: object
+      description: SessionTokenCreateRequestUser defines per-session user-specific data for `/session/token/create`
+      properties:
+        client_user_id:
+          type: string
+          description: A unique ID representing the end user. Typically this will be a user ID number from your application. Personally identifiable information, such as an email address or phone number, should not be used in the `client_user_id`. It is currently used as a means of searching logs for the given user in the Plaid Dashboard.
     HostedLinkDeliveryMethod:
       type: string
       description: |
@@ -23142,6 +23508,32 @@ components:
       - link_token
       - expiration
       - request_id
+    SessionTokenCreateResponse:
+      type: object
+      additionalProperties: true
+      description: SessionTokenCreateResponse defines the response schema for `/session/token/create`
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+        link:
+          $ref: '#/components/schemas/SessionTokenCreateResponseLink'
+      required:
+      - request_id
+    SessionTokenCreateResponseLink:
+      type: object
+      additionalProperties: true
+      description: Response data for `/session/token/create` intended for use with the Link SDK.
+      properties:
+        link_token:
+          type: string
+          description: A Link token, which can be supplied to Link in order to initialize it and receive a `public_token`.
+        expiration:
+          type: string
+          format: date-time
+          description: The expiration date for the `link_token`, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format. A `link_token` created to generate a `public_token` that will be exchanged for a new `access_token` expires after 4 hours. A `link_token` created for an existing Item (such as when updating an existing `access_token` by launching Link in update mode) expires after 30 minutes.
+      required:
+      - link_token
+      - expiration
     PlaidError:
       description: 'Errors are identified by `error_code` and categorized by `error_type`. Use these in preference to HTTP status codes to identify and handle specific errors. HTTP status codes are set and provide the broadest categorization of errors: 4xx codes are for developer- or user-related errors, and 5xx codes are for Plaid-related errors, and the status will be 2xx in non-error cases. An Item with a non-`null` error object will only be part of an API response when calling `/item/get` to view Item status. Otherwise, error fields will be `null` if no error has occurred; if an error has occurred, an error code will be returned instead.'
       type: object
@@ -23321,11 +23713,15 @@ components:
           - database_insights_pass_with_caution
           - database_insights_fail
           description: "The current verification status of an Auth Item initiated through micro-deposits or database verification. Returned for Auth Items only.\n\n`pending_automatic_verification`: The Item is pending automatic verification\n\n`pending_manual_verification`: The Item is pending manual micro-deposit verification. Items remain in this state until the user successfully verifies the micro-deposit.\n\n`automatically_verified`: The Item has successfully been automatically verified\t\n\n`manually_verified`: The Item has successfully been manually verified\n\n`verification_expired`: Plaid was unable to automatically verify the deposit within 7 calendar days and will no longer attempt to validate the Item. Users may retry by submitting their information again through Link.\n\n`verification_failed`: The Item failed manual micro-deposit verification because the user exhausted all 3 verification attempts. Users may retry by submitting their information again through Link.\n\n`database_matched`: The Item has successfully been verified using Plaid's data sources. Only returned for Auth Items created via Database Match.\n\n`database_insights_pass`: The Item's numbers have been verified using Plaid's data sources and have strong signal for being valid. Only returned for Auth Items created via Database Insights. Note: Database Insights is currently a beta feature, please contact your account manager for more information.\n\n`database_insights_pass_with_caution`: The Item's numbers have been verified using Plaid's data sources and have some signal for being valid. Only returned for Auth Items created via Database Insights. Note: Database Insights is currently a beta feature, please contact your account manager for more information.\n\n`database_insights_fail`:  The Item's numbers have been verified using Plaid's data sources and have signal for being invalid and/or have no signal for being valid. Only returned for Auth Items created via Database Insights. Note: Database Insights is currently a beta feature, please contact your account manager for more information.\t\n\t"
+        verification_name:
+          type: string
+          x-hidden-from-docs: true
+          description: The account holder name that was used for micro-deposit and/or database verification. Only returned for Auth Items created via micro-deposit or database verification. This name was manually-entered by the user during Link, unless it was otherwise provided via the `user.legal_name` request field in `/link/token/create` for the Link session that created the Item.
         verification_insights:
           $ref: '#/components/schemas/AccountVerificationInsights'
         persistent_account_id:
           type: string
-          description: A unique and persistent identifier for accounts that can be used to trace multiple instances of the same account across different Items for depository accounts. This field is currently supported only for Items at institutions that use Tokenized Account Numbers (i.e., Chase and PNC). Because these accounts have a different account number each time they are linked, this field may be used instead of the account number to uniquely identify an account across multiple Items for payments use cases, helping to reduce duplicate Items or attempted fraud. In Sandbox, this field may be populated for any account; in Production, it will only be populated for accounts at applicable institutions.
+          description: A unique and persistent identifier for accounts that can be used to trace multiple instances of the same account across different Items for depository accounts. This field is currently supported only for Items at institutions that use Tokenized Account Numbers (i.e., Chase and PNC). Because these accounts have a different account number each time they are linked, this field may be used instead of the account number to uniquely identify an account across multiple Items for payments use cases, helping to reduce duplicate Items or attempted fraud. In Sandbox, this field is populated for TAN-based institutions (`ins_56`, `ins_13`) as well as the OAuth Sandbox institution (`ins_127287`); in Production, it will only be populated for accounts at applicable institutions.
         holder_category:
           $ref: '#/components/schemas/AccountHolderCategory'
       required:
@@ -23504,6 +23900,11 @@ components:
       additionalProperties: true
       description: Insights from performing database verification for the account. Only returned for Auth Items created via Database Insights.
       properties:
+        name_match_score:
+          type: integer
+          nullable: true
+          description: Indicates the score of the name match between the given name provided during database verification and matched Plaid network accounts. If defined, will be a value between 0 and 100. Will be undefined if name matching was not enabled for the database verification session or if there were no eligible Plaid network matches to compare the given name with.
+          x-hidden-from-docs: true
         network_status:
           $ref: '#/components/schemas/AccountVerificationInsightsNetworkStatus'
         previous_returns:
@@ -23885,7 +24286,7 @@ components:
           description: The full account number for the account
         dtc_numbers:
           type: array
-          description: Identifiers for the clearinghouses that are associated with the account in order of relevance. This array will be empty if we can't provide any account level data. Institution level data can be retrieved from the institutions/get endpoints.
+          description: Identifiers for the clearinghouses that are associated with the account in order of relevance. If this array is empty, call `/institutions/get_by_id` with the `item.institution_id` to get the DTC number.
           items:
             type: string
       required:
@@ -24223,6 +24624,8 @@ components:
               This field replaces the `transaction_type` field.
           personal_finance_category:
             $ref: '#/components/schemas/PersonalFinanceCategory'
+          business_finance_category:
+            $ref: '#/components/schemas/BusinessFinanceCategory'
           transaction_code:
             $ref: '#/components/schemas/TransactionCode'
           personal_finance_category_icon_url:
@@ -24499,7 +24902,7 @@ components:
     InvestmentsAuth401kContributionDetails:
       type: object
       additionalProperties: true
-      description: Object containing information on contribution transactions for the 401k account.
+      description: Object containing information on contribution transactions for the 401k account. Note that the sum fields in this object represent the total of absolute contribution values.
       properties:
         last_contribution_transactions:
           type: array
@@ -24977,6 +25380,34 @@ components:
         Information describing the intent of the transaction. Most relevant for personal finance use cases, but not limited to such use cases.
 
         See the [`taxonomy CSV file`](https://plaid.com/documents/transactions-personal-finance-category-taxonomy.csv) for a full list of personal finance categories. If you are migrating to personal finance categories from the legacy categories, also refer to the [`migration guide`](https://plaid.com/docs/transactions/pfc-migration/).
+      properties:
+        primary:
+          type: string
+          description: A high level category that communicates the broad category of the transaction.
+        detailed:
+          type: string
+          description: A granular category conveying the transaction's intent. This field can also be used as a unique identifier for the category.
+        confidence_level:
+          type: string
+          description: |-
+            A description of how confident we are that the provided categories accurately describe the transaction intent.
+
+            `VERY_HIGH`: We are more than 98% confident that this category reflects the intent of the transaction.
+            `HIGH`: We are more than 90% confident that this category reflects the intent of the transaction.
+            `MEDIUM`: We are moderately confident that this category reflects the intent of the transaction.
+            `LOW`: This category may reflect the intent, but there may be other categories that are more accurate.
+            `UNKNOWN`: We don’t know the confidence level for this category.
+          nullable: true
+      required:
+      - primary
+      - detailed
+    BusinessFinanceCategory:
+      title: BusinessFinanceCategory
+      nullable: true
+      type: object
+      additionalProperties: true
+      description: Information describing the intent of the transaction. Most relevant for business finance use cases, but not limited to such use cases.
+      x-hidden-from-docs: true
       properties:
         primary:
           type: string
@@ -38900,12 +39331,7 @@ components:
           $ref: '#/components/schemas/CreditDocumentType'
         download_url:
           type: string
-          description: |-
-            Signed URL to retrieve the underlying file. For Payroll Income, the file type will always be PDF, and the file may not be available, in which case the field will be `null`. If you would like Plaid to generate a PDF if the original is not available, contact your Account Manager. [Example generated pay stub](https://www.plaid.com/documents/plaid-generated-mock-paystub.pdf).
-
-            For Document Income, this field will not be `null`, and the file type will be the original file type uploaded by the user. For more details on available file types, see the [Document Income](https://www.plaid.com/docs/income/payroll-income) documentation.
-
-            This download URL can only be used once and expires after two minutes. To generate a new download URL, call `/credit/payroll_income/get` again.
+          description: "Signed URL to retrieve the document(s). The payload will be a .zip file containing the document(s). \n\nFor Payroll Income, the file type of the documents will always be PDF, and the documents may not be available, in which case the field will be `null`. If you would like Plaid to generate a PDF if the original is not available, contact your Account Manager. [Example generated pay stub](https://www.plaid.com/documents/plaid-generated-mock-paystub.pdf).\n\nFor Document Income, this field will not be `null`, and the file type of the underlying document(s) will be the original file type uploaded by the user. For more details on available file types, see the [Document Income](https://www.plaid.com/docs/income/payroll-income) documentation.\n\nThis download URL can only be used once and expires after two minutes. To generate a new download URL, call `/credit/payroll_income/get` again."
           nullable: true
         status:
           type: string
@@ -45268,7 +45694,12 @@ components:
       enum:
       - ACCOUNT_REVIEW_CREDIT
       - WRITTEN_INSTRUCTION_OTHER
-      description: "Describes the reason you are generating a Consumer Report for this user. \n\n`ACCOUNT_REVIEW_CREDIT`: In connection with a consumer credit transaction for the review or collection of an account pursuant to FCRA Section 604(a)(3)(A).\n\n`WRITTEN_INSTRUCTION_OTHER`: In accordance with the written instructions of the consumer pursuant to FCRA Section 604(a)(2), such as when an individual agrees to act as a guarantor or assumes personal liability for a consumer, business, or commercial loan."
+      description: |-
+        Describes the reason you are generating a Consumer Report for this user.
+
+        `ACCOUNT_REVIEW_CREDIT`: In connection with a consumer credit transaction for the review or collection of an account pursuant to FCRA Section 604(a)(3)(A).
+
+        `WRITTEN_INSTRUCTION_OTHER`: In accordance with the written instructions of the consumer pursuant to FCRA Section 604(a)(2), such as when an individual agrees to act as a guarantor or assumes personal liability for a consumer, business, or commercial loan.
     MonitoringInsights:
       title: MonitoringInsights
       type: object
@@ -46355,11 +46786,183 @@ components:
           description: Data returned by Plaid about each of the Items included in the Base Report.
           items:
             $ref: '#/components/schemas/BaseReportItem'
+        attributes:
+          $ref: '#/components/schemas/BaseReportUserAttributes'
       required:
       - report_id
       - date_generated
       - days_requested
       - items
+    BaseReportUserAttributes:
+      title: BaseReportUserAttributes
+      description: Calculated attributes derived from transaction-level data, aggregated across accounts.
+      type: object
+      additionalProperties: true
+      properties:
+        nsf_overdraft_transactions_count:
+          type: integer
+          description: The number of NSF and overdraft fee transactions in the time range for the report in the given report.
+        nsf_overdraft_transactions_count_30d:
+          type: integer
+          description: The number of NSF and overdraft fee transactions in the last 30 days for a given report.
+        nsf_overdraft_transactions_count_60d:
+          type: integer
+          description: The number of NSF and overdraft fee transactions in the last 60 days for a given report.
+        nsf_overdraft_transactions_count_90d:
+          type: integer
+          description: The number of NSF and overdraft fee transactions in the last 90 days for a given report.
+        total_inflow_amount:
+          $ref: '#/components/schemas/TotalReportInflowAmount'
+        total_inflow_amount_30d:
+          $ref: '#/components/schemas/TotalReportInflowAmount30d'
+        total_inflow_amount_60d:
+          $ref: '#/components/schemas/TotalReportInflowAmount60d'
+        total_inflow_amount_90d:
+          $ref: '#/components/schemas/TotalReportInflowAmount90d'
+        total_outflow_amount:
+          $ref: '#/components/schemas/TotalReportOutflowAmount'
+        total_outflow_amount_30d:
+          $ref: '#/components/schemas/TotalReportOutflowAmount30d'
+        total_outflow_amount_60d:
+          $ref: '#/components/schemas/TotalReportOutflowAmount60d'
+        total_outflow_amount_90d:
+          $ref: '#/components/schemas/TotalReportOutflowAmount90d'
+    TotalReportInflowAmount:
+      type: object
+      description: Total amount of debit transactions into the report's accounts in the time period of the report. This field only takes into account USD transactions from the accounts.
+      additionalProperties: true
+      nullable: true
+      properties:
+        amount:
+          type: number
+          description: Value of amount with up to 2 decimal places.
+        iso_currency_code:
+          $ref: '#/components/schemas/CreditIsoCurrencyCode'
+        unofficial_currency_code:
+          $ref: '#/components/schemas/CreditUnofficialCurrencyCode'
+      required:
+      - amount
+      - iso_currency_code
+      - unofficial_currency_code
+    TotalReportInflowAmount30d:
+      type: object
+      description: Total amount of debit transactions into the report's accounts in the last 30 days. This field only takes into account USD transactions from the accounts.
+      additionalProperties: true
+      nullable: true
+      properties:
+        amount:
+          type: number
+          description: Value of amount with up to 2 decimal places.
+        iso_currency_code:
+          $ref: '#/components/schemas/CreditIsoCurrencyCode'
+        unofficial_currency_code:
+          $ref: '#/components/schemas/CreditUnofficialCurrencyCode'
+      required:
+      - amount
+      - iso_currency_code
+      - unofficial_currency_code
+    TotalReportInflowAmount60d:
+      type: object
+      description: Total amount of debit transactions into the report's accounts in the last 60 days. This field only takes into account USD transactions from the accounts.
+      additionalProperties: true
+      nullable: true
+      properties:
+        amount:
+          type: number
+          description: Value of amount with up to 2 decimal places.
+        iso_currency_code:
+          $ref: '#/components/schemas/CreditIsoCurrencyCode'
+        unofficial_currency_code:
+          $ref: '#/components/schemas/CreditUnofficialCurrencyCode'
+      required:
+      - amount
+      - iso_currency_code
+      - unofficial_currency_code
+    TotalReportInflowAmount90d:
+      type: object
+      description: Total amount of debit transactions into the report's account in the last 90 days. This field only takes into account USD transactions from the accounts.
+      additionalProperties: true
+      nullable: true
+      properties:
+        amount:
+          type: number
+          description: Value of amount with up to 2 decimal places.
+        iso_currency_code:
+          $ref: '#/components/schemas/CreditIsoCurrencyCode'
+        unofficial_currency_code:
+          $ref: '#/components/schemas/CreditUnofficialCurrencyCode'
+      required:
+      - amount
+      - iso_currency_code
+      - unofficial_currency_code
+    TotalReportOutflowAmount:
+      type: object
+      description: Total amount of credit transactions into the report's accounts in the time period of the report. This field only takes into account USD transactions from the accounts.
+      additionalProperties: true
+      nullable: true
+      properties:
+        amount:
+          type: number
+          description: Value of amount with up to 2 decimal places.
+        iso_currency_code:
+          $ref: '#/components/schemas/CreditIsoCurrencyCode'
+        unofficial_currency_code:
+          $ref: '#/components/schemas/CreditUnofficialCurrencyCode'
+      required:
+      - amount
+      - iso_currency_code
+      - unofficial_currency_code
+    TotalReportOutflowAmount30d:
+      type: object
+      description: Total amount of credit transactions into the report's accounts in the last 30 days. This field only takes into account USD transactions from the accounts.
+      additionalProperties: true
+      nullable: true
+      properties:
+        amount:
+          type: number
+          description: Value of amount with up to 2 decimal places.
+        iso_currency_code:
+          $ref: '#/components/schemas/CreditIsoCurrencyCode'
+        unofficial_currency_code:
+          $ref: '#/components/schemas/CreditUnofficialCurrencyCode'
+      required:
+      - amount
+      - iso_currency_code
+      - unofficial_currency_code
+    TotalReportOutflowAmount60d:
+      type: object
+      description: Total amount of credit transactions into the report's accounts in the last 60 days. This field only takes into account USD transactions from the accounts.
+      additionalProperties: true
+      nullable: true
+      properties:
+        amount:
+          type: number
+          description: Value of amount with up to 2 decimal places.
+        iso_currency_code:
+          $ref: '#/components/schemas/CreditIsoCurrencyCode'
+        unofficial_currency_code:
+          $ref: '#/components/schemas/CreditUnofficialCurrencyCode'
+      required:
+      - amount
+      - iso_currency_code
+      - unofficial_currency_code
+    TotalReportOutflowAmount90d:
+      type: object
+      description: Total amount of credit transactions into the report's accounts in the last 90 days. This field only takes into account USD transactions from the accounts.
+      additionalProperties: true
+      nullable: true
+      properties:
+        amount:
+          type: number
+          description: Value of amount with up to 2 decimal places.
+        iso_currency_code:
+          $ref: '#/components/schemas/CreditIsoCurrencyCode'
+        unofficial_currency_code:
+          $ref: '#/components/schemas/CreditUnofficialCurrencyCode'
+      required:
+      - amount
+      - iso_currency_code
+      - unofficial_currency_code
     BaseReportItem:
       title: BaseReportItem
       type: object
@@ -46768,6 +47371,14 @@ components:
       type: object
       additionalProperties: true
       properties:
+        is_primary_account:
+          type: boolean
+          description: Prediction indicator of whether the account is a primary account. Only one account per account type across the items connected will have a value of true.
+          nullable: true
+        primary_account_score:
+          type: number
+          description: Value ranging from 0-1. The higher the score, the more confident we are of the account being the primary account.
+          nullable: true
         nsf_overdraft_transactions_count:
           type: integer
           description: The number of NSF and overdraft fee transactions in the time range for the report in the given account.
@@ -46780,14 +47391,6 @@ components:
         nsf_overdraft_transactions_count_90d:
           type: integer
           description: The number of NSF and overdraft fee transactions in the last 90 days for a given account.
-        is_primary_account:
-          type: boolean
-          description: Prediction indicator of whether the account is a primary account. Only one account per account type across the items connected will have a value of true.
-          nullable: true
-        primary_account_score:
-          type: number
-          description: Value ranging from 0-1. The higher the score, the more confident we are of the account being the primary account.
-          nullable: true
         total_inflow_amount:
           $ref: '#/components/schemas/TotalInflowAmount'
         total_inflow_amount_30d:
@@ -47978,6 +48581,8 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/BeaconReportSyndicationID'
+        beacon_user_id:
+          $ref: '#/components/schemas/BeaconUserID'
         report:
           $ref: '#/components/schemas/BeaconReportSyndicationOriginalReport'
         analysis:
@@ -47986,6 +48591,7 @@ components:
       - id
       - report
       - analysis
+      - beacon_user_id
       additionalProperties: true
     BeaconReportSyndicationAnalysis:
       type: object
@@ -48043,6 +48649,8 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/BeaconReportSyndicationID'
+        beacon_user_id:
+          $ref: '#/components/schemas/BeaconUserID'
         report:
           $ref: '#/components/schemas/BeaconReportSyndicationOriginalReport'
         analysis:
@@ -48053,6 +48661,7 @@ components:
       - id
       - report
       - analysis
+      - beacon_user_id
       - request_id
       type: object
     BeaconReportSyndicationID:
@@ -53997,6 +54606,7 @@ components:
           description: The version of Prism Data's cash score model used.
         score:
           type: integer
+          nullable: true
           description: The score returned by Prism Data. Ranges from 1-999, with higher score indicating lower risk.
         reason_codes:
           type: array
@@ -54081,6 +54691,7 @@ components:
           description: The version of Prism Data's FirstDetect model used.
         score:
           type: integer
+          nullable: true
           description: The score returned by Prism Data. Ranges from 1-999, with higher score indicating lower risk.
         reason_codes:
           type: array
@@ -56097,7 +56708,7 @@ components:
           - cra_cashflow_insights
           - layer
         consent_expiration_time:
-          description: The date and time at which the Item's access consent will expire, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format. If the Item does not have consent expiration scheduled, this field will be `null`. Currently, only institutions in Europe and a small number of institutions in the US have expiring consent. Closer to the 1033 compliance deadline of April 1, 2026, expiration times will be populated more widely. For more details, see [Data Transparency Messaging consent expiration](https://plaid.com/docs/link/data-transparency-messaging-migration-guide/#consent-expiration-and-reauthorization.)
+          description: The date and time at which the Item's access consent will expire, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format. If the Item does not have consent expiration scheduled, this field will be `null`. Currently, only institutions in Europe and a small number of institutions in the US have expiring consent. Closer to the 1033 compliance deadline of April 1, 2026, expiration times will be populated more widely. For more details, see [Data Transparency Messaging consent expiration](https://plaid.com/docs/link/data-transparency-messaging-migration-guide/#consent-expiration-and-reauthorization).
           nullable: true
           type: string
           format: date-time
@@ -56708,6 +57319,11 @@ components:
           format: double
           description: 'The amount (in USD) made available to your customers instantly following the debit transaction. It could be a partial amount of the requested transaction (example: 102.05).'
           nullable: true
+        submitted_at:
+          x-hidden-from-docs: true
+          type: string
+          format: date-time
+          description: 'The date the ACH debit was submitted to the bank for processing (in ISO 8601 format: `YYYY-MM-DDTHH:mm:ssZ`). This field should correspond to the attempt initiated after the `/signal/schedule` call.'
       required:
       - client_transaction_id
       - initiated

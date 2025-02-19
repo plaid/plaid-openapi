@@ -1,3 +1,30 @@
+### 2020-09-14_1.619.0
+- Add `/session/token/create` endpoint
+
+### 2020-09-14_1.618.2
+- Add `beacon_user_id` to `/beacon/report_syndication/get` and `/beacon/report_syndication/list` response
+
+### 2020-09-14_1.618.1
+- `/cashflow_report/get` endpoint is added. This includes defining the `CashflowReportGetRequest` and `CashflowReportGetResponse` fields. Adding `access_token` as required field in `CashflowReportRefreshRequest`. 
+
+### 2020-09-14_1.618.0
+- Add `attributes` object to `BaseReport` definition.
+
+### 2020-09-14_1.617.6
+- `/cashflow_report/refresh` endpoint is added. This includes defining the `CashflowReportRefreshRequest` and `CashflowReportRefreshResponse` fields. 
+
+### 2020-09-14_1.617.5
+- `submitted_at` is added as an optional field to `/signal/decision/report`.
+
+### 2020-09-14_1.617.4
+- `persistentId` and `isTokenizedAccountNumber` fields now only populated for select institutions in sandbox related to TAN-based institutions (ins_13, ins_56) or the default testing OAuth institution (ins_127287)
+
+### 2020-09-14_1.617.3
+- Modified how contribution transactions are summed up in `account_details_401k.contribution_details` object in `/investments/auth/get` endpoint.
+
+### 2020-09-14_1.617.2
+- Updated PrismCashScore and PrismFirstDetect to allow Score in /cra/check_report/partner_insights/get to be nullable
+
 ### 2020-09-14_1.617.1
 - For Plaid Check: `date_of_birth` is now required within the `consumer_report_user_identity` object when creating or updating a user token.
 
