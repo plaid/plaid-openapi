@@ -1,3 +1,10 @@
+### 2020-09-14_1.620.0
+- Add `intent_id` field to `/transfer/event/sync` response
+
+### 2020-09-14_1.619.1
+- Add new `cashflow_updates` webhook triggers
+- Remove `reason` field from `MonitoringInsightsWebhook`
+
 ### 2020-09-14_1.619.0
 - Add `/session/token/create` endpoint
 

@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.619.0
+  version: 2020-09-14_1.620.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -22521,6 +22521,10 @@ components:
         user_token:
           type: string
           description: A user token generated using `/user/create`. Any Item created during the Link session will be associated with the user.
+        third_party_user_token:
+          x-hidden-from-docs: true
+          type: string
+          description: A third party user token associated with the current user.
         investments:
           $ref: '#/components/schemas/LinkTokenInvestments'
         investments_auth:
@@ -33655,6 +33659,10 @@ components:
           type: string
           nullable: true
           description: The Plaid client ID that is the originator of the transfer that this event applies to. Only present if the transfer was created on behalf of another client as a third-party sender (TPS).
+        intent_id:
+          type: string
+          nullable: true
+          description: The `id` returned by the /transfer/intent/create endpoint, for transfers created via Transfer UI. For transfers not created by Transfer UI, the value is `null`. This will currently only be populated for RfP transfers.
       required:
       - event_id
       - timestamp
@@ -44398,10 +44406,6 @@ components:
           description: '`INSIGHTS_UPDATED`'
         status:
           $ref: '#/components/schemas/MonitoringInsightsStatus'
-        reason:
-          type: string
-          description: The reason for why insights may not be `AVAILABLE`
-          nullable: true
         user_id:
           type: string
           description: The `user_id` that the report is associated with
@@ -44417,6 +44421,198 @@ components:
         example-1:
           webhook_type: CRA_MONITORING
           webhook_code: INSIGHTS_UPDATED
+          status: AVAILABLE
+          user_id: 9eaba3c2fdc916bc197f279185b986607dd21682a5b04eab04a5a03e8b3f3334
+          environment: production
+    MonitoringInsightsNSFWebhook:
+      title: MonitoringInsightsNSFWebhook
+      type: object
+      additionalProperties: true
+      description: For each user enabled for Cash Flow Updates, this webhook will fire when an update includes an NSF overdraft transaction. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
+      properties:
+        webhook_type:
+          type: string
+          description: '`CRA_MONITORING`'
+        webhook_code:
+          type: string
+          description: '`NSF_OVERDRAFT_DETECTED`'
+        status:
+          $ref: '#/components/schemas/MonitoringInsightsStatus'
+        user_id:
+          type: string
+          description: The `user_id` that the report is associated with
+        environment:
+          $ref: '#/components/schemas/WebhookEnvironmentValues'
+      required:
+      - webhook_type
+      - webhook_code
+      - status
+      - user_id
+      - environment
+      x-examples:
+        example-1:
+          webhook_type: CRA_MONITORING
+          webhook_code: NSF_OVERDRAFT_DETECTED
+          status: AVAILABLE
+          user_id: 9eaba3c2fdc916bc197f279185b986607dd21682a5b04eab04a5a03e8b3f3334
+          environment: production
+    MonitoringInsightsNewIncomeStreamWebhook:
+      title: MonitoringInsightsNewIncomeStreamWebhook
+      type: object
+      additionalProperties: true
+      description: For each user enabled for Cash Flow Updates, this webhook will fire when an update includes a new income stream. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
+      properties:
+        webhook_type:
+          type: string
+          description: '`CRA_MONITORING`'
+        webhook_code:
+          type: string
+          description: '`NEW_INCOME_STREAM_DETECTED`'
+        status:
+          $ref: '#/components/schemas/MonitoringInsightsStatus'
+        user_id:
+          type: string
+          description: The `user_id` that the report is associated with
+        environment:
+          $ref: '#/components/schemas/WebhookEnvironmentValues'
+      required:
+      - webhook_type
+      - webhook_code
+      - status
+      - user_id
+      - environment
+      x-examples:
+        example-1:
+          webhook_type: CRA_MONITORING
+          webhook_code: NEW_INCOME_STREAM_DETECTED
+          status: AVAILABLE
+          user_id: 9eaba3c2fdc916bc197f279185b986607dd21682a5b04eab04a5a03e8b3f3334
+          environment: production
+    MonitoringInsightsExpectedDepositMissedWebhook:
+      title: MonitoringInsightsExpectedDepositMissedWebhook
+      type: object
+      additionalProperties: true
+      description: For each user enabled for Cash Flow Updates, this webhook will fire when an update detects that an expected deposit was missed. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
+      properties:
+        webhook_type:
+          type: string
+          description: '`CRA_MONITORING`'
+        webhook_code:
+          type: string
+          description: '`EXPECTED_DEPOSIT_MISSED`'
+        status:
+          $ref: '#/components/schemas/MonitoringInsightsStatus'
+        user_id:
+          type: string
+          description: The `user_id` that the report is associated with
+        environment:
+          $ref: '#/components/schemas/WebhookEnvironmentValues'
+      required:
+      - webhook_type
+      - webhook_code
+      - status
+      - user_id
+      - environment
+      x-examples:
+        example-1:
+          webhook_type: CRA_MONITORING
+          webhook_code: EXPECTED_DEPOSIT_MISSED
+          status: AVAILABLE
+          user_id: 9eaba3c2fdc916bc197f279185b986607dd21682a5b04eab04a5a03e8b3f3334
+          environment: production
+    MonitoringInsightsLowBalanceWebhook:
+      title: MonitoringInsightsLowBalanceWebhook
+      type: object
+      additionalProperties: true
+      description: For each user enabled for Cash Flow Updates, this webhook will fire when an update detects a low balance. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
+      properties:
+        webhook_type:
+          type: string
+          description: '`CRA_MONITORING`'
+        webhook_code:
+          type: string
+          description: '`LOW_BALANCE_DETECTED`'
+        status:
+          $ref: '#/components/schemas/MonitoringInsightsStatus'
+        user_id:
+          type: string
+          description: The `user_id` that the report is associated with
+        environment:
+          $ref: '#/components/schemas/WebhookEnvironmentValues'
+      required:
+      - webhook_type
+      - webhook_code
+      - status
+      - user_id
+      - environment
+      x-examples:
+        example-1:
+          webhook_type: CRA_MONITORING
+          webhook_code: LOW_BALANCE_DETECTED
+          status: AVAILABLE
+          user_id: 9eaba3c2fdc916bc197f279185b986607dd21682a5b04eab04a5a03e8b3f3334
+          environment: production
+    MonitoringInsightsLargeDepositWebhook:
+      title: MonitoringInsightsLargeDepositWebhook
+      type: object
+      additionalProperties: true
+      description: For each user enabled for Cash Flow Updates, this webhook will fire when an update detects a large deposit. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
+      properties:
+        webhook_type:
+          type: string
+          description: '`CRA_MONITORING`'
+        webhook_code:
+          type: string
+          description: '`LARGE_DEPOSIT_DETECTED`'
+        status:
+          $ref: '#/components/schemas/MonitoringInsightsStatus'
+        user_id:
+          type: string
+          description: The `user_id` that the report is associated with
+        environment:
+          $ref: '#/components/schemas/WebhookEnvironmentValues'
+      required:
+      - webhook_type
+      - webhook_code
+      - status
+      - user_id
+      - environment
+      x-examples:
+        example-1:
+          webhook_type: CRA_MONITORING
+          webhook_code: LARGE_DEPOSIT_DETECTED
+          status: AVAILABLE
+          user_id: 9eaba3c2fdc916bc197f279185b986607dd21682a5b04eab04a5a03e8b3f3334
+          environment: production
+    MonitoringInsightsNewLoanPaymentWebhook:
+      title: MonitoringInsightsNewLoanPaymentWebhook
+      type: object
+      additionalProperties: true
+      description: For each user enabled for Cash Flow Updates, this webhook will fire when an update detects a new loan payment. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
+      properties:
+        webhook_type:
+          type: string
+          description: '`CRA_MONITORING`'
+        webhook_code:
+          type: string
+          description: '`NEW_LOAN_PAYMENT_DETECTED`'
+        status:
+          $ref: '#/components/schemas/MonitoringInsightsStatus'
+        user_id:
+          type: string
+          description: The `user_id` that the report is associated with
+        environment:
+          $ref: '#/components/schemas/WebhookEnvironmentValues'
+      required:
+      - webhook_type
+      - webhook_code
+      - status
+      - user_id
+      - environment
+      x-examples:
+        example-1:
+          webhook_type: CRA_MONITORING
+          webhook_code: NEW_LOAN_PAYMENT_DETECTED
           status: AVAILABLE
           user_id: 9eaba3c2fdc916bc197f279185b986607dd21682a5b04eab04a5a03e8b3f3334
           environment: production
