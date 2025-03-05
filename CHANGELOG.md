@@ -1,3 +1,34 @@
+### 2020-09-14_1.627.0
+- [BREAKING] Update `posted_date` field on `/statements/list` response to be nullable
+
+### 2020-09-14_1.626.0
+- Add reason_code field to /transfer/cancel request
+
+### 2020-09-14_1.625.2
+- Add `USER_PERMISSION_REVOKED` and `USER_ACCOUNT_REVOKED` webhook codes to `WebhookCodeEnum` in `SandboxItemFireWebhookRequest` to reflect actual API behavior.
+
+### 2020-09-14_1.625.1
+- Add new `verification_name` field to `Account`
+
+### 2020-09-14_1.625.0
+- Add new `posted_date` field to `/statements/list` response
+
+### 2020-09-14_1.624.0
+- (pre-release) Add `human_review` object to the `analysis`  object within each `documentary_verification.documents` object. This change affects the response of all of the identity verification endpoints:
+   - `identity_verification/create`
+   - `identity_verification/get`
+   - `identity_verification/list`
+   - `identity_verification/retry`
+
+### 2020-09-14_1.623.0
+
+### 2020-09-14_1.622.0
+- [BREAKING] Updated the `investments` schema returned by `/asset_report/get` (`AssetReportInvestments`) to accurately reflect the actual API behavior, including renaming the schema object
+- Updated the Auth descriptions to reflect the fact that the preferred method to enable database and micro-deposit-based Auth verification flows is now the Dashboard, and that Database Insights has been deprecated and replaced by the similar product Database Auth.
+
+### 2020-09-14_1.621.0
+- [BREAKING] Changed `score` in `PlaidCheckScore` from a float to an integer
+
 ### 2020-09-14_1.620.0
 - Add `intent_id` field to `/transfer/event/sync` response
 
@@ -12,13 +43,13 @@
 - Add `beacon_user_id` to `/beacon/report_syndication/get` and `/beacon/report_syndication/list` response
 
 ### 2020-09-14_1.618.1
-- `/cashflow_report/get` endpoint is added. This includes defining the `CashflowReportGetRequest` and `CashflowReportGetResponse` fields. Adding `access_token` as required field in `CashflowReportRefreshRequest`. 
+- `/cashflow_report/get` endpoint is added. This includes defining the `CashflowReportGetRequest` and `CashflowReportGetResponse` fields. Adding `access_token` as required field in `CashflowReportRefreshRequest`.
 
 ### 2020-09-14_1.618.0
 - Add `attributes` object to `BaseReport` definition.
 
 ### 2020-09-14_1.617.6
-- `/cashflow_report/refresh` endpoint is added. This includes defining the `CashflowReportRefreshRequest` and `CashflowReportRefreshResponse` fields. 
+- `/cashflow_report/refresh` endpoint is added. This includes defining the `CashflowReportRefreshRequest` and `CashflowReportRefreshResponse` fields.
 
 ### 2020-09-14_1.617.5
 - `submitted_at` is added as an optional field to `/signal/decision/report`.
