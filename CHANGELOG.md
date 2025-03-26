@@ -1,3 +1,33 @@
+### 2020-09-14_1.631.0
+- [BREAKING] Correct the schema object returned by `AssetReport` `investments` field -- it is now correctly represented as an `AssetReportInvestments` object, not an `AssetReportInvestmentsTransaction` object, to accurately reflect the API behavior.
+
+### 2020-09-14_1.630.0
+- Add optional `income_categories` param to `/cra/monitoring_insights/subscribe` request
+
+### 2020-09-14_1.629.0
+- [Breaking] Date of birth is now required within consumer report user identity for `user/create` and `user/update`
+
+### 2020-09-14_1.628.4
+- Renamed CRA Cash Flow Updates webhook types
+
+### 2020-09-14_1.628.3
+- Adde `warnings` to responses for `cra/check_report/income_insights/get`, `cra/check_report/network_insights/get`, `cra/check_report/cashflow_insights/get`, and `cra/check_report/partner_insights/get`
+
+### 2020-09-14_1.628.2
+- Update description for the `options.add_ons` field in `asset_reports/create`
+
+### 2020-09-14_1.628.1
+- Add `client_report_id` field to `cra/check_report/create` request and deprecate `base_report.client_report_id` field in `cra/check_report/create`.
+- Add `client_report_id` field to `LinkTokenCreateRequestCraOptions` field
+- Deprecate `client_report_id` field in `LinkTokenCreateRequestBaseReport`
+- Add `client_report_id` field to `CraIncomeInsights`
+
+### 2020-09-14_1.628.0
+- Add `redirect_uri` field to `/session/token/create` request
+
+### 2020-09-14_1.627.1
+- Update description of `transfer_id` field on `TransferEvent` schema to be empty string for Plaid Ledger Sweep events
+
 ### 2020-09-14_1.627.0
 - [BREAKING] Update `posted_date` field on `/statements/list` response to be nullable
 
