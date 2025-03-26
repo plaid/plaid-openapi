@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.627.0
+  version: 2020-09-14_1.631.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -4148,7 +4148,7 @@ paths:
       description: |-
         The `/item/remove` endpoint allows you to remove an Item. Once removed, the `access_token`, as well as any processor tokens or bank account tokens associated with the Item, is no longer valid and cannot be used to access any data that was associated with the Item.
 
-        Calling `/item/remove` is a recommended best practice when offboarding users or if a user chooses to disconnect an account linked via Plaid. For subscription products, such as Transactions, Liabilities, and Investments, calling `/item/remove` is required to end subscription billing for the Item. For money movement products such as Auth and Transfer, if the Item is at an institution that uses Tokenized Account Numbers (TANs), such as Chase or PNC, calling `/item/remove` will invalidate the TAN, and subsequent ACH transfer attempts using that TAN will be returned.
+        Calling `/item/remove` is a recommended best practice when offboarding users or if a user chooses to disconnect an account linked via Plaid. For subscription products, such as Transactions, Liabilities, and Investments, calling `/item/remove` is required to end subscription billing for the Item. For money movement products such as Auth and Transfer, if the Item is at Chase or PNC, calling `/item/remove` will invalidate the TAN, and subsequent ACH transfer attempts using that TAN will be returned.
 
         In Limited Production, calling `/item/remove` does not impact the number of remaining Limited Production Items you have available.
 
@@ -11985,6 +11985,39 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/TransferOriginatorFundingAccountUpdateRequest'
+  /transfer/originator/funding_account/create:
+    post:
+      summary: Create a new funding account for an originator
+      tags:
+      - plaid
+      externalDocs:
+        url: /api/products/transfer/platform-payments/#transferoriginatorfunding_accountcreate
+      operationId: transferOriginatorFundingAccountCreate
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferOriginatorFundingAccountCreateResponse'
+              examples:
+                example-1:
+                  value:
+                    funding_account_id: 8945fedc-e703-463d-86b1-dc0607b55460
+                    request_id: saKrIBuEB9qJZno
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      description: Use the `/transfer/originator/funding_account/create` endpoint to create a new funding account for the originator.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferOriginatorFundingAccountCreateRequest'
   /transfer/metrics/get:
     post:
       summary: Get transfer product usage metrics
@@ -20787,6 +20820,7 @@ components:
       - last_name
       - phone_numbers
       - emails
+      - date_of_birth
       - primary_address
     CreditSessionsGetRequest:
       type: object
@@ -22173,16 +22207,7 @@ components:
           minLength: 1
         country_codes:
           type: array
-          description: |-
-            Specify an array of Plaid-supported country codes using the ISO-3166-1 alpha-2 country code standard. Institutions from all listed countries will be shown. For a complete mapping of supported products by country, see https://plaid.com/global/.
-
-            If using Identity Verification, `country_codes` should be set to the country where your company is based, not the country where your user is located. For all other products, `country_codes` represents the location of your user's financial institution.
-
-            If Link is launched with multiple country codes, only products that you are enabled for in all countries will be used by Link. While all countries are enabled by default in Sandbox, in Production only the countries you have requested access for are shown. To request access to additional countries, [file a product access Support ticket](https://dashboard.plaid.com/support/new/product-and-development/product-troubleshooting/request-product-access) via the Plaid dashboard.
-
-            If using a Link customization, make sure the country codes in the customization match those specified in `country_codes`, or the customization may not be applied.
-
-            If using the Auth features Instant Match, Instant Micro-deposits, Same-day Micro-deposits, Automated Micro-deposits, or Database Auth, `country_codes` must be set to `['US']`.
+          description: "Specify an array of Plaid-supported country codes using the ISO-3166-1 alpha-2 country code standard. Institutions from all listed countries will be shown. For a complete mapping of supported products by country, see https://plaid.com/global/. By default, access is granted to US and CA. For Production or Limited Production access to other countries, [contact Sales](https://plaid.com/contact/) or your account manager.  \n\nIf using Identity Verification, `country_codes` should be set to the country where your company is based, not the country where your user is located. For all other products, `country_codes` represents the location of your user's financial institution.\n\nIf Link is launched with multiple country codes, only products that you are enabled for in all countries will be used by Link. While all countries are enabled by default in Sandbox, in Production only the countries you have requested access for are shown. To request access to additional countries, [file a product access Support ticket](https://dashboard.plaid.com/support/new/product-and-development/product-troubleshooting/request-product-access) via the Plaid dashboard.\n\nIf using a Link customization, make sure the country codes in the customization match those specified in `country_codes`, or the customization may not be applied.\n\nIf using the Auth features Instant Match, Instant Micro-deposits, Same-day Micro-deposits, Automated Micro-deposits, or Database Auth, `country_codes` must be set to `['US']`."
           items:
             $ref: '#/components/schemas/CountryCode'
           minItems: 1
@@ -22308,8 +22333,7 @@ components:
           type: string
           description: The name of the Link customization from the Plaid Dashboard to be applied to Link. If not specified, the `default` customization will be used. When using a Link customization, the language in the customization must match the language selected via the `language` parameter, and the countries in the customization should match the country codes selected via `country_codes`.
         redirect_uri:
-          type: string
-          description: A URI indicating the destination where a user should be forwarded after completing the Link flow; used to support OAuth authentication flows when launching Link in the browser or another app. The `redirect_uri` should not contain any query parameters. When used in Production, must be an https URI. To specify any subdomain, use `*` as a wildcard character, e.g. `https://*.example.com/oauth.html`. Note that any redirect URI must also be added to the Allowed redirect URIs list in the [developer dashboard](https://dashboard.plaid.com/team/api). If initializing on Android, `android_package_name` must be specified instead and `redirect_uri` should be left blank.
+          $ref: '#/components/schemas/LinkTokenCreateRequestRedirectUri'
         android_package_name:
           type: string
           description: The name of your app's Android package. Required if using the `link_token` to initialize Link on Android. Any package name specified here must also be added to the Allowed Android package names setting on the [developer dashboard](https://dashboard.plaid.com/team/api). When creating a `link_token` for initializing Link on other platforms, `android_package_name` must be left blank and `redirect_uri` should be used instead.
@@ -22517,6 +22541,8 @@ components:
           description: The id of a template defined in Plaid Dashboard
         user:
           $ref: '#/components/schemas/SessionTokenCreateRequestUser'
+        redirect_uri:
+          $ref: '#/components/schemas/LinkTokenCreateRequestRedirectUri'
       required:
       - template_id
     SessionTokenCreateRequestUser:
@@ -22832,7 +22858,7 @@ components:
         address:
           allOf:
           - $ref: '#/components/schemas/UserAddress'
-          - description: The user's address. Used only for Identity Verification. If provided, the user will not be shown fields to enter their address in the Identity Verification flow. May be omitted, but if not omitted, all fields marked as required must be provided.
+          - description: The user's address. Used only for Identity Verification and the Identity Match in Link workflows. If provided for Identity Verification, the user will not be shown fields to enter their address in the Identity Verification flow. If provided for Identity Match, the provided data will be used to match against the user's address. May be omitted, but if not omitted, all fields marked as required must be provided.
         id_number:
           allOf:
           - $ref: '#/components/schemas/UserIDNumber'
@@ -22878,6 +22904,9 @@ components:
           $ref: '#/components/schemas/LinkTokenCreateLoanFilter'
         investment:
           $ref: '#/components/schemas/LinkTokenCreateInvestmentFilter'
+    LinkTokenCreateRequestRedirectUri:
+      description: A URI indicating the destination where a user should be forwarded after completing the Link flow; used to support OAuth authentication flows when launching Link in the browser or another app. The `redirect_uri` should not contain any query parameters. When used in Production, must be an https URI. To specify any subdomain, use `*` as a wildcard character, e.g. `https://*.example.com/oauth.html`. Note that any redirect URI must also be added to the Allowed redirect URIs list in the [developer dashboard](https://dashboard.plaid.com/team/api). If initializing on Android, `android_package_name` must be specified instead and `redirect_uri` should be left blank.
+      type: string
     LinkTokenCreateDepositoryFilter:
       description: A filter to apply to `depository`-type accounts
       type: object
@@ -23442,7 +23471,7 @@ components:
           description: |-
             In this product, a request can pertain to more than one Item. If an error is returned for such a request, `causes` will return an array of errors containing a breakdown of these errors on the individual Item level, if any can be identified.
 
-            `causes` will only be provided for the `error_type` `ASSET_REPORT_ERROR`. `causes` will also not be populated inside an error nested within a `warning` object.
+            `causes` will be provided for the `error_type` `ASSET_REPORT_ERROR` or `CHECK_REPORT_ERROR`. `causes` will also not be populated inside an error nested within a `warning` object.
           items: {}
         status:
           type: integer
@@ -23484,6 +23513,8 @@ components:
       - TRANSACTIONS_ERROR
       - TRANSACTION_ERROR
       - TRANSFER_ERROR
+      - CHECK_REPORT_ERROR
+      - CONSUMER_REPORT_ERROR
     AccountType:
       type: string
       title: AccountType
@@ -23586,7 +23617,7 @@ components:
           $ref: '#/components/schemas/AccountVerificationInsights'
         persistent_account_id:
           type: string
-          description: A unique and persistent identifier for accounts that can be used to trace multiple instances of the same account across different Items for depository accounts. This field is currently supported only for Items at institutions that use Tokenized Account Numbers (i.e., Chase and PNC). Because these accounts have a different account number each time they are linked, this field may be used instead of the account number to uniquely identify an account across multiple Items for payments use cases, helping to reduce duplicate Items or attempted fraud. In Sandbox, this field is populated for TAN-based institutions (`ins_56`, `ins_13`) as well as the OAuth Sandbox institution (`ins_127287`); in Production, it will only be populated for accounts at applicable institutions.
+          description: A unique and persistent identifier for accounts that can be used to trace multiple instances of the same account across different Items for depository accounts. This field is currently supported only for Items at institutions that use Tokenized Account Numbers (i.e., Chase and PNC, and in May 2025 US Bank). Because these accounts have a different account number each time they are linked, this field may be used instead of the account number to uniquely identify an account across multiple Items for payments use cases, helping to reduce duplicate Items or attempted fraud. In Sandbox, this field is populated for TAN-based institutions (`ins_56`, `ins_13`) as well as the OAuth Sandbox institution (`ins_127287`); in Production, it will only be populated for accounts at applicable institutions.
         holder_category:
           $ref: '#/components/schemas/AccountHolderCategory'
       required:
@@ -23977,7 +24008,7 @@ components:
           description: |-
             The ACH account number for the account.
 
-            At certain institutions, including Chase and PNC, you will receive "tokenized" routing and account numbers, which are not the user's actual account and routing numbers. For important details on how this may impact your integration and on how to avoid fraud, user confusion, and ACH returns, see [Tokenized account numbers](https://plaid.com/docs/auth/#tokenized-account-numbers).
+            At certain institutions, including Chase, PNC, and (coming May 2025) US Bank, you will receive "tokenized" routing and account numbers, which are not the user's actual account and routing numbers. For important details on how this may impact your integration and on how to avoid fraud, user confusion, and ACH returns, see [Tokenized account numbers](https://plaid.com/docs/auth/#tokenized-account-numbers).
         is_tokenized_account_number:
           type: boolean
           description: Indicates whether the account number is tokenized by the institution. For important details on how tokenized account numbers may impact your integration, see [Tokenized account numbers](https://plaid.com/docs/auth/#tokenized-account-numbers).
@@ -24641,10 +24672,14 @@ components:
         is_user_modified:
           type: boolean
           description: This will be set to `true` if the stream has been modified by request to a `/transactions/recurring/streams` endpoint. It will be `false` for all other streams.
+          deprecated: true
+          x-hidden-from-docs: true
         last_user_modified_datetime:
           type: string
           description: The date and time of the most recent user modification. This will only be set if `is_user_modified` is `true`.
           format: date-time
+          deprecated: true
+          x-hidden-from-docs: true
       required:
       - account_id
       - stream_id
@@ -30872,7 +30907,7 @@ components:
       description: |-
         The `USER_PERMISSION_REVOKED` webhook may be fired when an end user has revoked the permission that they previously granted to access an Item. If the end user revoked their permissions through Plaid (such as via the Plaid Portal or by contacting Plaid Support), the webhook will fire. If the end user revoked their permissions directly through the institution, this webhook may not always fire, since some institutions’ consent portals do not trigger this webhook. Upon receiving this webhook, it is recommended to delete any stored data from Plaid associated with the Item. To restore the Item, it can be sent through [update mode](https://plaid.com/docs/link/update-mode).
 
-        Note that when working with tokenized account numbers with Auth or Transfer, the account number provided by Plaid will no longer work for creating transfers once user permission has been revoked.
+        Note that when working with tokenized account numbers with Auth or Transfer, the account number provided by Plaid will no longer work for creating transfers once user permission has been revoked, except for US Bank Items.
       x-examples:
         example-1:
           webhook_type: ITEM
@@ -31614,11 +31649,11 @@ components:
 
         `"ccd"` - Corporate Credit or Debit - fund transfer between two corporate bank accounts
 
-        `"ppd"` - Prearranged Payment or Deposit - the transfer is part of a pre-existing relationship with a consumer, e.g. bill payment
+        `"ppd"` - Prearranged Payment or Deposit - The transfer is part of a pre-existing relationship with a consumer. Authorization was obtained in writing either in person or via an electronic document signing, e.g. Docusign, by the consumer. Can be used for credits or debits.
 
-        `"tel"` - Telephone-Initiated Entry
+        `"web"` - Internet-Initiated Entry. The transfer debits a consumer’s bank account. Authorization from the consumer is obtained over the Internet (e.g. a web or mobile application). Can be used for single debits or recurring debits.
 
-        `"web"` - Internet-Initiated Entry - debits from a consumer’s account where their authorization is obtained over the Internet
+        `"tel"` - Telephone-Initiated Entry. The transfer debits a consumer. Debit authorization has been received orally over the telephone via a recorded call.
     TransferCreditFundsSource:
       type: string
       title: TransferCreditFundsSource
@@ -31652,7 +31687,7 @@ components:
     TransferFacilitatorFee:
       title: TransferFacilitatorFee
       type: string
-      description: The amount to deduct from `transfer.amount` and distribute to the platform’s Ledger balance as a facilitator fee (decimal string with two digits of precision e.g. "10.00"). The remainder will go to the end-customer’s Ledger balance. This must be less than or equal to the `transfer.amount`.
+      description: The amount to deduct from `transfer.amount` and distribute to the platform’s Ledger balance as a facilitator fee (decimal string with two digits of precision e.g. "10.00"). The remainder will go to the end-customer’s Ledger balance. This must be value greater than 0 and less than or equal to the `transfer.amount`.
     TransferNetworkTraceID:
       title: TransferNetworkTraceID
       type: string
@@ -32274,7 +32309,6 @@ components:
         `swept`: The transfer was swept to the sweep account.
         `swept_settled`: Credits are available to be withdrawn or debits have been deducted from the customer’s business checking account.
         `return_swept`: The transfer was returned, funds were pulled back or pushed back to the sweep account.
-        `funds_available`: Funds from the transfer have been released from hold and applied to the ledger's available balance. This is only applicable to debits.
         `null`: The transfer will never be swept (e.g. if the transfer is cancelled or returned before being swept)
       enum:
       - null
@@ -32282,7 +32316,6 @@ components:
       - swept
       - swept_settled
       - return_swept
-      - funds_available
     TransferRefundStatus:
       type: string
       title: TransferRefundStatus
@@ -32340,7 +32373,7 @@ components:
 
         For transfers submitted as `rtp`,  Plaid will automatically route between Real Time Payment rail by TCH or FedNow rails as necessary. If a transfer is submitted as `rtp` and the counterparty account is not eligible for RTP, the `/transfer/authorization/create` request will fail with an `INVALID_FIELD` error code. To pre-check to determine whether a counterparty account can support RTP, call `/transfer/capabilities/get` before calling `/transfer/authorization/create`.
 
-        Wire transfers are currently in early availability. To request access to `wire` as a payment network, contact your Account Manager. For transfers submitted as `wire`, the `type` must be `credit`; wire debits are not supported. The cutoff to submit a wire payment is 4:30 PM Eastern Time on a business day; wires submitted after that time will be processed on the next business day.
+        Wire transfers are currently in early availability. To request access to `wire` as a payment network, contact your Account Manager. For transfers submitted as `wire`, the `type` must be `credit`; wire debits are not supported. The cutoff to submit a wire payment is 4:30 PM Eastern Time on a business day; wires submitted after that time will be processed on the next business day. The transaction limit for a wire is $999,999.99. Authorization requests sent with an amount greater than $999,999.99 will fail.
       enum:
       - ach
       - same-day-ach
@@ -33612,7 +33645,7 @@ components:
           $ref: '#/components/schemas/TransferLedgerID'
         transfer_id:
           type: string
-          description: Plaid’s unique identifier for a transfer. This field is `null` for Plaid Ledger Sweep events.
+          description: Plaid's unique identifier for a transfer. This field is an empty string for Plaid Ledger Sweep events.
         origination_account_id:
           type: string
           description: The ID of the origination account that this balance belongs to.
@@ -33907,6 +33940,7 @@ components:
       - pending
       - posted
       - settled
+      - funds_available
       - returned
       - failed
       - null
@@ -33918,6 +33952,7 @@ components:
         `"posted"` - The sweep has been posted
         `"settled"` - The sweep has settled
         `"returned"` - The sweep has been returned
+        `"funds_available"` - Funds from the sweep have been released from hold and applied to the ledger's available balance. (Only applicable to deposits)
         `"failed"` - The sweep has failed
     SweepTrigger:
       title: SweepTrigger
@@ -34440,6 +34475,35 @@ components:
           $ref: '#/components/schemas/RequestID'
       required:
       - request_id
+    TransferOriginatorFundingAccountCreateRequest:
+      title: TransferOriginatorFundingAccountCreateRequest
+      type: object
+      description: Defines the request schema for `/transfer/originator/funding_account/create`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        originator_client_id:
+          type: string
+          description: The Plaid client ID of the transfer originator.
+        funding_account:
+          $ref: '#/components/schemas/TransferFundingAccountWithDisplayName'
+      required:
+      - funding_account
+      - originator_client_id
+    TransferOriginatorFundingAccountCreateResponse:
+      title: TransferOriginatorFundingAccountCreateResponse
+      type: object
+      additionalProperties: true
+      description: Defines the response schema for `/transfer/originator/funding_account/create`
+      properties:
+        funding_account_id:
+          $ref: '#/components/schemas/TransferFundingAccountIDResponse'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
     BankTransferMigrateAccountRequest:
       title: BankTransferMigrateAccountRequest
       type: object
@@ -34736,9 +34800,9 @@ components:
 
             `"ccd"` - Corporate Credit or Debit - fund transfer between two corporate bank accounts
 
-            `"ppd"` - Prearranged Payment or Deposit - the transfer is part of a pre-existing relationship with a consumer, e.g. bill payment
+            `"ppd"` - Prearranged Payment or Deposit - The transfer is part of a pre-existing relationship with a consumer. Authorization was obtained in writing either in person or via an electronic document signing, e.g. Docusign, by the consumer. Can be used for credits or debits.
 
-            `"web"` - A credit Entry initiated by or on behalf of a holder of a Consumer Account that is intended for a Consumer Account of a Receiver
+            `"web"` - Internet-Initiated Entry. The transfer debits a consumer’s bank account. Authorization from the consumer is obtained over the Internet (e.g. a web or mobile application). Can be used for single debits or recurring debits.
           type: array
           items:
             $ref: '#/components/schemas/CreditACHClass'
@@ -34760,9 +34824,9 @@ components:
 
         `"ccd"` - Corporate Credit or Debit - fund transfer between two corporate bank accounts
 
-        `"ppd"` - Prearranged Payment or Deposit - the transfer is part of a pre-existing relationship with a consumer, eg. bill payment
+        `"ppd"` - Prearranged Payment or Deposit - The transfer is part of a pre-existing relationship with a consumer. Authorization was obtained in writing either in person or via an electronic document signing, e.g. Docusign, by the consumer. Can be used for credits or debits.
 
-        `"web"` - A credit Entry initiated by or on behalf of a holder of a Consumer Account that is intended for a Consumer Account of a Receiver
+        `"web"` - Internet-Initiated Entry. The transfer debits a consumer’s bank account. Authorization from the consumer is obtained over the Internet (e.g. a web or mobile application). Can be used for single debits or recurring debits.
     TransferDebitUsageConfiguration:
       description: Specifies the originator's expected usage of debits. For all dollar amounts, use a decimal string with two digits of precision e.g. "10.00". This field is required if the originator is expected to process debit transfers.
       type: object
@@ -34785,11 +34849,11 @@ components:
 
             `"ccd"` - Corporate Credit or Debit - fund transfer between two corporate bank accounts
 
-            `"ppd"` - Prearranged Payment or Deposit - the transfer is part of a pre-existing relationship with a consumer, eg. bill payment
+            `"ppd"` - Prearranged Payment or Deposit - The transfer is part of a pre-existing relationship with a consumer. Authorization was obtained in writing either in person or via an electronic document signing, e.g. Docusign, by the consumer. Can be used for credits or debits.
 
-            `"tel"` - Telephone-Initiated Entry
+            `"web"` - Internet-Initiated Entry. The transfer debits a consumer’s bank account. Authorization from the consumer is obtained over the Internet (e.g. a web or mobile application). Can be used for single debits or recurring debits.
 
-            `"web"` - Internet-Initiated Entry - debits from a consumer’s account where their authorization is obtained over the Internet
+            `"tel"` - Telephone-Initiated Entry. The transfer debits a consumer. Debit authorization has been received orally over the telephone via a recorded call.
           type: array
           items:
             $ref: '#/components/schemas/ACHClass'
@@ -34821,6 +34885,17 @@ components:
       required:
       - access_token
       - account_id
+    TransferFundingAccountWithDisplayName:
+      type: object
+      title: TransferFundingAccount
+      description: The originator's funding account, linked with Plaid Link or `/transfer/migrate_account`.
+      allOf:
+      - $ref: '#/components/schemas/TransferFundingAccount'
+      - type: object
+        properties:
+          display_name:
+            type: string
+            description: The name for the funding account that is displayed in the Plaid dashboard.
     TransferOriginatorGetRequest:
       title: TransferOriginatorGetRequest
       type: object
@@ -36818,6 +36893,10 @@ components:
           type: integer
           description: The minimum number of days of data required for the report to be successfully generated.
           maximum: 730
+        client_report_id:
+          type: string
+          nullable: true
+          description: Client-generated identifier, which can be used by lenders to track loan applications.
         partner_insights:
           $ref: '#/components/schemas/LinkTokenCreateRequestCraOptionsPartnerInsights'
         base_report:
@@ -36853,10 +36932,7 @@ components:
       description: Specifies options for initializing Link for use with the Cashflow Insights product.
       properties:
         plaid_check_score_version:
-          x-hidden-from-docs: true
-          type: string
-          nullable: true
-          description: The version of the Plaid Check score to return
+          $ref: '#/components/schemas/PlaidCheckScoreVersion'
         attributes_version:
           $ref: '#/components/schemas/CashflowAttributesVersion'
     LinkTokenCreateRequestCreditPartnerInsights:
@@ -44437,15 +44513,15 @@ components:
           status: AVAILABLE
           user_id: 9eaba3c2fdc916bc197f279185b986607dd21682a5b04eab04a5a03e8b3f3334
           environment: production
-    MonitoringInsightsNSFWebhook:
-      title: MonitoringInsightsNSFWebhook
+    CashFlowUpdatesNSFWebhook:
+      title: CashFlowUpdatesNSFWebhook
       type: object
       additionalProperties: true
       description: For each user enabled for Cash Flow Updates, this webhook will fire when an update includes an NSF overdraft transaction. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
       properties:
         webhook_type:
           type: string
-          description: '`CRA_MONITORING`'
+          description: '`CASH_FLOW_UPDATES`'
         webhook_code:
           type: string
           description: '`NSF_OVERDRAFT_DETECTED`'
@@ -44464,20 +44540,20 @@ components:
       - environment
       x-examples:
         example-1:
-          webhook_type: CRA_MONITORING
+          webhook_type: CASH_FLOW_UPDATES
           webhook_code: NSF_OVERDRAFT_DETECTED
           status: AVAILABLE
           user_id: 9eaba3c2fdc916bc197f279185b986607dd21682a5b04eab04a5a03e8b3f3334
           environment: production
-    MonitoringInsightsNewIncomeStreamWebhook:
-      title: MonitoringInsightsNewIncomeStreamWebhook
+    CashFlowUpdatesNewIncomeStreamWebhook:
+      title: CashFlowUpdatesNewIncomeStreamWebhook
       type: object
       additionalProperties: true
       description: For each user enabled for Cash Flow Updates, this webhook will fire when an update includes a new income stream. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
       properties:
         webhook_type:
           type: string
-          description: '`CRA_MONITORING`'
+          description: '`CASH_FLOW_UPDATES`'
         webhook_code:
           type: string
           description: '`NEW_INCOME_STREAM_DETECTED`'
@@ -44496,20 +44572,20 @@ components:
       - environment
       x-examples:
         example-1:
-          webhook_type: CRA_MONITORING
+          webhook_type: CASH_FLOW_UPDATES
           webhook_code: NEW_INCOME_STREAM_DETECTED
           status: AVAILABLE
           user_id: 9eaba3c2fdc916bc197f279185b986607dd21682a5b04eab04a5a03e8b3f3334
           environment: production
-    MonitoringInsightsExpectedDepositMissedWebhook:
-      title: MonitoringInsightsExpectedDepositMissedWebhook
+    CashFlowUpdatesExpectedDepositMissedWebhook:
+      title: CashFlowUpdatesExpectedDepositMissedWebhook
       type: object
       additionalProperties: true
       description: For each user enabled for Cash Flow Updates, this webhook will fire when an update detects that an expected deposit was missed. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
       properties:
         webhook_type:
           type: string
-          description: '`CRA_MONITORING`'
+          description: '`CASH_FLOW_UPDATES`'
         webhook_code:
           type: string
           description: '`EXPECTED_DEPOSIT_MISSED`'
@@ -44528,20 +44604,20 @@ components:
       - environment
       x-examples:
         example-1:
-          webhook_type: CRA_MONITORING
+          webhook_type: CASH_FLOW_UPDATES
           webhook_code: EXPECTED_DEPOSIT_MISSED
           status: AVAILABLE
           user_id: 9eaba3c2fdc916bc197f279185b986607dd21682a5b04eab04a5a03e8b3f3334
           environment: production
-    MonitoringInsightsLowBalanceWebhook:
-      title: MonitoringInsightsLowBalanceWebhook
+    CashFlowUpdatesLowBalanceWebhook:
+      title: CashFlowUpdatesLowBalanceWebhook
       type: object
       additionalProperties: true
-      description: For each user enabled for Cash Flow Updates, this webhook will fire when an update detects a low balance. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
+      description: For each user enabled for Cash Flow Updates, this webhook will fire when an update detects a low balance (below $100). Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
       properties:
         webhook_type:
           type: string
-          description: '`CRA_MONITORING`'
+          description: '`CASH_FLOW_UPDATES`'
         webhook_code:
           type: string
           description: '`LOW_BALANCE_DETECTED`'
@@ -44560,20 +44636,20 @@ components:
       - environment
       x-examples:
         example-1:
-          webhook_type: CRA_MONITORING
+          webhook_type: CASH_FLOW_UPDATES
           webhook_code: LOW_BALANCE_DETECTED
           status: AVAILABLE
           user_id: 9eaba3c2fdc916bc197f279185b986607dd21682a5b04eab04a5a03e8b3f3334
           environment: production
-    MonitoringInsightsLargeDepositWebhook:
-      title: MonitoringInsightsLargeDepositWebhook
+    CashFlowUpdatesLargeDepositWebhook:
+      title: CashFlowUpdatesLargeDepositWebhook
       type: object
       additionalProperties: true
-      description: For each user enabled for Cash Flow Updates, this webhook will fire when an update detects a large deposit. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
+      description: For each user enabled for Cash Flow Updates, this webhook will fire when an update detects a large deposit (over $5,000). Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
       properties:
         webhook_type:
           type: string
-          description: '`CRA_MONITORING`'
+          description: '`CASH_FLOW_UPDATES`'
         webhook_code:
           type: string
           description: '`LARGE_DEPOSIT_DETECTED`'
@@ -44592,20 +44668,20 @@ components:
       - environment
       x-examples:
         example-1:
-          webhook_type: CRA_MONITORING
+          webhook_type: CASH_FLOW_UPDATES
           webhook_code: LARGE_DEPOSIT_DETECTED
           status: AVAILABLE
           user_id: 9eaba3c2fdc916bc197f279185b986607dd21682a5b04eab04a5a03e8b3f3334
           environment: production
-    MonitoringInsightsNewLoanPaymentWebhook:
-      title: MonitoringInsightsNewLoanPaymentWebhook
+    CashFlowUpdatesNewLoanPaymentWebhook:
+      title: CashFlowUpdatesNewLoanPaymentWebhook
       type: object
       additionalProperties: true
       description: For each user enabled for Cash Flow Updates, this webhook will fire when an update detects a new loan payment. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
       properties:
         webhook_type:
           type: string
-          description: '`CRA_MONITORING`'
+          description: '`CASH_FLOW_UPDATES`'
         webhook_code:
           type: string
           description: '`NEW_LOAN_PAYMENT_DETECTED`'
@@ -44624,7 +44700,7 @@ components:
       - environment
       x-examples:
         example-1:
-          webhook_type: CRA_MONITORING
+          webhook_type: CASH_FLOW_UPDATES
           webhook_code: NEW_LOAN_PAYMENT_DETECTED
           status: AVAILABLE
           user_id: 9eaba3c2fdc916bc197f279185b986607dd21682a5b04eab04a5a03e8b3f3334
@@ -44793,6 +44869,30 @@ components:
         user_id:
           type: string
           description: The `user_id` corresponding to the user the webhook has fired for.
+        successful_products:
+          type: array
+          description: Specifies a list of products that have successfully been generated for the report.
+          nullable: true
+          items:
+            $ref: '#/components/schemas/Products'
+          x-override-enum-values-shown:
+          - cra_base_report
+          - cra_income_insights
+          - cra_cashflow_insights
+          - cra_partner_insights
+          - cra_network_insights
+        failed_products:
+          type: array
+          description: Specifies a list of products that have failed to generate for the report. Additional detail on what caused the failure can be found by calling the product /get endpoint.
+          nullable: true
+          items:
+            $ref: '#/components/schemas/Products'
+          x-override-enum-values-shown:
+          - cra_base_report
+          - cra_income_insights
+          - cra_cashflow_insights
+          - cra_partner_insights
+          - cra_network_insights
         item_ids:
           type: array
           items:
@@ -44812,6 +44912,8 @@ components:
           webhook_type: CHECK_REPORT
           webhook_code: CHECK_REPORT_READY
           user_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
+          successful_products:
+          - cra_base_report
           environment: production
     CraCheckReportFailedWebhook:
       type: object
@@ -45479,9 +45581,14 @@ components:
             type: string
         add_ons:
           type: array
-          description: This field can be used to add additional options for the Asset Report. To fetch `investments` data (transactions, holdings, etc.) in the Asset Report, `investments` must be specified in `add_ons`. For Fast Assets, `fast_assets` must be specified in `add_ons`.
           items:
             $ref: '#/components/schemas/AssetReportAddOns'
+          description: |-
+            A list of add-ons that should be included in the Asset Report.
+
+            `fast_assets`: When Fast Assets is requested, Plaid will create two versions of the Asset Report: the Fast Asset Report, which will contain only Identity and Balance information, and the Full Asset Report, which will also contain Transactions information. A `PRODUCT_READY` webhook will be fired for each Asset Report when it is ready, and the `report_type` field will indicate whether the webhook is firing for the `full` or `fast` Asset Report. To retrieve the Fast Asset Report, call `/asset_report/get` with `fast_report` set to `true`. There is no additional charge for using Fast Assets. To create a Fast Asset Report, Plaid must successfully retrieve both Identity and Balance data; if Plaid encounters an error obtaining this data, the Fast Asset Report will not be created. However, as long as Plaid can obtain Transactions data, the Full Asset Report will still be available.
+
+            `investments`: Request an Asset Report with Investments. To properly fetch investments data, `investments` must be specified in the `optional_products` array when initializing Link.
         user:
           $ref: '#/components/schemas/AssetReportUser'
         require_all_items:
@@ -45772,6 +45879,12 @@ components:
         webhook:
           type: string
           description: URL to which Plaid will send Monitoring Insights webhooks, for example when the requested Monitoring Insights is ready.
+        income_categories:
+          type: array
+          description: Income categories to include in Cash Flow Updates. If empty or `null`, this field will default to including all possible categories.
+          items:
+            $ref: '#/components/schemas/CreditBankIncomeCategory'
+          nullable: true
       required:
       - user_token
       - webhook
@@ -45866,6 +45979,12 @@ components:
           $ref: '#/components/schemas/MonitoringInsightsItemStatus'
         insights:
           $ref: '#/components/schemas/MonitoringInsights'
+        accounts:
+          x-hidden-from-docs: true
+          type: array
+          description: Data about each of the accounts open on the Item.
+          items:
+            $ref: '#/components/schemas/BaseReportAccount'
       required:
       - date_generated
       - item_id
@@ -46177,12 +46296,9 @@ components:
       - cause
     BaseReportWarningCode:
       type: string
-      description: |-
-        The warning code identifies a specific kind of warning. `OWNERS_UNAVAILABLE` indicates that account-owner information is not available. `TRANSACTIONS_UNAVAILABLE` indicates that transactions information associated with Credit and Depository accounts are unavailable. `USER_FRAUD_ALERT` indicates that the User has placed a fraud alert on their Plaid Check consumer report due to suspected fraud.
-
-        Please note that when a fraud alert is in place, the recipient of the consumer report has an obligation to verify the consumer’s identity.
+      description: "The warning code identifies a specific kind of warning. \n`IDENTITY_UNAVAILABLE`: Account-owner information is not available. \n`TRANSACTIONS_UNAVAILABLE`: Transactions information associated with Credit and Depository accounts are unavailable. \n`USER_FRAUD_ALERT`: The User has placed a fraud alert on their Plaid Check consumer report due to suspected fraud. Note: when a fraud alert is in place, the recipient of the consumer report has an obligation to verify the consumer’s identity."
       enum:
-      - OWNERS_UNAVAILABLE
+      - IDENTITY_UNAVAILABLE
       - TRANSACTIONS_UNAVAILABLE
       - USER_FRAUD_ALERT
     BaseReportHistoricalBalance:
@@ -46404,12 +46520,7 @@ components:
       enum:
       - investments
       - fast_assets
-      description: |-
-        A list of add-ons that should be included in the Asset Report.
-
-        `fast_assets`: When Fast Assets is requested, Plaid will create two versions of the Asset Report: the Fast Asset Report, which will contain only Identity and Balance information, and the Full Asset Report, which will also contain Transactions information. A `PRODUCT_READY` webhook will be fired for each Asset Report when it is ready, and the `report_type` field will indicate whether the webhook is firing for the `full` or `fast` Asset Report. To retrieve the Fast Asset Report, call `/asset_report/get` with `fast_report` set to `true`. There is no additional charge for using Fast Assets. To create a Fast Asset Report, Plaid must successfully retrieve both Identity and Balance data; if Plaid encounters an error obtaining this data, the Fast Asset Report will not be created. However, as long as Plaid can obtain Transactions data, the Full Asset Report will still be available.
-
-        `investments`: Request an Asset Report with Investments. This add-on is in closed beta and not generally available.
+      description: Add-ons that should be included in the Asset Report.
       type: string
     AssetReportId:
       title: AssetReportId
@@ -46547,7 +46658,7 @@ components:
           items:
             $ref: '#/components/schemas/AssetReportTransaction'
         investments:
-          $ref: '#/components/schemas/AssetReportInvestmentTransaction'
+          $ref: '#/components/schemas/AssetReportInvestments'
         owners:
           type: array
           description: Data returned by the financial institution about the account owner or owners.For business accounts, the name reported may be either the name of the individual or the name of the business, depending on the institution. Multiple owners on a single account will be represented in the same `owner` object, not in multiple owner objects within the array. In API versions 2018-05-22 and earlier, the `owners` object is not returned, and instead identity information is returned in the top level `identity` object. For more details, see [Plaid API versioning](https://plaid.com/docs/api/versioning/#version-2019-05-29)
@@ -50141,6 +50252,8 @@ components:
       - US_SSI
       - US_CMC
       - US_UVL
+      - US_SAM
+      - US_TEL
       - AU_CON
       - UK_HMC
       example: EU_CON
@@ -50159,6 +50272,8 @@ components:
          `US_SSI`: US OFAC Sectoral Sanctions Identifications
          `US_CMC`: US OFAC Non-SDN Chinese Military-Industrial Complex List
          `US_UVL`: Bureau of Industry and Security Unverified List
+         `US_SAM`: US System for Award Management Exclusion List
+         `US_TEL`: US Terrorist Exclusion List
          `UK_HMC`: UK HM Treasury Consolidated List
       title: EntityWatchlistCode
     EntityWatchlistProgram:
@@ -51530,6 +51645,7 @@ components:
       - US_ISN
       - US_MBS
       - US_PLC
+      - US_SAM
       - US_SDN
       - US_SSI
       - SG_SOF
@@ -51556,6 +51672,7 @@ components:
          `US_FSE`: US OFAC Foreign Sanctions Evaders
          `US_ISN`: US Department of State Nonproliferation Sanctions
          `US_PLC`: US OFAC Palestinian Legislative Council
+         `US_SAM`: US System for Award Management Exclusion List
          `US_SDN`: US OFAC Specially Designated Nationals List
          `US_SSI`: US OFAC Sectoral Sanctions Identifications
          `SG_SOF`: Government of Singapore Terrorists and Terrorist Entities
@@ -54036,8 +54153,40 @@ components:
           $ref: '#/components/schemas/CraIncomeInsights'
         request_id:
           $ref: '#/components/schemas/RequestID'
+        warnings:
+          type: array
+          description: If the Income Insights generation was successful but a subset of data could not be retrieved, this array will contain information about the errors causing information to be missing
+          items:
+            $ref: '#/components/schemas/CheckReportWarning'
       required:
       - request_id
+    CheckReportWarning:
+      title: CraReportWarning
+      type: object
+      additionalProperties: true
+      description: It is possible for a Check Report product to be returned with missing information. In such cases, the product will contain warning data in the response, indicating why obtaining the owner information failed.
+      properties:
+        warning_type:
+          type: string
+          description: The warning type, which will always be `CHECK_REPORT_WARNING`
+        warning_code:
+          $ref: '#/components/schemas/CheckReportWarningCode'
+        cause:
+          $ref: '#/components/schemas/Cause'
+      required:
+      - warning_type
+      - warning_code
+      - cause
+    CheckReportWarningCode:
+      type: string
+      description: |-
+        The warning code identifies a specific kind of warning. `IDENTITY_UNAVAILABLE` indicates that account-owner information is not available. `TRANSACTIONS_UNAVAILABLE` indicates that transactions information associated with Credit and Depository accounts are unavailable. `USER_FRAUD_ALERT` indicates that the User has placed a fraud alert on their Plaid Check consumer report due to suspected fraud.
+
+        Please note that when a fraud alert is in place, the recipient of the consumer report has an obligation to verify the consumer’s identity.
+      enum:
+      - IDENTITY_UNAVAILABLE
+      - TRANSACTIONS_UNAVAILABLE
+      - USER_FRAUD_ALERT
     ConsumerReportPDFGetRequest:
       type: object
       description: ConsumerReportPDFGetRequest defines the request schema for `/consumer_report/pdf/get`
@@ -54069,6 +54218,10 @@ components:
         days_requested:
           type: integer
           description: The number of days requested by the customer for the Check Income Insights Report.
+        client_report_id:
+          type: string
+          nullable: true
+          description: Client-generated identifier, which can be used by lenders to track loan applications.
         items:
           type: array
           description: The list of Items in the report along with the associated metadata about the Item.
@@ -54501,15 +54654,18 @@ components:
         days_required:
           type: integer
           description: The minimum number of days of data required for the report to be successfully generated.
+        client_report_id:
+          type: string
+          nullable: true
+          description: Client-generated identifier, which can be used by lenders to track loan applications.
         products:
           type: array
-          description: Specifies a list of products that will be eagerly generated when creating the report. These products will be made available before a success webhook is sent. Use this option to minimize response latency for product `/get` endpoints.
+          description: Specifies a list of products that will be eagerly generated when creating the report (in addition to the Base Report, which is always eagerly generated). These products will be made available before a success webhook is sent. Use this option to minimize response latency for product `/get` endpoints. Note that specifying `cra_partner_insights` in this field will trigger a billable event. Other products are not billed until the respective reports are fetched via product-specific `/get` endpoints.
           nullable: true
           minItems: 1
           items:
             $ref: '#/components/schemas/Products'
           x-override-enum-values-shown:
-          - cra_base_report
           - cra_income_insights
           - cra_cashflow_insights
           - cra_partner_insights
@@ -54634,6 +54790,11 @@ components:
           $ref: '#/components/schemas/CraPartnerInsights'
         request_id:
           $ref: '#/components/schemas/RequestID'
+        warnings:
+          type: array
+          description: If the Partner Insights generation was successful but a subset of data could not be retrieved, this array will contain information about the errors causing information to be missing
+          items:
+            $ref: '#/components/schemas/CheckReportWarning'
       required:
       - request_id
     CraPartnerInsights:
@@ -54916,7 +55077,8 @@ components:
         client_report_id:
           type: string
           nullable: true
-          description: Client-generated identifier, which can be used by lenders to track loan applications.
+          description: Client-generated identifier, which can be used by lenders to track loan applications. This field is deprecated. Use the `client_report_id`` field at the top level of the request instead.
+          deprecated: true
     CraCheckReportCashflowInsightsGetOptions:
       title: CraCheckReportCashflowInsightsGetOptions
       type: object
@@ -54924,15 +55086,20 @@ components:
       description: Defines configuration options to generate Cashflow Insights
       properties:
         plaid_check_score_version:
-          x-hidden-from-docs: true
-          type: string
-          nullable: true
-          description: The version of the Plaid Check score to return
+          $ref: '#/components/schemas/PlaidCheckScoreVersion'
         attributes_version:
           $ref: '#/components/schemas/CashflowAttributesVersion'
+    PlaidCheckScoreVersion:
+      x-hidden-from-docs: true
+      type: string
+      description: The version of the Plaid Check Score
+      nullable: true
+      enum:
+      - v1.0
+      - v2.0
     CashflowAttributesVersion:
       type: string
-      description: The versions of cashflow attributes
+      description: The version of cashflow attributes
       nullable: true
       enum:
       - v1.0
@@ -54947,6 +55114,11 @@ components:
           $ref: '#/components/schemas/CraCashflowInsightsReport'
         request_id:
           $ref: '#/components/schemas/RequestID'
+        warnings:
+          type: array
+          description: If the Cashflow Insights generation was successful but a subset of data could not be retrieved, this array will contain information about the errors causing information to be missing
+          items:
+            $ref: '#/components/schemas/CheckReportWarning'
       required:
       - report
       - request_id
@@ -55015,6 +55187,11 @@ components:
           $ref: '#/components/schemas/CraNetworkInsightsReport'
         request_id:
           $ref: '#/components/schemas/RequestID'
+        warnings:
+          type: array
+          description: If the Network Insights generation was successful but a subset of data could not be retrieved, this array will contain information about the errors causing information to be missing
+          items:
+            $ref: '#/components/schemas/CheckReportWarning'
       required:
       - report
       - request_id
@@ -56384,6 +56561,52 @@ components:
       - FirstName
       - LastName
       - MiddleName
+    CraCheckReportFreddieMacGetRequest:
+      title: CraCheckReportFreddieMacGetRequest
+      type: object
+      description: CraCheckReportFreddieMacGetRequest defines the request schema for `/cra/check_report/freddie_mac/get`
+      properties:
+        third_party_user_token:
+          $ref: '#/components/schemas/ThirdPartyUserToken'
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+      required:
+      - third_party_user_token
+    CraCheckReportFreddieMacGetResponse:
+      title: CraCheckReportFreddieMacGetResponse
+      type: object
+      additionalProperties: true
+      description: CraCheckReportFreddieMacGetResponse defines the response schema for `/cra/check_report/freddie_mac/get`
+      properties:
+        DEAL:
+          $ref: '#/components/schemas/CraCheckReportFreddieMacVerificationOfAssetsDeal'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+        SchemaVersion:
+          type: number
+          description: The Verification Of Assets (VOA) schema version.
+      required:
+      - request_id
+      - DEAL
+      - SchemaVersion
+    CraCheckReportFreddieMacVerificationOfAssetsDeal:
+      title: CraCheckReportFreddieMacVerificationOfAssetsDeal
+      type: object
+      additionalProperties: true
+      description: An object representing a Base Report with Freddie Mac schema.
+      properties:
+        LOANS:
+          $ref: '#/components/schemas/CreditFreddieMacLoans'
+        PARTIES:
+          $ref: '#/components/schemas/CreditFreddieMacParties'
+        SERVICES:
+          $ref: '#/components/schemas/CreditFreddieMacServices'
+      required:
+      - LOANS
+      - PARTIES
+      - SERVICES
     IdentityDocumentsUploadsGetRequest:
       title: IdentityDocumentsUploadsGetRequest
       description: IdentityDocumentsUploadsGetRequest defines the request schema for `/identity/documents/uploads/get`
