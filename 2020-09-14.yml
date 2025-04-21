@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.631.0
+  version: 2020-09-14_1.633.1
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -2133,6 +2133,199 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CraCheckReportNetworkInsightsGetRequest'
+  /cra/check_report/verification/get:
+    x-hidden-from-docs: true
+    post:
+      summary: Retrieve various verification reports for a user.
+      tags:
+      - plaid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CraCheckReportVerificationGetResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: LhQf0THi8SH1yJm
+                    report:
+                      report_id: 028e8404-a013-4a45-ac9e-002482f9cafc
+                      client_report_id: client_report_id_1221
+                      voa:
+                        generated_time: "2023-03-30T18:27:37Z"
+                        days_requested: 90
+                        attributes:
+                          total_inflow_amount:
+                            amount: 345.12
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
+                          total_outflow_amount:
+                            amount: 235.12
+                            iso_currency_code: USD
+                            unofficial_currency_code: null
+                        items:
+                        - accounts:
+                          - account_id: eG7pNLjknrFpWvP7Dkbdf3Pq6GVBPKTaQJK5v
+                            balances:
+                              available: 100
+                              current: 110
+                              iso_currency_code: USD
+                              unofficial_currency_code: null
+                              historical_balances:
+                              - current: 110
+                                date: "2023-03-29"
+                                iso_currency_code: USD
+                                unofficial_currency_code: null
+                              - current: 125.55
+                                date: "2023-03-28"
+                                iso_currency_code: USD
+                                unofficial_currency_code: null
+                              - current: 80.13
+                                date: "2023-03-27"
+                                iso_currency_code: USD
+                                unofficial_currency_code: null
+                              - current: 246.11
+                                date: "2023-03-26"
+                                iso_currency_code: USD
+                                unofficial_currency_code: null
+                              - current: 182.71
+                                date: "2023-03-25"
+                                iso_currency_code: USD
+                                unofficial_currency_code: null
+                              average_balance_30_days: 200
+                              average_balance_60_days: 150
+                              average_balance_90_days: 125
+                              nsf_overdraft_transactions_count: 0
+                            consumer_disputes: []
+                            mask: "0000"
+                            name: Plaid Checking
+                            official_name: Plaid Gold Standard 0% Interest Checking
+                            type: depository
+                            subtype: checking
+                            days_available: 90
+                            transactions_insights:
+                              all_transactions:
+                              - account_id: eG7pNLjknrFpWvP7Dkbdf3Pq6GVBPKTaQJK5v
+                                amount: 89.4
+                                date: "2023-03-27"
+                                iso_currency_code: USD
+                                original_description: SparkFun
+                                pending: false
+                                transaction_id: 4zBRq1Qem4uAPnoyKjJNTRQpQddM4ztlo1PLD
+                                unofficial_currency_code: null
+                              - account_id: eG7pNLjknrFpWvP7Dkbdf3Pq6GVBPKTaQJK5v
+                                amount: 12
+                                date: "2023-03-28"
+                                iso_currency_code: USD
+                                original_description: 'McDonalds #3322'
+                                pending: false
+                                transaction_id: dkjL41PnbKsPral79jpxhMWdW55gkPfBkWpRL
+                                unofficial_currency_code: null
+                              - account_id: eG7pNLjknrFpWvP7Dkbdf3Pq6GVBPKTaQJK5v
+                                amount: 4.33
+                                date: "2023-03-28"
+                                iso_currency_code: USD
+                                original_description: Starbucks
+                                pending: false
+                                transaction_id: a84ZxQaWDAtDL3dRgmazT57K7jjN3WFkNWMDy
+                                unofficial_currency_code: null
+                              - account_id: eG7pNLjknrFpWvP7Dkbdf3Pq6GVBPKTaQJK5v
+                                amount: -500
+                                date: "2023-03-29"
+                                iso_currency_code: USD
+                                original_description: United Airlines **** REFUND ****
+                                pending: false
+                                transaction_id: xG9jbv3eMoFWepzB7wQLT3LoLggX5Duy1Gbe5
+                                unofficial_currency_code: null
+                              end_date: "2024-07-31"
+                              start_date: "2024-07-01"
+                            owners:
+                            - addresses:
+                              - data:
+                                  city: Malakoff
+                                  country: US
+                                  region: NY
+                                  street: 2992 Cameron Road
+                                  postal_code: "14236"
+                                primary: true
+                              - data:
+                                  city: San Matias
+                                  country: US
+                                  region: CA
+                                  street: 2493 Leisure Lane
+                                  postal_code: 93405-2255
+                                primary: false
+                              emails:
+                              - data: accountholder0@example.com
+                                primary: true
+                                type: primary
+                              - data: accountholder1@example.com
+                                primary: false
+                                type: secondary
+                              - data: extraordinarily.long.email.username.123456@reallylonghostname.com
+                                primary: false
+                                type: other
+                              names:
+                              - Alberta Bobbeth Charleson
+                              phone_numbers:
+                              - data: +1 111-555-3333
+                                primary: false
+                                type: home
+                              - data: +1 111-555-4444
+                                primary: false
+                                type: work
+                              - data: +1 111-555-5555
+                                primary: false
+                                type: mobile
+                            ownership_type: null
+                          institution_name: First Platypus Bank
+                          institution_id: ins_109508
+                          item_id: AZMP7JrGXgtPd3AQMeg7hwMKgk5E8qU1V5ME7
+                          last_update_time: "2023-03-30T18:25:26Z"
+                      voe:
+                        generated_time: "2023-03-30T18:27:37Z"
+                        days_requested: 60
+                        items:
+                        - accounts:
+                          - account_id: 1qKRXQjk8xUWDJojNwPXTj8gEmR48piqRNye8
+                            name: Plaid Money Market
+                            official_name: Plaid Platinum Standard 1.85% Interest Money Market
+                            type: depository
+                            subtype: money market
+                            transactions:
+                            - account_id: 1qKRXQjk8xUWDJojNwPXTj8gEmR48piqRNye8
+                              original_description: ACH Electronic CreditGUSTO PAY 123456
+                              date: "2023-03-30"
+                              pending: false
+                              transaction_id: gGQgjoeyqBF89PND6K14Sow1wddZBmtLomJ78
+                          - account_id: eG7pNLjknrFpWvP7Dkbdf3Pq6GVBPKTaQJK5v
+                            name: Plaid Checking
+                            official_name: Plaid Gold Standard 0% Interest Checking
+                            type: depository
+                            subtype: checking
+                            transactions:
+                            - account_id: eG7pNLjknrFpWvP7Dkbdf3Pq6GVBPKTaQJK5v
+                              original_description: United Airlines **** REFUND ****
+                              date: "2023-03-29"
+                              pending: false
+                              transaction_id: xG9jbv3eMoFWepzB7wQLT3LoLggX5Duy1Gbe5
+                          institution_name: First Platypus Bank
+                          institution_id: ins_109508
+                          item_id: AZMP7JrGXgtPd3AQMeg7hwMKgk5E8qU1V5ME7
+                          last_update_time: "2023-03-30T18:25:26Z"
+                    warnings: []
+      externalDocs:
+        url: /api/products/check/#cracheck_reportverificationget
+      operationId: craCheckReportVerificationGet
+      description: "This endpoint allows you to retrieve verification reports for a user. To obtain a VoA or VoE report, you need to make sure that `cra_base_report` is included in the `products` parameter when calling `/link/token/create` or `/cra/check_report/create`. \n\nYou should call this endpoint after you've received a `CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`.\n\nIf the most recent consumer report for the user doesn’t have sufficient data to generate the report, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.\""
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CraCheckReportVerificationGetRequest'
   /cra/loans/applications/register:
     post:
       tags:
@@ -9626,6 +9819,7 @@ paths:
       description: |-
         `/user/remove` deletes a user token and and associated information, including any Items associated with the token.
         Any subsequent calls to retrieve information using the same user token will result in an error stating the user does not exist.
+        If a user is created for a given `client_user_id` using `/user/create` and that user is then deleted with `/user/remove`, the `client_user_id` cannot be reused for another `/user/create` request.
       requestBody:
         required: true
         content:
@@ -10909,34 +11103,6 @@ paths:
             schema:
               $ref: '#/components/schemas/ProcessorApexProcessorTokenCreateRequest'
         description: ""
-  /deposit_switch/create:
-    post:
-      tags:
-      - plaid
-      summary: (Deprecated) Create a deposit switch
-      deprecated: true
-      externalDocs:
-        url: /deposit-switch/reference#deposit_switchcreate
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DepositSwitchCreateResponse'
-              examples:
-                example-1:
-                  value:
-                    deposit_switch_id: c7jMwPPManIwy9rwMewWP7lpb4pKRbtrbMomp
-                    request_id: lMjeOeu9X1VUh1F
-      operationId: depositSwitchCreate
-      description: This endpoint creates a deposit switch entity that will be persisted throughout the lifecycle of the switch.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DepositSwitchCreateRequest'
   /items/transactions/notify: {}
   /item/import:
     post:
@@ -10966,36 +11132,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ItemImportRequest'
-  /deposit_switch/token/create:
-    post:
-      tags:
-      - plaid
-      summary: (Deprecated) Create a deposit switch token
-      deprecated: true
-      externalDocs:
-        url: /deposit-switch/reference#deposit_switchtokencreate
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DepositSwitchTokenCreateResponse'
-              examples:
-                example-1:
-                  value:
-                    deposit_switch_token: deposit-switch-sandbox-3e5cacca-10a6-11ea-bcdb-6003089acac0
-                    deposit_switch_token_expiration_time: "2019-12-31T12:01:37Z"
-                    request_id: 68MvHx4Ub5NYoXt
-      operationId: depositSwitchTokenCreate
-      description: |
-        In order for the end user to take action, you will need to create a public token representing the deposit switch. This token is used to initialize Link. It can be used one time and expires after 30 minutes.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DepositSwitchTokenCreateRequest'
   /link/token/create:
     post:
       tags:
@@ -11316,49 +11452,6 @@ paths:
             schema:
               $ref: '#/components/schemas/SessionTokenCreateRequest'
         description: ""
-  /deposit_switch/get:
-    post:
-      summary: (Deprecated) Retrieve a deposit switch
-      deprecated: true
-      externalDocs:
-        url: /deposit-switch/reference#deposit_switchget
-      tags:
-      - plaid
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DepositSwitchGetResponse'
-              examples:
-                example-1:
-                  value:
-                    target_item_id: MdRAkq1QikR3BLjDyMfMkVpqLmEm1VR7bX5hE
-                    target_account_id: bX5hEMdRAkq1QikR3BLjDyMfMkVpqLmEm1VR7
-                    deposit_switch_id: LjDyMfMkVpqLmEm1VR7bQikR3BX5hEMdRAkq1
-                    state: completed
-                    switch_method: instant
-                    date_created: "2019-11-01"
-                    date_completed: "2019-11-01"
-                    account_has_multiple_allocations: true
-                    is_allocated_remainder: false
-                    percent_allocated: 50
-                    amount_allocated: null
-                    employer_name: COMPANY INC
-                    employer_id: pqLmEm1VR7bQi11231
-                    institution_name: Bank of America
-                    institution_id: ins_1
-                    request_id: lMjeOeu9X1VUh1F
-      operationId: depositSwitchGet
-      description: This endpoint returns information related to how the user has configured their payroll allocation and the state of the switch. You can use this information to build logic related to the user's direct deposit allocation preferences.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DepositSwitchGetRequest'
-      parameters: []
   /transfer/get:
     post:
       summary: Retrieve a transfer
@@ -14575,34 +14668,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/EmploymentVerificationGetRequest'
-  /deposit_switch/alt/create:
-    post:
-      summary: (Deprecated) Create a deposit switch without using Plaid Exchange
-      deprecated: true
-      tags:
-      - plaid
-      externalDocs:
-        url: /deposit-switch/reference#deposit_switchaltcreate
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DepositSwitchAltCreateResponse'
-              examples:
-                example-1:
-                  value:
-                    deposit_switch_id: c7jMwPPManIwy9rwMewWP7lpb4pKRbtrbMomp
-                    request_id: lMjeOeu9X1VUh1F
-      operationId: depositSwitchAltCreate
-      description: This endpoint provides an alternative to `/deposit_switch/create` for customers who have not yet fully integrated with Plaid Exchange. Like `/deposit_switch/create`, it creates a deposit switch entity that will be persisted throughout the lifecycle of the switch.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DepositSwitchAltCreateRequest'
   /credit/audit_copy_token/create:
     post:
       tags:
@@ -19808,7 +19873,7 @@ components:
         transactions_update_status:
           $ref: '#/components/schemas/TransactionsUpdateStatus'
         account:
-          $ref: '#/components/schemas/AccountBase'
+          $ref: '#/components/schemas/AccountBaseNullable'
         added:
           type: array
           description: Transactions that have been added to the Item since `cursor` ordered by ascending last modified time.
@@ -20709,7 +20774,7 @@ components:
           description: |-
             The user's email address.
 
-            Note: email is currently not returned for users, and is an upcoming addition that will be live in early 2025.
+            Note: email is currently not returned for users, and will be added later in 2025.
           type: string
           nullable: true
         date_of_birth:
@@ -22061,99 +22126,6 @@ components:
       required:
       - access_token
       - account_id
-    DepositSwitchCreateRequest:
-      type: object
-      deprecated: true
-      description: (Deprecated) DepositSwitchCreateRequest defines the request schema for `/deposit_switch/create`
-      properties:
-        client_id:
-          $ref: '#/components/schemas/APIClientID'
-        secret:
-          $ref: '#/components/schemas/APISecret'
-        target_access_token:
-          type: string
-          description: 'Access token for the target Item, typically provided in the Import Item response. '
-        target_account_id:
-          type: string
-          description: Plaid Account ID that specifies the target bank account. This account will become the recipient for a user's direct deposit.
-        country_code:
-          type: string
-          title: CountryCode
-          enum:
-          - US
-          - CA
-          description: ISO-3166-1 alpha-2 country code standard.
-          nullable: true
-        options:
-          $ref: '#/components/schemas/DepositSwitchCreateRequestOptions'
-      required:
-      - target_access_token
-      - target_account_id
-    DepositSwitchCreateRequestOptions:
-      type: object
-      title: DepositSwitchCreateRequestOptions
-      deprecated: true
-      description: (Deprecated) Options to configure the `/deposit_switch/create` request. If provided, cannot be `null`.
-      x-private-visibility: false
-      properties:
-        webhook:
-          type: string
-          description: |
-            The URL registered to receive webhooks when the status of a deposit switch request has changed.
-          nullable: true
-        transaction_item_access_tokens:
-          type: array
-          description: An array of access tokens corresponding to transaction items to use when attempting to match the user to their Payroll Provider. These tokens must be created by the same client id as the one creating the switch, and have access to the transactions product.
-          items:
-            $ref: '#/components/schemas/AccessToken'
-          minItems: 1
-          maxItems: 99
-    DepositSwitchCreateResponse:
-      type: object
-      additionalProperties: true
-      deprecated: true
-      description: (Deprecated) DepositSwitchCreateResponse defines the response schema for `/deposit_switch/create`
-      properties:
-        deposit_switch_id:
-          type: string
-          description: ID of the deposit switch. This ID is persisted throughout the lifetime of the deposit switch.
-        request_id:
-          $ref: '#/components/schemas/RequestID'
-      required:
-      - deposit_switch_id
-      - request_id
-    DepositSwitchTokenCreateRequest:
-      type: object
-      deprecated: true
-      description: (Deprecated) DepositSwitchTokenCreateRequest defines the request schema for `/deposit_switch/token/create`
-      properties:
-        client_id:
-          $ref: '#/components/schemas/APIClientID'
-        secret:
-          $ref: '#/components/schemas/APISecret'
-        deposit_switch_id:
-          type: string
-          description: The ID of the deposit switch
-      required:
-      - deposit_switch_id
-    DepositSwitchTokenCreateResponse:
-      type: object
-      additionalProperties: true
-      deprecated: true
-      description: (Deprecated) DepositSwitchTokenCreateResponse defines the response schema for `/deposit_switch/token/create`
-      properties:
-        deposit_switch_token:
-          type: string
-          description: Deposit switch token, used to initialize Link for the Deposit Switch product
-        deposit_switch_token_expiration_time:
-          type: string
-          description: Expiration time of the token, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format
-        request_id:
-          $ref: '#/components/schemas/RequestID'
-      required:
-      - deposit_switch_token
-      - deposit_switch_token_expiration_time
-      - request_id
     LinkTokenGetRequest:
       type: object
       description: LinkTokenGetRequest defines the request schema for `/link/token/get`
@@ -22167,6 +22139,16 @@ components:
           description: A `link_token` from a previous invocation of `/link/token/create`
       required:
       - link_token
+    LinkTokenCreateRequestAppearanceMode:
+      x-hidden-from-docs: true
+      nullable: true
+      type: string
+      description: Enum representing the desired appearance mode for Link, used to force light or dark modes or set Link to change depending on user system settings. Currently in closed beta.
+      enum:
+      - LIGHT
+      - DARK
+      - SYSTEM
+      - null
     LinkTokenCreateRequest:
       type: object
       description: LinkTokenCreateRequest defines the request schema for `/link/token/create`
@@ -22332,6 +22314,8 @@ components:
         link_customization_name:
           type: string
           description: The name of the Link customization from the Plaid Dashboard to be applied to Link. If not specified, the `default` customization will be used. When using a Link customization, the language in the customization must match the language selected via the `language` parameter, and the countries in the customization should match the country codes selected via `country_codes`.
+        appearance_mode:
+          $ref: '#/components/schemas/LinkTokenCreateRequestAppearanceMode'
         redirect_uri:
           $ref: '#/components/schemas/LinkTokenCreateRequestRedirectUri'
         android_package_name:
@@ -22552,6 +22536,8 @@ components:
         client_user_id:
           type: string
           description: A unique ID representing the end user. Typically this will be a user ID number from your application. Personally identifiable information, such as an email address or phone number, should not be used in the `client_user_id`. It is currently used as a means of searching logs for the given user in the Plaid Dashboard.
+        user_id:
+          $ref: '#/components/schemas/UserId'
     HostedLinkDeliveryMethod:
       type: string
       description: |
@@ -22750,7 +22736,7 @@ components:
           - "OFF"
           - OPTIONAL
           - FORCED
-          description: Specifies what type of [Reroute to Credentials](https://plaid.com/docs/auth/coverage/same-day/#reroute-to-credentials) pane should be used in the Link session for the Same Day Micro-deposits flow. Default behavior is `OPTIONAL`.
+          description: Specifies what type of [Reroute to Credentials](https://plaid.com/docs/auth/coverage/flow-options/#removing-manual-verification-entry-points-with-reroute-to-credentials) pane should be used in the Link session for the Same Day Micro-deposits flow. Default behavior is `OPTIONAL`.
         database_match_enabled:
           type: boolean
           deprecated: true
@@ -23628,6 +23614,15 @@ components:
       - official_name
       - type
       - subtype
+    AccountBaseNullable:
+      title: AccountNullable
+      type: object
+      additionalProperties: true
+      description: A single account at a financial institution.
+      allOf:
+      - $ref: '#/components/schemas/AccountBase'
+      - type: object
+        nullable: true
     AccountBalance:
       title: AccountBalance
       type: object
@@ -23693,11 +23688,9 @@ components:
           type: string
           format: date-time
           description: |-
-            Timestamp in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format (`YYYY-MM-DDTHH:mm:ssZ`) indicating the oldest acceptable balance when making a request to `/accounts/balance/get`.
+            Timestamp in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format (`YYYY-MM-DDTHH:mm:ssZ`) indicating the last time the balance was updated.
 
-            This field is only used and expected when the institution is `ins_128026` (Capital One) and the Item contains one or more accounts with a non-depository account type, in which case a value must be provided or an `INVALID_REQUEST` error with the code of `INVALID_FIELD` will be returned. For Capital One depository accounts as well as all other account types on all other institutions, this field is ignored. See [account type schema](https://plaid.com/docs/api/accounts/#account-type-schema) for a full list of account types.
-
-            If the balance that is pulled is older than the given timestamp for Items with this field required, an `INVALID_REQUEST` error with the code of `LAST_UPDATED_DATETIME_OUT_OF_RANGE` will be returned with the most recent timestamp for the requested account contained in the response.
+            This field is returned only when the institution is `ins_128026` (Capital One).
           nullable: true
       required:
       - available
@@ -25042,6 +25035,8 @@ components:
       - LV
       - PT
       - BE
+      - AT
+      - FI
       description: ISO-3166-1 alpha-2 country code standard.
     ConsumerReportPermissiblePurpose:
       type: string
@@ -30482,7 +30477,7 @@ components:
       description: |-
         Details about the option security.
 
-        For the Sandbox environment, this data is currently only available if the item is using a custom configuration object, and the `ticker` field of the custom security follows the [OCC Option Symbol](https://en.wikipedia.org/wiki/Option_symbol#The_OCC_Option_Symbol) standard with no spaces.
+        For the Sandbox environment, this data is currently only available if the Item is using a [custom Sandbox user](https://plaid.com/docs/sandbox/user-custom/) and the `ticker` field of the custom security follows the [OCC Option Symbol](https://en.wikipedia.org/wiki/Option_symbol#The_OCC_Option_Symbol) standard with no spaces. For an example of simulating this in Sandbox, see the [custom Sandbox GitHub](https://github.com/plaid/sandbox-custom-users).
       properties:
         contract_type:
           type: string
@@ -30937,172 +30932,6 @@ components:
       - webhook_code
       - item_id
       - environment
-    DepositSwitchGetRequest:
-      title: DepositSwitchGetRequest
-      deprecated: true
-      description: (Deprecated) DepositSwitchGetRequest defines the request schema for `/deposit_switch/get`
-      type: object
-      x-examples: {}
-      properties:
-        client_id:
-          $ref: '#/components/schemas/APIClientID'
-        secret:
-          $ref: '#/components/schemas/APISecret'
-        deposit_switch_id:
-          type: string
-          description: The ID of the deposit switch
-      required:
-      - deposit_switch_id
-    DepositSwitchGetResponse:
-      title: DepositSwitchGetResponse
-      type: object
-      additionalProperties: true
-      deprecated: true
-      description: (Deprecated) DepositSwitchGetResponse defines the response schema for `/deposit_switch/get`
-      properties:
-        deposit_switch_id:
-          type: string
-          description: The ID of the deposit switch.
-        target_account_id:
-          type: string
-          nullable: true
-          description: The ID of the bank account the direct deposit was switched to.
-        target_item_id:
-          type: string
-          nullable: true
-          description: The ID of the Item the direct deposit was switched to.
-        state:
-          type: string
-          enum:
-          - initialized
-          - processing
-          - completed
-          - error
-          description: |2-
-
-            The state, or status, of the deposit switch.
-
-            - `initialized` – The deposit switch has been initialized with the user entering the information required to submit the deposit switch request.
-
-            - `processing` – The deposit switch request has been submitted and is being processed.
-
-            - `completed` – The user's employer has fulfilled the deposit switch request.
-
-            - `error` – There was an error processing the deposit switch request.
-        switch_method:
-          nullable: true
-          type: string
-          enum:
-          - instant
-          - mail
-          - pdf
-          - null
-          description: |-
-            The method used to make the deposit switch.
-
-            - `instant` – User instantly switched their direct deposit to a new or existing bank account by connecting their payroll or employer account.
-
-            - `mail` – User requested that Plaid contact their employer by mail to make the direct deposit switch.
-
-            - `pdf` – User generated a PDF or email to be sent to their employer with the information necessary to make the deposit switch.'
-        account_has_multiple_allocations:
-          nullable: true
-          type: boolean
-          description: When `true`, user’s direct deposit goes to multiple banks. When false, user’s direct deposit only goes to the target account. Always `null` if the deposit switch has not been completed.
-        is_allocated_remainder:
-          nullable: true
-          type: boolean
-          description: When `true`, the target account is allocated the remainder of direct deposit after all other allocations have been deducted. When `false`, user’s direct deposit is allocated as a percent or amount. Always `null` if the deposit switch has not been completed.
-        percent_allocated:
-          type: number
-          format: double
-          nullable: true
-          description: The percentage of direct deposit allocated to the target account. Always `null` if the target account is not allocated a percentage or if the deposit switch has not been completed or if `is_allocated_remainder` is true.
-        amount_allocated:
-          type: number
-          format: double
-          nullable: true
-          description: The dollar amount of direct deposit allocated to the target account. Always `null` if the target account is not allocated an amount or if the deposit switch has not been completed.
-        employer_name:
-          type: string
-          nullable: true
-          description: The name of the employer selected by the user. If the user did not select an employer, the value returned is `null`.
-        employer_id:
-          type: string
-          nullable: true
-          description: The ID of the employer selected by the user. If the user did not select an employer, the value returned is `null`.
-        institution_name:
-          type: string
-          nullable: true
-          description: The name of the institution selected by the user. If the user did not select an institution, the value returned is `null`.
-        institution_id:
-          type: string
-          nullable: true
-          description: The ID of the institution selected by the user. If the user did not select an institution, the value returned is `null`.
-        date_created:
-          description: |
-            [ISO 8601](https://wikipedia.org/wiki/ISO_8601) date the deposit switch was created.
-          type: string
-          format: date
-        date_completed:
-          type: string
-          format: date
-          nullable: true
-          description: |
-            [ISO 8601](https://wikipedia.org/wiki/ISO_8601) date the deposit switch was completed. Always `null` if the deposit switch has not been completed.
-        request_id:
-          $ref: '#/components/schemas/RequestID'
-      required:
-      - deposit_switch_id
-      - target_account_id
-      - target_item_id
-      - state
-      - account_has_multiple_allocations
-      - is_allocated_remainder
-      - percent_allocated
-      - amount_allocated
-      - date_created
-      - date_completed
-      - request_id
-    DepositSwitchStateUpdateWebhook:
-      title: DepositSwitchStateUpdateWebhook
-      type: object
-      deprecated: true
-      description: (Deprecated) Fired when the status of a deposit switch request has changed.
-      x-examples:
-        example-1:
-          webhook_type: DEPOSIT_SWITCH
-          webhook_code: SWITCH_STATE_UPDATE
-          state: completed
-          deposit_switch_id: f6f5132f-853b-421c-8c41-d24f93ebc39f
-          environment: production
-      properties:
-        webhook_type:
-          type: string
-          description: '`"DEPOSIT_SWITCH"`'
-        webhook_code:
-          type: string
-          description: '`"SWITCH_STATE_UPDATE"`'
-        state:
-          type: string
-          description: |2-
-
-            The state, or status, of the deposit switch.
-
-            `initialized`: The deposit switch has been initialized with the user entering the information required to submit the deposit switch request.
-
-            `processing`: The deposit switch request has been submitted and is being processed.
-
-            `completed`: The user's employer has fulfilled and completed the deposit switch request.
-
-            `error`: There was an error processing the deposit switch request.
-
-            For more information, see the [Deposit Switch API reference](/docs/deposit-switch/reference#deposit_switchget).
-        deposit_switch_id:
-          type: string
-          description: The ID of the deposit switch.
-        environment:
-          $ref: '#/components/schemas/WebhookEnvironmentValues'
     FallbackAuthMicrodepositAutoVerifiedWebhook:
       title: FallbackAuthMicrodepositAutoVerifiedWebhook
       type: object
@@ -32272,11 +32101,11 @@ components:
 
         `pending`: A new transfer was created; it is in the pending state.
         `posted`: The transfer has been successfully submitted to the payment network.
-        `settled`: The transfer was successfully completed by the payment network. Note that funds from received debits are not available to be moved out of the Ledger until the transfer reaches `funds_available` status. For credit transactions, `settled` means the funds have been delivered to the receiving bank account.
-        `funds_available`: Funds from the transfer have been released from hold and applied to the ledger's available balance. (Only applicable to ACH debits.)
-        `cancelled`: The transfer was cancelled by the client.
-        `failed`: The transfer failed, no funds were moved.
-        `returned`: A posted transfer was returned.
+        `settled`: The transfer was successfully completed by the payment network. Note that funds from received debits are not available to be moved out of the Ledger until the transfer reaches `funds_available` status. For credit transactions, `settled` means the funds have been delivered to the receiving bank account. This is the terminal state of a successful credit transfer.
+        `funds_available`: Funds from the transfer have been released from hold and applied to the ledger's available balance. (Only applicable to ACH debits.) This is the terminal state of a successful debit transfer.
+        `cancelled`: The transfer was cancelled by the client. This is the terminal state of a cancelled transfer.
+        `failed`: The transfer failed, no funds were moved. This is the terminal state of a failed transfer.
+        `returned`: A posted transfer was returned. This is the terminal state of a returned transfer.
       enum:
       - pending
       - posted
@@ -32415,7 +32244,7 @@ components:
         failure_code:
           type: string
           nullable: true
-          description: The failure code, e.g. `R01`.  A failure code will be provided if and only if the transfer status is `returned`. See [ACH return codes](https://plaid.com/docs/errors/transfer/#ach-return-codes) for a full listing of ACH return codes and [RTP error codes](https://plaid.com/docs/errors/transfer/#rtp-error-codes) for RTP error codes.
+          description: The failure code, e.g. `R01`.  A failure code will be provided if and only if the transfer status is `returned`. See [ACH return codes](https://plaid.com/docs/errors/transfer/#ach-return-codes) for a full listing of ACH return codes and [RTP/RfP error codes](https://plaid.com/docs/errors/transfer/#rtprfp-error-codes) for RTP error codes.
         ach_return_code:
           deprecated: true
           type: string
@@ -33068,12 +32897,12 @@ components:
           type: string
           format: date-time
           nullable: true
-          description: The start datetime of transfers to list. This should be in RFC 3339 format (i.e. `2019-12-06T22:35:49Z`)
+          description: The start `created` datetime of transfers to list. This should be in RFC 3339 format (i.e. `2019-12-06T22:35:49Z`)
         end_date:
           type: string
           format: date-time
           nullable: true
-          description: The end datetime of transfers to list. This should be in RFC 3339 format (i.e. `2019-12-06T22:35:49Z`)
+          description: The end `created` datetime of transfers to list. This should be in RFC 3339 format (i.e. `2019-12-06T22:35:49Z`)
         count:
           type: integer
           minimum: 1
@@ -33112,12 +32941,12 @@ components:
           type: string
           format: date-time
           nullable: true
-          description: The start datetime of recurring transfers to list. This should be in RFC 3339 format (i.e. `2019-12-06T22:35:49Z`)
+          description: The start `created` datetime of recurring transfers to list. This should be in RFC 3339 format (i.e. `2019-12-06T22:35:49Z`)
         end_time:
           type: string
           format: date-time
           nullable: true
-          description: The end datetime of recurring transfers to list. This should be in RFC 3339 format (i.e. `2019-12-06T22:35:49Z`)
+          description: The end `created` datetime of recurring transfers to list. This should be in RFC 3339 format (i.e. `2019-12-06T22:35:49Z`)
         count:
           type: integer
           minimum: 1
@@ -33372,12 +33201,12 @@ components:
         start_date:
           type: string
           format: date-time
-          description: The start datetime of transfers to list. This should be in RFC 3339 format (i.e. `2019-12-06T22:35:49Z`)
+          description: The start `created` datetime of transfers to list. This should be in RFC 3339 format (i.e. `2019-12-06T22:35:49Z`)
           nullable: true
         end_date:
           type: string
           format: date-time
-          description: The end datetime of transfers to list. This should be in RFC 3339 format (i.e. `2019-12-06T22:35:49Z`)
+          description: The end `created` datetime of transfers to list. This should be in RFC 3339 format (i.e. `2019-12-06T22:35:49Z`)
           nullable: true
         transfer_id:
           type: string
@@ -33919,12 +33748,12 @@ components:
         start_time:
           type: string
           format: date-time
-          description: The start datetime of sweeps to return (RFC 3339 format).
+          description: The start `created` datetime of sweeps to return (RFC 3339 format).
           nullable: true
         end_time:
           type: string
           format: date-time
-          description: The end datetime of sweeps to return (RFC 3339 format).
+          description: The end `created` datetime of sweeps to return (RFC 3339 format).
           nullable: true
         count:
           type: integer
@@ -33950,10 +33779,10 @@ components:
 
         `"pending"` - The sweep is currently pending
         `"posted"` - The sweep has been posted
-        `"settled"` - The sweep has settled
-        `"returned"` - The sweep has been returned
-        `"funds_available"` - Funds from the sweep have been released from hold and applied to the ledger's available balance. (Only applicable to deposits)
-        `"failed"` - The sweep has failed
+        `"settled"` - The sweep has settled. This is the terminal state of a successful credit sweep.
+        `"returned"` - The sweep has been returned. This is the terminal state of a returned sweep. Returns of a sweep are extremely rare, since sweeps are money movement between your own bank account and your own Ledger.
+        `"funds_available"` - Funds from the sweep have been released from hold and applied to the ledger's available balance. (Only applicable to deposits.) This is the terminal state of a successful deposit sweep.
+        `"failed"` - The sweep has failed. This is the terminal state of a failed sweep.
     SweepTrigger:
       title: SweepTrigger
       type: string
@@ -33988,12 +33817,12 @@ components:
         start_date:
           type: string
           format: date-time
-          description: The start datetime of sweeps to return (RFC 3339 format).
+          description: The start `created` datetime of sweeps to return (RFC 3339 format).
           nullable: true
         end_date:
           type: string
           format: date-time
-          description: The end datetime of sweeps to return (RFC 3339 format).
+          description: The end `created` datetime of sweeps to return (RFC 3339 format).
           nullable: true
         count:
           type: integer
@@ -34147,7 +33976,7 @@ components:
         failure_code:
           type: string
           nullable: true
-          description: The failure code, e.g. `R01`.  A failure code will be provided if and only if the sweep status is `returned`. See [ACH return codes](https://plaid.com/docs/errors/transfer/#ach-return-codes) for a full listing of ACH return codes and [RTP error codes](https://plaid.com/docs/errors/transfer/#rtp-error-codes) for RTP error codes.
+          description: The failure code, e.g. `R01`.  A failure code will be provided if and only if the sweep status is `returned`. See [ACH return codes](https://plaid.com/docs/errors/transfer/#ach-return-codes) for a full listing of ACH return codes and [RTP/RfP error codes](https://plaid.com/docs/errors/transfer/#rtprfp-error-codes) for RTP error codes.
         description:
           type: string
           nullable: true
@@ -34972,12 +34801,12 @@ components:
         start_date:
           type: string
           format: date-time
-          description: The start datetime of repayments to return (RFC 3339 format).
+          description: The start `created` datetime of repayments to return (RFC 3339 format).
           nullable: true
         end_date:
           type: string
           format: date-time
-          description: The end datetime of repayments to return (RFC 3339 format).
+          description: The end `created` datetime of repayments to return (RFC 3339 format).
           nullable: true
         count:
           type: integer
@@ -35449,7 +35278,7 @@ components:
         failure_code:
           type: string
           nullable: true
-          description: The failure code, e.g. `R01`.  A failure code will be provided if and only if the refund status is `returned`. See [ACH return codes](https://plaid.com/docs/errors/transfer/#ach-return-codes) for a full listing of ACH return codes and [RTP error codes](https://plaid.com/docs/errors/transfer/#rtp-error-codes) for RTP error codes.
+          description: The failure code, e.g. `R01`.  A failure code will be provided if and only if the refund status is `returned`. See [ACH return codes](https://plaid.com/docs/errors/transfer/#ach-return-codes) for a full listing of ACH return codes and [RTP/RfP error codes](https://plaid.com/docs/errors/transfer/#rtprfp-error-codes) for RTP error codes.
         ach_return_code:
           deprecated: true
           type: string
@@ -35626,7 +35455,7 @@ components:
       - environment
     TransferPlatformPersonCreateRequest:
       type: object
-      description: Defines the response schema for `/transfer/platform/person/create`
+      description: Defines the request schema for `/transfer/platform/person/create`
       required:
       - originator_client_id
       properties:
@@ -35657,6 +35486,11 @@ components:
         relationship_to_originator:
           type: string
           description: The relationship between this person and the originator they are related to.
+        ownership_percentage:
+          type: integer
+          minimum: 25
+          maximum: 100
+          description: The percentage of ownership this person has in the onboarding business. Only applicable to beneficial owners with 25% or more ownership.
     TransferPlatformPersonIDNumber:
       description: ID number of the person
       type: object
@@ -36887,7 +36721,7 @@ components:
       properties:
         days_requested:
           type: integer
-          description: The number of days of history to include in Plaid Check products. Default value is 365; maximum is 730; minimum is 180. If a value lower than 180 is provided, a minimum of 180 days of history will be requested.
+          description: The number of days of history to include in Plaid Check products. Maximum is 730; minimum is 180. If a value lower than 180 is provided, a minimum of 180 days of history will be requested.
           maximum: 730
         days_required:
           type: integer
@@ -38305,136 +38139,6 @@ components:
           type: string
           format: date-time
           description: The date when the update was published, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format, e.g. `"2020-10-30T15:26:48Z"`.
-    DepositSwitchAltCreateRequest:
-      title: DepositSwitchAltCreateRequest
-      type: object
-      deprecated: true
-      description: (Deprecated) DepositSwitchAltCreateRequest defines the request schema for `/deposit_switch/alt/create`
-      properties:
-        client_id:
-          $ref: '#/components/schemas/APIClientID'
-        secret:
-          $ref: '#/components/schemas/APISecret'
-        target_account:
-          $ref: '#/components/schemas/DepositSwitchTargetAccount'
-        target_user:
-          $ref: '#/components/schemas/DepositSwitchTargetUser'
-        options:
-          $ref: '#/components/schemas/DepositSwitchCreateRequestOptions'
-        country_code:
-          type: string
-          title: CountryCode
-          enum:
-          - US
-          - CA
-          description: ISO-3166-1 alpha-2 country code standard.
-          nullable: true
-      required:
-      - target_account
-      - target_user
-    DepositSwitchAltCreateResponse:
-      title: DepositSwitchAltCreateResponse
-      type: object
-      deprecated: true
-      additionalProperties: true
-      properties:
-        deposit_switch_id:
-          type: string
-          description: ID of the deposit switch. This ID is persisted throughout the lifetime of the deposit switch.
-        request_id:
-          $ref: '#/components/schemas/RequestID'
-      required:
-      - deposit_switch_id
-      - request_id
-      description: (Deprecated) DepositSwitchAltCreateResponse defines the response schema for `/deposit_switch/alt/create`
-    DepositSwitchTargetAccount:
-      title: DepositSwitchTargetAccount
-      deprecated: true
-      description: (Deprecated) The deposit switch destination account
-      type: object
-      additionalProperties: true
-      properties:
-        account_number:
-          type: string
-          description: Account number for deposit switch destination
-        routing_number:
-          type: string
-          description: Routing number for deposit switch destination
-        account_name:
-          type: string
-          description: The name of the deposit switch destination account, as it will be displayed to the end user in the Deposit Switch interface. It is not required to match the name used in online banking.
-        account_subtype:
-          type: string
-          description: The account subtype of the account, either `checking` or `savings`.
-          enum:
-          - checking
-          - savings
-      required:
-      - account_number
-      - routing_number
-      - account_name
-      - account_subtype
-    DepositSwitchTargetUser:
-      title: DepositSwitchTargetUser
-      description: (Deprecated) The deposit switch target user
-      deprecated: true
-      type: object
-      additionalProperties: true
-      properties:
-        given_name:
-          type: string
-          description: The given name (first name) of the user.
-        family_name:
-          type: string
-          description: The family name (last name) of the user.
-        phone:
-          type: string
-          description: The phone number of the user. The endpoint can accept a variety of phone number formats, including E.164.
-        email:
-          type: string
-          description: The email address of the user.
-        address:
-          $ref: '#/components/schemas/DepositSwitchAddressData'
-        tax_payer_id:
-          type: string
-          description: The taxpayer ID of the user, generally their SSN, EIN, or TIN.
-      required:
-      - given_name
-      - family_name
-      - phone
-      - email
-    DepositSwitchAddressData:
-      title: DepositSwitchAddressData
-      type: object
-      deprecated: true
-      additionalProperties: true
-      description: (Deprecated) The user's address.
-      properties:
-        city:
-          type: string
-          description: The full city name
-        region:
-          type: string
-          description: |-
-            The region or state
-            Example: `"NC"`
-        street:
-          type: string
-          description: |-
-            The full street address
-            Example: `"564 Main Street, APT 15"`
-        postal_code:
-          type: string
-          description: The postal code
-        country:
-          type: string
-          description: The ISO 3166-1 alpha-2 country code
-      required:
-      - street
-      - city
-      - region
-      - postal_code
-      - country
     CreditBankEmploymentGetRequest:
       title: CreditBankEmploymentGetRequest
       type: object
@@ -43668,7 +43372,7 @@ components:
           description: The webhook URL where notifications should be sent when the issue status changes.
       required:
       - issue_id
-      - webhook_url
+      - webhook
     IssuesSubscribeResponse:
       type: object
       description: IssuesSubscribeResponse defines the response schema for `/issues/subscribe`.
@@ -44513,6 +44217,38 @@ components:
           status: AVAILABLE
           user_id: 9eaba3c2fdc916bc197f279185b986607dd21682a5b04eab04a5a03e8b3f3334
           environment: production
+    CashFlowUpdatesInsightsWebhook:
+      title: CashFlowUpdatesInsightsWebhook
+      type: object
+      additionalProperties: true
+      description: For each user enabled for Cash Flow Updates, this webhook will fire every day with information on the status of the update. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
+      properties:
+        webhook_type:
+          type: string
+          description: '`CASH_FLOW_UPDATES`'
+        webhook_code:
+          type: string
+          description: '`INSIGHTS_UPDATED`'
+        status:
+          $ref: '#/components/schemas/MonitoringInsightsStatus'
+        user_id:
+          type: string
+          description: The `user_id` that the report is associated with
+        environment:
+          $ref: '#/components/schemas/WebhookEnvironmentValues'
+      required:
+      - webhook_type
+      - webhook_code
+      - status
+      - user_id
+      - environment
+      x-examples:
+        example-1:
+          webhook_type: CASH_FLOW_UPDATES
+          webhook_code: INSIGHTS_UPDATED
+          status: AVAILABLE
+          user_id: 9eaba3c2fdc916bc197f279185b986607dd21682a5b04eab04a5a03e8b3f3334
+          environment: production
     CashFlowUpdatesNSFWebhook:
       title: CashFlowUpdatesNSFWebhook
       type: object
@@ -44613,7 +44349,7 @@ components:
       title: CashFlowUpdatesLowBalanceWebhook
       type: object
       additionalProperties: true
-      description: For each user enabled for Cash Flow Updates, this webhook will fire when an update detects a low balance (below $100). Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
+      description: For each user enabled for Cash Flow Updates, this webhook will fire when an update detects a balance below $100. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
       properties:
         webhook_type:
           type: string
@@ -44645,7 +44381,7 @@ components:
       title: CashFlowUpdatesLargeDepositWebhook
       type: object
       additionalProperties: true
-      description: For each user enabled for Cash Flow Updates, this webhook will fire when an update detects a large deposit (over $5,000). Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
+      description: For each user enabled for Cash Flow Updates, this webhook will fire when an update detects a deposit over $5,000. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
       properties:
         webhook_type:
           type: string
@@ -45586,9 +45322,9 @@ components:
           description: |-
             A list of add-ons that should be included in the Asset Report.
 
-            `fast_assets`: When Fast Assets is requested, Plaid will create two versions of the Asset Report: the Fast Asset Report, which will contain only Identity and Balance information, and the Full Asset Report, which will also contain Transactions information. A `PRODUCT_READY` webhook will be fired for each Asset Report when it is ready, and the `report_type` field will indicate whether the webhook is firing for the `full` or `fast` Asset Report. To retrieve the Fast Asset Report, call `/asset_report/get` with `fast_report` set to `true`. There is no additional charge for using Fast Assets. To create a Fast Asset Report, Plaid must successfully retrieve both Identity and Balance data; if Plaid encounters an error obtaining this data, the Fast Asset Report will not be created. However, as long as Plaid can obtain Transactions data, the Full Asset Report will still be available.
+            When Fast Assets is requested, Plaid will create two versions of the Asset Report: the Fast Asset Report, which will contain only Identity and Balance information, and the Full Asset Report, which will also contain Transactions information. A `PRODUCT_READY` webhook will be fired for each Asset Report when it is ready, and the `report_type` field will indicate whether the webhook is firing for the `full` or `fast` Asset Report. To retrieve the Fast Asset Report, call `/asset_report/get` with `fast_report` set to `true`. There is no additional charge for using Fast Assets. To create a Fast Asset Report, Plaid must successfully retrieve both Identity and Balance data; if Plaid encounters an error obtaining this data, the Fast Asset Report will not be created. However, as long as Plaid can obtain Transactions data, the Full Asset Report will still be available.
 
-            `investments`: Request an Asset Report with Investments. To properly fetch investments data, `investments` must be specified in the `optional_products` array when initializing Link.
+            When Investments is requested, `investments` must be specified in the `optional_products` array when initializing Link.
         user:
           $ref: '#/components/schemas/AssetReportUser'
         require_all_items:
@@ -46520,7 +46256,11 @@ components:
       enum:
       - investments
       - fast_assets
-      description: Add-ons that should be included in the Asset Report.
+      description: |-
+        Add-ons that should be included in the Asset Report.
+
+        `investments`: The Investments add-on
+        `fast_assets`: The Fast Assets add-on
       type: string
     AssetReportId:
       title: AssetReportId
@@ -54179,10 +53919,7 @@ components:
       - cause
     CheckReportWarningCode:
       type: string
-      description: |-
-        The warning code identifies a specific kind of warning. `IDENTITY_UNAVAILABLE` indicates that account-owner information is not available. `TRANSACTIONS_UNAVAILABLE` indicates that transactions information associated with Credit and Depository accounts are unavailable. `USER_FRAUD_ALERT` indicates that the User has placed a fraud alert on their Plaid Check consumer report due to suspected fraud.
-
-        Please note that when a fraud alert is in place, the recipient of the consumer report has an obligation to verify the consumer’s identity.
+      description: "The warning code identifies a specific kind of warning. \n`IDENTITY_UNAVAILABLE`:  Account-owner information is not available. \n`TRANSACTIONS_UNAVAILABLE`: Transactions information associated with Credit and Depository accounts are unavailable. \n`USER_FRAUD_ALERT`: The user has placed a fraud alert on their Plaid Check consumer report due to suspected fraud. Please note that when a fraud alert is in place, the recipient of the consumer report has an obligation to verify the consumer’s identity."
       enum:
       - IDENTITY_UNAVAILABLE
       - TRANSACTIONS_UNAVAILABLE
@@ -55077,7 +54814,7 @@ components:
         client_report_id:
           type: string
           nullable: true
-          description: Client-generated identifier, which can be used by lenders to track loan applications. This field is deprecated. Use the `client_report_id`` field at the top level of the request instead.
+          description: Client-generated identifier, which can be used by lenders to track loan applications. This field is deprecated. Use the `client_report_id` field at the top level of the request instead.
           deprecated: true
     CraCheckReportCashflowInsightsGetOptions:
       title: CraCheckReportCashflowInsightsGetOptions
@@ -55240,6 +54977,464 @@ components:
       - institution_id
       - institution_name
       - item_id
+    CraCheckReportVerificationGetRequest:
+      title: CraCheckReportVerificationGetRequest
+      x-hidden-from-docs: true
+      type: object
+      description: CraCheckReportVerificationGetRequest defines the request schema for `/cra/check_report/verification/get`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        reports_requested:
+          type: array
+          description: Specifies which types of verification reports are expected in the response
+          items:
+            $ref: '#/components/schemas/CraCheckReportVerificationGetReportType'
+        voe_options:
+          $ref: '#/components/schemas/CraCheckReportVerificationGetVoeOptions'
+        user_token:
+          $ref: '#/components/schemas/UserToken'
+      required:
+      - reports_requested
+    CraCheckReportVerificationGetReportType:
+      title: CraCheckReportVerificationGetReportType
+      type: string
+      description: Type of verification report.
+      enum:
+      - VOA
+      - VOE
+    CraCheckReportVerificationGetVoeOptions:
+      title: CraCheckReportVerificationGetVoeOptions
+      type: object
+      description: Defines configuration options for the VoE report.
+      nullable: true
+      properties:
+        days_requested:
+          type: integer
+          description: The number of days of data to request for the report. This field is required if a VOE report is requested. Maximum is 731.
+          maximum: 731
+      required:
+      - days_requested
+    CraCheckReportVerificationGetResponse:
+      title: CraCheckReportVerificationGetResponse
+      x-hidden-from-docs: true
+      type: object
+      description: CraCheckReportVerificationGetResponse defines the response schema for `/cra/check_report/verification/get`.
+      additionalProperties: true
+      properties:
+        report:
+          $ref: '#/components/schemas/CraVerificationReport'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+        warnings:
+          type: array
+          description: If the verification report generation was successful but a subset of data could not be retrieved, this array will contain information about the errors causing information to be missing.
+          items:
+            $ref: '#/components/schemas/CheckReportWarning'
+      required:
+      - report
+      - request_id
+      - warnings
+    CraVerificationReport:
+      title: CraVerificationReport
+      type: object
+      description: Contains data for the CRA Verification Report.
+      additionalProperties: true
+      properties:
+        report_id:
+          type: string
+          description: The unique identifier associated with the Verification Report object. This ID will be the same as the Base Report ID.
+        client_report_id:
+          type: string
+          nullable: true
+          description: Client-generated identifier, which can be used by lenders to track loan applications.
+        voa:
+          $ref: '#/components/schemas/CraVoaReport'
+        voe:
+          $ref: '#/components/schemas/CraVoeReport'
+      required:
+      - report_id
+    CraVoaReportAttributes:
+      title: CraVoaReportAttributes
+      type: object
+      description: Attributes for the VOA report.
+      additionalProperties: true
+      properties:
+        total_inflow_amount:
+          $ref: '#/components/schemas/TotalReportInflowAmount'
+        total_outflow_amount:
+          $ref: '#/components/schemas/TotalReportOutflowAmount'
+      required:
+      - total_inflow_amount
+      - total_outflow_amount
+    CraVoaReport:
+      title: CraVoaReport
+      type: object
+      description: An object representing a VOE report.
+      additionalProperties: true
+      nullable: true
+      properties:
+        generated_time:
+          type: string
+          format: date-time
+          description: The date and time when the VOA Report was created, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (e.g. "2018-04-12T03:32:11Z").
+        days_requested:
+          type: number
+          description: The number of days of transaction history that the VOA report covers.
+        items:
+          type: array
+          description: Data returned by Plaid about each of the Items included in the Base Report.
+          items:
+            $ref: '#/components/schemas/CraVoaReportItem'
+        attributes:
+          $ref: '#/components/schemas/CraVoaReportAttributes'
+      required:
+      - generated_time
+      - days_requested
+      - items
+      - attributes
+    CraVoaReportItem:
+      title: CraVoaReportItem
+      type: object
+      description: A representation of an Item within a VOA report.
+      additionalProperties: true
+      properties:
+        accounts:
+          type: array
+          description: Data about each of the accounts open on the Item.
+          items:
+            $ref: '#/components/schemas/CraVoaReportAccount'
+        institution_name:
+          type: string
+          description: The full financial institution name associated with the Item.
+        institution_id:
+          type: string
+          description: The id of the financial institution associated with the Item.
+        item_id:
+          $ref: '#/components/schemas/ItemId'
+        last_update_time:
+          type: string
+          format: date-time
+          description: The date and time when this Item’s data was last retrieved from the financial institution, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format.
+      required:
+      - accounts
+      - institution_name
+      - institution_id
+      - item_id
+      - last_update_time
+    CraVoaReportAccount:
+      title: CraVoaReportAccount
+      type: object
+      description: VOA Report information about an account.
+      additionalProperties: true
+      properties:
+        account_id:
+          type: string
+          description: |-
+            Plaid’s unique identifier for the account. This value will not change unless Plaid can't reconcile the account with the data returned by the financial institution. This may occur, for example, when the name of the account changes. If this happens a new `account_id` will be assigned to the account.
+
+            If an account with a specific `account_id` disappears instead of changing, the account is likely closed. Closed accounts are not returned by the Plaid API.
+
+            Like all Plaid identifiers, the `account_id` is case sensitive.
+        balances:
+          $ref: '#/components/schemas/CraVoaReportAccountBalances'
+        consumer_disputes:
+          type: array
+          description: The information about previously submitted valid dispute statements by the consumer
+          items:
+            $ref: '#/components/schemas/ConsumerDispute'
+        mask:
+          type: string
+          nullable: true
+          description: The last 2-4 alphanumeric characters of an account's official account number. Note that the mask may be non-unique between an Item's accounts, and it may also not match the mask that the bank displays to the user.
+        name:
+          type: string
+          description: The name of the account, either assigned by the user or by the financial institution itself.
+        official_name:
+          type: string
+          nullable: true
+          description: The official name of the account as given by the financial institution.
+        type:
+          $ref: '#/components/schemas/AccountType'
+        subtype:
+          $ref: '#/components/schemas/AccountSubtype'
+        days_available:
+          type: number
+          description: The duration of transaction history available within this report for this Item, typically defined as the time since the date of the earliest transaction in that account.
+        transactions_insights:
+          $ref: '#/components/schemas/CraVoaReportTransactionsInsights'
+        owners:
+          type: array
+          description: Data returned by the financial institution about the account owner or owners.
+          items:
+            $ref: '#/components/schemas/Owner'
+        ownership_type:
+          $ref: '#/components/schemas/OwnershipType'
+      required:
+      - account_id
+      - balances
+      - consumer_disputes
+      - mask
+      - name
+      - official_name
+      - type
+      - subtype
+      - days_available
+      - transactions_insights
+      - owners
+      - ownership_type
+    CraVoaReportAccountBalances:
+      title: CraVoaReportAccountBalances
+      type: object
+      description: VOA Report information about an account's balances.
+      additionalProperties: true
+      properties:
+        available:
+          type: number
+          format: double
+          description: |-
+            The amount of funds available to be withdrawn from the account, as determined by the financial institution.
+
+            For `credit`-type accounts, the `available` balance typically equals the `limit` less the `current` balance, less any pending outflows plus any pending inflows.
+
+            For `depository`-type accounts, the `available` balance typically equals the `current` balance less any pending outflows plus any pending inflows. For `depository`-type accounts, the `available` balance does not include the overdraft limit.
+
+            For `investment`-type accounts (or `brokerage`-type accounts for API versions 2018-05-22 and earlier), the `available` balance is the total cash available to withdraw as presented by the institution.
+
+            Note that not all institutions calculate the `available`  balance. In the event that `available` balance is unavailable, Plaid will return an `available` balance value of `null`.
+
+            Available balance may be cached and is not guaranteed to be up-to-date in realtime unless the value was returned by `/accounts/balance/get`.
+
+            If `current` is `null` this field is guaranteed not to be `null`.
+          nullable: true
+        current:
+          type: number
+          format: double
+          description: |-
+            The total amount of funds in or owed by the account.
+
+            For `credit`-type accounts, a positive balance indicates the amount owed; a negative amount indicates the lender owing the account holder.
+
+            For `loan`-type accounts, the current balance is the principal remaining on the loan, except in the case of student loan accounts at Sallie Mae (`ins_116944`). For Sallie Mae student loans, the account's balance includes both principal and any outstanding interest.
+
+            For `investment`-type accounts (or `brokerage`-type accounts for API versions 2018-05-22 and earlier), the current balance is the total value of assets as presented by the institution.
+
+            Note that balance information may be cached unless the value was returned by `/accounts/balance/get`; if the Item is enabled for Transactions, the balance will be at least as recent as the most recent Transaction update. If you require realtime balance information, use the `available` balance as provided by `/accounts/balance/get`.
+
+            When returned by `/accounts/balance/get`, this field may be `null`. When this happens, `available` is guaranteed not to be `null`.
+          nullable: true
+        iso_currency_code:
+          type: string
+          description: The ISO-4217 currency code of the balance. Always null if `unofficial_currency_code` is non-null.
+          nullable: true
+        unofficial_currency_code:
+          type: string
+          description: |-
+            The unofficial currency code associated with the balance. Always null if `iso_currency_code` is non-null. Unofficial currency codes are used for currencies that do not have official ISO currency codes, such as cryptocurrencies and the currencies of certain countries.
+
+            See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `unofficial_currency_code`s.
+          nullable: true
+        historical_balances:
+          type: array
+          description: Calculated data about the historical balances on the account.
+          items:
+            $ref: '#/components/schemas/CraVoaReportAccountHistoricalBalance'
+        average_balance_30_days:
+          type: number
+          format: double
+          description: The average balance in the account over the last 30 days. Calculated using the derived historical balances.
+          nullable: true
+        average_balance_60_days:
+          type: number
+          format: double
+          description: The average balance in the account over the last 60 days. Calculated using the derived historical balances.
+          nullable: true
+        nsf_overdraft_transactions_count:
+          type: number
+          description: The number of NSF and overdraft fee transactions in the time range for the report in the given account.
+      required:
+      - available
+      - current
+      - iso_currency_code
+      - unofficial_currency_code
+      - historical_balances
+      - average_balance_30_days
+      - average_balance_60_days
+      - nsf_overdraft_transactions_count
+    CraVoaReportAccountHistoricalBalance:
+      title: CraVoaReportAccountHistoricalBalance
+      type: object
+      description: An object representing a balance held by an account in the past.
+      additionalProperties: true
+      properties:
+        current:
+          type: number
+          format: double
+          description: The total amount of funds in the account, calculated from the `current` balance in the `balance` object by subtracting inflows and adding back outflows according to the posted date of each transaction.
+        date:
+          type: string
+          format: date
+          description: The date of the calculated historical balance, in an [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (YYYY-MM-DD).
+        iso_currency_code:
+          type: string
+          description: The ISO-4217 currency code of the balance. Always `null` if `unofficial_currency_code` is non-`null`.
+          nullable: true
+        unofficial_currency_code:
+          type: string
+          description: |-
+            The unofficial currency code associated with the balance. Always `null` if `iso_currency_code` is non-`null`.
+
+            See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `unofficial_currency_code`s.
+          nullable: true
+      required:
+      - current
+      - date
+      - iso_currency_code
+      - unofficial_currency_code
+    CraVoaReportTransactionsInsights:
+      title: CraVoaReportTransactionsInsights
+      type: object
+      description: Transaction data associated with the account.
+      additionalProperties: true
+      properties:
+        all_transactions:
+          type: array
+          description: Transaction history associated with the account.
+          items:
+            $ref: '#/components/schemas/BaseReportTransaction'
+        end_date:
+          type: string
+          format: date
+          description: The latest timeframe provided by the FI, in an ISO 8601 format (YYYY-MM-DD).
+          nullable: true
+        start_date:
+          type: string
+          format: date
+          description: The earliest timeframe provided by the FI, in an ISO 8601 format (YYYY-MM-DD).
+          nullable: true
+      required:
+      - all_transactions
+      - end_date
+      - start_date
+    CraVoeReport:
+      title: CraVoeReport
+      type: object
+      description: An object representing a VOE report.
+      additionalProperties: true
+      nullable: true
+      properties:
+        generated_time:
+          type: string
+          format: date-time
+          description: The date and time when the VOE Report was created, in ISO 8601 format (e.g. "2018-04-12T03:32:11Z").
+        days_requested:
+          type: number
+          description: The number of days of transaction history that the VOE Report covers.
+        items:
+          type: array
+          description: Data returned by Plaid about each of the Items included in the VOE Report.
+          items:
+            $ref: '#/components/schemas/CraVoeReportItem'
+      required:
+      - generated_time
+      - days_requested
+      - items
+    CraVoeReportItem:
+      title: CraVoeReportItem
+      type: object
+      description: A representation of an Item within a VOE Report.
+      additionalProperties: true
+      properties:
+        accounts:
+          type: array
+          description: Data about each of the accounts open on the Item.
+          items:
+            $ref: '#/components/schemas/CraVoeReportAccount'
+        institution_name:
+          type: string
+          description: The full financial institution name associated with the Item.
+        institution_id:
+          type: string
+          description: The id of the financial institution associated with the Item.
+        item_id:
+          $ref: '#/components/schemas/ItemId'
+        last_update_time:
+          type: string
+          format: date-time
+          description: The date and time when this Item’s data was last retrieved from the financial institution, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format.
+      required:
+      - accounts
+      - institution_name
+      - institution_id
+      - item_id
+      - last_update_time
+    CraVoeReportAccount:
+      title: CraVoeReportAccount
+      type: object
+      description: VOE Report information about an account.
+      additionalProperties: true
+      properties:
+        account_id:
+          type: string
+          description: |-
+            Plaid’s unique identifier for the account. This value will not change unless Plaid can't reconcile the account with the data returned by the financial institution. This may occur, for example, when the name of the account changes. If this happens a new `account_id` will be assigned to the account.
+
+            If an account with a specific `account_id` disappears instead of changing, the account is likely closed. Closed accounts are not returned by the Plaid API.
+
+            Like all Plaid identifiers, the `account_id` is case sensitive.
+        name:
+          type: string
+          description: The name of the account, either assigned by the user or by the financial institution itself.
+        official_name:
+          type: string
+          nullable: true
+          description: The official name of the account as given by the financial institution.
+        type:
+          $ref: '#/components/schemas/AccountType'
+        subtype:
+          $ref: '#/components/schemas/AccountSubtype'
+        transactions:
+          type: array
+          description: Transaction history associated with the account for the VOE Report. Note that this transaction differs from a Base Report transaction in that it will only be deposits, and the amounts will be omitted.
+          items:
+            $ref: '#/components/schemas/CraVoeReportTransaction'
+      required:
+      - account_id
+      - name
+      - official_name
+      - type
+      - subtype
+      - transactions
+    CraVoeReportTransaction:
+      title: CraVoeReportTransaction
+      type: object
+      description: A transaction on the VoE report. Note that this transaction differs from a Base Report transaction in that it will only be deposits, and the amounts will be omitted.
+      additionalProperties: true
+      properties:
+        account_id:
+          type: string
+          description: The ID of the account in which this transaction occurred.
+        original_description:
+          type: string
+          description: The string returned by the financial institution to describe the transaction.
+        date:
+          type: string
+          format: date
+          description: For pending transactions, the date that the transaction occurred; for posted transactions, the date that the transaction posted. Both dates are returned in an ISO 8601 format ( `YYYY-MM-DD` ).
+        pending:
+          type: boolean
+          description: When `true`, identifies the transaction as pending or unsettled. Pending transaction details (name, type, amount, category ID) may change before they are settled.
+        transaction_id:
+          type: string
+          description: The unique ID of the transaction. Like all Plaid identifiers, the `transaction_id` is case sensitive.
+      required:
+      - account_id
+      - original_description
+      - date
+      - pending
+      - transaction_id
     CraLoansApplicationsRegisterRequest:
       type: object
       description: CraLoansApplicationsRegisterRequest defines the request schema for `/cra/loans/applications/register`.
@@ -58237,9 +58432,41 @@ components:
         ruleset_key:
           type: string
           description: The key of the Ruleset used for this transaction.
+        triggered_rule_details:
+          $ref: '#/components/schemas/RuleDetails'
         outcome:
+          deprecated: true
           type: string
           description: The evaluated outcome for this transaction. You can configure a list of outcomes, such as "accept", "review", and "decline" using the Signal dashboard located within the Plaid Dashboard.
+    RuleDetails:
+      title: RuleDetails
+      type: object
+      description: Details about the rule that was triggered for this transaction.
+      nullable: true
+      additionalProperties: true
+      properties:
+        result:
+          $ref: '#/components/schemas/RuleResult'
+        internal_note:
+          type: string
+          description: A message for your internal use about the rule that was triggered for this transaction.
+        custom_action_key:
+          type: string
+          description: A string key used to trigger programmatic behavior for a certain `result`. For instance, you could optionally choose to define a `3-day-hold` key for an `ACCEPT` result.
+      required:
+      - result
+    RuleResult:
+      type: string
+      enum:
+      - ACCEPT
+      - REROUTE
+      - REVIEW
+      description: |-
+        The result of the rule that was triggered for this transaction.
+
+        `ACCEPT`: Accept the transaction for processing.
+        `REROUTE`: Reroute the transaction to a different payment method.
+        `REVIEW`: Review the transaction before proceeding.
     SignalDecisionOutcome:
       type: string
       enum:
@@ -58818,4 +59045,4 @@ components:
     VerifyClientSessionStartData:
       title: VerifyClientSessionStartData
       type: string
-      description: The initial data collected by the Plaid.JS SDK when a Verify client session is started.
+      description: The initial data collected by the Plaid Pixel SDK when a Verify client session is started.

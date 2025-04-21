@@ -1,3 +1,30 @@
+### 2020-09-14_1.633.1
+- [BREAKING] Update `account` object to nullable in `/processor/transactions/sync` response
+
+### 2020-09-14_1.633.0
+- Move `user_id` field of `/session/token/create` request to be within `user`
+
+### 2020-09-14_1.632.6
+- Update descriptions for `CashFlowUpdatesLowBalanceWebhook` and `CashFlowUpdatesLargeDepositWebhook`
+
+### 2020-09-14_1.632.5
+- Add new `CashFlowUpdatesInsightsWebhook` for Cash Flow Updates
+
+### 2020-09-14_1.632.4
+- Add `triggered_rule_details` to `/signal/evaluate` response
+
+### 2020-09-14_1.632.3
+- [BREAKING] Update `webhook` field in `IssuesSubscribeRequest` to be required
+
+### 2020-09-14_1.632.2
+- Update the `warnings` field in `/cra/check_report/verification/get` response to be required
+
+### 2020-09-14_1.632.1
+- Add `AT` and `FI` to the list of available countries
+
+### 2020-09-14_1.632.0
+- Add `user_id` field to `/session/token/create` request
+
 ### 2020-09-14_1.631.0
 - [BREAKING] Correct the schema object returned by `AssetReport` `investments` field -- it is now correctly represented as an `AssetReportInvestments` object, not an `AssetReportInvestmentsTransaction` object, to accurately reflect the API behavior.
 
