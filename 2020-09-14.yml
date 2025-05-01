@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.633.1
+  version: 2020-09-14_1.635.2
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -2456,6 +2456,128 @@ paths:
             schema:
               $ref: '#/components/schemas/ConsumerReportPDFGetRequest'
         description: ""
+  /oauth/token:
+    post:
+      tags:
+      - plaid
+      summary: Create or refresh an OAuth access token
+      externalDocs:
+        url: /api/oauth/#token
+      operationId: oauthToken
+      description: |-
+        `/oauth/token` issues an access token and refresh token depending on the `grant_type` provided:
+          - `refresh_token` allows refreshing an access token using a refresh token. Only the `refresh_token` field is required.
+          - `urn:ietf:params:oauth:grant-type:token-exchange` allows exchanging a subject token for an OAuth token. The following `subject_token_type`s are supported:
+            - `urn:plaid:params:tokensdb::user-token` allows exchanging a Plaid-issued user token for an OAuth token. `audience` must be the same as the `client_id`. `subject_token` must be a Plaid-issued user token issued from the `/user/create` endpoint.
+            - `urn:plaid:params:oauth::user-token` allows exchanging a refresh token for an OAuth token to another `client_id`. The other `client_id` is provided in `audience`. `subject_token` must be an OAuth refresh token issued from the `/oauth/token` endpoint.
+
+        Note: This endpoint supports `Content-Type: application/x-www-form-urlencoded` as well as JSON. The fields for the form are equivalent to the fields for JSON and conform to the OAuth 2.0 specification.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OAuthTokenRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthTokenResponse'
+              examples:
+                example-1:
+                  value:
+                    access_token: pda-RDdg0TUCB0FB25_UPIlnhA==
+                    refresh_token: pdr--viXurkDg88d5zf8m6Wl0g==
+                    expires_in: 900
+                    token_type: Bearer
+                    request_id: m8MDqcS6F3lzqvP
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthErrorResponse'
+  /oauth/introspect:
+    post:
+      tags:
+      - plaid
+      summary: Get metadata about an OAuth token
+      externalDocs:
+        url: /api/oauth/#introspect
+      operationId: oauthIntrospect
+      description: |-
+        `/oauth/introspect` returns metadata about an access token or refresh token.
+
+        Note: This endpoint supports `Content-Type: application/x-www-form-urlencoded` as well as JSON. The fields for the form are equivalent to the fields for JSON and conform to the OAuth 2.0 specification.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OAuthIntrospectRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthIntrospectResponse'
+              examples:
+                example-1:
+                  value:
+                    active: true
+                    scope: user:read user:write exchange
+                    client_id: 68028ce48d2b0dec68747f6c
+                    exp: 1670000000
+                    iat: 1670000000
+                    sub: 68028ce48d2b0dec68747f6c
+                    aud: https://production.plaid.com
+                    iss: https://production.plaid.com
+                    token_type: Bearer
+                    request_id: m8MDqcS6F3lzqvP
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthErrorResponse'
+  /oauth/revoke:
+    post:
+      tags:
+      - plaid
+      summary: Revoke an OAuth token
+      externalDocs:
+        url: /api/oauth/#revoke
+      operationId: oauthRevoke
+      description: |-
+        `/oauth/revoke` revokes an access or refresh token, preventing any further use. If a refresh token is revoked, all access and refresh tokens derived from it are also revoked, including exchanged tokens.
+
+        Note: This endpoint supports `Content-Type: application/x-www-form-urlencoded` as well as JSON. The fields for the form are equivalent to the fields for JSON and conform to the OAuth 2.0 specification.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OAuthRevokeRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthRevokeResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: m8MDqcS6F3lzqvP
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthErrorResponse'
   /statements/list:
     post:
       tags:
@@ -3381,6 +3503,44 @@ paths:
                       official_name: Plaid Gold Standard 0% Interest Checking
                       subtype: checking
                       type: depository
+                      owners:
+                      - addresses:
+                        - data:
+                            city: Malakoff
+                            country: US
+                            postal_code: "14236"
+                            region: NY
+                            street: 2992 Cameron Road
+                          primary: true
+                        - data:
+                            city: San Matias
+                            country: US
+                            postal_code: 93405-2255
+                            region: CA
+                            street: 2493 Leisure Lane
+                          primary: false
+                        emails:
+                        - data: accountholder0@example.com
+                          primary: true
+                          type: primary
+                        - data: accountholder1@example.com
+                          primary: false
+                          type: secondary
+                        - data: extraordinarily.long.email.username.123456@reallylonghostname.com
+                          primary: false
+                          type: other
+                        names:
+                        - Alberta Bobbeth Charleson
+                        phone_numbers:
+                        - data: "1112223333"
+                          primary: false
+                          type: home
+                        - data: "1112224444"
+                          primary: false
+                          type: work
+                        - data: "1112225555"
+                          primary: false
+                          type: mobile
                     transactions:
                     - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
                       account_owner: null
@@ -18423,7 +18583,7 @@ components:
           type: array
           description: An array containing the `accounts` associated with the Item for which transactions are being returned. Each transaction can be mapped to its corresponding account via the `account_id` field.
           items:
-            $ref: '#/components/schemas/AccountBase'
+            $ref: '#/components/schemas/BusinessAccount'
         transactions:
           type: array
           description: An array containing transactions from the account. Transactions are returned in reverse chronological order, with the most recent at the beginning of the array. The maximum number of transactions returned is determined by the `count` parameter.
@@ -18450,6 +18610,19 @@ components:
       - next_cursor
       - has_more
       - request_id
+    BusinessAccount:
+      description: Business identity information about an account
+      title: BusinessAccount
+      allOf:
+      - $ref: '#/components/schemas/AccountBase'
+      - type: object
+        additionalProperties: true
+        properties:
+          owners:
+            type: array
+            description: Data returned by the financial institution about the account owner or owners. For business accounts, the name reported may be either the name of the individual or the name of the business, depending on the institution. Multiple owners on a single account will be represented in the same owner object, not in multiple owner objects within the array.
+            items:
+              $ref: '#/components/schemas/Owner'
     TransactionsRecurringUpdateRequest:
       type: object
       description: TransactionsRecurringUpdateRequest defined the request schema for `/transactions/recurring/streams/update` endpoint.
@@ -22152,6 +22325,8 @@ components:
     LinkTokenCreateRequest:
       type: object
       description: LinkTokenCreateRequest defines the request schema for `/link/token/create`
+      x-reserved-keys:
+      - deposit_switch
       properties:
         client_id:
           $ref: '#/components/schemas/APIClientID'
@@ -22336,8 +22511,6 @@ components:
           $ref: '#/components/schemas/LinkTokenCreateRequestPaymentConfiguration'
         payment_initiation:
           $ref: '#/components/schemas/LinkTokenCreateRequestPaymentInitiation'
-        deposit_switch:
-          $ref: '#/components/schemas/LinkTokenCreateRequestDepositSwitch'
         employment:
           $ref: '#/components/schemas/LinkTokenCreateRequestEmployment'
         income_verification:
@@ -22529,6 +22702,7 @@ components:
           $ref: '#/components/schemas/LinkTokenCreateRequestRedirectUri'
       required:
       - template_id
+      - user
     SessionTokenCreateRequestUser:
       type: object
       description: SessionTokenCreateRequestUser defines per-session user-specific data for `/session/token/create`
@@ -22538,6 +22712,8 @@ components:
           description: A unique ID representing the end user. Typically this will be a user ID number from your application. Personally identifiable information, such as an email address or phone number, should not be used in the `client_user_id`. It is currently used as a means of searching logs for the given user in the Plaid Dashboard.
         user_id:
           $ref: '#/components/schemas/UserId'
+      required:
+      - client_user_id
     HostedLinkDeliveryMethod:
       type: string
       description: |
@@ -31206,6 +31382,11 @@ components:
           description: The date when settlement will occur between Plaid and the receiving bank (RDFI). For ACH debits, this is the date funds will be pulled from the bank account being debited. For ACH credits, this is the date funds will be delivered to the bank account being credited. Only set for ACH transfers; `null` for non-ACH transfers. This will be of the form YYYY-MM-DD.
           format: date
           nullable: true
+        expected_funds_available_date:
+          type: string
+          description: The expected date when funds from a transfer will be made available and can be withdrawn from the associated ledger balance, assuming the debit does not return before this date. If the transfer does return before this date, this field will be null. Only applies to debit transfers. This will be of the form YYYY-MM-DD.
+          format: date
+          nullable: true
         originator_client_id:
           type: string
           nullable: true
@@ -33946,6 +34127,11 @@ components:
         settled:
           type: string
           description: The date when the sweep settled, in the YYYY-MM-DD format.
+          format: date
+          nullable: true
+        expected_funds_available_date:
+          type: string
+          description: The expected date when funds from a ledger deposit will be made available and can be withdrawn from the associated ledger balance. Only applies to deposits. This will be of the form YYYY-MM-DD.
           format: date
           nullable: true
         status:
@@ -45232,6 +45418,9 @@ components:
         payment_id:
           type: string
           description: The ID of the payment to simulate
+        webhook:
+          type: string
+          description: The webhook url to use for any payment events triggered by the simulated status change.
         status:
           type: string
           description: |-
@@ -45247,6 +45436,7 @@ components:
             - `PAYMENT_STATUS_REJECTED`
       required:
       - payment_id
+      - webhook
       - status
     SandboxPaymentSimulateResponse:
       type: object
@@ -47451,8 +47641,7 @@ components:
           description: Number of days with no transactions
     BaseReportAttributes:
       title: BaseReportAttributes
-      deprecated: true
-      description: Calculated attributes derived from transaction-level data. This field has been deprecated in favor of [Base Report attributes aggregated across accounts](https://plaid.com/docs/api/products/check/#cra-check_report-base_report-get-response-report-attributes) and will be removed in a future release.
+      description: Calculated attributes derived from transaction-level data.
       type: object
       additionalProperties: true
       properties:
@@ -57441,6 +57630,205 @@ components:
           description: The last webhook code sent.
           type: string
           nullable: true
+    OAuthScope:
+      title: OAuth Scope
+      type: string
+      description: A JSON string containing a space-separated list of scopes associated with this token, in the format described in https://datatracker.ietf.org/doc/html/rfc6749#section-3.3 `user:read` allows reading user data. `user:write` allows writing user data. `exchange` allows exchanging a token using the `urn:plaid:params:oauth::user-token` grant type.
+      example: user:read user:write exchange
+    OAuthErrorCode:
+      title: OAuth Error Code
+      type: string
+      enum:
+      - invalid_request
+      - invalid_client
+      - invalid_grant
+      - unauthorized_client
+      - invalid_scope
+      - unsupported_grant_type
+      description: OAuth error code
+    OAuthErrorDescription:
+      title: OAuth Error Description
+      type: string
+      description: A human-readable description of the error
+    OAuthErrorURI:
+      title: OAuth Error URI
+      type: string
+      description: A URI identifying the specific error
+    OAuthRefreshToken:
+      title: OAuth Refresh Token
+      type: string
+      description: Refresh token for OAuth
+    OAuthAccessToken:
+      title: OAuth Access Token
+      type: string
+      description: Access token for OAuth
+    OAuthAnyToken:
+      title: OAuth Generic Token
+      type: string
+      description: An OAuth token of any type (`refresh_token`, `access_token`, etc)
+    OAuthGrantType:
+      type: string
+      enum:
+      - refresh_token
+      - urn:ietf:params:oauth:grant-type:token-exchange
+      description: The type of OAuth grant being requested. These grants are defined in their respective RFCs. `refresh_token` is defined in RFC 6749 and `urn:ietf:params:oauth:grant-type:token-exchange` is defined in RFC 8693.
+    OAuthSubjectTokenType:
+      type: string
+      enum:
+      - urn:plaid:params:tokensdb::user-token
+      - urn:plaid:params:oauth::user-token
+      description: The type of the subject token. `urn:plaid:params:tokensdb::user-token` allows exchanging a Plaid-issued user token for an OAuth token. `audience` must be the same as the `client_id`. `subject_token` must be a Plaid-issued user token issued from the `/user/create` endpoint. `urn:plaid:params:oauth::user-token` allows exchanging a refresh token for an OAuth token to another `client_id`. The other `client_id` is provided in `audience`. `subject_token` must be an OAuth refresh token issued from the `/oauth/token` endpoint.
+    OAuthTokenRequest:
+      type: object
+      required:
+      - grant_type
+      properties:
+        grant_type:
+          $ref: '#/components/schemas/OAuthGrantType'
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        client_secret:
+          $ref: '#/components/schemas/APISecret'
+        scope:
+          $ref: '#/components/schemas/OAuthScope'
+        refresh_token:
+          $ref: '#/components/schemas/OAuthRefreshToken'
+        resource:
+          type: string
+          description: URI of the target resource server
+          example: https://production.plaid.com
+        audience:
+          type: string
+          description: Used when exchanging a token. The meaning depends on the `subject_token_type`.
+          example: 68028ce48d2b0dec68747f6c
+        subject_token:
+          type: string
+          description: Token representing the subject. The meaning depends on the `subject_token_type`.
+          example: user-sandbox-b0e2c4ee-a763-4df5-bfe9-46a46bce993d
+        subject_token_type:
+          $ref: '#/components/schemas/OAuthSubjectTokenType'
+      description: OAuth token grant request.
+    OAuthTokenResponse:
+      type: object
+      required:
+      - access_token
+      - refresh_token
+      - token_type
+      - expires_in
+      - request_id
+      additionalProperties: true
+      properties:
+        access_token:
+          $ref: '#/components/schemas/OAuthAccessToken'
+        refresh_token:
+          $ref: '#/components/schemas/OAuthRefreshToken'
+        token_type:
+          type: string
+          example: Bearer
+          description: type of token the access token is. Currently it is always Bearer
+        expires_in:
+          type: integer
+          example: 500
+          description: time remaining in seconds before expiration
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      description: OAuth token grant success response
+    OAuthIntrospectRequest:
+      type: object
+      required:
+      - token
+      properties:
+        token:
+          $ref: '#/components/schemas/OAuthAnyToken'
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        client_secret:
+          $ref: '#/components/schemas/APISecret'
+      description: OAuth token introspect request.
+    OAuthIntrospectResponse:
+      type: object
+      additionalProperties: true
+      required:
+      - active
+      - request_id
+      properties:
+        active:
+          type: boolean
+          description: Boolean indicator of whether or not the presented token is currently active. A true value indicates that the token has been issued, has not been revoked, and is within the time window of validitity
+        scope:
+          $ref: '#/components/schemas/OAuthScope'
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        exp:
+          type: integer
+          description: Expiration time as UNIX timestamp since January 1 1970 UTC
+          example: 1670000000
+        iat:
+          type: integer
+          description: Issued at time as UNIX timestamp since January 1 1970 UTC
+          example: 1670000000
+        sub:
+          type: string
+          description: Subject of the token
+          example: 68028ce48d2b0dec68747f6c
+        aud:
+          type: string
+          description: Audience of the token
+          example: https://production.plaid.com
+        iss:
+          type: string
+          description: Issuer of the token
+          example: https://production.plaid.com
+        token_type:
+          type: string
+          description: Type of the token
+          example: Bearer
+        user_id:
+          type: string
+          description: User ID of the token
+          example: wz666MBjYWTp2PDzzggYhM6oWWmBb
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      description: OAuth token introspect response
+    OAuthErrorResponse:
+      type: object
+      additionalProperties: true
+      required:
+      - error
+      - request_id
+      - error_description
+      - error_uri
+      properties:
+        error:
+          $ref: '#/components/schemas/OAuthErrorCode'
+        error_description:
+          $ref: '#/components/schemas/OAuthErrorDescription'
+        error_uri:
+          $ref: '#/components/schemas/OAuthErrorURI'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      description: OAuth error response
+    OAuthRevokeRequest:
+      type: object
+      required:
+      - token
+      properties:
+        token:
+          $ref: '#/components/schemas/OAuthAnyToken'
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        client_secret:
+          $ref: '#/components/schemas/APISecret'
+      description: OAuth token revoke request
+    OAuthRevokeResponse:
+      type: object
+      required:
+      - request_id
+      additionalProperties: true
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      description: successful OAuth token revoke response
     GetRecipientsResponse:
       type: object
       description: GetRecipientsResponse defines the response schema for `/fdx/recipients`
@@ -58432,12 +58820,16 @@ components:
         ruleset_key:
           type: string
           description: The key of the Ruleset used for this transaction.
+        result:
+          $ref: '#/components/schemas/RuleResult'
         triggered_rule_details:
           $ref: '#/components/schemas/RuleDetails'
         outcome:
           deprecated: true
           type: string
-          description: The evaluated outcome for this transaction. You can configure a list of outcomes, such as "accept", "review", and "decline" using the Signal dashboard located within the Plaid Dashboard.
+          description: The evaluated outcome for this transaction. This field is deprecated, use `result` or `triggered_rule_details.custom_action_key` instead.
+      required:
+      - result
     RuleDetails:
       title: RuleDetails
       type: object
@@ -58445,16 +58837,12 @@ components:
       nullable: true
       additionalProperties: true
       properties:
-        result:
-          $ref: '#/components/schemas/RuleResult'
         internal_note:
           type: string
           description: A message for your internal use about the rule that was triggered for this transaction.
         custom_action_key:
           type: string
           description: A string key used to trigger programmatic behavior for a certain `result`. For instance, you could optionally choose to define a `3-day-hold` key for an `ACCEPT` result.
-      required:
-      - result
     RuleResult:
       type: string
       enum:
