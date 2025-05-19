@@ -1,3 +1,33 @@
+### 2020-09-14_1.627.4
+- Fix incorrect placement of `nullable: true` on `AccountBaseNullable` object, making the object actually `nullable`.
+
+### 2020-09-14_1.627.3
+- Add missing `unsent` value as a possible `verification_status` to reflect actual API behavior.
+
+### 2020-09-14_1.637.2
+- (beta) Add `PLAID-NEW-USER-API-ENABLED` as a header parameter to `/user/create`
+- (beta) Add `PLAID-NEW-USER-API-ENABLED` as a header parameter to `/user/remove`
+
+### 2020-09-14_1.637.2
+- (beta) Add `user_id` to `/session/token/create` response
+
+### 2020-09-14_1.637.1
+- Add optional `institution_id` to `/item/import`
+
+### 2020-09-14_1.637.0
+- Add `android_package_name` to `/session/token/create`
+
+### 2020-09-14_1.636.0
+- Update `average_inflow_amount` to be positive.
+
+### 2020-09-14_1.635.4
+- [BREAKING] (beta) Updated `user_token` field in `UserCreateResponse` to be optional.
+- [BREAKING for Go] (beta) Updated `user_token` field in `UserRemoveRequest` to be optional.
+- Other hidden changes.
+
+### 2020-09-14_1.635.3
+- (beta) Add `user_id` to `/link/token/create` response
+
 ### 2020-09-14_1.635.2
 - Update description of `ruleset.outcome` in `/signal/evaluate` response
 
