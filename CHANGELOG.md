@@ -1,3 +1,12 @@
+### 2020-09-14_1.628.1
+- Support for upcoming results in `link/token/get`.
+
+### 2020-09-14_1.628.0
+-  (pre-release) Preparation for upcoming products.
+
+### 2020-09-14_1.627.5
+- Deprecate `report.items.accounts.account_insights` for `/cra/check_report/base_report/get`
+
 ### 2020-09-14_1.627.4
 - Fix incorrect placement of `nullable: true` on `AccountBaseNullable` object, making the object actually `nullable`.
 
