@@ -1,3 +1,25 @@
+### 2020-09-14_1.639.0
+- [Breaking] Add /cashflow_report/transactions/get route, identital to /cashflow_report/get minus days_requested request parameter
+- Remove historical_balances from BusinessAccounts object
+
+### 2020-09-14_1.638.0
+- Add `webhook` field to `/session/token/create` request
+
+### 2020-09-14_1.637.6
+- Deprecate Prism Products field from Partner Insights generation and retrieval
+
+### 2020-09-14_1.637.5
+- Add client report id to partner insights
+
+### 2020-09-14_1.637.4
+- Remove unused enums for MonitoringInsightsStatus and MonitoringItemStatusCode
+
+### 2020-09-14_1.637.3
+- Add Prism Detect and Extend cashscores to CRA Partner Insights 
+
+### 2020-09-14_1.628.2
+- (beta) expect a boolean instead of a string in generated client interfaces for PLAID-NEW-USER-API-ENABLED
+
 ### 2020-09-14_1.628.1
 - Support for upcoming results in `link/token/get`.
 
