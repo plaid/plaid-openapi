@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.628.1
+  version: 2020-09-14_1.641.1
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -719,6 +719,7 @@ paths:
                             l6m_cumbal_acc: 1
                         cash_score:
                           version: 3
+                          model_version: "3"
                           score: 900
                           reason_codes:
                           - CS03038
@@ -735,6 +736,7 @@ paths:
                             l1m_debit_value_cnt: 40
                         first_detect:
                           version: 3
+                          model_version: "3"
                           score: 900
                           reason_codes:
                           - CS03038
@@ -1969,6 +1971,7 @@ paths:
                     request_id: LhQf0THi8SH1yJm
                     report:
                       report_id: vzeNDwK7KQIm4yEog683uElbp9GRLEFXGK98D
+                      client_report_id: client_report_id_1221
                       generated_time: "2022-01-31T22:47:53Z"
                       items:
                       - institution_id: ins_109508
@@ -1992,6 +1995,7 @@ paths:
                             l6m_cumbal_acc: 1
                         cash_score:
                           version: 3
+                          model_version: "3"
                           score: 900
                           reason_codes:
                           - CS03038
@@ -2008,6 +2012,7 @@ paths:
                             l1m_debit_value_cnt: 40
                         first_detect:
                           version: 3
+                          model_version: "3"
                           score: 900
                           reason_codes:
                           - CS03038
@@ -3415,6 +3420,66 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/TransactionsRefreshRequest'
+  /sandbox/transactions/create:
+    post:
+      tags:
+      - plaid
+      summary: Create sandbox transactions
+      externalDocs:
+        url: /api/sandbox/#sandboxtransactionscreate
+      operationId: sandboxTransactionsCreate
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SandboxTransactionsCreateResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: m8MDnv9okwxFNBV
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+              examples:
+                too_many_transactions:
+                  value:
+                    error_type: INVALID_REQUEST
+                    error_code: INVALID_FIELD
+                    error_message: The request contains too many transactions.
+                    display_message: The request contains too many transactions.
+                    status: 400
+                    request_id: m8MDnv9okwxFNBV
+                invalid_dates:
+                  value:
+                    error_type: INVALID_REQUEST
+                    error_code: INVALID_FIELD
+                    error_message: Transaction and posted dates must be within the last 14 days. The posted date cannot be before the transaction date.
+                    display_message: Transaction and posted dates must be within the last 14 days. The posted date cannot be before the transaction date.
+                    status: 400
+                    request_id: m8MDnv9okwxFNBV
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+          description: Error response
+      description: |-
+        Use the `/sandbox/transactions/create` endpoint to create new transactions for an existing Item. This endpoint can be used to add up to 10 transactions to any Item at a time.
+
+        This endpoint is only available in the Sandbox environment, thus can only be used with Items that were created in the Sandbox. You can use this to add transactions to test the `/transactions/get` and `/transactions/sync` endpoints.
+
+        For Items created in the Production environment, real transactions will be available once the transactions product is enabled.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SandboxTransactionsCreateRequest'
   /cashflow_report/refresh:
     x-hidden-from-docs: true
     post:
@@ -3673,6 +3738,225 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CashflowReportGetRequest'
+            examples: {}
+  /cashflow_report/transactions/get:
+    x-hidden-from-docs: true
+    post:
+      tags:
+      - plaid
+      summary: Gets transaction data in cashflow_report
+      externalDocs:
+        url: /api/products/transactions/#cashflowReportTransactionsGet
+      operationId: cashflowReportTransactionsGet
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashflowReportTransactionsGetResponse'
+              examples:
+                example-1:
+                  value:
+                    accounts:
+                    - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
+                      balances:
+                        available: 110.94
+                        current: 110.94
+                        iso_currency_code: USD
+                        limit: null
+                        unofficial_currency_code: null
+                      mask: "0000"
+                      name: Plaid Checking
+                      official_name: Plaid Gold Standard 0% Interest Checking
+                      subtype: checking
+                      type: depository
+                      owners:
+                      - addresses:
+                        - data:
+                            city: Malakoff
+                            country: US
+                            postal_code: "14236"
+                            region: NY
+                            street: 2992 Cameron Road
+                          primary: true
+                        - data:
+                            city: San Matias
+                            country: US
+                            postal_code: 93405-2255
+                            region: CA
+                            street: 2493 Leisure Lane
+                          primary: false
+                        emails:
+                        - data: accountholder0@example.com
+                          primary: true
+                          type: primary
+                        - data: accountholder1@example.com
+                          primary: false
+                          type: secondary
+                        - data: extraordinarily.long.email.username.123456@reallylonghostname.com
+                          primary: false
+                          type: other
+                        names:
+                        - Alberta Bobbeth Charleson
+                        phone_numbers:
+                        - data: "1112223333"
+                          primary: false
+                          type: home
+                        - data: "1112224444"
+                          primary: false
+                          type: work
+                        - data: "1112225555"
+                          primary: false
+                          type: mobile
+                    transactions:
+                    - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
+                      account_owner: null
+                      amount: 28.34
+                      iso_currency_code: USD
+                      unofficial_currency_code: null
+                      check_number: null
+                      counterparties:
+                      - name: DoorDash
+                        type: marketplace
+                        logo_url: https://plaid-counterparty-logos.plaid.com/doordash_1.png
+                        website: doordash.com
+                        entity_id: YNRJg5o2djJLv52nBA1Yn1KpL858egYVo4dpm
+                        confidence_level: HIGH
+                      - name: Burger King
+                        type: merchant
+                        logo_url: https://plaid-merchant-logos.plaid.com/burger_king_155.png
+                        website: burgerking.com
+                        entity_id: mVrw538wamwdm22mK8jqpp7qd5br0eeV9o4a1
+                        confidence_level: VERY_HIGH
+                      date: "2023-09-28"
+                      datetime: "2023-09-28T15:10:09Z"
+                      authorized_date: "2023-09-27"
+                      authorized_datetime: "2023-09-27T08:01:58Z"
+                      location:
+                        address: null
+                        city: null
+                        region: null
+                        postal_code: null
+                        country: null
+                        lat: null
+                        lon: null
+                        store_number: null
+                      name: Dd Doordash Burgerkin
+                      merchant_name: Burger King
+                      merchant_entity_id: mVrw538wamwdm22mK8jqpp7qd5br0eeV9o4a1
+                      logo_url: https://plaid-merchant-logos.plaid.com/burger_king_155.png
+                      website: burgerking.com
+                      payment_meta:
+                        by_order_of: null
+                        payee: null
+                        payer: null
+                        payment_method: null
+                        payment_processor: null
+                        ppd_id: null
+                        reason: null
+                        reference_number: null
+                      payment_channel: online
+                      pending: true
+                      pending_transaction_id: null
+                      personal_finance_category:
+                        primary: FOOD_AND_DRINK
+                        detailed: FOOD_AND_DRINK_FAST_FOOD
+                        confidence_level: VERY_HIGH
+                      personal_finance_category_icon_url: https://plaid-category-icons.plaid.com/PFC_FOOD_AND_DRINK.png
+                      transaction_id: yhnUVvtcGGcCKU0bcz8PDQr5ZUxUXebUvbKC0
+                      transaction_code: null
+                      transaction_type: digital
+                    - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
+                      account_owner: null
+                      amount: 72.1
+                      iso_currency_code: USD
+                      unofficial_currency_code: null
+                      check_number: null
+                      counterparties:
+                      - name: Walmart
+                        type: merchant
+                        logo_url: https://plaid-merchant-logos.plaid.com/walmart_1100.png
+                        website: walmart.com
+                        entity_id: O5W5j4dN9OR3E6ypQmjdkWZZRoXEzVMz2ByWM
+                        confidence_level: VERY_HIGH
+                      date: "2023-09-24"
+                      datetime: "2023-09-24T11:01:01Z"
+                      authorized_date: "2023-09-22"
+                      authorized_datetime: "2023-09-22T10:34:50Z"
+                      location:
+                        address: 13425 Community Rd
+                        city: Poway
+                        region: CA
+                        postal_code: "92064"
+                        country: US
+                        lat: 32.959068
+                        lon: -117.037666
+                        store_number: "1700"
+                      name: 'PURCHASE WM SUPERCENTER #1700'
+                      merchant_name: Walmart
+                      merchant_entity_id: O5W5j4dN9OR3E6ypQmjdkWZZRoXEzVMz2ByWM
+                      logo_url: https://plaid-merchant-logos.plaid.com/walmart_1100.png
+                      website: walmart.com
+                      payment_meta:
+                        by_order_of: null
+                        payee: null
+                        payer: null
+                        payment_method: null
+                        payment_processor: null
+                        ppd_id: null
+                        reason: null
+                        reference_number: null
+                      payment_channel: in store
+                      pending: false
+                      pending_transaction_id: no86Eox18VHMvaOVL7gPUM9ap3aR1LsAVZ5nc
+                      personal_finance_category:
+                        primary: GENERAL_MERCHANDISE
+                        detailed: GENERAL_MERCHANDISE_SUPERSTORES
+                        confidence_level: VERY_HIGH
+                      personal_finance_category_icon_url: https://plaid-category-icons.plaid.com/PFC_GENERAL_MERCHANDISE.png
+                      transaction_id: lPNjeW1nR6CDn5okmGQ6hEpMo4lLNoSrzqDje
+                      transaction_code: null
+                      transaction_type: place
+                    total_transactions: 2
+                    item:
+                      available_products:
+                      - balance
+                      - identity
+                      - investments
+                      billed_products:
+                      - assets
+                      - auth
+                      - liabilities
+                      - transactions
+                      consent_expiration_time: null
+                      error: null
+                      institution_id: ins_3
+                      institution_name: Chase
+                      item_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBFL9DrE6
+                      update_type: background
+                      webhook: https://www.genericwebhookurl.com/webhook
+                      auth_method: INSTANT_AUTH
+                    next_cursor: eu4rIDi328130dKJEoqieej
+                    has_more: true
+                    request_id: 45QSn
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+          description: Error response
+      description: |-
+        The `/cashflow_report/transactions/get` endpoint retrieves transactions data associated with an item. Transactions data is standardized across financial institutions.
+        Transactions are returned in reverse-chronological order, and the sequence of transaction ordering is stable and will not shift. Transactions are not immutable and can also be removed altogether by the institution; a removed transaction will no longer appear in `/transactions/get`.  For more details, see [Pending and posted transactions](https://plaid.com/docs/transactions/transactions-data/#pending-and-posted-transactions).
+        Due to the potentially large number of transactions associated with an Item, results are paginated. Manipulate the `count` and `cursor` parameters in conjunction with the `has_more` response body field to fetch all available transactions.
+        Note that data isn't likely to be immediately available to `/cashflow_report/transactions/get`. Plaid will begin to prepare transactions data upon Item link, if Link was initialized with cashflow_report, or if it wasn't, upon the first call to /cashflow_report/refresh. To be alerted when transaction data is ready to be fetched, listen for the `CASHFLOW_REPORT_READY` webhook.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CashflowReportTransactionsGetRequest'
             examples: {}
   /transactions/recurring/get:
     post:
@@ -16575,6 +16859,7 @@ paths:
                       total_plaid_connections_count: 15
                       is_savings_or_money_market_account: false
                     ruleset:
+                      ruleset_key: onboarding_flow
                       result: REROUTE
                       triggered_rule_details:
                         internal_note: Rerouting customer to different payment method, since bank risk score is too high
@@ -18114,7 +18399,8 @@ components:
       x-hidden-from-docs: true
       description: 'The HTTP header used in API requests to determine which set of User APIs to invoke: the legacy CRA version or the new User API version.'
       schema:
-        type: string
+        type: boolean
+        default: false
   schemas:
     NetworkStatusGetRequest:
       type: object
@@ -18455,6 +18741,33 @@ components:
           $ref: '#/components/schemas/RequestID'
       required:
       - request_id
+    SandboxTransactionsCreateRequest:
+      type: object
+      description: SandboxTransactionsCreateRequest defines the request schema for `/sandbox/transactions/create`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+        transactions:
+          type: array
+          description: List of transactions to be added
+          items:
+            $ref: '#/components/schemas/CustomSandboxTransaction'
+      required:
+      - transactions
+      - access_token
+    SandboxTransactionsCreateResponse:
+      type: object
+      additionalProperties: true
+      description: SandboxTransactionsCreateResponse defines the response schema for `/sandbox/transactions/create`
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
     CashflowReportRefreshRequest:
       x-hidden-from-docs: true
       type: object
@@ -18563,6 +18876,78 @@ components:
       - next_cursor
       - has_more
       - request_id
+    CashflowReportTransactionsGetRequest:
+      x-hidden-from-docs: true
+      type: object
+      description: CashflowReportTransactionsGetRequest defines the request schema for `/cashflow_report/transactions/get`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        count:
+          type: integer
+          description: Number of transactions to fetch per call
+          minimum: 1
+          maximum: 500
+          default: 100
+        cursor:
+          type: string
+          description: The cursor value represents the last update requested. Pass in the empty string "" in the first call.
+        options:
+          $ref: '#/components/schemas/CashflowReportTransactionsGetRequestOptions'
+      required:
+      - access_token
+    CashflowReportTransactionsGetRequestOptions:
+      type: object
+      description: An optional object to be used with the request. If specified, `options` must not be `null`.
+      properties:
+        account_ids:
+          type: array
+          description: |-
+            A list of `account_ids` to retrieve for the Item
+
+            Note: An error will be returned if a provided `account_id` is not associated with the Item.
+          items:
+            type: string
+    CashflowReportTransactionsGetResponse:
+      type: object
+      additionalProperties: true
+      description: CashflowReportTransactionsGetResponse defines the response schema for `/cashflow_report/transactions/get`
+      properties:
+        accounts:
+          type: array
+          description: An array containing the `accounts` associated with the Item for which transactions are being returned. Each transaction can be mapped to its corresponding account via the `account_id` field.
+          items:
+            $ref: '#/components/schemas/BusinessAccount'
+        transactions:
+          type: array
+          description: An array containing transactions from the account. Transactions are returned in reverse chronological order, with the most recent at the beginning of the array. The maximum number of transactions returned is determined by the `count` parameter.
+          items:
+            $ref: '#/components/schemas/CashflowReportTransaction'
+        total_transactions:
+          type: integer
+          description: The total number of transactions available within the date range specified. If `total_transactions` is larger than the size of the `transactions` array, more transactions are available and can be fetched via manipulating the `offset` parameter.
+        item:
+          $ref: '#/components/schemas/Item'
+        next_cursor:
+          type: string
+          description: Cursor used for fetching any future updates after the latest update provided in this response.
+        has_more:
+          type: boolean
+          description: Represents if more than requested count of transactions exists to be fetched
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - accounts
+      - transactions
+      - total_transactions
+      - item
+      - next_cursor
+      - has_more
+      - request_id
     BusinessAccount:
       description: Business identity information about an account
       title: BusinessAccount
@@ -18576,11 +18961,6 @@ components:
             description: Data returned by the financial institution about the account owner or owners. For business accounts, the name reported may be either the name of the individual or the name of the business, depending on the institution. Multiple owners on a single account will be represented in the same owner object, not in multiple owner objects within the array.
             items:
               $ref: '#/components/schemas/Owner'
-          historical_balances:
-            type: array
-            description: Calculated data about the historical balances on the account.
-            items:
-              $ref: '#/components/schemas/BaseReportHistoricalBalance'
     TransactionsRecurringUpdateRequest:
       type: object
       description: TransactionsRecurringUpdateRequest defined the request schema for `/transactions/recurring/streams/update` endpoint.
@@ -22686,6 +23066,9 @@ components:
         android_package_name:
           type: string
           description: The name of your app's Android package. Required if using the session token to initialize Layer on Android. Any package name specified here must also be added to the Allowed Android package names setting on the [developer dashboard](https://dashboard.plaid.com/team/api). When creating a session token for initializing Layer on other platforms, `android_package_name` must be left blank and `redirect_uri` should be used instead.
+        webhook:
+          type: string
+          description: The destination URL to which any webhooks should be sent. If you use the same webhook listener for all Sandbox or all Production activity, set this value in the Layer template editor in the Dashboard instead. Only provide a value in this field if you need to use multiple webhook URLs per environment (an uncommon use case). If provided, a value in this field will take priority over webhook values set in the Layer template editor.
       required:
       - template_id
       - user
@@ -28187,6 +28570,35 @@ components:
       - date_posted
       - amount
       - description
+    CustomSandboxTransaction:
+      title: CustomSandboxTransaction
+      type: object
+      additionalProperties: true
+      description: Data to populate as test transaction data.
+      properties:
+        date_transacted:
+          type: string
+          format: date
+          description: The date of the transaction, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) (YYYY-MM-DD) format. Transaction date must be the present date or a date up to 14 days in the past. Future dates are not allowed.
+        date_posted:
+          type: string
+          format: date
+          description: The date the transaction posted, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) (YYYY-MM-DD) format. Posted date must be the present date or a date up to 14 days in the past. Future dates are not allowed.
+        amount:
+          type: number
+          format: double
+          description: The transaction amount. Can be negative.
+        description:
+          type: string
+          description: The transaction description.
+        iso_currency_code:
+          type: string
+          description: The ISO-4217 format currency code for the transaction. Defaults to USD.
+      required:
+      - date_transacted
+      - date_posted
+      - amount
+      - description
     SecurityOverride:
       type: object
       title: SecurityOverride
@@ -32556,9 +32968,9 @@ components:
       description: |-
         The network or rails used for the transfer. Defaults to `same-day-ach`.
 
-        For transfers submitted using `ach`, the next-day cutoff is 8:30 PM Eastern Time.
+        For transfers submitted using `ach`, the Standard ACH cutoff is 8:30 PM Eastern Time.
 
-        For transfers submitted using `same-day-ach`, the same-day cutoff is 3:30 PM Eastern Time. It is recommended to send the request 15 minutes prior to the cutoff to ensure that it will be processed in time for submission before the cutoff. If the transfer is processed after this cutoff but before the next-day cutoff, it will be sent over next-day rails and will not incur same-day charges.
+        For transfers submitted using `same-day-ach`, the Same Day ACH cutoff is 3:30 PM Eastern Time. It is recommended to send the request 15 minutes prior to the cutoff to ensure that it will be processed in time for submission before the cutoff. If the transfer is processed after this cutoff but before the Standard ACH cutoff, it will be sent over Standard ACH rails and will not incur same-day charges.
 
         For transfers submitted using `rtp`, in the case that the account being credited does not support RTP, the transfer will be sent over ACH as long as an `ach_class` is provided in the request. If RTP isn't supported by the account and no `ach_class` is provided, the transfer will fail to be submitted.
       enum:
@@ -32572,9 +32984,9 @@ components:
       description: |-
         The network or rails used for the transfer.
 
-        For transfers submitted as `ach` or `same-day-ach`, the next-day cutoff is 8:30 PM Eastern Time.
+        For transfers submitted as `ach` or `same-day-ach`, the Standard ACH cutoff is 8:30 PM Eastern Time.
 
-        For transfers submitted as `same-day-ach`, the same-day cutoff is 3:30 PM Eastern Time.  It is recommended to send the request 15 minutes prior to the cutoff to ensure that it will be processed in time for submission before the cutoff. If the transfer is processed after this cutoff but before the next-day cutoff, it will be sent over next-day rails and will not incur same-day charges; this will apply to both legs of the transfer if applicable. The transaction limit for a Same-day ACH transfer is $1,000,000. Authorization requests sent with an amount greater than $1,000,000 will fail.
+        For transfers submitted as `same-day-ach`, the Same Day ACH cutoff is 3:30 PM Eastern Time.  It is recommended to send the request 15 minutes prior to the cutoff to ensure that it will be processed in time for submission before the cutoff. If the transfer is processed after this cutoff but before the Standard ACH cutoff, it will be sent over Standard ACH rails and will not incur same-day charges; this will apply to both legs of the transfer if applicable. The transaction limit for a Same Day ACH transfer is $1,000,000. Authorization requests sent with an amount greater than $1,000,000 will fail.
 
         For transfers submitted as `rtp`,  Plaid will automatically route between Real Time Payment rail by TCH or FedNow rails as necessary. If a transfer is submitted as `rtp` and the counterparty account is not eligible for RTP, the `/transfer/authorization/create` request will fail with an `INVALID_FIELD` error code. To pre-check to determine whether a counterparty account can support RTP, call `/transfer/capabilities/get` before calling `/transfer/authorization/create`.
 
@@ -32590,7 +33002,7 @@ components:
       description: |-
         The ACH networks used for the funds flow.
 
-        For requests submitted as either `ach` or `same-day-ach` the cutoff for same-day is 3:30 PM Eastern Time and the cutoff for next-day transfers is 8:30 PM Eastern Time. It is recommended to submit a request at least 15 minutes before the cutoff time in order to ensure that it will be processed before the cutoff. Any request that is indicated as `same-day-ach` and that misses the same-day cutoff, but is submitted in time for the next-day cutoff, will be sent over next-day rails and will not incur same-day charges.
+        For requests submitted as either `ach` or `same-day-ach` the cutoff for Same Day ACH is 3:30 PM Eastern Time and the cutoff for Standard ACH transfers is 8:30 PM Eastern Time. It is recommended to submit a request at least 15 minutes before the cutoff time in order to ensure that it will be processed before the cutoff. Any request that is indicated as `same-day-ach` and that misses the Same Day ACH cutoff, but is submitted in time for the Standard ACH cutoff, will be sent over Standard ACH rails and will not incur same-day charges.
       enum:
       - ach
       - same-day-ach
@@ -32816,7 +33228,7 @@ components:
           $ref: '#/components/schemas/TransferAmount'
         description:
           type: string
-          description: The transfer description. Maximum of 15 characters. If reprocessing a returned transfer, please note that the `description` field must be `"Retry 1"` or `"Retry 2"` to indicate that it's a retry of a previously returned transfer. You may retry a transfer up to 2 times, within 180 days of creating the original transfer. Only transfers that were returned with code `R01` or `R09` may be retried. For a full listing of ACH return codes, see [Transfer errors](https://plaid.com/docs/errors/transfer/#ach-return-codes).
+          description: "The transfer description, maximum of 15 characters. Should represent why the money is moving, not your company name. For recommendations on setting the `description` field to avoid ACH returns, see [Description field recommendations](https://www.plaid.com/docs/transfers/creating-transfers/#description-field-recommendations). \n\nIf reprocessing a returned transfer, the `description` field must be `\"Retry 1\"` or `\"Retry 2\"`. You may retry a transfer up to 2 times, within 180 days of creating the original transfer. Only transfers that were returned with code `R01` or `R09` may be retried."
           maxLength: 15
         ach_class:
           x-hidden-from-docs: true
@@ -37124,6 +37536,7 @@ components:
       properties:
         prism_products:
           type: array
+          deprecated: true
           description: The specific Prism products to return. If none are passed in, then all products will be returned.
           items:
             $ref: '#/components/schemas/PrismProduct'
@@ -37132,12 +37545,29 @@ components:
     LinkTokenCreateRequestCraOptionsBaseReport:
       title: LinkTokenCreateRequestCraOptionsBaseReport
       type: object
-      description: Specifies options for initializing Link for use with the Base Report product.
+      deprecated: true
+      description: Specifies options for initializing Link for use with the Base Report product, specifically the `client_report_id`. This object has been deprecated in favor of [`cra_options.client_report_id`](https://plaid.com/docs/api/link/#link-token-create-request-cra-options-client-report-id).
       properties:
         client_report_id:
           type: string
           nullable: true
           description: Client-generated identifier, which can be used by lenders to track loan applications.
+        gse_options:
+          $ref: '#/components/schemas/LinkTokenCreateRequestCraOptionsBaseReportGSEOptions'
+    LinkTokenCreateRequestCraOptionsBaseReportGSEOptions:
+      title: LinkTokenCreateRequestCraOptionsBaseReportGSEOptions
+      x-hidden-from-docs: true
+      type: object
+      description: Specifies options for initializing Link to create reports that can be shared with GSEs for mortgage verification.
+      nullable: true
+      properties:
+        report_types:
+          type: array
+          items:
+            $ref: '#/components/schemas/GSEReportType'
+          description: Specifies which types of reports should be made available to GSEs.
+      required:
+      - report_types
     LinkTokenCreateRequestCraOptionsCashflowInsights:
       title: LinkTokenCreateRequestCraOptionsCashflowInsights
       type: object
@@ -37159,12 +37589,14 @@ components:
           minimum: 1
           maximum: 730
         prism_products:
+          deprecated: true
           type: array
           description: The specific Prism products to return. If none are passed in, then all products will be returned.
           items:
             $ref: '#/components/schemas/PrismProduct'
     PrismProduct:
       title: PrismProduct
+      deprecated: true
       x-hidden-from-docs: true
       enum:
       - insights
@@ -46131,9 +46563,6 @@ components:
       enum:
       - AVAILABLE
       - FAILED
-      - PENDING
-      - UNSUPPORTED
-      - UNHEALTHY
       description: Enum for the status of the insights
     MonitoringItemStatusCode:
       title: MonitoringItemStatusCode
@@ -46142,8 +46571,6 @@ components:
       - AVAILABLE
       - FAILED
       - PENDING
-      - ITEM_NOT_SUPPORTED
-      - ITEM_LOGIN_REQUIRED
       description: Enum for the status of the Item's insights
     MonitoringConsumerReportPermissiblePurpose:
       type: string
@@ -47669,12 +48096,12 @@ components:
         start_date:
           type: string
           format: date
-          description: The date of the earliest extracted transaction, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ("yyyy-mm-dd").
+          description: The beginning of the range of the financial institution provided data for the account, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ("yyyy-mm-dd").
           nullable: true
         end_date:
           type: string
           format: date
-          description: The date of the most recent extracted transaction, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ("yyyy-mm-dd").
+          description: The end of the range of the financial institution provided data for the account, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ("yyyy-mm-dd").
           nullable: true
       required:
       - start_date
@@ -54861,6 +55288,7 @@ components:
       properties:
         prism_products:
           type: array
+          deprecated: true
           description: The specific Prism Data products to return. If none are passed in, then all products will be returned.
           items:
             $ref: '#/components/schemas/PrismProduct'
@@ -54874,8 +55302,12 @@ components:
       properties:
         firstdetect:
           $ref: '#/components/schemas/PrismFirstDetectVersion'
+        detect:
+          $ref: '#/components/schemas/PrismDetectVersion'
         cashscore:
           $ref: '#/components/schemas/PrismCashScoreVersion'
+        extend:
+          $ref: '#/components/schemas/PrismExtendVersion'
         insights:
           $ref: '#/components/schemas/PrismInsightsVersion'
     PrismFirstDetectVersion:
@@ -54885,6 +55317,13 @@ components:
       enum:
       - 3
       - null
+    PrismDetectVersion:
+      type: string
+      description: The version of Prism Detect
+      nullable: true
+      enum:
+      - 4
+      - null
     PrismCashScoreVersion:
       type: string
       description: The version of Prism CashScore. If not specified, will default to v3.
@@ -54892,6 +55331,13 @@ components:
       enum:
       - 3_lite
       - 3
+      - null
+    PrismExtendVersion:
+      type: string
+      description: The version of Prism Extend
+      nullable: true
+      enum:
+      - 4
       - null
     PrismInsightsVersion:
       type: string
@@ -54929,6 +55375,10 @@ components:
           type: string
           description: The time when the Partner Insights report was generated.
           format: date-time
+        client_report_id:
+          type: string
+          nullable: true
+          description: Client-generated identifier, which can be used by lenders to track loan applications.
         prism:
           $ref: '#/components/schemas/CraPartnerInsightsPrism'
         items:
@@ -55029,8 +55479,12 @@ components:
           $ref: '#/components/schemas/PrismInsights'
         cash_score:
           $ref: '#/components/schemas/PrismCashScore'
+        extend:
+          $ref: '#/components/schemas/PrismExtend'
         first_detect:
           $ref: '#/components/schemas/PrismFirstDetect'
+        detect:
+          $ref: '#/components/schemas/PrismDetect'
         status:
           type: string
           description: Details on whether the Prism Data attributes succeeded or failed to be generated.
@@ -55140,6 +55594,31 @@ components:
       - num_trxn_debit
       - l1m_credit_value_cnt
       - l1m_debit_value_cnt
+    PrismExtend:
+      type: object
+      additionalProperties: true
+      description: The data from the CashScore® Extend product returned by Prism Data.
+      nullable: true
+      properties:
+        model_version:
+          type: string
+          description: The version of Prism Data's CashScore® Extend model used.
+        score:
+          type: integer
+          nullable: true
+          description: The score returned by Prism Data. Ranges from 1-999, with higher score indicating lower risk.
+        reason_codes:
+          type: array
+          description: The reasons for an individual having risk according to the CashScore® Extend score.
+          items:
+            type: string
+        metadata:
+          $ref: '#/components/schemas/PrismCashScoreMetadata'
+        error_reason:
+          $ref: '#/components/schemas/PrismErrorReason'
+      required:
+      - model_version
+      - score
     PrismFirstDetect:
       type: object
       additionalProperties: true
@@ -55168,6 +55647,31 @@ components:
           $ref: '#/components/schemas/PrismErrorReason'
       required:
       - version
+      - score
+    PrismDetect:
+      type: object
+      additionalProperties: true
+      description: The data from the CashScore® Detect product returned by Prism Data.
+      nullable: true
+      properties:
+        model_version:
+          type: string
+          description: The version of Prism Data's CashScore® Detect model used.
+        score:
+          type: integer
+          nullable: true
+          description: The score returned by Prism Data. Ranges from 1-999, with higher score indicating lower risk.
+        reason_codes:
+          type: array
+          description: The reasons for an individual having risk according to the CashScore® Detect score.
+          items:
+            type: string
+        metadata:
+          $ref: '#/components/schemas/PrismCashScoreMetadata'
+        error_reason:
+          $ref: '#/components/schemas/PrismErrorReason'
+      required:
+      - model_version
       - score
     PrismErrorReason:
       type: string
@@ -55199,6 +55703,22 @@ components:
           nullable: true
           description: Client-generated identifier, which can be used by lenders to track loan applications. This field is deprecated. Use the `client_report_id` field at the top level of the request instead.
           deprecated: true
+        gse_options:
+          $ref: '#/components/schemas/CraCheckReportGSEOptions'
+    CraCheckReportGSEOptions:
+      title: CraCheckReportGSEOptions
+      x-hidden-from-docs: true
+      type: object
+      nullable: true
+      description: Specifies options for creating reports that can be shared with GSEs for mortgage verification.
+      properties:
+        report_types:
+          type: array
+          items:
+            $ref: '#/components/schemas/GSEReportType'
+          description: Specifies which types of reports should be made available to GSEs.
+      required:
+      - report_types
     CraCheckReportCashflowInsightsGetOptions:
       title: CraCheckReportCashflowInsightsGetOptions
       type: object
@@ -55217,6 +55737,13 @@ components:
       enum:
       - v1.0
       - v2.0
+    GSEReportType:
+      x-hidden-from-docs: true
+      enum:
+      - VOA
+      - VOE
+      description: The types of GSE Reports supported by the Plaid API
+      type: string
     CashflowAttributesVersion:
       type: string
       description: The version of cashflow attributes
@@ -57841,7 +58368,7 @@ components:
 
         - `user:read` allows reading user data.
         - `user:write` allows writing user data.
-        - `exchange` allows exchanging a token using the `urn:plaid:params:oauth::user-token` grant type.
+        - `exchange` allows exchanging a token using the `urn:plaid:params:oauth:user-token` grant type.
         - `mcp:dashboard` allows access to the MCP dashboard server.
       example: user:read user:write exchange
     OAuthErrorCode:
@@ -57885,13 +58412,13 @@ components:
     OAuthSubjectTokenType:
       type: string
       enum:
-      - urn:plaid:params:tokensdb::user-token
-      - urn:plaid:params:oauth::user-token
+      - urn:plaid:params:tokensdb:user-token
+      - urn:plaid:params:oauth:user-token
       description: |-
         The type of the subject token.
 
-        - `urn:plaid:params:tokensdb::user-token` allows exchanging a Plaid-issued user token for an OAuth token. When using this token type, `audience` must be the same as the `client_id`. `subject_token` must be a Plaid-issued user token issued from the `/user/create` endpoint.
-        - `urn:plaid:params:oauth::user-token` allows exchanging a refresh token for an OAuth token to another `client_id`. The other `client_id` is provided in `audience`. `subject_token` must be an OAuth refresh token issued from the `/oauth/token` endpoint.
+        - `urn:plaid:params:tokensdb:user-token` allows exchanging a Plaid-issued user token for an OAuth token. When using this token type, `audience` must be the same as the `client_id`. `subject_token` must be a Plaid-issued user token issued from the `/user/create` endpoint.
+        - `urn:plaid:params:oauth:user-token` allows exchanging a refresh token for an OAuth token to another `client_id`. The other `client_id` is provided in `audience`. `subject_token` must be an OAuth refresh token issued from the `/oauth/token` endpoint.
     OAuthTokenRequest:
       type: object
       required:
