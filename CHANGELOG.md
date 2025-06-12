@@ -1,3 +1,24 @@
+### 2020-09-14_1.645.0
+- Removes the `payment_details` field from `/accounts/balance/get` request
+- Removes the `payment_risk_assessment` from `/accounts/balance/get` response
+
+### 2020-09-14_1.644.1
+- Fixed incorrect event type in example for `ProtectUserEventWebhook`.
+
+### 2020-09-14_1.644.0
+- [Breaking] For Signal, remove enum values `REAL_TIME_PAYMENTS` and `DEBIT_CARD` as these payment methods are not supported by the Signal product.
+- [Breaking] Rename client library `/cra/check_report/create`'s `partner_insights` object to type `CraCheckReportCreatePartnerInsightsOptions` instead of `CraCheckReportPartnerInsightsGetOptions`. All the object fields are identical.
+- [Breaking] Rename client library `/cra/check_report/partner_insights/get`'s `option.prism_versions` object to type `PrismVersionsDeprecated` instead of `PrismVersions`. All the object fields' are identical.
+
+### 2020-09-14_1.642.2
+- Added `ProtectUserEventWebhook`.
+
+### 2020-09-14_1.642.1
+- Deprecated `/link/token/create`'s `base_report`. Revert erroneous deprecation of `cra_options.base_report`.
+
+### 2020-09-14_1.642.0
+- Add `error` field to responses of `/payment_initiation/payment/get` and `/payment_initiation/consent/payment/execute` containing error details when the payment fails.
+
 ### 2020-09-14_1.641.1
 - Fix descriptions for BaseReportAccountMetadata
 

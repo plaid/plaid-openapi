@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.641.1
+  version: 2020-09-14_1.645.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -3958,6 +3958,169 @@ paths:
             schema:
               $ref: '#/components/schemas/CashflowReportTransactionsGetRequest'
             examples: {}
+  /cashflow_report/insights/get:
+    post:
+      tags:
+      - plaid
+      summary: Gets insights data in Cashflow Report
+      externalDocs:
+        url: /api/products/transactions/#cashflowReportInsightsGet
+      operationId: cashflowReportInsightsGet
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashflowReportInsightsGetResponse'
+              examples:
+                example-1:
+                  value:
+                    item:
+                      available_products:
+                      - balance
+                      - identity
+                      - investments
+                      billed_products:
+                      - assets
+                      - auth
+                      - liabilities
+                      - transactions
+                      consent_expiration_time: null
+                      error: null
+                      institution_id: ins_56
+                      institution_name: Chase
+                      item_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBFL9DrE6
+                      update_type: background
+                      webhook: https://www.genericwebhookurl.com/webhook
+                      auth_method: INSTANT_AUTH
+                    accounts:
+                    - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
+                      balances:
+                        available: 110.94
+                        current: 110.94
+                        iso_currency_code: USD
+                        limit: null
+                        unofficial_currency_code: null
+                      mask: "0000"
+                      name: Plaid Checking
+                      official_name: Plaid Gold Standard 0% Interest Checking
+                      subtype: checking
+                      type: depository
+                      owners:
+                      - addresses:
+                        - data:
+                            city: Malakoff
+                            country: US
+                            postal_code: "14236"
+                            region: NY
+                            street: 2992 Cameron Road
+                          primary: true
+                        - data:
+                            city: San Matias
+                            country: US
+                            postal_code: 93405-2255
+                            region: CA
+                            street: 2493 Leisure Lane
+                          primary: false
+                        emails:
+                        - data: accountholder0@example.com
+                          primary: true
+                          type: primary
+                        - data: accountholder1@example.com
+                          primary: false
+                          type: secondary
+                        - data: extraordinarily.long.email.username.123456@reallylonghostname.com
+                          primary: false
+                          type: other
+                        names:
+                        - Alberta Bobbeth Charleson
+                        phone_numbers:
+                        - data: "1112223333"
+                          primary: false
+                          type: home
+                        - data: "1112224444"
+                          primary: false
+                          type: work
+                        - data: "1112225555"
+                          primary: false
+                          type: mobile
+                    account_insights:
+                      historical_balances:
+                      - amount: 48050
+                        date: "2023-06-04"
+                        iso_currency_code: USD
+                        unofficial_currency_code: null
+                      - amount: 49050
+                        date: "2023-06-03"
+                        iso_currency_code: USD
+                        unofficial_currency_code: null
+                      - amount: 37050
+                        date: "2023-06-02"
+                        iso_currency_code: USD
+                        unofficial_currency_code: null
+                      - amount: 35050
+                        date: "2023-06-01"
+                        iso_currency_code: USD
+                        unofficial_currency_code: null
+                      monthly_summaries:
+                      - start_date: "2023-06-01"
+                        end_date: "2023-06-30"
+                        starting_balance: null
+                        ending_balance: null
+                        average_daily_ending_balance:
+                          amount: 42300
+                          iso_currency_code: USD
+                          unofficial_currency_code: null
+                        average_daily_inflow_amount:
+                          amount: 3050
+                          iso_currency_code: USD
+                          unofficial_currency_code: null
+                        average_daily_outflow_amount:
+                          amount: 250
+                          iso_currency_code: USD
+                          unofficial_currency_code: null
+                        average_daily_net_cashflow_amount:
+                          amount: 2800
+                          iso_currency_code: USD
+                          unofficial_currency_code: null
+                        average_daily_inflow_transaction_count: 6
+                        average_daily_outflow_transaction_count: 2
+                        total_revenue:
+                          amount: 16200
+                          iso_currency_code: USD
+                          unofficial_currency_code: null
+                        total_loan_payment:
+                          amount: 1000
+                          iso_currency_code: USD
+                          unofficial_currency_code: null
+                        total_variable_expense:
+                          amount: 250
+                          iso_currency_code: USD
+                          unofficial_currency_code: null
+                        total_payroll:
+                          amount: 200
+                          iso_currency_code: USD
+                          unofficial_currency_code: null
+                        nsf_transaction_count: 0
+                        overdraft_transaction_count: 1
+                        negative_ending_balance_day_count: 0
+                    request_id: 45QSn
+                    last_generated_time: "2023-06-04T10:34:50Z"
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+          description: Error response
+      description: The `/cashflow_report/insights/get` endpoint retrieves insights data associated with an item. Insights are only calculated on credit and depository accounts.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CashflowReportInsightsGetRequest'
+            examples: {}
   /transactions/recurring/get:
     post:
       tags:
@@ -4741,7 +4904,18 @@ paths:
       externalDocs:
         url: /api/items/#itemremove
       operationId: itemRemove
-      description: "The `/item/remove` endpoint allows you to remove an Item. Once removed, the `access_token`, as well as any processor tokens or bank account tokens associated with the Item, is no longer valid and cannot be used to access any data that was associated with the Item.\n\nCalling `/item/remove` is a recommended best practice when offboarding users or if a user chooses to disconnect an account linked via Plaid. For subscription products, such as Transactions, Liabilities, and Investments, calling `/item/remove` is required to end subscription billing for the Item. \n\nIn Limited Production, calling `/item/remove` does not impact the number of remaining Limited Production Items you have available.\n\nRemoving an Item does not affect any Asset Reports or Audit Copies you have already created, which will remain accessible until you remove access to them specifically using the `/asset_report/remove` endpoint.\n\nAlso note that for certain OAuth-based institutions, an Item removed via `/item/remove` may still show as an active connection in the institution's OAuth permission manager.\n\nAPI versions 2019-05-29 and earlier return a `removed` boolean as part of the response."
+      description: |-
+        The `/item/remove` endpoint allows you to remove an Item. Once removed, the `access_token`, as well as any processor tokens or bank account tokens associated with the Item, is no longer valid and cannot be used to access any data that was associated with the Item.
+
+        Calling `/item/remove` is a recommended best practice when offboarding users or if a user chooses to disconnect an account linked via Plaid. For subscription products, such as Transactions, Liabilities, and Investments, calling `/item/remove` is required to end subscription billing for the Item, unless the end user revoked permission (e.g. via [https://my.plaid.com/](https://my.plaid.com/). For more details, see [Subscription fee model](https://plaid.com/docs/account/billing/#subscription-fee).
+
+        In Limited Production, calling `/item/remove` does not impact the number of remaining Limited Production Items you have available.
+
+        Removing an Item does not affect any Asset Reports or Audit Copies you have already created, which will remain accessible until you remove access to them specifically using the `/asset_report/remove` endpoint.
+
+        Also note that for certain OAuth-based institutions, an Item removed via `/item/remove` may still show as an active connection in the institution's OAuth permission manager.
+
+        API versions 2019-05-29 and earlier return a `removed` boolean as part of the response.
       responses:
         "200":
           description: success
@@ -7972,6 +8146,135 @@ paths:
       description: Get Account Insights for all Accounts linked to this Beacon User. The insights for each account are computed based on the information that was last retrieved from the financial institution.
       externalDocs:
         url: /api/products/beacon/#beaconuseraccount_insightsget
+  /protect/user/insights/get:
+    post:
+      tags:
+      - plaid
+      summary: Get Protect user insights
+      externalDocs:
+        url: /api/products/protect/#protectuserinsightsget
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProtectUserInsightsGetResponse'
+              examples:
+                example-1:
+                  value:
+                    user_id: plaid-user-6009db6e
+                    latest_scored_event:
+                      event_id: protect-event-2be8498f
+                      timestamp: "2020-07-24T03:26:02Z"
+                      trust_index:
+                        score: 86
+                        model: ti-pro-1.0
+                        subscores:
+                          device_and_connection:
+                            score: 87
+                          bank_account_insights:
+                            score: 85
+                      fraud_attributes:
+                        num_distinct_names_on_accounts: 3
+                        identity_match_idv_bank_account: true
+                        idv_id_doc_passed: true
+                    request_id: saKrIBuEB9qJZng
+      operationId: protectUserInsightsGet
+      description: Use this endpoint to get basic information about a user as it relates to their fraud profile with Protect.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProtectUserInsightsGetRequest'
+  /protect/event/send:
+    post:
+      tags:
+      - plaid
+      summary: Send a new event to enrich user data
+      externalDocs:
+        url: /api/products/protect/#protecteventsend
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProtectEventSendResponse'
+              examples:
+                example-1:
+                  value:
+                    event_id: protect-event-2be8498f
+                    trust_index:
+                      score: 86
+                      model: ti-pro-1.0
+                      subscores:
+                        device_and_connection:
+                          score: 87
+                        bank_account_insights:
+                          score: 85
+                      fraud_attributes:
+                        num_distinct_names_on_accounts: 3
+                        identity_match_idv_bank_account: true
+                        idv_id_doc_passed: true
+                    request_id: saKrIBuEB9qJZng
+      operationId: protectEventSend
+      description: Send a new event to enrich user data and optionally get a Trust Index score for the event.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProtectEventSendRequest'
+  /protect/event/get:
+    post:
+      tags:
+      - plaid
+      summary: Get information about a user event
+      externalDocs:
+        url: /api/products/protect/#protecteventget
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProtectEventGetResponse'
+              examples:
+                example-1:
+                  value:
+                    event_id: protect-event-2be8498f
+                    timestamp: "2020-07-24T03:26:02Z"
+                    trust_index:
+                      score: 86
+                      model: ti-pro-1.0
+                      subscores:
+                        device_and_connection:
+                          score: 87
+                        bank_account_insights:
+                          score: 85
+                    fraud_attributes:
+                      num_distinct_names_on_accounts: 3
+                      identity_match_idv_bank_account: true
+                      idv_id_doc_passed: true
+                      bank_accounts:
+                      - account_name: Premium Checking
+                        account_type: checking
+                        institution_name: Huntington Credit Union
+                        account_age_days: 144
+                        num_distinct_owner_names: 3
+                      - account_name: Credit ***8889
+                        account_type: credit
+                    request_id: saKrIBuEB9qJZng
+      operationId: protectEventGet
+      description: Get information about a user event including Trust Index score and fraud attributes.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProtectEventGetRequest'
   /idv_classic/identity_assessments: {}
   /idv_classic/identity_searches/:id: {}
   /idv_classic/identity_searches: {}
@@ -18377,6 +18680,36 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/NetworkInsightsReportGetRequest'
+  /tch/notifications:
+    x-hidden-from-docs: true
+    post:
+      summary: Receive token notifications from The Clearing House (TCH).
+      description: This endpoint allows us to receive token notifications from The Clearing House (TCH). The schema is defined by TCH.
+      tags:
+      - plaid
+      operationId: tchNotifications
+      externalDocs:
+        url: none
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TCHNotification'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TCHNotificationResponse'
+              examples:
+                example-1:
+                  value:
+                    messageId: 3a3ee6ca-a102-426c-8b1c-0c6658dacc34
+                    conversationId: 2738a1f1-f712-4a63-9124-cee42b9de905
+                    statusCode: "00000"
+                    statusMessage: Success
 components:
   securitySchemes:
     clientId:
@@ -18948,6 +19281,333 @@ components:
       - next_cursor
       - has_more
       - request_id
+    CashflowReportInsightsGetRequest:
+      type: object
+      description: CashflowReportInsightsGetRequest defines the request schema for `/cashflow_report/insights/get`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+      required:
+      - access_token
+    CashflowReportInsightsGetResponse:
+      type: object
+      additionalProperties: true
+      description: CashflowReportInsightsGetResponse defines the response schema for `/cashflow_report/insights/get`
+      properties:
+        item:
+          $ref: '#/components/schemas/Item'
+        accounts:
+          type: array
+          description: An array containing the `accounts` associated with the Item for which transactions are being returned. Each transaction can be mapped to its corresponding account via the `account_id` field.
+          items:
+            $ref: '#/components/schemas/BusinessAccount'
+        account_insights:
+          $ref: '#/components/schemas/CashflowReportAccountInsights'
+        last_generated_time:
+          type: string
+          format: date-time
+          description: Datetime of last cashflow report generation in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ( `YYYY-MM-DDTHH:mm:ssZ` )
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - item
+      - accounts
+      - account_insights
+      - last_generated_time
+      - request_id
+    CashflowReportAccountInsights:
+      title: CashflowAccountInsights
+      type: object
+      additionalProperties: true
+      description: Insights on the account level. These are only returned for Credit and Depository type accounts.
+      properties:
+        historical_balances:
+          type: array
+          description: Calculated data about the historical balances on the account.
+          items:
+            $ref: '#/components/schemas/CashflowReportHistoricalBalance'
+        monthly_summaries:
+          type: array
+          description: Monthly summary statistics derived from transaction-level data.
+          items:
+            $ref: '#/components/schemas/CashflowReportMonthlySummary'
+      required:
+      - historical_balances
+      - monthly_summaries
+    CashflowReportHistoricalBalance:
+      title: CashflowReportHistoricalBalance
+      type: object
+      additionalProperties: true
+      description: An object representing a balance held by an account in the past
+      properties:
+        date:
+          type: string
+          format: date
+          description: The date of the calculated historical balance, in an [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (YYYY-MM-DD)
+        amount:
+          type: number
+          format: double
+          description: |-
+            The total amount of funds in the account, calculated from the `current` balance in the `balance` object by subtracting inflows and adding back outflows according to the posted date of each transaction.
+
+            If the account has any pending transactions, historical balance amounts on or after the date of the earliest pending transaction may differ if retrieved in subsequent Asset Reports as a result of those pending transactions posting.
+        iso_currency_code:
+          type: string
+          description: The ISO-4217 currency code of the balance. Always `null` if `unofficial_currency_code` is non-`null`.
+          nullable: true
+        unofficial_currency_code:
+          type: string
+          description: |-
+            The unofficial currency code associated with the balance. Always `null` if `iso_currency_code` is non-`null`.
+
+            See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `unofficial_currency_code`s.
+          nullable: true
+      required:
+      - date
+      - amount
+      - iso_currency_code
+      - unofficial_currency_code
+    CashflowIsoCurrencyCode:
+      type: string
+      description: The ISO-4217 currency code of the amount. Always `null` if `unofficial_currency_code` is non-`null`
+      nullable: true
+    CashflowUnofficialCurrencyCode:
+      type: string
+      description: The unofficial currency code of the amount. Always `null` if `iso_currency_code` is non-`null`. Unofficial currency codes are used for currencies that do not have official ISO currency codes, such as cryptocurrencies and the currencies of certain countries.
+      nullable: true
+    CashflowReportMonthlySummaryStartingBalance:
+      type: object
+      description: The starting balance of the month. This will be the same as the ending balance of the previous month. This field will not be available for the first monthly summary.
+      nullable: true
+      properties:
+        amount:
+          type: number
+          description: Value of amount with up to 2 decimal places.
+        iso_currency_code:
+          $ref: '#/components/schemas/CashflowIsoCurrencyCode'
+        unofficial_currency_code:
+          $ref: '#/components/schemas/CashflowUnofficialCurrencyCode'
+      required:
+      - amount
+      - iso_currency_code
+      - unofficial_currency_code
+    CashflowReportMonthlySummaryEndingBalance:
+      type: object
+      description: The ending balance of the month. This will be the same as the starting balance of the next month. This field will not be available for the last monthly summary.
+      nullable: true
+      properties:
+        amount:
+          type: number
+          description: Value of amount with up to 2 decimal places.
+        iso_currency_code:
+          $ref: '#/components/schemas/CashflowIsoCurrencyCode'
+        unofficial_currency_code:
+          $ref: '#/components/schemas/CashflowUnofficialCurrencyCode'
+      required:
+      - amount
+      - iso_currency_code
+      - unofficial_currency_code
+    CashflowReportMonthlySummaryAverageDailyEndingBalance:
+      type: object
+      description: Calendar-day average of the ending balance.
+      properties:
+        amount:
+          type: number
+          description: Value of amount with up to 2 decimal places.
+        iso_currency_code:
+          $ref: '#/components/schemas/CashflowIsoCurrencyCode'
+        unofficial_currency_code:
+          $ref: '#/components/schemas/CashflowUnofficialCurrencyCode'
+      required:
+      - amount
+      - iso_currency_code
+      - unofficial_currency_code
+    CashflowReportMonthlySummaryAverageDailyInflowAmount:
+      type: object
+      description: The average daily sum of inflow transactions, calculated over the month. Always represented as a positive monetary amount.
+      properties:
+        amount:
+          type: number
+          description: Value of amount with up to 2 decimal places.
+        iso_currency_code:
+          $ref: '#/components/schemas/CashflowIsoCurrencyCode'
+        unofficial_currency_code:
+          $ref: '#/components/schemas/CashflowUnofficialCurrencyCode'
+      required:
+      - amount
+      - iso_currency_code
+      - unofficial_currency_code
+    CashflowReportMonthlySummaryAverageDailyOutflowAmount:
+      type: object
+      description: The average daily sum of outflow transactions, calculated over the month. Always represented as a positive monetary amount.
+      properties:
+        amount:
+          type: number
+          description: Value of amount with up to 2 decimal places.
+        iso_currency_code:
+          $ref: '#/components/schemas/CashflowIsoCurrencyCode'
+        unofficial_currency_code:
+          $ref: '#/components/schemas/CashflowUnofficialCurrencyCode'
+      required:
+      - amount
+      - iso_currency_code
+      - unofficial_currency_code
+    CashflowReportMonthlySummaryAverageDailyNetCashflowAmount:
+      type: object
+      description: The average daily net cash flow amount, calculated as total daily inflows less total daily outflows.
+      properties:
+        amount:
+          type: number
+          description: Value of amount with up to 2 decimal places.
+        iso_currency_code:
+          $ref: '#/components/schemas/CashflowIsoCurrencyCode'
+        unofficial_currency_code:
+          $ref: '#/components/schemas/CashflowUnofficialCurrencyCode'
+      required:
+      - amount
+      - iso_currency_code
+      - unofficial_currency_code
+    CashflowReportMonthlySummaryTotalRevenue:
+      type: object
+      description: The total amount of all revenue transactions during this month.
+      properties:
+        amount:
+          type: number
+          description: Value of amount with up to 2 decimal places.
+        iso_currency_code:
+          $ref: '#/components/schemas/CashflowIsoCurrencyCode'
+        unofficial_currency_code:
+          $ref: '#/components/schemas/CashflowUnofficialCurrencyCode'
+      required:
+      - amount
+      - iso_currency_code
+      - unofficial_currency_code
+    CashflowReportMonthlySummaryTotalLoanPayment:
+      type: object
+      description: The total amount of all loan payment transactions during this month.
+      properties:
+        amount:
+          type: number
+          description: Value of amount with up to 2 decimal places.
+        iso_currency_code:
+          $ref: '#/components/schemas/CashflowIsoCurrencyCode'
+        unofficial_currency_code:
+          $ref: '#/components/schemas/CashflowUnofficialCurrencyCode'
+      required:
+      - amount
+      - iso_currency_code
+      - unofficial_currency_code
+    CashflowReportMonthlySummaryTotalVariableExpense:
+      type: object
+      description: The total amount of all variable expense transactions during this month.
+      properties:
+        amount:
+          type: number
+          description: Value of amount with up to 2 decimal places.
+        iso_currency_code:
+          $ref: '#/components/schemas/CashflowIsoCurrencyCode'
+        unofficial_currency_code:
+          $ref: '#/components/schemas/CashflowUnofficialCurrencyCode'
+      required:
+      - amount
+      - iso_currency_code
+      - unofficial_currency_code
+    CashflowReportMonthlySummaryTotalPayroll:
+      type: object
+      description: The total amount of all payroll transactions during this month.
+      properties:
+        amount:
+          type: number
+          description: Value of amount with up to 2 decimal places.
+        iso_currency_code:
+          $ref: '#/components/schemas/CashflowIsoCurrencyCode'
+        unofficial_currency_code:
+          $ref: '#/components/schemas/CashflowUnofficialCurrencyCode'
+      required:
+      - amount
+      - iso_currency_code
+      - unofficial_currency_code
+    CashflowReportMonthlySummary:
+      description: Monthly summary statistics derived from transaction-level data.
+      title: CashflowReportMonthlySummary
+      type: object
+      additionalProperties: true
+      properties:
+        start_date:
+          type: string
+          format: date
+          description: |-
+            The start date of the period covered in this monthly summary.
+
+            This date will be the first day of the month, unless the month being covered is a partial month because it is the first month included in the summary and the date range being requested does not begin with the first day of the month.
+
+            The date will be returned in an ISO 8601 format (YYYY-MM-DD).
+        end_date:
+          type: string
+          format: date
+          description: |-
+            The end date of the period included in this monthly summary.
+
+            This date will be the last day of the month, unless the month being covered is a partial month because it is the last month included in the summary and the date range being requested does not end with the last day of the month.
+
+            The date will be returned in an ISO 8601 format (YYYY-MM-DD).
+        starting_balance:
+          $ref: '#/components/schemas/CashflowReportMonthlySummaryStartingBalance'
+        ending_balance:
+          $ref: '#/components/schemas/CashflowReportMonthlySummaryEndingBalance'
+        average_daily_ending_balance:
+          $ref: '#/components/schemas/CashflowReportMonthlySummaryAverageDailyEndingBalance'
+        average_daily_inflow_amount:
+          $ref: '#/components/schemas/CashflowReportMonthlySummaryAverageDailyInflowAmount'
+        average_daily_outflow_amount:
+          $ref: '#/components/schemas/CashflowReportMonthlySummaryAverageDailyOutflowAmount'
+        average_daily_net_cashflow_amount:
+          $ref: '#/components/schemas/CashflowReportMonthlySummaryAverageDailyNetCashflowAmount'
+        average_daily_inflow_transaction_count:
+          type: number
+          description: The average count of the number of daily inflow transactions. Rounded to 2 decimal places.
+        average_daily_outflow_transaction_count:
+          type: number
+          description: The average count of the number of daily outflow transactions. Rounded to 2 decimal places.
+        total_revenue:
+          $ref: '#/components/schemas/CashflowReportMonthlySummaryTotalRevenue'
+        total_loan_payment:
+          $ref: '#/components/schemas/CashflowReportMonthlySummaryTotalLoanPayment'
+        total_variable_expense:
+          $ref: '#/components/schemas/CashflowReportMonthlySummaryTotalVariableExpense'
+        total_payroll:
+          $ref: '#/components/schemas/CashflowReportMonthlySummaryTotalPayroll'
+        nsf_transaction_count:
+          type: integer
+          description: The total number of all NSF transactions during this month.
+        overdraft_transaction_count:
+          type: integer
+          description: The total number of all overdraft transactions during this month.
+        negative_ending_balance_day_count:
+          type: integer
+          description: The number of days with a negative daily average ending balance. The daily average is calculated across all valid accounts. Values will be in the range [0, 31].
+      required:
+      - start_date
+      - end_date
+      - starting_balance
+      - ending_balance
+      - average_daily_ending_balance
+      - average_daily_inflow_amount
+      - average_daily_outflow_amount
+      - average_daily_net_cashflow_amount
+      - average_daily_inflow_transaction_count
+      - average_daily_outflow_transaction_count
+      - total_revenue
+      - total_loan_payment
+      - total_variable_expense
+      - total_payroll
+      - nsf_transaction_count
+      - overdraft_transaction_count
+      - negative_ending_balance_day_count
     BusinessAccount:
       description: Business identity information about an account
       title: BusinessAccount
@@ -19672,58 +20332,12 @@ components:
             $ref: '#/components/schemas/AccountBase'
         item:
           $ref: '#/components/schemas/Item'
-        payment_risk_assessment:
-          $ref: '#/components/schemas/AccountsBalanceGetResponsePaymentRiskAssessment'
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
       - accounts
       - item
       - request_id
-    AccountsBalanceGetResponsePaymentRiskAssessment:
-      x-hidden-behind-flag: balance-plus
-      type: object
-      description: Provides a detailed risk assessment for the requested transaction. For this field to be returned, the client must be enrolled in the Balance Plus beta program and the [`payment_details`](http://plaid.com/docs/balance/balance-plus/#accounts-balance-get-request-payment-details) object must have been sent in the request.
-      additionalProperties: true
-      nullable: true
-      properties:
-        risk_level:
-          $ref: '#/components/schemas/BalancePlusRiskLevel'
-        attributes:
-          $ref: '#/components/schemas/BalancePlusAttributes'
-        score:
-          x-hidden-from-docs: true
-          nullable: true
-          description: |-
-            A risk score ranging from 1-99, reflecting the likelihood of ACH debit return.
-            A higher score indicates a greater risk of return, often due to overdrawn accounts or account
-            ineligibility to receive ACH transactions. Typical return codes include "R01", "R02", "R03",
-            "R04", "R06", "R08", "R09", "R13", "R16", "R17", "R20", "R23", etc., with a turnaround of 2 banking days.
-          type: integer
-          minimum: 1
-          maximum: 99
-        balance_last_updated:
-          type: string
-          description: Timestamp of the last successful balance update, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format.
-          format: date-time
-        risk_reasons:
-          type: array
-          description: An array of objects, each representing a specific reason contributing to the risk assessment of an ACH transaction. This field is only supplied for transactions classified as `HIGH`, `MEDIUM-HIGH`, or `MEDIUM` risk.
-          items:
-            $ref: '#/components/schemas/RiskReason'
-        exceeds_balance_threshold:
-          type: boolean
-          description: |-
-            Whether the proposed transaction exceeds the balance threshold set in the request. `true` indicates higher risk; `false` indicates lower risk. If the `amount` multiplied by the `balance_threshold_percentage` (as a percentage) exceeds the balance in the account, then `exceeds_balance_threshold` will be true, otherwise, it will be false. For example, if the `amount` is 200 and the `balance_threshold_percentage` is 90, then the account balance must be at least 180 for `exceeds_balance_threshold` to be false.
-
-            By default, the available balance will be used for this calculation; if it cannot be obtained, the current balance will be used.
-
-            This field is particularly useful for customers using indirect Items and who do not have direct access to raw balance data.
-      required:
-      - risk_level
-      - attributes
-      - exceeds_balance_threshold
-      - balance_last_updated
     CategoriesGetRequest:
       type: object
       description: CategoriesGetRequest defines the request schema for `/categories/get`
@@ -19978,50 +20592,8 @@ components:
           $ref: '#/components/schemas/APIClientID'
         options:
           $ref: '#/components/schemas/AccountsBalanceGetRequestOptions'
-        payment_details:
-          $ref: '#/components/schemas/AccountsBalanceGetRequestPaymentDetails'
       required:
       - access_token
-    AccountsBalanceGetRequestPaymentDetails:
-      x-hidden-behind-flag: balance-plus
-      type: object
-      description: To enable Balance Plus (beta), send this object as part of the `/accounts/balance/get` request. Only available to customers participating in the Balance Plus beta program; to enroll in the beta, contact your account manager. If this object is present in the request, the [`payment_risk_assessment`](https://plaid.com/docs/balance/balance-plus/#accounts-balance-get-response-payment-risk-assessment-risk-level) object will be present in the response.
-      nullable: true
-      additionalProperties: true
-      properties:
-        account_id:
-          type: string
-          description: |-
-            The Plaid `account_id` of the account that is the funding source for the proposed transaction. The `account_id` is returned in the `/accounts/get` endpoint as well as the [`onSuccess`](/docs/link/ios/#link-ios-onsuccess-linkSuccess-metadata-accounts-id) callback metadata.
-
-            This will return an [`INVALID_ACCOUNT_ID`](/docs/errors/invalid-input/#invalid_account_id) error if the account has been removed at the bank or if the `account_id` is no longer valid.
-        client_transaction_id:
-          type: string
-          description: The unique ID that you would like to use to refer to this transaction. For your convenience mapping your internal data, you could use your internal identifier for this transaction.
-          minLength: 1
-          maxLength: 36
-        amount:
-          type: number
-          format: double
-          description: The transaction amount, in USD (e.g. `102.05`)
-        balance_threshold_percentage:
-          type: integer
-          minimum: 1
-          default: 90
-          description: |-
-            If the `amount` multiplied by the `balance_threshold_percentage` (as a percentage) exceeds the balance in the account, then [`payment_risk_assessment.exceeds_balance_threshold`](https://plaid.com/docs/balance/balance-plus/#accounts-balance-get-response-payment-risk-assessment-exceeds-balance-threshold) in the response will be true, otherwise, it will be false. For example, if the `amount` is 200 and the `balance_threshold_percentage` is 90, then the account balance must be at least 180 for `exceeds_balance_threshold` to be false.
-
-            By default, the available balance will be used for this calculation; if it cannot be obtained, the current balance will be used.
-
-            This field is particularly useful for customers using indirect Items and who do not have direct access to raw balance data.
-        requires_real_time_balance_refresh:
-          type: boolean
-          description: A boolean that determines whether the balance has to be refreshed in real time as part of the API call when using Balance Plus. Setting this to field to `true` will result in more recent balances, but latency may be up to 30 seconds or more. If making a regular (non-Balance Plus) Balance call, without the `payment_details` object present, `/accounts/balance/get` will always return real-time balances.
-          default: false
-      required:
-      - account_id
-      - client_transaction_id
-      - amount
     AccountsBalanceGetRequestOptions:
       type: object
       description: Optional parameters to `/accounts/balance/get`.
@@ -21378,6 +21950,14 @@ components:
           type: array
           items:
             type: string
+        ssn_full:
+          x-hidden-from-docs: true
+          description: |-
+            The user's full social security number. This field should only be provided by lenders intending to share the resulting consumer report with a Government-Sponsored Enterprise (GSE), such as Fannie Mae or Freddie Mac.
+
+            Format: "ddd-dd-dddd"
+          type: string
+          nullable: true
         ssn_last_4:
           description: The last 4 digits of the user's social security number.
           type: string
@@ -21754,39 +22334,7 @@ components:
       - PAYMENT_STATUS_CANCELLED
       - PAYMENT_STATUS_ESTABLISHED
       - PAYMENT_STATUS_REJECTED
-      description: |-
-        The status of the payment.
-
-        `PAYMENT_STATUS_INPUT_NEEDED`: This is the initial state of all payments. It indicates that the payment is waiting on user input to continue processing. A payment may re-enter this state later on if further input is needed.
-
-        `PAYMENT_STATUS_INITIATED`: The payment has been successfully authorised and accepted by the financial institution. For successful payments, this is a potential terminal status. Further status transitions can be to REJECTED and, when supported by the institution, to EXECUTED.
-
-        `PAYMENT_STATUS_INSUFFICIENT_FUNDS`: The payment has failed due to insufficient funds.
-
-        `PAYMENT_STATUS_FAILED`: The payment has failed to be initiated. This error may be caused by transient system outages and is retryable once the root cause is resolved.
-
-        `PAYMENT_STATUS_BLOCKED`: The payment has been blocked by Plaid. This can occur, for example, due to Plaid flagging the payment as potentially risky. This is a retryable error.
-
-        `PAYMENT_STATUS_AUTHORISING`: The payment is currently being processed. The payment will automatically exit this state when the financial institution has authorised the transaction.
-
-        `PAYMENT_STATUS_CANCELLED`: The payment was cancelled (typically by the end user) during authorisation.
-
-        `PAYMENT_STATUS_EXECUTED`: The funds have successfully left the payer account and payment is considered complete. Not all institutions support this status: support is more common in the UK, and less common in the EU. For institutions where this status is not supported, the terminal status for a successful payment will be `PAYMENT_STATUS_INITIATED`.
-
-        `PAYMENT_STATUS_SETTLED`: The payment has settled and funds are available for use. A payment will typically settle within seconds to several days, depending on which payment rail is used. This status is only available to customers using [Plaid Virtual Accounts](https://plaid.com/docs/payment-initiation/virtual-accounts/).
-
-        `PAYMENT_STATUS_ESTABLISHED`: Indicates that the standing order has been successfully established. This state is only used for standing orders.
-
-        `PAYMENT_STATUS_REJECTED`: The payment was rejected by the financial institution.
-
-        Deprecated:
-        These statuses will be removed in a future release.
-
-        `PAYMENT_STATUS_UNKNOWN`: The payment status is unknown.
-
-        `PAYMENT_STATUS_PROCESSING`: The payment is currently being processed. The payment will automatically exit this state when processing is complete.
-
-        `PAYMENT_STATUS_COMPLETED`: Indicates that the standing order has been successfully established. This state is only used for standing orders.
+      description: "The status of the payment.\n\nCore lifecycle statuses:\n\n`PAYMENT_STATUS_INPUT_NEEDED`: **Transitional.** The payment is awaiting user input to continue processing. It may re-enter this state if additional input is required.\n\n`PAYMENT_STATUS_AUTHORISING`: **Transitional.** The payment is being authorised by the financial institution. It will automatically move on once authorisation completes.\n\n`PAYMENT_STATUS_INITIATED`: **Transitional.** The payment has been authorised and accepted by the financial institution and is now in transit. A payment should be considered complete once it reaches the `PAYMENT_STATUS_EXECUTED` state or the funds settle in the recipient account.\n\n`PAYMENT_STATUS_EXECUTED`: **Terminal.** The funds have left the payer’s account and the payment is en route to settlement. Support is more common in the UK than in the EU; where unsupported, a successful payment remains in `PAYMENT_STATUS_INITIATED` before settling. When using Plaid Virtual Accounts, `PAYMENT_STATUS_EXECUTED` is not terminal—the payment will continue to `PAYMENT_STATUS_SETTLED` once funds are available.\n\n`PAYMENT_STATUS_SETTLED`: **Terminal.** The funds are available in the recipient’s account. Only available to customers using [Plaid Virtual Accounts](https://plaid.com/docs/payment-initiation/virtual-accounts/).\n\nFailure statuses:\n\n`PAYMENT_STATUS_INSUFFICIENT_FUNDS`: **Terminal.** The payment failed due to insufficient funds. No further retries will succeed until the payer’s balance is replenished.\n\n`PAYMENT_STATUS_FAILED`: **Terminal (retryable).** The payment could not be initiated due to a system error or outage. Retry once the root cause is resolved.\n\n`PAYMENT_STATUS_BLOCKED`: **Terminal (retryable).** The payment was blocked by Plaid (e.g., flagged as risky). Resolve any compliance or risk issues and retry.\n\n`PAYMENT_STATUS_REJECTED`: **Terminal.** The payment was rejected by the financial institution. No automatic retry is possible.\n\n`PAYMENT_STATUS_CANCELLED`: **Terminal.** The end user cancelled the payment during authorisation.\n\nStanding-order statuses:\n\n`PAYMENT_STATUS_ESTABLISHED`: **Terminal.** A recurring/standing order has been successfully created.\n\nDeprecated (to be removed in a future release):\n\n`PAYMENT_STATUS_UNKNOWN`: The payment status is unknown.  \n\n`PAYMENT_STATUS_PROCESSING`: The payment is currently being processed.  \n\n`PAYMENT_STATUS_COMPLETED`: Indicates that the standing order has been successfully established."
     PaymentInitiationPayment:
       type: object
       additionalProperties: true
@@ -21854,6 +22402,8 @@ components:
 
             Note: Not all banks handle `end_to_end_id` consistently. To ensure accurate matching, clients should convert both the incoming `end_to_end_id` and the one provided by Plaid to the same case (either lower or upper) before comparison. For virtual account payments, Plaid manages this field automatically.
           nullable: true
+        error:
+          $ref: '#/components/schemas/PlaidError'
       required:
       - payment_id
       - amount
@@ -22106,6 +22656,8 @@ components:
           $ref: '#/components/schemas/PaymentInitiationPaymentStatus'
         request_id:
           $ref: '#/components/schemas/RequestID'
+        error:
+          $ref: '#/components/schemas/PlaidError'
       required:
       - payment_id
       - status
@@ -22518,6 +23070,7 @@ components:
           - loanpro
           - bloom_credit
           - sfox
+          - brale
           description: The processor you are integrating with.
       required:
       - access_token
@@ -22741,7 +23294,7 @@ components:
 
             If launching Link with CRA products, `cra_base_reports` is required and must be included in the `products` array.
 
-            The products specified here will determine which institutions will be available to your users in Link. Only institutions that support *all* requested products can be selected; a if a user attempts to select an institution that does not support a listed product, a "Connectivity not supported" error message will appear in Link. To maximize the number of institutions available, initialize Link with the minimal product set required for your use case.
+            The products specified here will determine which institutions will be available to your users in Link. Only institutions that support *all* requested products can be selected; if a user attempts to select an institution that does not support a listed product, a "Connectivity not supported" error message will appear in Link. To maximize the number of institutions available, initialize Link with the minimal product set required for your use case.
 
             Additional products can be included via the [`optional_products`](https://plaid.com/docs/api/link/#link-token-create-request-optional-products) or  [`required_if_supported_products`](https://plaid.com/docs/api/link/#link-token-create-request-required-if-supported-products) fields. Products can also be initialized by calling the endpoint after obtaining an access token; this may require the product to be listed in the [`additional_consented_products`](https://plaid.com/docs/api/link/#link-token-create-request-additional-consented-products) array. For details, see [Choosing when to initialize products](https://plaid.com/docs/link/initializing-products/).
 
@@ -22823,7 +23376,7 @@ components:
 
             There should be no overlap between this array and the `products` or `required_if_supported_products` arrays.
 
-            If you include `signal` in `additional_consented_products`, you will need to call `/signal/prepare` before calling `/signal/evaluate` for the first time on an Item in order to get the most accurate results. For more details, see [Using `/signal/prepare`](/docs/signal/#using-signalprepare).
+            If you include `signal` in `additional_consented_products`, you will need to call [`/signal/prepare`](https://plaid.com/docs/api/products/signal/#signalprepare) before calling `/signal/evaluate` for the first time on an Item in order to get the most accurate results. For more details, see [`/signal/prepare`](https://plaid.com/docs/api/products/signal/#signalprepare).
           items:
             $ref: '#/components/schemas/Products'
           x-override-enum-values-shown:
@@ -29860,6 +30413,47 @@ components:
       - environment
       - link_session_id
       - link_token
+    ProtectUserEventWebhook:
+      title: ProtectUserEventWebhook
+      type: object
+      additionalProperties: true
+      description: Fired when there has been a new user event. The webhook payload contains limited information about the event. For full event details, call [`/protect/event/get`](https://plaid.com/docs/api/products/protect/#protecteventget).
+      x-examples:
+        example-1:
+          webhook_type: PROTECT
+          webhook_code: PROTECT_USER_EVENT
+          user_id: plaid-user-6009db6e
+          event_id: protect-event-2be8498f
+          timestamp: "2020-07-24T03:26:02Z"
+          event_type: LINK_COMPLETE
+      properties:
+        webhook_type:
+          type: string
+          description: '`"PROTECT"`'
+        webhook_code:
+          type: string
+          description: '`PROTECT_USER_EVENT`'
+        event_id:
+          type: string
+          description: The event ID of the user event that occurred.
+        event_type:
+          type: string
+          description: The type of user event that occurred.
+        timestamp:
+          type: string
+          format: date-time
+          description: The timestamp of the event, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format, e.g. `"2017-09-14T14:42:19.350Z"`
+        user_id:
+          type: string
+          description: The Plaid User ID.
+          nullable: true
+      required:
+      - webhook_type
+      - webhook_code
+      - event_id
+      - event_type
+      - timestamp
+      - user_id
     RecurringNewTransferWebhook:
       title: RecurringNewTransferWebhook
       type: object
@@ -37491,6 +38085,7 @@ components:
       title: LinkTokenCreateRequestBaseReport
       type: object
       x-hidden-from-docs: true
+      deprecated: true
       description: Specifies options for initializing Link for use with the Base Report product. This field is required if `assets` is included in the `products` array and the client is CRA-enabled.
       properties:
         days_requested:
@@ -37545,8 +38140,7 @@ components:
     LinkTokenCreateRequestCraOptionsBaseReport:
       title: LinkTokenCreateRequestCraOptionsBaseReport
       type: object
-      deprecated: true
-      description: Specifies options for initializing Link for use with the Base Report product, specifically the `client_report_id`. This object has been deprecated in favor of [`cra_options.client_report_id`](https://plaid.com/docs/api/link/#link-token-create-request-cra-options-client-report-id).
+      description: Specifies options for initializing Link for use with the Base Report product, specifically the `client_report_id`.
       properties:
         client_report_id:
           type: string
@@ -48535,157 +49129,6 @@ components:
       - start_date
       - end_date
       - average_balance
-    BalancePlusRiskLevel:
-      type: string
-      description: "A five-tier risk assessment for the transaction, based on the probability distribution of ACH returns, measured by the incident rate. \n\nEach tier corresponds to a distribution with a different mean (average) probability. \n\n`HIGH`: The mean probability of ACH return risk is above 40%.\n`MEDIUM_HIGH`: The mean probability of ACH return risk is 15%-40%. \n`MEDIUM`: The mean probability of ACH return risk is 5-10%.\n`MEDIUM_LOW`: The mean probability of ACH return risk is 1%-2%.\n`LOW`: The mean probability of ACH return risk is below 1%. \n\nNote that these tiers correspond to probability *distributions* and not to discrete probabilities. \n\nThese tier definitions are specific to Balance Plus and do not apply to risk tiers generated by other Plaid endpoints. "
-      enum:
-      - HIGH
-      - MEDIUM_HIGH
-      - MEDIUM
-      - MEDIUM_LOW
-      - LOW
-    BalancePlusAttributes:
-      title: BalancePlusAttributes
-      type: object
-      description: Contains additional data that can be used to assess the ACH return risk
-      additionalProperties: true
-      properties:
-        unauthorized_transactions_count_7d:
-          type: integer
-          description: The number of possible past returns due to unauthorized transactions over the past 7 days from the account that will be debited
-          nullable: true
-        unauthorized_transactions_count_30d:
-          type: integer
-          description: The number of possible past returns due to unauthorized transactions over the past 30 days from the account that will be debited
-          nullable: true
-        unauthorized_transactions_count_60d:
-          type: integer
-          description: The number of possible past returns due to unauthorized transactions over the past 60 days from the account that will be debited
-          nullable: true
-        unauthorized_transactions_count_90d:
-          type: integer
-          description: The number of possible past returns due to unauthorized transactions over the past 90 days from the account that will be debited
-          nullable: true
-        nsf_overdraft_transactions_count_7d:
-          type: integer
-          description: The number of possible past returns due to non-sufficient funds/overdrafts over the past 7 days from the account that will be debited
-          nullable: true
-        nsf_overdraft_transactions_count_30d:
-          type: integer
-          description: The number of possible past returns due to non-sufficient funds/overdrafts over the past 30 days from the account that will be debited
-          nullable: true
-        nsf_overdraft_transactions_count_60d:
-          type: integer
-          description: The number of possible past returns due to non-sufficient funds/overdrafts over the past 60 days from the account that will be debited
-          nullable: true
-        nsf_overdraft_transactions_count_90d:
-          type: integer
-          description: The number of possible past returns due to non-sufficient funds/overdrafts over the past 90 days from the account that will be debited
-          nullable: true
-        days_since_first_plaid_connection:
-          type: integer
-          description: The number of days since the first time the Item was connected to an application via Plaid
-          nullable: true
-        plaid_connections_count_7d:
-          type: integer
-          description: The number of times the Item has been connected to applications via Plaid over the past 7 days
-          nullable: true
-        plaid_connections_count_30d:
-          type: integer
-          description: The number of times the Item has been connected to applications via Plaid over the past 30 days
-          nullable: true
-        total_plaid_connections_count:
-          type: integer
-          description: The total number of times the Item has been connected to applications via Plaid
-          nullable: true
-        is_savings_or_money_market_account:
-          type: boolean
-          description: Indicates if the ACH transaction funding account is a savings/money market account
-          nullable: true
-        phone_change_count_28d:
-          type: integer
-          description: The number of times the account's phone numbers on file have changed over the past 28 days
-          nullable: true
-        phone_change_count_90d:
-          type: integer
-          description: The number of times the account's phone numbers on file have changed over the past 90 days
-          nullable: true
-        email_change_count_28d:
-          type: integer
-          description: The number of times the account's email addresses on file have changed over the past 28 days
-          nullable: true
-        email_change_count_90d:
-          type: integer
-          description: The number of times the account's email addresses on file have changed over the past 90 days
-          nullable: true
-        address_change_count_28d:
-          type: integer
-          description: The number of times the account's addresses on file have changed over the past 28 days
-          nullable: true
-        address_change_count_90d:
-          type: integer
-          description: The number of times the account's addresses on file have changed over the past 90 days
-          nullable: true
-        plaid_non_oauth_authentication_attempts_count_3d:
-          type: integer
-          description: The number of non-OAuth authentication attempts via Plaid for this bank account over the past 3 days
-          nullable: true
-        plaid_non_oauth_authentication_attempts_count_7d:
-          type: integer
-          description: The number of non-OAuth authentication attempts via Plaid for this bank account over the past 7 days
-          nullable: true
-        plaid_non_oauth_authentication_attempts_count_30d:
-          type: integer
-          description: The number of non-OAuth authentication attempts via Plaid for this bank account over the past 30 days
-          nullable: true
-        failed_plaid_non_oauth_authentication_attempts_count_3d:
-          type: integer
-          description: The number of failed non-OAuth authentication attempts via Plaid for this bank account over the past 3 days
-          nullable: true
-        failed_plaid_non_oauth_authentication_attempts_count_7d:
-          type: integer
-          description: The number of failed non-OAuth authentication attempts via Plaid for this bank account over the past 7 days
-          nullable: true
-        failed_plaid_non_oauth_authentication_attempts_count_30d:
-          type: integer
-          description: The number of failed non-OAuth authentication attempts via Plaid for this bank account over the past 30 days
-          nullable: true
-        is_account_closed:
-          type: boolean
-          description: Indicates if the receiver bank account is closed
-          nullable: true
-        is_account_frozen_or_restricted:
-          type: boolean
-          description: Indicates if the receiver bank account is either frozen or restricted
-          nullable: true
-      required:
-      - unauthorized_transactions_count_7d
-      - unauthorized_transactions_count_30d
-      - unauthorized_transactions_count_60d
-      - unauthorized_transactions_count_90d
-      - nsf_overdraft_transactions_count_7d
-      - nsf_overdraft_transactions_count_30d
-      - nsf_overdraft_transactions_count_60d
-      - nsf_overdraft_transactions_count_90d
-      - days_since_first_plaid_connection
-      - plaid_connections_count_7d
-      - plaid_connections_count_30d
-      - total_plaid_connections_count
-      - is_savings_or_money_market_account
-      - phone_change_count_28d
-      - phone_change_count_90d
-      - email_change_count_28d
-      - email_change_count_90d
-      - address_change_count_28d
-      - address_change_count_90d
-      - plaid_non_oauth_authentication_attempts_count_3d
-      - plaid_non_oauth_authentication_attempts_count_7d
-      - plaid_non_oauth_authentication_attempts_count_30d
-      - failed_plaid_non_oauth_authentication_attempts_count_3d
-      - failed_plaid_non_oauth_authentication_attempts_count_7d
-      - failed_plaid_non_oauth_authentication_attempts_count_30d
-      - is_account_closed
-      - is_account_frozen_or_restricted
     BeaconAccountRiskEvaluateRequest:
       title: BeaconAccountRiskEvaluateRequest
       description: BeaconAccountRiskEvaluateRequest defines the request schema for `/v1/beacon/account_risk/risk/evaluate`
@@ -55222,7 +55665,7 @@ components:
         cashflow_insights:
           $ref: '#/components/schemas/CraCheckReportCashflowInsightsGetOptions'
         partner_insights:
-          $ref: '#/components/schemas/CraCheckReportPartnerInsightsGetOptions'
+          $ref: '#/components/schemas/CraCheckReportCreatePartnerInsightsOptions'
         consumer_report_permissible_purpose:
           $ref: '#/components/schemas/ConsumerReportPermissiblePurpose'
       required:
@@ -55278,13 +55721,37 @@ components:
           $ref: '#/components/schemas/UserToken'
         third_party_user_token:
           $ref: '#/components/schemas/ThirdPartyUserToken'
+        partner_insights:
+          $ref: '#/components/schemas/CraCheckReportPartnerInsightsGetPartnerInsights'
         options:
           $ref: '#/components/schemas/CraCheckReportPartnerInsightsGetOptions'
+    CraCheckReportPartnerInsightsGetPartnerInsights:
+      title: CraCheckReportPartnerInsightsGetPartnerInsights
+      type: object
+      description: Defines configuration to generate Partner Insights
+      properties:
+        prism_versions:
+          $ref: '#/components/schemas/PrismVersions'
     CraCheckReportPartnerInsightsGetOptions:
       title: CraCheckReportPartnerInsightsGetOptions
       type: object
       nullable: true
-      description: Defines configuration options to generate Partner Insights
+      description: Deprecated, specify `partner_insights.prism_versions` instead.
+      deprecated: true
+      properties:
+        prism_products:
+          type: array
+          deprecated: true
+          description: The specific Prism Data products to return. If none are passed in, then all products will be returned.
+          items:
+            $ref: '#/components/schemas/PrismProduct'
+        prism_versions:
+          $ref: '#/components/schemas/PrismVersionsDeprecated'
+    CraCheckReportCreatePartnerInsightsOptions:
+      title: CraCheckReportCreatePartnerInsightsOptions
+      type: object
+      nullable: true
+      description: Defines configuration to generate Partner Insights.
       properties:
         prism_products:
           type: array
@@ -55294,6 +55761,23 @@ components:
             $ref: '#/components/schemas/PrismProduct'
         prism_versions:
           $ref: '#/components/schemas/PrismVersions'
+    PrismVersionsDeprecated:
+      title: PrismVersions
+      type: object
+      nullable: true
+      deprecated: true
+      description: Deprecated, use `partner_insights.prism_versions` instead.
+      properties:
+        firstdetect:
+          $ref: '#/components/schemas/PrismFirstDetectVersion'
+        detect:
+          $ref: '#/components/schemas/PrismDetectVersion'
+        cashscore:
+          $ref: '#/components/schemas/PrismCashScoreVersion'
+        extend:
+          $ref: '#/components/schemas/PrismExtendVersion'
+        insights:
+          $ref: '#/components/schemas/PrismInsightsVersion'
     PrismVersions:
       title: PrismVersions
       type: object
@@ -55328,7 +55812,12 @@ components:
       type: string
       description: The version of Prism CashScore. If not specified, will default to v3.
       nullable: true
+      x-override-enum-values-shown:
+      - 4
+      - 3
+      - null
       enum:
+      - 4
       - 3_lite
       - 3
       - null
@@ -55344,6 +55833,7 @@ components:
       description: The version of Prism Insights. If not specified, will default to v3.
       nullable: true
       enum:
+      - 4
       - 3
       - null
     CraCheckReportPartnerInsightsGetResponse:
@@ -58499,7 +58989,7 @@ components:
       properties:
         active:
           type: boolean
-          description: Boolean indicator of whether or not the presented token is currently active. A true value indicates that the token has been issued, has not been revoked, and is within the time window of validitity
+          description: Boolean indicator of whether or not the presented token is currently active. A `true` value indicates that the token has been issued, has not been revoked, and is within the time window of validity.
         scope:
           $ref: '#/components/schemas/OAuthScope'
         client_id:
@@ -58900,14 +59390,11 @@ components:
         default_payment_method:
           type: string
           description: |-
-            The default ACH or non-ACH payment method to complete the transaction.
+            The default ACH payment method to complete the transaction.
             `SAME_DAY_ACH`: Same Day ACH by NACHA. The debit transaction is processed and settled on the same day
-            `NEXT_DAY_ACH`: Next Day ACH settlement for debit transactions, offered by some payment processors
             `STANDARD_ACH`: standard ACH by NACHA
-            `REAL_TIME_PAYMENTS`: real-time payments such as RTP and FedNow
-            `DEBIT_CARD`: if the default payment is over debit card networks
             `MULTIPLE_PAYMENT_METHODS`: if there is no default debit rail or there are multiple payment methods
-            Possible values:  `SAME_DAY_ACH`, `NEXT_DAY_ACH`, `STANDARD_ACH`, `REAL_TIME_PAYMENTS`, `DEBIT_CARD`, `MULTIPLE_PAYMENT_METHODS`
+            Possible values:  `SAME_DAY_ACH`, `STANDARD_ACH`, `MULTIPLE_PAYMENT_METHODS`
           nullable: true
         user:
           $ref: '#/components/schemas/SignalUser'
@@ -59171,12 +59658,9 @@ components:
           description: |-
             The default ACH or non-ACH payment method to complete the transaction.
             `SAME_DAY_ACH`: Same Day ACH by NACHA. The debit transaction is processed and settled on the same day
-            `NEXT_DAY_ACH`: Next Day ACH settlement for debit transactions, offered by some payment processors
             `STANDARD_ACH`: standard ACH by NACHA
-            `REAL_TIME_PAYMENTS`: real-time payments such as RTP and FedNow
-            `DEBIT_CARD`: if the default payment is over debit card networks
             `MULTIPLE_PAYMENT_METHODS`: if there is no default debit rail or there are multiple payment methods
-            Possible values:  `SAME_DAY_ACH`, `NEXT_DAY_ACH`, `STANDARD_ACH`, `REAL_TIME_PAYMENTS`, `DEBIT_CARD`, `MULTIPLE_PAYMENT_METHODS`
+            Possible values:  `SAME_DAY_ACH`, `STANDARD_ACH`, `MULTIPLE_PAYMENT_METHODS`
           nullable: true
         user:
           $ref: '#/components/schemas/SignalUser'
@@ -59387,8 +59871,6 @@ components:
       enum:
       - SAME_DAY_ACH
       - STANDARD_ACH
-      - REAL_TIME_PAYMENTS
-      - DEBIT_CARD
       - MULTIPLE_PAYMENT_METHODS
       description: |-
         The payment method specified in the `default_payment_method` field directly impacts the timing recommendations provided by the API for submitting the debit entry to your processor or ODFI. If unspecified, Signal defaults to `STANDARD_ACH`.
@@ -59396,10 +59878,6 @@ components:
         `SAME_DAY_ACH`: Same Day ACH (as defined by Nacha). The Signal API assumes the settlement will occur on the same business day if the `/signal/schedule` request is submitted by 6:00 PM UTC. Note: The actual cutoff time can vary depending on your payment processor or ODFI. NACHA has established three processing windows for Same Day ACH (UTC): 2:30 PM, 6:45 PM, and 8:45 PM.
 
         `STANDARD_ACH`: Standard ACH (as defined by Nacha), typically settled one to three business days after submission.
-
-        `REAL_TIME_PAYMENTS`: Real-time payments via Request for Payment through networks such as RTP (The Clearing House) and FedNow, where the consumer can authorize the payment in response to a RFP, and the transaction is processed and settled immediately.
-
-        `DEBIT_CARD`: Payments processed over debit card networks, leveraging the card-based infrastructure for real-time or near-real-time settlement.
 
         `MULTIPLE_PAYMENT_METHODS`: Indicates that there is no default debit rail or multiple payment methods are available, and the transaction could use any of them based on customer policy or availability.
     RecommendationString:
@@ -59613,25 +60091,20 @@ components:
       - SAME_DAY_ACH
       - NEXT_DAY_ACH
       - STANDARD_ACH
-      - REAL_TIME_PAYMENTS
-      - DEBIT_CARD
+      - MULTIPLE_PAYMENT_METHODS
+      - null
+      x-override-enum-values-shown:
+      - SAME_DAY_ACH
+      - STANDARD_ACH
       - MULTIPLE_PAYMENT_METHODS
       description: |
         The payment method to complete the transaction after the risk assessment. It may be different from the default payment method.
 
         `SAME_DAY_ACH`: Same Day ACH by NACHA. The debit transaction is processed and settled on the same day
 
-        `NEXT_DAY_ACH`: Next Day ACH settlement for debit transactions, offered by some payment processors
-
-        `STANDARD_ACH`: standard ACH by NACHA
-
-        `REAL_TIME_PAYMENTS`: real-time payments such as RTP and FedNow
-
-        `DEBIT_CARD`: if the default payment is over debit card networks
+        `STANDARD_ACH`: Standard ACH by NACHA
 
         `MULTIPLE_PAYMENT_METHODS`: if there is no default debit rail or there are multiple payment methods
-
-        Possible values: `SAME_DAY_ACH`, `NEXT_DAY_ACH`, `STANDARD_ACH`, `REAL_TIME_PAYMENTS`, `DEBIT_CARD`, `MULTIPLE_PAYMENT_METHODS`
       nullable: true
     SignalEvaluateCoreAttributes:
       title: SignalEvaluateCoreAttributes
@@ -60155,6 +60628,57 @@ components:
           $ref: '#/components/schemas/RequestID'
       required:
       - request_id
+    TCHNotification:
+      title: TCH Notification
+      type: object
+      description: Provides the fields of a notification
+      properties:
+        messageId:
+          title: Message Id
+          type: string
+          description: Unique message identifier (GUID v4 format) of this command, used for tracking purposes. Each request and its response have the same value.
+        conversationId:
+          title: Conversation Id
+          type: string
+          description: Message identifier assigned for the entire conversation (GUID v4 format). Typically, it is generated by the initiator of the flow. The response has the same value with its request.
+        tokenRequestorId:
+          title: Token Requestor Id
+          type: string
+          nullable: true
+          description: Token requestor identifier associated to the domain to which the token belongs.
+        tokenReferenceId:
+          title: Token Reference Id
+          type: string
+          nullable: true
+          description: Unique reference identifier for the token generated.
+      required:
+      - messageId
+      - conversationId
+    TCHNotificationResponse:
+      title: TCH Notification Response
+      type: object
+      additionalProperties: true
+      description: Provides the fields of a notification response
+      properties:
+        messageId:
+          title: Message Id
+          type: string
+          description: Unique message identifier (GUID v4 format) of this command. It is used for the tracking purpose. Each request and its response have same value.
+        conversationId:
+          title: Conversation Id
+          type: string
+          description: Message identifier assigned for the entire conversation (GUID v4 format). Typically, it is generated by the initiator of the flow. The response has the same value with its request.
+        statusCode:
+          title: Status Code
+          type: string
+          description: The five digit status code.
+        statusMessage:
+          title: Status Message
+          type: string
+          description: Human readable comments about the status.
+      required:
+      - messageId
+      - conversationId
     VerifyAPIToken:
       title: VerifyAPIToken
       type: string
@@ -60202,3 +60726,173 @@ components:
           description: The subscore score.
       required:
       - score
+    ProtectUserInsightsGetRequest:
+      type: object
+      description: Request object for /protect/user/insights/get
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        user_id:
+          type: string
+          description: The Plaid User ID. Either `user_id` or `client_user_id` must be provided.
+        client_user_id:
+          type: string
+          description: A unique ID representing the end user. Either `user_id` or `client_user_id` must be provided.
+    ProtectUserInsightsGetResponse:
+      type: object
+      additionalProperties: true
+      description: Response object for /protect/user/insights/get
+      properties:
+        user_id:
+          type: string
+          description: The Plaid User ID. If a `client_user_id` was provided in the request instead of a `user_id`, a new `user_id` will be generated if one doesn't already exist for that `client_user_id`.
+        latest_scored_event:
+          $ref: '#/components/schemas/LatestScoredEvent'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - user_id
+      - latest_scored_event
+      - request_id
+    ProtectEventSendRequest:
+      type: object
+      description: Request object for /protect/event/send
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        timestamp:
+          type: string
+          format: date-time
+          description: Timestamp of the event. Might be the current moment or a time in the past. In [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format, e.g. `"2017-09-14T14:42:19.350Z"`
+        event:
+          $ref: '#/components/schemas/ProtectEvent'
+        protect_sdk_session_id:
+          type: string
+          description: Protect SDK session id should be provided for any event correlated with a frontend user session
+        request_trust_index:
+          type: boolean
+          description: Whether this event should be scored with Trust Index. The default is false.
+      required:
+      - event
+    ProtectEventSendResponse:
+      type: object
+      additionalProperties: true
+      description: Response object for /protect/event/send
+      properties:
+        event_id:
+          type: string
+          description: The id of the recorded event.
+        trust_index:
+          $ref: '#/components/schemas/TrustIndex'
+        fraud_attributes:
+          $ref: '#/components/schemas/FraudAttributes'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - event_id
+      - request_id
+    ProtectEventGetRequest:
+      type: object
+      description: Request object for /protect/event/get
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        event_id:
+          type: string
+          description: The event ID to retrieve information for.
+      required:
+      - event_id
+    ProtectEventGetResponse:
+      type: object
+      additionalProperties: true
+      description: Response object for /protect/event/get
+      properties:
+        event_id:
+          type: string
+          description: The event ID.
+        timestamp:
+          type: string
+          format: date-time
+          description: The timestamp of the event, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format, e.g. `"2017-09-14T14:42:19.350Z"`
+        trust_index:
+          $ref: '#/components/schemas/TrustIndex'
+        fraud_attributes:
+          $ref: '#/components/schemas/FraudAttributes'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - event_id
+      - timestamp
+      - request_id
+    LatestScoredEvent:
+      type: object
+      nullable: true
+      additionalProperties: true
+      description: The latest scored event for a user.
+      properties:
+        event_id:
+          type: string
+          description: The event ID.
+        timestamp:
+          type: string
+          format: date-time
+          description: The timestamp of the event, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format, e.g. `"2017-09-14T14:42:19.350Z"`
+        event_type:
+          type: string
+          description: The type of event.
+        trust_index:
+          $ref: '#/components/schemas/TrustIndex'
+        fraud_attributes:
+          $ref: '#/components/schemas/FraudAttributes'
+      required:
+      - event_id
+      - timestamp
+      - trust_index
+      - fraud_attributes
+    ProtectEvent:
+      type: object
+      nullable: true
+      additionalProperties: true
+      description: Event data for Protect events.
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          description: The timestamp of the event, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format, e.g. `"2017-09-14T14:42:19.350Z"`
+        protect_session_id:
+          type: string
+          description: If present, contains the current Protect Session ID from the Plaid Pixel SDK.
+        app_visit:
+          $ref: '#/components/schemas/ProtectAppVisitEvent'
+        user_sign_in:
+          $ref: '#/components/schemas/ProtectUserSignInEvent'
+        user_sign_up:
+          $ref: '#/components/schemas/ProtectUserSignUpEvent'
+      required:
+      - timestamp
+    ProtectAppVisitEvent:
+      type: object
+      nullable: true
+      additionalProperties: true
+      description: This event type represents a user visiting the client application.
+    ProtectUserSignInEvent:
+      type: object
+      nullable: true
+      additionalProperties: true
+      description: This event type represents a user signing in to the application.
+    ProtectUserSignUpEvent:
+      type: object
+      nullable: true
+      additionalProperties: true
+      description: This event type represents a user signing up for the application.
+    FraudAttributes:
+      type: object
+      nullable: true
+      additionalProperties: true
+      description: Event fraud attributes as an arbitrary set of key-value pairs.
