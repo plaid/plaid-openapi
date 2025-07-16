@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.645.0
+  version: 2020-09-14_1.651.1
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -528,7 +528,7 @@ paths:
                   value:
                     subscription_id: f17efbdd-caab-4278-8ece-963511cd3d51
                     request_id: GVzMdiDd8DDAQK4
-      description: This endpoint allows you to subscribe to insights for a user's linked CRA items, which are updated every day (best-effort).
+      description: This endpoint allows you to subscribe to insights for a user's linked CRA items, which are updated between one and four times per day (best-effort).
   /cra/monitoring_insights/unsubscribe:
     post:
       summary: Unsubscribe from Monitoring Insights
@@ -583,6 +583,8 @@ paths:
                     items:
                     - date_generated: "2023-03-30T18:27:37Z"
                       item_id: AZMP7JrGXgtPd3AQMeg7hwMKgk5E8qU1V5ME7
+                      institution_id: ins_0
+                      institution_name: Plaid Bank
                       status:
                         status_code: AVAILABLE
                       insights:
@@ -2139,7 +2141,6 @@ paths:
             schema:
               $ref: '#/components/schemas/CraCheckReportNetworkInsightsGetRequest'
   /cra/check_report/verification/get:
-    x-hidden-from-docs: true
     post:
       summary: Retrieve various verification reports for a user.
       tags:
@@ -2289,7 +2290,7 @@ paths:
                           institution_id: ins_109508
                           item_id: AZMP7JrGXgtPd3AQMeg7hwMKgk5E8qU1V5ME7
                           last_update_time: "2023-03-30T18:25:26Z"
-                      voe:
+                      employment_refresh:
                         generated_time: "2023-03-30T18:27:37Z"
                         days_requested: 60
                         items:
@@ -2324,7 +2325,7 @@ paths:
       externalDocs:
         url: /api/products/check/#cracheck_reportverificationget
       operationId: craCheckReportVerificationGet
-      description: "This endpoint allows you to retrieve verification reports for a user. To obtain a VoA or VoE report, you need to make sure that `cra_base_report` is included in the `products` parameter when calling `/link/token/create` or `/cra/check_report/create`. \n\nYou should call this endpoint after you've received a `CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`.\n\nIf the most recent consumer report for the user doesn’t have sufficient data to generate the report, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.\""
+      description: "This endpoint allows you to retrieve verification reports for a user. To obtain a VoA or Employment Refresh report, you need to make sure that `cra_base_report` is included in the `products` parameter when calling `/link/token/create` or `/cra/check_report/create`. \n\nYou should call this endpoint after you've received a `CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`.\n\nIf the most recent consumer report for the user doesn’t have sufficient data to generate the report, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.\""
       requestBody:
         required: true
         content:
@@ -3581,13 +3582,13 @@ paths:
                         names:
                         - Alberta Bobbeth Charleson
                         phone_numbers:
-                        - data: "1112223333"
+                        - data: "2025550123"
                           primary: false
                           type: home
-                        - data: "1112224444"
+                        - data: "3125550123"
                           primary: false
                           type: work
-                        - data: "1112225555"
+                        - data: "4155550123"
                           primary: false
                           type: mobile
                     transactions:
@@ -3721,6 +3722,7 @@ paths:
                     next_cursor: eu4rIDi328130dKJEoqieej
                     has_more: true
                     request_id: 45QSn
+                    last_successful_update_time: "2025-07-02T00:00:00Z"
         default:
           content:
             application/json:
@@ -3800,7 +3802,7 @@ paths:
                         names:
                         - Alberta Bobbeth Charleson
                         phone_numbers:
-                        - data: "1112223333"
+                        - data: "2025550123"
                           primary: false
                           type: home
                         - data: "1112224444"
@@ -4036,7 +4038,7 @@ paths:
                         names:
                         - Alberta Bobbeth Charleson
                         phone_numbers:
-                        - data: "1112223333"
+                        - data: "2025550123"
                           primary: false
                           type: home
                         - data: "1112224444"
@@ -4171,8 +4173,7 @@ paths:
                         unofficial_currency_code: null
                       is_active: true
                       status: MATURE
-                      is_user_modified: true
-                      last_user_modified_datetime: "2023-01-19T10:34:50Z"
+                      is_user_modified: false
                     outflow_streams:
                     - account_id: lPNjeW1nR6CDn5okmGQ6hEpMo4lLNoSrzqDff
                       stream_id: no86Eox18VHMvaOVL7gPUM9ap3aR1LsAVZ5nd
@@ -4231,8 +4232,7 @@ paths:
                         unofficial_currency_code: null
                       is_active: true
                       status: MATURE
-                      is_user_modified: true
-                      last_user_modified_datetime: "2023-01-19T10:34:50Z"
+                      is_user_modified: false
                     request_id: tbFyCEqkU775ZGG
         default:
           content:
@@ -4545,6 +4545,124 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/TransactionsEnrichRequest'
+  /user/transactions/refresh:
+    post:
+      tags:
+      - plaid
+      summary: Refresh user items for Transactions bundle
+      externalDocs:
+        url: /api/products/transactions/#usertransactionsrefresh
+      operationId: userTransactionsRefresh
+      description: |-
+        `/user/transactions/refresh` is an optional endpoint that initiates an on-demand extraction to fetch the newest transactions for a User using the Transactions bundle.
+        This bundle refreshes only the Transactions product data.
+        This endpoint is for clients who use the Transactions Insights bundle and want to proactively update all linked Items under a user.
+        The refresh may succeed or fail on a per-Item basis. Use the `results` array in the response to understand the outcome for each Item.
+
+        This endpoint is distinct from `/transactions/refresh`, which triggers a refresh for a single Item. Use `/user/transactions/refresh` to target all Items for a user instead.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserTransactionsRefreshRequest'
+            examples:
+              example-1:
+                value:
+                  user_id: usr_8c3ZbDBYjaqUXZ
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserTransactionsRefreshResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: 7fe31f2c-d3db-49f8-9e45-b13cf1eaa1eb
+                    user_id: usr_8c3ZbDBYjaqUXZ
+                    results:
+                    - item_id: Fd7bjNrDLJfGvZWwnkQlfxwoNz54B5C97ejBr
+                      product: transactions
+                    - item_id: AbCdEfGhIjKlMnOpQrStUvWxYz1234567890
+                      product: transactions
+                      error:
+                        error_type: ITEM_ERROR
+                        error_code: ITEM_LOGIN_REQUIRED
+                        error_code_reason: null
+                        error_message: The login credentials for this Item have changed.
+                        display_message: Please update your login credentials.
+                        request_id: req_xyz789
+                        causes: []
+                        status: 400
+                        documentation_url: https://plaid.com/docs/errors/item/item-login-required/
+                        suggested_action: Prompt the user to re-authenticate their account.
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+  /user/financial_data/refresh:
+    post:
+      tags:
+      - plaid
+      summary: Refresh user items for Financial-Insights bundle
+      externalDocs:
+        url: /api/products/transactions/#userfinancialdatarefresh
+      operationId: userFinancialDataRefresh
+      description: |-
+        `/user/financial_data/refresh` is an optional endpoint that initiates an on-demand extraction to fetch the newest transactions for a User using the Financial Insights bundle.
+        This bundle refreshes the Transactions, Investments, and Liabilities product data.
+        This endpoint is for clients who use the Transactions Insights bundle and want to proactively update all linked Items under a user.
+        The refresh may succeed or fail on a per-Item basis. Use the `results` array in the response to understand the outcome for each Item.
+
+        This endpoint is distinct from `/transactions/refresh`, which triggers a refresh for a single Item. Use `/user/financial_data/refresh` to target all Items for a user instead.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserFinancialDataRefreshRequest'
+            examples:
+              example-1:
+                value:
+                  user_id: usr_8c3ZbDBYjaqUXZ
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserFinancialDataRefreshResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: 7fe31f2c-d3db-49f8-9e45-b13cf1eaa1eb
+                    user_id: usr_8c3ZbDBYjaqUXZ
+                    results:
+                    - item_id: Fd7bjNrDLJfGvZWwnkQlfxwoNz54B5C97ejBr
+                      product: transactions
+                    - item_id: AbCdEfGhIjKlMnOpQrStUvWxYz1234567890
+                      product: transactions
+                      error:
+                        error_type: ITEM_ERROR
+                        error_code: ITEM_LOGIN_REQUIRED
+                        error_code_reason: null
+                        error_message: The login credentials for this Item have changed.
+                        display_message: Please update your login credentials.
+                        request_id: req_xyz789
+                        causes: []
+                        status: 400
+                        documentation_url: https://plaid.com/docs/errors/item/item-login-required/
+                        suggested_action: Prompt the user to re-authenticate their account.
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
   /institutions/get:
     post:
       tags:
@@ -5463,7 +5581,7 @@ paths:
                         names:
                         - Alberta Bobbeth Charleson
                         phone_numbers:
-                        - data: "1112223333"
+                        - data: "2025550123"
                           primary: false
                           type: home
                         - data: "1112224444"
@@ -5513,7 +5631,7 @@ paths:
                         names:
                         - Alberta Bobbeth Charleson
                         phone_numbers:
-                        - data: "1112223333"
+                        - data: "2025550123"
                           primary: false
                           type: home
                         - data: "1112224444"
@@ -9058,8 +9176,7 @@ paths:
                         unofficial_currency_code: null
                       is_active: true
                       status: MATURE
-                      is_user_modified: true
-                      last_user_modified_datetime: "2023-01-19T10:34:50Z"
+                      is_user_modified: false
                     outflow_streams:
                     - account_id: lPNjeW1nR6CDn5okmGQ6hEpMo4lLNoSrzqDff
                       stream_id: no86Eox18VHMvaOVL7gPUM9ap3aR1LsAVZ5nd
@@ -9118,8 +9235,7 @@ paths:
                         unofficial_currency_code: null
                       is_active: true
                       status: MATURE
-                      is_user_modified: true
-                      last_user_modified_datetime: "2023-01-19T10:34:50Z"
+                      is_user_modified: false
                     request_id: tbFyCEqkU775ZGG
         default:
           content:
@@ -9486,7 +9602,7 @@ paths:
                         names:
                         - Alberta Bobbeth Charleson
                         phone_numbers:
-                        - data: "1112223333"
+                        - data: "2025550123"
                           primary: false
                           type: home
                         - data: "1112224444"
@@ -10710,7 +10826,12 @@ paths:
                       sort_code: "601613"
                     iban: null
                     request_id: aEAQmewMzlVa1k6
-      description: The `/payment_initiation/payment/get` endpoint can be used to check the status of a payment, as well as to receive basic information such as recipient and payment amount. In the case of standing orders, the `/payment_initiation/payment/get` endpoint will provide information about the status of the overall standing order itself; the API cannot be used to retrieve payment status for individual payments within a standing order.
+      description: |-
+        The `/payment_initiation/payment/get` endpoint can be used to check the status of a payment, as well as to receive basic information such as recipient and payment amount. In the case of standing orders, the `/payment_initiation/payment/get` endpoint will provide information about the status of the overall standing order itself; the API cannot be used to retrieve payment status for individual payments within a standing order.
+
+        Polling for status updates in Production is highly discouraged. Repeatedly calling `/payment_initiation/payment/get` to check a payment's status is unreliable and may trigger API rate limits. Only the `payment_status_update` webhook should be used to receive real-time status updates in Production.
+
+        In the case of standing orders, the `/payment_initiation/payment/get` endpoint will provide information about the status of the overall standing order itself; the API cannot be used to retrieve payment status for individual payments within a standing order.
       requestBody:
         required: true
         content:
@@ -12515,7 +12636,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
-      description: Use the `/transfer/capabilities/get` endpoint to determine the RTP eligibility information of an account to be used with Transfer. This endpoint works on all Transfer-capable Items, including those created by `/transfer/migrate_account`. To simulate RTP eligibility in Sandbox, log in using the username `user_good` and password `pass_good` and use the first two checking and savings accounts in the "First Platypus Bank" institution (ending in 0000 or 1111), which will return `true`. Any other account will return `false`.
+      description: Use the `/transfer/capabilities/get` endpoint to determine the RTP eligibility information of an account to be used with Transfer. This endpoint works on all Transfer-capable Items, including those created by `/transfer/migrate_account`.
       requestBody:
         required: true
         content:
@@ -12603,7 +12724,7 @@ paths:
               $ref: '#/components/schemas/TransferLedgerGetRequest'
   /transfer/ledger/distribute:
     post:
-      summary: Move available balance between the ledgers of the platform and one of its originators
+      summary: Move available balance between ledgers
       tags:
       - plaid
       externalDocs:
@@ -12626,7 +12747,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
-      description: Use the `/transfer/ledger/distribute` endpoint to move available balance between the ledgers of the platform and one of its originators.
+      description: Use the `/transfer/ledger/distribute` endpoint to move available balance between ledgers, if you have multiple. If you’re a platform, you can move funds between one of your ledgers and one of your customer’s ledger.
       requestBody:
         required: true
         content:
@@ -17070,7 +17191,7 @@ paths:
               $ref: '#/components/schemas/SandboxBankIncomeFireWebhookRequest'
   /sandbox/cra/cashflow_updates/update:
     post:
-      summary: Trigger an update for Cashflow Updates
+      summary: Trigger an update for Cash Flow Updates
       tags:
       - plaid
       externalDocs:
@@ -17093,7 +17214,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
-      description: Use the `/sandbox/cra/cashflow_updates/update` endpoint to manually trigger an update for cashflow updates (Monitoring) in the Sandbox environment.
+      description: Use the `/sandbox/cra/cashflow_updates/update` endpoint to manually trigger an update for Cash Flow Updates (Monitoring) in the Sandbox environment.
       requestBody:
         required: true
         content:
@@ -19199,6 +19320,10 @@ components:
         has_more:
           type: boolean
           description: Represents if more than requested count of transactions exists to be fetched
+        last_successful_update_time:
+          type: string
+          format: date-time
+          description: The last successful update time in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ( `YYYY-MM-DDTHH:mm:ssZ` )
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
@@ -19208,6 +19333,7 @@ components:
       - item
       - next_cursor
       - has_more
+      - last_successful_update_time
       - request_id
     CashflowReportTransactionsGetRequest:
       x-hidden-from-docs: true
@@ -20098,7 +20224,7 @@ components:
           - transfer
         routing_numbers:
           type: array
-          description: Specify an array of routing numbers to filter institutions. The response will only return institutions that match all of the routing numbers in the array. Routing number records used for this matching are generally comprehensive; however, failure to match a given routing number to an institution does not necessarily mean that the institution is unsupported by Plaid.
+          description: Specify an array of routing numbers to filter institutions. The response will only return institutions that match all of the routing numbers in the array. Routing number records used for this matching are generally comprehensive; however, failure to match a given routing number to an institution does not necessarily mean that the institution is unsupported by Plaid. Invalid routing numbers (numbers that are not 9 digits in length or do not have a valid checksum) will be filtered from the array before the response is processed.
           nullable: true
           items:
             type: string
@@ -23071,6 +23197,8 @@ components:
           - bloom_credit
           - sfox
           - brale
+          - parafin
+          - cardless
           description: The processor you are integrating with.
       required:
       - access_token
@@ -23345,6 +23473,7 @@ components:
           - transactions
           - signal
           - statements
+          - protect_linked_bank
           nullable: true
         optional_products:
           type: array
@@ -25917,9 +26046,8 @@ components:
           $ref: '#/components/schemas/PersonalFinanceCategory'
         is_user_modified:
           type: boolean
-          description: This will be set to `true` if the stream has been modified by request to a `/transactions/recurring/streams` endpoint. It will be `false` for all other streams.
+          description: As the ability to modify transactions streams has been discontinued, this field will always be `false`.
           deprecated: true
-          x-hidden-from-docs: true
         last_user_modified_datetime:
           type: string
           description: The date and time of the most recent user modification. This will only be set if `is_user_modified` is `true`.
@@ -26523,6 +26651,8 @@ components:
           type: string
           description: The phone number associated with the counterparty in E. 164 format. If there is a location match (i.e. a street address is returned in the location object), the phone number will be location specific.
           nullable: true
+        account_numbers:
+          $ref: '#/components/schemas/CounterpartyNumbers'
       required:
       - name
       - type
@@ -26563,6 +26693,8 @@ components:
             `LOW`: We didn’t find a matching counterparty in our records, so we are returning a cleansed name parsed out of the request description.
             `UNKNOWN`: We don’t know the confidence level for this counterparty.
           nullable: true
+        account_numbers:
+          $ref: '#/components/schemas/CounterpartyNumbers'
       required:
       - name
       - type
@@ -26587,6 +26719,47 @@ components:
       - marketplace
       - payment_terminal
       - income_source
+    CounterpartyNumbers:
+      type: object
+      title: CounterpartyNumbers
+      additionalProperties: true
+      description: |-
+        Account numbers associated with the counterparty, when available.
+        This field is currently only filled in for select financial institutions in Europe.
+      nullable: true
+      properties:
+        bacs:
+          $ref: '#/components/schemas/CounterpartyNumbersBACS'
+        international:
+          $ref: '#/components/schemas/CounterpartyNumbersInternational'
+    CounterpartyNumbersBACS:
+      type: object
+      title: CounterpartyNumbersBACS
+      description: Identifying information for a UK bank account via BACS.
+      nullable: true
+      properties:
+        account:
+          type: string
+          nullable: true
+          description: The BACS account number for the account.
+        sort_code:
+          type: string
+          nullable: true
+          description: The BACS sort code for the account.
+    CounterpartyNumbersInternational:
+      type: object
+      title: CounterpartyNumbersInternational
+      description: Account numbers using the International Bank Account Number and BIC/SWIFT code format.
+      nullable: true
+      properties:
+        iban:
+          $ref: '#/components/schemas/NumbersIBANNullable'
+        bic:
+          type: string
+          description: Bank identifier code (BIC) for this counterparty.
+          nullable: true
+          minLength: 8
+          maxLength: 11
     PersonalFinanceCategory:
       title: PersonalFinanceCategory
       nullable: true
@@ -28650,7 +28823,7 @@ components:
 
         `IMMEDIATE`: Will immediately execute the payment, waiting for a response from the ASPSP before returning the result of the payment initiation. This is ideal for user-present flows.
 
-         `ASYNC`: Will accept a payment execution request and schedule it for processing, immediately returning the new `payment_id`. Listen for webhooks or use the [`/payment_initiation/payment/get`](https://plaid.com/docs/api/products/payment-initiation/#payment_initiationpaymentget) endpoint to obtain updates on the payment status. This is ideal for non user-present flows.
+         `ASYNC`: Will accept a payment execution request and schedule it for processing, immediately returning the new `payment_id`. Listen for webhooks to obtain real-time updates on the payment status. This is ideal for non user-present flows.
     ExternalPaymentInitiationConsentOptions:
       type: object
       title: ExternalPaymentInitiationConsentOptions
@@ -31063,6 +31236,8 @@ components:
           $ref: '#/components/schemas/LoanAccount'
         investment:
           $ref: '#/components/schemas/InvestmentAccountSubtypeStandalone'
+        payroll:
+          $ref: '#/components/schemas/PayrollAccount'
         other:
           type: string
           description: Other or unknown account type.
@@ -31077,18 +31252,21 @@ components:
       description: An account type holding cash, in which funds are deposited.
       type: string
       properties:
-        checking:
+        cash management:
           type: string
-          description: Checking account
-        savings:
-          type: string
-          description: Savings account
-        hsa:
-          type: string
-          description: Health Savings Account (US only) that can only hold cash
+          description: A cash management account, typically a cash account at a brokerage
         cd:
           type: string
           description: Certificate of deposit account
+        checking:
+          type: string
+          description: Checking account
+        ebt:
+          type: string
+          description: An Electronic Benefit Transfer (EBT) account, used by certain public assistance programs to distribute funds (US only)
+        hsa:
+          type: string
+          description: Health Savings Account (US only) that can only hold cash
         money market:
           type: string
           description: Money market account
@@ -31098,12 +31276,9 @@ components:
         prepaid:
           type: string
           description: Prepaid debit card
-        cash management:
+        savings:
           type: string
-          description: A cash management account, typically a cash account at a brokerage
-        ebt:
-          type: string
-          description: An Electronic Benefit Transfer (EBT) account, used by certain public assistance programs to distribute funds (US only)
+          description: Savings account
       required:
       - checking
       - savings
@@ -31151,24 +31326,24 @@ components:
         home equity:
           type: string
           description: Home Equity Line of Credit (HELOC)
+        line of credit:
+          type: string
+          description: Pre-approved line of credit
         loan:
           type: string
           description: General loan
         mortgage:
           type: string
           description: Mortgage loan
-        overdraft:
-          type: string
-          description: Pre-approved overdraft account, usually tied to a checking account
-        line of credit:
-          type: string
-          description: Pre-approved line of credit
-        student:
-          type: string
-          description: Student loan
         other:
           type: string
           description: Other loan type or unknown loan type
+        overdraft:
+          type: string
+          description: Pre-approved overdraft account, usually tied to a checking account
+        student:
+          type: string
+          description: Student loan
       required:
       - auto
       - business
@@ -31187,10 +31362,6 @@ components:
       type: string
       description: An investment account. In API versions 2018-05-22 and earlier, this type is called `brokerage`.
       properties:
-        "529":
-          type: string
-          description: |
-            Tax-advantaged college savings and prepaid tuition 529 plans (US)
         401a:
           type: string
           description: Employer-sponsored money-purchase 401(a) retirement plan (US)
@@ -31203,6 +31374,10 @@ components:
         457b:
           type: string
           description: Tax-advantaged deferred-compensation 457(b) retirement plan for governments and non-profits (US)
+        "529":
+          type: string
+          description: |
+            Tax-advantaged college savings and prepaid tuition 529 plans (US)
         brokerage:
           type: string
           description: Standard brokerage account
@@ -31325,6 +31500,9 @@ components:
         tfsa:
           type: string
           description: Tax-Free Savings Account (TFSA), a retirement plan similar to a Roth IRA (Canada)
+        thrift savings plan:
+          type: string
+          description: Thrift Savings Plan, a retirement savings and investment plan for Federal employees and members of the uniformed services.
         trust:
           type: string
           description: Account representing funds or assets held by a trustee for the benefit of a beneficiary. Includes both revocable and irrevocable trusts.
@@ -31383,11 +31561,22 @@ components:
       - simple ira
       - sipp
       - stock plan
+      - thrift savings plan
       - tfsa
       - trust
       - ugma
       - utma
       - variable annuity
+    PayrollAccount:
+      title: PayrollAccount
+      type: string
+      description: A payroll account.
+      properties:
+        payroll:
+          type: string
+          description: Standard payroll account
+      required:
+      - payroll
     PaymentStatusUpdateWebhook:
       title: PaymentStatusUpdateWebhook
       type: object
@@ -31546,6 +31735,8 @@ components:
           type: string
           format: date-time
           description: The timestamp of the update, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format, e.g. `"2017-09-14T14:42:19.350Z"`
+        error:
+          $ref: '#/components/schemas/PlaidError'
         environment:
           $ref: '#/components/schemas/WebhookEnvironmentValues'
       required:
@@ -33042,6 +33233,10 @@ components:
           type: string
           nullable: true
           description: Additional information from the wire originator to the beneficiary. Max 140 characters.
+        wire_return_fee:
+          type: string
+          nullable: true
+          description: The fee amount deducted from the original transfer during a wire return, if applicable.
     TransferUserInRequest:
       title: TransferUserInRequest
       type: object
@@ -34887,6 +35082,10 @@ components:
           type: string
           nullable: true
           description: The `id` returned by the /transfer/intent/create endpoint, for transfers created via Transfer UI. For transfers not created by Transfer UI, the value is `null`. This will currently only be populated for RfP transfers.
+        wire_return_fee:
+          type: string
+          nullable: true
+          description: The fee amount deducted from the original transfer during a wire return, if applicable.
       required:
       - event_id
       - timestamp
@@ -36871,6 +37070,9 @@ components:
           minimum: 25
           maximum: 100
           description: The percentage of ownership this person has in the onboarding business. Only applicable to beneficial owners with 25% or more ownership.
+        title:
+          type: string
+          description: The title of the person at the business. Only applicable to control persons - for example, "CEO", "President", "Owner", etc.
     TransferPlatformPersonIDNumber:
       description: ID number of the person
       type: object
@@ -38106,12 +38308,12 @@ components:
       properties:
         days_requested:
           type: integer
-          description: The number of days of history to include in Plaid Check products. Maximum is 730; minimum is 180. If a value lower than 180 is provided, a minimum of 180 days of history will be requested.
-          maximum: 730
+          description: The number of days of history to include in Plaid Check products. Maximum is 731; minimum is 180. If a value lower than 180 is provided, a minimum of 180 days of history will be requested.
+          maximum: 731
         days_required:
           type: integer
           description: The minimum number of days of data required for the report to be successfully generated.
-          maximum: 730
+          maximum: 184
         client_report_id:
           type: string
           nullable: true
@@ -38148,6 +38350,10 @@ components:
           description: Client-generated identifier, which can be used by lenders to track loan applications.
         gse_options:
           $ref: '#/components/schemas/LinkTokenCreateRequestCraOptionsBaseReportGSEOptions'
+        require_identity:
+          type: boolean
+          nullable: true
+          description: Indicates that the report must include identity information. If identity information is not available, the report will fail.
     LinkTokenCreateRequestCraOptionsBaseReportGSEOptions:
       title: LinkTokenCreateRequestCraOptionsBaseReportGSEOptions
       x-hidden-from-docs: true
@@ -43263,6 +43469,12 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_token:
           $ref: '#/components/schemas/UserToken'
+        webhook_codes:
+          type: array
+          description: Webhook codes corresponding to the Cash Flow Updates events to be simulated.
+          items:
+            $ref: '#/components/schemas/CashFlowUpdatesEventWebhookCodes'
+          nullable: true
       required:
       - user_token
     SandboxCraCashflowUpdatesUpdateResponse:
@@ -43827,7 +44039,7 @@ components:
         cursor:
           type: string
           maxLength: 256
-          description: A base64 value representing the latest transaction that has already been requested. Set this to `next_cursor` received from the previous `/wallet/transaction/list` request. If provided, the response will only contain transactions created before that transaction. If omitted, the response will contain transactions starting from the most recent, and in descending order by the `created_at` time.
+          description: A value representing the latest transaction to be included in the response. Set this from `next_cursor` received in the previous `/wallet/transaction/list` request. If provided, the response will only contain that transaction and transactions created before it. If omitted, the response will contain transactions starting from the most recent, and in descending order by the `created_at` time.
         count:
           type: integer
           description: The number of transactions to fetch
@@ -43889,7 +44101,7 @@ components:
             $ref: '#/components/schemas/WalletTransaction'
         next_cursor:
           type: string
-          description: Cursor used for fetching transactions created before the latest transaction provided in this response
+          description: The value that, when used as the optional `cursor` parameter to `/wallet/transaction/list`, will return the corresponding transaction as its first entry.
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
@@ -43956,6 +44168,8 @@ components:
           description: The payment id that this transaction is associated with, if any. This is present only for transaction types `PIS_PAY_IN` and `REFUND`.
         failure_reason:
           $ref: '#/components/schemas/WalletTransactionFailureReason'
+        error:
+          $ref: '#/components/schemas/PlaidError'
         related_transactions:
           type: array
           description: A list of wallet transactions that this transaction is associated with, if any.
@@ -44851,6 +45065,73 @@ components:
         request_id:
           type: string
           description: A unique identifier for the API request.
+    UserTransactionsRefreshRequest:
+      type: object
+      description: UserTransactionsRefreshRequest defines the request schema for `user/transactions/refresh`
+      properties:
+        user_id:
+          type: string
+          description: A Plaid-generated ID that identifies the end user.
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+      required:
+      - user_id
+    UserTransactionsRefreshResponse:
+      type: object
+      description: UserTransactionsRefreshResponse defines the response schema for `user/transactions/refresh`
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+        user_id:
+          type: string
+          description: The user ID associated with the refresh request.
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/RefreshResult'
+      additionalProperties: true
+    UserFinancialDataRefreshRequest:
+      type: object
+      description: UserFinancialDataRefreshRequest defines the request schema for `user/financial_data/refresh`
+      properties:
+        user_id:
+          type: string
+          description: A Plaid-generated ID that identifies the end user.
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+      required:
+      - user_id
+    UserFinancialDataRefreshResponse:
+      type: object
+      description: UserFinancialDataRefreshResponse defines the response schema for `user/financial_data/refresh`
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+        user_id:
+          type: string
+          description: The user ID associated with the refresh request.
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/RefreshResult'
+      additionalProperties: true
+    RefreshResult:
+      type: object
+      description: RefreshResult represents the result status of a user refresh for a specific item.
+      properties:
+        item_id:
+          type: string
+          description: A unique identifier for the Plaid Item.
+        product:
+          type: string
+          description: The product for which the refresh was attempted.
+        error:
+          $ref: '#/components/schemas/PlaidError'
+      additionalProperties: true
     PaymentProfileCreateRequest:
       type: object
       description: PaymentProfileCreateRequest defines the request schema for `/payment_profile/create`
@@ -45591,43 +45872,19 @@ components:
         `SUCCESS`: The statements were successfully extracted and can be listed via `/statements/list/` and downloaded via `/statements/download/`.
 
         `FAILURE`: The statements failed to be extracted.
-    MonitoringInsightsWebhook:
-      title: MonitoringInsightsWebhook
-      type: object
-      additionalProperties: true
-      description: For each user enabled for Cash Flow Updates, this webhook will fire every day with information on the status of the update. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
-      properties:
-        webhook_type:
-          type: string
-          description: '`CRA_MONITORING`'
-        webhook_code:
-          type: string
-          description: '`INSIGHTS_UPDATED`'
-        status:
-          $ref: '#/components/schemas/MonitoringInsightsStatus'
-        user_id:
-          type: string
-          description: The `user_id` that the report is associated with
-        environment:
-          $ref: '#/components/schemas/WebhookEnvironmentValues'
-      required:
-      - webhook_type
-      - webhook_code
-      - status
-      - user_id
-      - environment
-      x-examples:
-        example-1:
-          webhook_type: CRA_MONITORING
-          webhook_code: INSIGHTS_UPDATED
-          status: AVAILABLE
-          user_id: 9eaba3c2fdc916bc197f279185b986607dd21682a5b04eab04a5a03e8b3f3334
-          environment: production
+    CashFlowUpdatesEventWebhookCodes:
+      type: string
+      enum:
+      - LARGE_DEPOSIT_DETECTED
+      - LOW_BALANCE_DETECTED
+      - NEW_LOAN_PAYMENT_DETECTED
+      - NSF_OVERDRAFT_DETECTED
+      description: Webhook code for a Cash Flow Updates event.
     CashFlowUpdatesInsightsWebhook:
       title: CashFlowUpdatesInsightsWebhook
       type: object
       additionalProperties: true
-      description: For each user enabled for Cash Flow Updates, this webhook will fire every day with information on the status of the update. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
+      description: For each user's item enabled for Cash Flow Updates, this webhook will fire between one and four times a day with information on the status of the update. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
       properties:
         webhook_type:
           type: string
@@ -45659,7 +45916,7 @@ components:
       title: CashFlowUpdatesNSFWebhook
       type: object
       additionalProperties: true
-      description: For each user enabled for Cash Flow Updates, this webhook will fire when an update includes an NSF overdraft transaction. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
+      description: For each user's item enabled for Cash Flow Updates, this webhook will fire when an update includes an NSF overdraft transaction. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
       properties:
         webhook_type:
           type: string
@@ -45691,7 +45948,7 @@ components:
       title: CashFlowUpdatesNewIncomeStreamWebhook
       type: object
       additionalProperties: true
-      description: For each user enabled for Cash Flow Updates, this webhook will fire when an update includes a new income stream. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
+      description: For each user's item enabled for Cash Flow Updates, this webhook will fire when an update includes a new income stream. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
       properties:
         webhook_type:
           type: string
@@ -45723,7 +45980,7 @@ components:
       title: CashFlowUpdatesExpectedDepositMissedWebhook
       type: object
       additionalProperties: true
-      description: For each user enabled for Cash Flow Updates, this webhook will fire when an update detects that an expected deposit was missed. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
+      description: For each user's item enabled for Cash Flow Updates, this webhook will fire when an update detects that an expected deposit was missed. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
       properties:
         webhook_type:
           type: string
@@ -45755,7 +46012,7 @@ components:
       title: CashFlowUpdatesLowBalanceWebhook
       type: object
       additionalProperties: true
-      description: For each user enabled for Cash Flow Updates, this webhook will fire when an update detects a balance below $100. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
+      description: For each user's item enabled for Cash Flow Updates, this webhook will fire when an update detects a balance below $100. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
       properties:
         webhook_type:
           type: string
@@ -45787,7 +46044,7 @@ components:
       title: CashFlowUpdatesLargeDepositWebhook
       type: object
       additionalProperties: true
-      description: For each user enabled for Cash Flow Updates, this webhook will fire when an update detects a deposit over $5,000. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
+      description: For each user's item enabled for Cash Flow Updates, this webhook will fire when an update detects a deposit over $5,000. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
       properties:
         webhook_type:
           type: string
@@ -45819,7 +46076,7 @@ components:
       title: CashFlowUpdatesNewLoanPaymentWebhook
       type: object
       additionalProperties: true
-      description: For each user enabled for Cash Flow Updates, this webhook will fire when an update detects a new loan payment. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
+      description: For each user's item enabled for Cash Flow Updates, this webhook will fire when an update detects a new loan payment. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights.
       properties:
         webhook_type:
           type: string
@@ -47121,6 +47378,12 @@ components:
         item_id:
           type: string
           description: The `item_id` of the Item associated with the insights
+        institution_id:
+          type: string
+          description: The id of the financial institution associated with the Item.
+        institution_name:
+          type: string
+          description: The full financial institution name associated with the Item.
         status:
           $ref: '#/components/schemas/MonitoringInsightsItemStatus'
         insights:
@@ -47133,6 +47396,8 @@ components:
       required:
       - date_generated
       - item_id
+      - institution_id
+      - institution_name
       - status
       - insights
     MonitoringInsightsItemStatus:
@@ -48520,10 +48785,10 @@ components:
           $ref: '#/components/schemas/AccountSubtype'
         days_available:
           type: number
-          description: The duration of transaction history available within this report for this Item, typically defined as the time since the date of the earliest transaction in that account. Only returned by Base Report endpoints.
+          description: The duration of transaction history available within this report for this Item, typically defined as the time since the date of the earliest transaction in that account.
         transactions:
           type: array
-          description: Transaction history associated with the account. Only returned by Base Report endpoints. Transaction history returned by endpoints such as `/transactions/get` or `/investments/transactions/get` will be returned in the top-level `transactions` field instead.
+          description: Transaction history associated with the account. Transaction history returned by endpoints such as `/transactions/get` or `/investments/transactions/get` will be returned in the top-level `transactions` field instead.
           items:
             $ref: '#/components/schemas/BaseReportTransaction'
         owners:
@@ -48536,7 +48801,7 @@ components:
         historical_balances:
           type: array
           x-hidden-from-docs: true
-          description: Calculated data about the historical balances on the account. Only returned by Base Report endpoints and currently not supported by `brokerage` or `investment` accounts.
+          description: Calculated data about the historical balances on the account. Currently not supported by `brokerage` or `investment` accounts.
           items:
             $ref: '#/components/schemas/BaseReportHistoricalBalance'
         account_insights:
@@ -48593,7 +48858,7 @@ components:
       description: Type of data being disputed by the consumer
     BaseReportAccountBalances:
       title: BaseReportAccountBalances
-      description: Base Report information about an account's balances
+      description: Information about an account's balances.
       type: object
       properties:
         available:
@@ -48684,7 +48949,7 @@ components:
       - unofficial_currency_code
     BaseReportAccountMetadata:
       title: BaseReportAccountMetadata
-      description: Base Report metadata about the extracted account.
+      description: Metadata about the extracted account.
       type: object
       properties:
         start_date:
@@ -48728,6 +48993,15 @@ components:
 
             See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `unofficial_currency_code`s.
           nullable: true
+        name:
+          deprecated: true
+          x-hidden-from-docs: true
+          nullable: true
+          type: string
+          description: |-
+            The merchant name or transaction description.
+
+            Note: This is a legacy field that is not actively maintained. Use `merchant_name` instead for the merchant name.
         original_description:
           type: string
           description: The string returned by the financial institution to describe the transaction.
@@ -48814,15 +49088,15 @@ components:
           type: string
           format: date
           nullable: true
-          description: Date of the earliest transaction in the base report for the account.
+          description: Date of the earliest transaction for the account.
         most_recent_transaction_date:
           type: string
           format: date
           nullable: true
-          description: Date of the most recent transaction in the base report for the account.
+          description: Date of the most recent transaction for the account.
         days_available:
           type: integer
-          description: Number of days days available in the base report for the account.
+          description: Number of days days available for the account.
         average_days_between_transactions:
           type: number
           description: Average number of days between sequential transactions
@@ -51763,6 +52037,8 @@ components:
           $ref: '#/components/schemas/WatchlistScreeningIndividualIDNullable'
         beacon_user_id:
           $ref: '#/components/schemas/BeaconUserIDNullable'
+        user_id:
+          $ref: '#/components/schemas/PlaidUserIDNullable'
         redacted_at:
           $ref: '#/components/schemas/TimestampNullable'
       required:
@@ -51885,6 +52161,8 @@ components:
       properties:
         client_user_id:
           $ref: '#/components/schemas/ClientUserID'
+        user_id:
+          $ref: '#/components/schemas/PlaidUserID'
         is_shareable:
           type: boolean
           example: true
@@ -51983,6 +52261,8 @@ components:
           $ref: '#/components/schemas/WatchlistScreeningIndividualIDNullable'
         beacon_user_id:
           $ref: '#/components/schemas/BeaconUserIDNullable'
+        user_id:
+          $ref: '#/components/schemas/PlaidUserIDNullable'
         redacted_at:
           $ref: '#/components/schemas/TimestampNullable'
         request_id:
@@ -52136,6 +52416,8 @@ components:
           $ref: '#/components/schemas/WatchlistScreeningIndividualIDNullable'
         beacon_user_id:
           $ref: '#/components/schemas/BeaconUserIDNullable'
+        user_id:
+          $ref: '#/components/schemas/PlaidUserIDNullable'
         redacted_at:
           $ref: '#/components/schemas/TimestampNullable'
         request_id:
@@ -52178,6 +52460,12 @@ components:
           $ref: '#/components/schemas/IdentityVerificationTemplateID'
         client_user_id:
           $ref: '#/components/schemas/ClientUserID'
+        user_id:
+          allOf:
+          - $ref: '#/components/schemas/PlaidUserID'
+          - description: A unique `user_id` generated by Plaid for the client-provided `client_user_id`. This field is currently in beta. If this field is provided, `client_user_id` is ignored.
+          x-hidden-from-docs: true
+          nullable: true
         cursor:
           $ref: '#/components/schemas/Cursor'
       required:
@@ -52361,6 +52649,8 @@ components:
           $ref: '#/components/schemas/WatchlistScreeningIndividualIDNullable'
         beacon_user_id:
           $ref: '#/components/schemas/BeaconUserIDNullable'
+        user_id:
+          $ref: '#/components/schemas/PlaidUserIDNullable'
         redacted_at:
           $ref: '#/components/schemas/TimestampNullable'
         request_id:
@@ -53007,6 +53297,19 @@ components:
       - cropped_back
       - face
       additionalProperties: true
+    PlaidUserID:
+      type: string
+      title: PlaidUserID
+      example: usr_dddAs9ewdcDQQQ
+      description: A unique `user_id` generated by Plaid for the client-provided `client_user_id`. This field is currently in beta.
+      x-hidden-from-docs: true
+    PlaidUserIDNullable:
+      type: string
+      title: PlaidUserID
+      example: usr_dddAs9ewdcDQQQ
+      description: A unique `user_id` generated by Plaid for the client-provided `client_user_id`. This field is currently in beta.
+      x-hidden-from-docs: true
+      nullable: true
     PostalCode:
       type: string
       example: "46001"
@@ -55644,6 +55947,7 @@ components:
         days_required:
           type: integer
           description: The minimum number of days of data required for the report to be successfully generated.
+          maximum: 184
         client_report_id:
           type: string
           nullable: true
@@ -56195,6 +56499,10 @@ components:
           deprecated: true
         gse_options:
           $ref: '#/components/schemas/CraCheckReportGSEOptions'
+        require_identity:
+          type: boolean
+          nullable: true
+          description: Indicates that the report must include identity information. If identity information is not available, the report will fail.
     CraCheckReportGSEOptions:
       title: CraCheckReportGSEOptions
       x-hidden-from-docs: true
@@ -56231,7 +56539,7 @@ components:
       x-hidden-from-docs: true
       enum:
       - VOA
-      - VOE
+      - EMPLOYMENT_REFRESH
       description: The types of GSE Reports supported by the Plaid API
       type: string
     CashflowAttributesVersion:
@@ -56379,7 +56687,6 @@ components:
       - item_id
     CraCheckReportVerificationGetRequest:
       title: CraCheckReportVerificationGetRequest
-      x-hidden-from-docs: true
       type: object
       description: CraCheckReportVerificationGetRequest defines the request schema for `/cra/check_report/verification/get`.
       properties:
@@ -56392,8 +56699,8 @@ components:
           description: Specifies which types of verification reports are expected in the response
           items:
             $ref: '#/components/schemas/CraCheckReportVerificationGetReportType'
-        voe_options:
-          $ref: '#/components/schemas/CraCheckReportVerificationGetVoeOptions'
+        employment_refresh_options:
+          $ref: '#/components/schemas/CraCheckReportVerificationGetEmploymentRefreshOptions'
         user_token:
           $ref: '#/components/schemas/UserToken'
       required:
@@ -56404,22 +56711,21 @@ components:
       description: Type of verification report.
       enum:
       - VOA
-      - VOE
-    CraCheckReportVerificationGetVoeOptions:
-      title: CraCheckReportVerificationGetVoeOptions
+      - EMPLOYMENT_REFRESH
+    CraCheckReportVerificationGetEmploymentRefreshOptions:
+      title: CraCheckReportVerificationGetEmploymentRefreshOptions
       type: object
-      description: Defines configuration options for the VoE report.
+      description: Defines configuration options for the Employment Refresh Report.
       nullable: true
       properties:
         days_requested:
           type: integer
-          description: The number of days of data to request for the report. This field is required if a VOE report is requested. Maximum is 731.
+          description: The number of days of data to request for the report. This field is required if an Employment Refresh Report is requested. Maximum is 731.
           maximum: 731
       required:
       - days_requested
     CraCheckReportVerificationGetResponse:
       title: CraCheckReportVerificationGetResponse
-      x-hidden-from-docs: true
       type: object
       description: CraCheckReportVerificationGetResponse defines the response schema for `/cra/check_report/verification/get`.
       additionalProperties: true
@@ -56452,8 +56758,8 @@ components:
           description: Client-generated identifier, which can be used by lenders to track loan applications.
         voa:
           $ref: '#/components/schemas/CraVoaReport'
-        voe:
-          $ref: '#/components/schemas/CraVoeReport'
+        employment_refresh:
+          $ref: '#/components/schemas/CraEmploymentRefreshReport'
       required:
       - report_id
     CraVoaReportAttributes:
@@ -56472,7 +56778,7 @@ components:
     CraVoaReport:
       title: CraVoaReport
       type: object
-      description: An object representing a VOE report.
+      description: An object representing a VOA report.
       additionalProperties: true
       nullable: true
       properties:
@@ -56718,40 +57024,40 @@ components:
       - all_transactions
       - end_date
       - start_date
-    CraVoeReport:
-      title: CraVoeReport
+    CraEmploymentRefreshReport:
+      title: CraEmploymentRefreshReport
       type: object
-      description: An object representing a VOE report.
+      description: An object representing an Employment Refresh Report.
       additionalProperties: true
       nullable: true
       properties:
         generated_time:
           type: string
           format: date-time
-          description: The date and time when the VOE Report was created, in ISO 8601 format (e.g. "2018-04-12T03:32:11Z").
+          description: The date and time when the Employment Refresh Report was created, in ISO 8601 format (e.g. "2018-04-12T03:32:11Z").
         days_requested:
           type: number
-          description: The number of days of transaction history that the VOE Report covers.
+          description: The number of days of transaction history that the Employment Refresh Report covers.
         items:
           type: array
-          description: Data returned by Plaid about each of the Items included in the VOE Report.
+          description: Data returned by Plaid about each of the Items included in the Employment Refresh Report.
           items:
-            $ref: '#/components/schemas/CraVoeReportItem'
+            $ref: '#/components/schemas/CraEmploymentRefreshReportItem'
       required:
       - generated_time
       - days_requested
       - items
-    CraVoeReportItem:
-      title: CraVoeReportItem
+    CraEmploymentRefreshReportItem:
+      title: CraEmploymentRefreshReportItem
       type: object
-      description: A representation of an Item within a VOE Report.
+      description: A representation of an Item within an Employment Refresh Report.
       additionalProperties: true
       properties:
         accounts:
           type: array
           description: Data about each of the accounts open on the Item.
           items:
-            $ref: '#/components/schemas/CraVoeReportAccount'
+            $ref: '#/components/schemas/CraEmploymentRefreshReportAccount'
         institution_name:
           type: string
           description: The full financial institution name associated with the Item.
@@ -56770,10 +57076,10 @@ components:
       - institution_id
       - item_id
       - last_update_time
-    CraVoeReportAccount:
-      title: CraVoeReportAccount
+    CraEmploymentRefreshReportAccount:
+      title: CraEmploymentRefreshReportAccount
       type: object
-      description: VOE Report information about an account.
+      description: Employment Refresh Report information about an account.
       additionalProperties: true
       properties:
         account_id:
@@ -56797,9 +57103,9 @@ components:
           $ref: '#/components/schemas/AccountSubtype'
         transactions:
           type: array
-          description: Transaction history associated with the account for the VOE Report. Note that this transaction differs from a Base Report transaction in that it will only be deposits, and the amounts will be omitted.
+          description: Transaction history associated with the account for the Employment Refresh Report. Note that this transaction differs from a Base Report transaction in that it will only be deposits, and the amounts will be omitted.
           items:
-            $ref: '#/components/schemas/CraVoeReportTransaction'
+            $ref: '#/components/schemas/CraEmploymentRefreshReportTransaction'
       required:
       - account_id
       - name
@@ -56807,10 +57113,10 @@ components:
       - type
       - subtype
       - transactions
-    CraVoeReportTransaction:
-      title: CraVoeReportTransaction
+    CraEmploymentRefreshReportTransaction:
+      title: CraEmploymentRefreshReportTransaction
       type: object
-      description: A transaction on the VoE report. Note that this transaction differs from a Base Report transaction in that it will only be deposits, and the amounts will be omitted.
+      description: A transaction on the Employment Refresh Report. Note that this transaction differs from a Base Report transaction in that it will only be deposits, and the amounts will be omitted.
       additionalProperties: true
       properties:
         account_id:
@@ -58902,12 +59208,12 @@ components:
     OAuthSubjectTokenType:
       type: string
       enum:
-      - urn:plaid:params:tokensdb:user-token
+      - urn:plaid:params:tokens:user
       - urn:plaid:params:oauth:user-token
       description: |-
         The type of the subject token.
 
-        - `urn:plaid:params:tokensdb:user-token` allows exchanging a Plaid-issued user token for an OAuth token. When using this token type, `audience` must be the same as the `client_id`. `subject_token` must be a Plaid-issued user token issued from the `/user/create` endpoint.
+        - `urn:plaid:params:tokens:user` allows exchanging a Plaid-issued user token for an OAuth token. When using this token type, `audience` must be the same as the `client_id`. `subject_token` must be a Plaid-issued user token issued from the `/user/create` endpoint.
         - `urn:plaid:params:oauth:user-token` allows exchanging a refresh token for an OAuth token to another `client_id`. The other `client_id` is provided in `audience`. `subject_token` must be an OAuth refresh token issued from the `/oauth/token` endpoint.
     OAuthTokenRequest:
       type: object
@@ -60082,8 +60388,6 @@ components:
         `TAKE_OTHER_RISK_MEASURES`: for example, placing a longer hold on funds than those approved transactions or introducing customer frictions such as step-up verification/authentication
 
         `NOT_EVALUATED`: if only logging the Signal results without using them
-
-        Possible values:  `APPROVE`, `REVIEW`, `REJECT`, `TAKE_OTHER_RISK_MEASURES`, `NOT_EVALUATED`
       nullable: true
     SignalPaymentMethod:
       type: string
@@ -60651,6 +60955,13 @@ components:
           type: string
           nullable: true
           description: Unique reference identifier for the token generated.
+        tokenTimestamp:
+          title: Token Timestamp
+          type: string
+          nullable: true
+          format: date-time
+          description: The event timestamp of the last state change.
+          example: "2021-07-15T14:46:41.375Z"
       required:
       - messageId
       - conversationId
@@ -60679,14 +60990,14 @@ components:
       required:
       - messageId
       - conversationId
-    VerifyAPIToken:
-      title: VerifyAPIToken
+    ProtectAPIToken:
+      title: ProtectAPIToken
       type: string
-      description: The customer's Plaid Verify API Token. The `verify_api_token` is required and may be provided either in the `VERIFY-API-TOKEN` header or as part of a request body.
-    VerifyClientSessionStartData:
-      title: VerifyClientSessionStartData
+      description: The customer's Plaid Protect API Token. The `protect_api_token` is required and may be provided either in the `PROTECT-API-TOKEN` header or as part of a request body.
+    ProtectClientSessionStartData:
+      title: ProtectClientSessionStartData
       type: string
-      description: The initial data collected by the Plaid Pixel SDK when a Verify client session is started.
+      description: The initial data collected by the Protect SDK when a Protect client session is started.
     TrustIndex:
       type: object
       nullable: true
@@ -60709,7 +61020,7 @@ components:
       type: object
       nullable: true
       additionalProperties: true
-      description: Contains sub-score metadata. Temporary stub with no properties yet.
+      description: Contains sub-score metadata.
       properties:
         device_and_connection:
           $ref: '#/components/schemas/TrustIndexSubscore'
