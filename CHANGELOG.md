@@ -1,3 +1,7 @@
+### 2020-09-14_1.651.2
+- (beta) Add `user_id` field to `link/token/create` request
+- [BREAKING for Go] (beta) Make `user` object optional in `link/token/create` if `user_id` is included
+
 ### 2020-09-14_1.651.1
 - Add `error` field to `WALLET_TRANSACTION_STATUS_UPDATE` webhook and to responses of `/wallet/transaction/get` and `/wallet/transaction/list`, containing error details for failed transactions.
 
