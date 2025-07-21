@@ -1,3 +1,6 @@
+### 2020-09-14_1.652.0
+- Add optional `cursor` and `count` fields to the `/payment_initiation/recipient/list` request and `next_cursor` to its response
+
 ### 2020-09-14_1.651.2
 - (beta) Add `user_id` field to `link/token/create` request
 - [BREAKING for Go] (beta) Make `user` object optional in `link/token/create` if `user_id` is included

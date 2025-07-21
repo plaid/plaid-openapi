@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.651.2
+  version: 2020-09-14_1.652.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -21589,6 +21589,17 @@ components:
           $ref: '#/components/schemas/APIClientID'
         secret:
           $ref: '#/components/schemas/APISecret'
+        count:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 100
+          description: The maximum number of recipients to return. If `count` is not specified, a maximum of 100 recipients will be returned, beginning with the recipient at the cursor (if specified).
+          nullable: true
+        cursor:
+          type: string
+          description: A value representing the latest recipient to be included in the response. Set this from `next_cursor` received from the previous `/payment_initiation/recipient/list` request. If provided, the response will only contain that recipient and recipients created before it. If omitted, the response will contain recipients starting from the most recent, and in descending order by the `created_at` time.
+          maxLength: 256
     PaymentInitiationRecipientListResponse:
       type: object
       additionalProperties: true
@@ -21601,6 +21612,10 @@ components:
             $ref: '#/components/schemas/PaymentInitiationRecipient'
         request_id:
           $ref: '#/components/schemas/RequestID'
+        next_cursor:
+          type: string
+          description: The value that, when used as the optional `cursor` parameter to `/payment_initiation/recipient/list`, will return the corresponding recipient as its first recipient.
+          maxLength: 256
       required:
       - recipients
       - request_id
@@ -48059,8 +48074,6 @@ components:
         persistent_account_id:
           type: string
           description: A unique and persistent identifier for accounts that can be used to trace multiple instances of the same account across different Items for depository accounts. This is currently an opt-in field and only supported for Chase Items.
-        holder_category:
-          $ref: '#/components/schemas/AccountHolderCategory'
         days_available:
           type: number
           description: The duration of transaction history available within this report for this Item, typically defined as the time since the date of the earliest transaction in that account.
