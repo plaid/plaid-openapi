@@ -1,3 +1,44 @@
+### 2020-09-14_1.658.0
+- (beta) Add `user_id` field to `/session/token/create` request.
+- [BREAKING for Go] (beta) Make `user` object optional in `/session/token/create` if `user_id` is included.
+
+### 2020-09-14_1.657.0
+Add Add `subtype` property to the `Security` model.
+
+### 2020-09-14_1.656.1
+- Renamed `protect_sdk_session_id` field in the request of `/protect/event/send` to `protect_session_id` for consistency across endpoints.
+
+### 2020-09-14_1.656.0
+- Added `aamva_verification` object in the responses of `documentary_verification.documents[].analysis`. This impacts the following endpoints: 
+    - `identity_verification/create`
+    - `identity_verification/get`
+    - `identity_verification/list`
+    - `identity_verification/retry`
+
+### 2020-09-14_1.655.0
+- Add `max_amount` and `iso_currency_code` to `rfp` in `/transfer/capabilitied/get` response
+
+### 2020-09-14_1.654.0
+- [BREAKING] To improve consistency and resolve a bug in a third-party client library, changed `MonitoringConsumerReportPermissiblePurpose` schema object title from `ConsumerReportPermissiblePurpose` to `MonitoringConsumerReportPermissiblePurpose`. This may be a breaking change for certain client libraries.
+
+### 2020-09-14_1.653.0
+- (beta) Add optional `user_id` field to `identity_verification/create` and `identity_verification/list` requests. When `user_id` is present during creation and `client_user_id` is not, the `client_user_id` from the associated user will be set on the created identity verification. If `user_id` is present during creation, the `user` object may not also be present. Modifying user data should be done via the `user/update` endpoint.
+- [BREAKING for Go] (beta) Make `client_user_id` optional in `identity_verification/list` if `user_id` is included.
+- (beta) Add nullable `user_id` to the response of all of the identity verification endpoints:
+   - `identity_verification/create`
+   - `identity_verification/get`
+   - `identity_verification/list`
+   - `identity_verification/retry`
+
+### 2020-09-14_1.652.3
+- Added support for `cra_monitoring` to `Products` array.
+
+### 2020-09-14_1.652.2
+- (beta) Add `/user/items/list` endpoint
+
+### 2020-09-14_1.652.1
+- Add `/transfer/ledger/event/list` endpoint
+
 ### 2020-09-14_1.652.0
 - Add optional `cursor` and `count` fields to the `/payment_initiation/recipient/list` request and `next_cursor` to its response
 
@@ -35,7 +76,7 @@
 - Add `last_successful_update_time` to `/cashflow_report/get`
 
 ### 2020-09-14_1.648.0
-- Add `require_identity` to `cra_options.base_report` in `link/token/create` and `/cra/check_report/create` requests 
+- Add `require_identity` to `cra_options.base_report` in `link/token/create` and `/cra/check_report/create` requests
 
 ### 2020-09-14_1.647.1
 - Update `/transfer/ledger/distribute` summary
@@ -48,7 +89,7 @@
   - `/cra/check_report/verification/get`'s `reports_requested` options are now `VOA` and `employment_refresh`
   - `voe_options` in the request is now `employment_refresh_options`
   - `/cra/check_report/verification/get`'s response now has `report.employment_refresh` instead of `report.voe`
-  - `gse_options.report_type` in `/cra/check_report/create` are now `VOA` and `employment_refresh` 
+  - `gse_options.report_type` in `/cra/check_report/create` are now `VOA` and `employment_refresh`
 
 ### 2020-09-14_1.645.1
 - Update description of `/transfer/ledger/distribute`
@@ -97,7 +138,7 @@
 - Remove unused enums for MonitoringInsightsStatus and MonitoringItemStatusCode
 
 ### 2020-09-14_1.638.3
-- Add Prism Detect and Extend cashscores to CRA Partner Insights 
+- Add Prism Detect and Extend cashscores to CRA Partner Insights
 
 ### 2020-09-14_1.638.2
 - (beta) expect a boolean instead of a string in generated client interfaces for PLAID-NEW-USER-API-ENABLED
@@ -118,8 +159,8 @@
 - Add missing `unsent` value as a possible `verification_status` to reflect actual API behavior.
 
 ### 2020-09-14_1.637.3
-- (beta) Add `PLAID-NEW-USER-API-ENABLED` as a header parameter to `/user/create`
-- (beta) Add `PLAID-NEW-USER-API-ENABLED` as a header parameter to `/user/remove`
+- (beta) Add `PLAID-NEW-USER-API-ENABLED` as a header parameter to `/user/create`. This header is only for the use of customers in the new user API beta; customers should *not* use this parameter unless they have been advised to do so by Plaid.
+- (beta) Add `PLAID-NEW-USER-API-ENABLED` as a header parameter to `/user/remove`. This header is only for the use of customers in the new user API beta; customers should *not* use this parameter unless they have been advised to do so by Plaid.
 
 ### 2020-09-14_1.637.2
 - (beta) Add `user_id` to `/session/token/create` response
@@ -134,8 +175,8 @@
 - Update `average_inflow_amount` to be positive.
 
 ### 2020-09-14_1.635.4
-- [BREAKING] (beta) Updated `user_token` field in `UserCreateResponse` to be optional.
-- [BREAKING for Go] (beta) Updated `user_token` field in `UserRemoveRequest` to be optional.
+- [BREAKING] (beta) Updated `user_token` field in `UserCreateResponse` to be optional to support customers enrolled in the New User API beta.
+- [BREAKING for Go] (beta) Updated `user_token` field in `UserRemoveRequest` to be optional to support customers enrolled in the New User API beta.
 - Other hidden changes.
 
 ### 2020-09-14_1.635.3
