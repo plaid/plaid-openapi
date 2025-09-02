@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.658.0
+  version: 2020-09-14_1.664.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -2094,6 +2094,49 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CraCheckReportCashflowInsightsGetRequest'
+  /cra/check_report/plaid_credit_score/get:
+    x-hidden-from-docs: true
+    post:
+      summary: Retrieve the plaid credit score from your user's banking data
+      tags:
+      - plaid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CraCheckReportPlaidCreditScoreGetResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: LhQf0THi8SH1yJm
+                    report:
+                      report_id: vzeNDwK7KQIm4yEog683uElbp9GRLEFXGK98D
+                      generated_time: "2022-01-31T22:47:53Z"
+                      plaid_credit_score:
+                        score: 80
+                        reason_codes:
+                        - Balance Volatility
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      externalDocs:
+        url: /api/products/check/#cracheck_reportplaid_credit_scoreget
+      operationId: craCheckReportPlaidCreditScoreGet
+      description: |-
+        This endpoint allows you to retrieve the Plaid Credit Score report for your user. You should call this endpoint after you've received the `CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`. If the most recent consumer report for the user doesn’t have sufficient data to generate the insights, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.
+
+        If you did not initialize Link with the `cra_plaid_credit_score` product or call `/cra/check_report/create` with the `cra_plaid_credit_score` product, we will generate the insights when you call this endpoint. In this case, you may optionally provide parameters under `options` to configure which insights you want to receive.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CraCheckReportPlaidCreditScoreGetRequest'
   /cra/check_report/network_insights/get:
     post:
       summary: Retrieve network attributes for the user
@@ -2721,9 +2764,9 @@ paths:
                       created_at: "2019-02-15T15:52:39Z"
                       consented_use_cases: []
                       consented_data_scopes:
-                      - Account and balance info
-                      - Contact info
-                      - Account and routing number
+                      - account_balance_info
+                      - contact_info
+                      - account_routing_number
                       consented_accounts: []
                     - item_id: Ed6bjNrDLJfGvZWwnkQlfxwoNz54B5C97ejBr
                       event_type: CONSENT_GRANTED
@@ -2952,9 +2995,9 @@ paths:
                       - identity
                       - transactions
                       consented_data_scopes:
-                      - Account and balance info
-                      - Contact info
-                      - Transactions
+                      - account_and_balance_info
+                      - contact_info
+                      - transactions
                       consented_use_cases:
                       - Verify your account
                       - Track and manage your finances
@@ -3529,7 +3572,7 @@ paths:
     post:
       tags:
       - plaid
-      summary: Refresh transaction data in cashflow_report
+      summary: Refresh transaction data in `cashflow_report`
       externalDocs:
         url: /api/products/transactions/#cashflowReportRefresh
       operationId: cashflowReportRefresh
@@ -3569,7 +3612,7 @@ paths:
     post:
       tags:
       - plaid
-      summary: Gets transaction data in cashflow_report
+      summary: Gets transaction data in `cashflow_report`
       externalDocs:
         url: /api/products/transactions/#cashflowReportGet
       operationId: cashflowReportGet
@@ -3776,7 +3819,7 @@ paths:
         The `/cashflow_report/get` endpoint retrieves transactions data associated with an item. Transactions data is standardized across financial institutions.
         Transactions are returned in reverse-chronological order, and the sequence of transaction ordering is stable and will not shift. Transactions are not immutable and can also be removed altogether by the institution; a removed transaction will no longer appear in `/transactions/get`.  For more details, see [Pending and posted transactions](https://plaid.com/docs/transactions/transactions-data/#pending-and-posted-transactions).
         Due to the potentially large number of transactions associated with an Item, results are paginated. Manipulate the `count` and `cursor` parameters in conjunction with the `has_more` response body field to fetch all available transactions.
-        Note that data isn't likely to be immediately available to `/cashflow_report/get`. Plaid will begin to prepare transactions data upon Item link, if Link was initialized with cashflow_report, or if it wasn't, upon the first call to /cashflow_report/refresh. To be alerted when transaction data is ready to be fetched, listen for the `CASHFLOW_REPORT_READY` webhook.
+        Note that data isn't likely to be immediately available to `/cashflow_report/get`. Plaid will begin to prepare transactions data upon Item link, if Link was initialized with `cashflow_report`, or if it wasn't, upon the first call to `/cashflow_report/refresh`. To be alerted when transaction data is ready to be fetched, listen for the `CASHFLOW_REPORT_READY` webhook.
       requestBody:
         required: true
         content:
@@ -3995,7 +4038,7 @@ paths:
         The `/cashflow_report/transactions/get` endpoint retrieves transactions data associated with an item. Transactions data is standardized across financial institutions.
         Transactions are returned in reverse-chronological order, and the sequence of transaction ordering is stable and will not shift. Transactions are not immutable and can also be removed altogether by the institution; a removed transaction will no longer appear in `/transactions/get`.  For more details, see [Pending and posted transactions](https://plaid.com/docs/transactions/transactions-data/#pending-and-posted-transactions).
         Due to the potentially large number of transactions associated with an Item, results are paginated. Manipulate the `count` and `cursor` parameters in conjunction with the `has_more` response body field to fetch all available transactions.
-        Note that data isn't likely to be immediately available to `/cashflow_report/transactions/get`. Plaid will begin to prepare transactions data upon Item link, if Link was initialized with cashflow_report, or if it wasn't, upon the first call to /cashflow_report/refresh. To be alerted when transaction data is ready to be fetched, listen for the `CASHFLOW_REPORT_READY` webhook.
+        Note that data isn't likely to be immediately available to `/cashflow_report/transactions/get`. Plaid will begin to prepare transactions data upon Item link, if Link was initialized with `cashflow_report`, or if it wasn't, upon the first call to `/cashflow_report/refresh`. To be alerted when transaction data is ready to be fetched, listen for the `CASHFLOW_REPORT_READY` webhook.
       requestBody:
         required: true
         content:
@@ -7857,9 +7900,9 @@ paths:
         1. Whether there are any associated Beacon Reports connected to the Beacon User, and
         2. Whether there are any confirmed Beacon Report Syndications connected to the Beacon User.
 
-        When updating a Beacon User's status to "rejected", we enforce that either a Beacon Report has been created for the Beacon User or a Beacon Report Syndication has been confirmed.
-        When updating a Beacon User's status to "cleared", we enforce that there are no active Beacon Reports or confirmed Beacon Report Syndications associated with the user. If you previously created a Beacon Report for this user, you must delete it before updating the Beacon User's status to "cleared".
-        There are no restrictions on updating a Beacon User's status to "pending_review".
+        When updating a Beacon User's status to `rejected`, we enforce that either a Beacon Report has been created for the Beacon User or a Beacon Report Syndication has been confirmed.
+        When updating a Beacon User's status to `cleared`, we enforce that there are no active Beacon Reports or confirmed Beacon Report Syndications associated with the user. If you previously created a Beacon Report for this user, you must delete it before updating the Beacon User's status to `cleared`.
+        There are no restrictions on updating a Beacon User's status to `pending_review`.
 
         If these conditions are not met, the request will be rejected with an error explaining the issue.
       externalDocs:
@@ -10837,6 +10880,38 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UserItemsListRequest'
+  /user/items/associate:
+    post:
+      tags:
+      - plaid
+      summary: Associate Items to a User
+      externalDocs:
+        url: /api/users/#useritemsassociate
+      operationId: userItemsAssociate
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserItemsAssociateResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: m8MDnv9okwxFNBV
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      description: Associates Items to the target user. If an Item is already associated to another user, the Item will be disassociated with the existing user and associated to the target user. This operation supports a max of 100 Items.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserItemsAssociateRequest'
   /user/third_party_token/create:
     x-hidden-from-docs: true
     post:
@@ -11851,7 +11926,7 @@ paths:
                       proxy_security_id: null
                       sector: Miscellaneous
                       security_id: AE5rBXra1AuZLE34rkvvIyG8918m3wtRzElnJ
-                      sedol: B5ND9B4
+                      sedol: null
                       ticker_symbol: DBLTX
                       type: mutual fund
                       subtype: mutual fund
@@ -12386,8 +12461,8 @@ paths:
                     link_token: link-sandbox-33792986-2b9c-4b80-b1f2-518caaac6183
                     request_id: u0ydFs493XjyTYn
       description: |-
-        Exchange an OAuth `link_correlation_id` for the corresponding `link_token`. The `link_correlation_id` is only available for 'payment_initiation' products and is provided to the client via the OAuth `redirect_uri` as a query parameter.
-        The `link_correlation_id` is ephemeral and expires in a brief period, after which it can no longer be exchanged for the 'link_token'.
+        Exchange an OAuth `link_correlation_id` for the corresponding `link_token`. The `link_correlation_id` is only available for `payment_initiation` products and is provided to the client via the OAuth `redirect_uri` as a query parameter.
+        The `link_correlation_id` is ephemeral and expires in a brief period, after which it can no longer be exchanged for the `link_token`.
       requestBody:
         required: true
         content:
@@ -15710,7 +15785,7 @@ paths:
                     request_id: Iam3b
       operationId: creditAuditCopyTokenCreate
       description: |-
-        Plaid can create an Audit Copy token of an Asset Report and/or Income Report to share with participating Government Sponsored Entity (GSE). If you participate in the Day 1 Certainty™ program, Plaid can supply an Audit Copy token directly to Fannie Mae on your behalf. An Audit Copy token contains the same underlying data as the Asset Report and/or Income Report (result of /credit/payroll_income/get).
+        Plaid can create an Audit Copy token of an Asset Report and/or Income Report to share with participating Government Sponsored Entity (GSE). If you participate in the Day 1 Certainty™ program, Plaid can supply an Audit Copy token directly to Fannie Mae on your behalf. An Audit Copy token contains the same underlying data as the Asset Report and/or Income Report (result of `/credit/payroll_income/get`).
 
         Use the `/credit/audit_copy_token/create` endpoint to create an `audit_copy_token` and then pass that token to the GSE who needs access.
       requestBody:
@@ -19350,6 +19425,16 @@ components:
       - access_token
       - start_date
       - end_date
+    PersonalFinanceCategoryVersion:
+      title: PersonalFinanceCategoryVersion
+      type: string
+      x-hidden-from-docs: true
+      description: |
+        Optional parameter that specifies which version of the personal finance category taxonomy to return. The v2 taxonomy is defined [here](https://docs.google.com/spreadsheets/d/e/2PACX-1vRUQR6BdYCwu7libfEUUA0U4TYfkyxpAUOSCj_unpv6OYCJMhIC0_PNrJnnki0At3LAG0PgT3aY7hRz/pubhtml). The legacy v1 taxonomy is defined [here](https://docs.google.com/spreadsheets/d/e/2PACX-1vQb96YxbnLdHbAROh1Dx7BaSpChnAIEKp1zZZFLBBpGbiLtPR3JTtxzvQ8mF4kU0StL8Y16WEpUd5P2/pubhtml).
+
+        If you enabled any Financial Insights products before October 2025 you will receive a default of `v1` taxonomy and may request `v2` by explicitly setting this field to `v2`.
+
+        If you enabled any Financial Insights products on or after October 2025 you may only receive `v2` taxonomy.
     TransactionsGetRequestOptions:
       type: object
       description: An optional object to be used with the request. If specified, `options` must not be `null`.
@@ -19397,6 +19482,8 @@ components:
           description: Counterparties and extra merchant fields are now returned by default.
           deprecated: true
           x-hidden-from-docs: true
+        personal_finance_category_version:
+          $ref: '#/components/schemas/PersonalFinanceCategoryVersion'
         days_requested:
           description: |-
             This field only applies to calls for Items where the Transactions product has not already been initialized (i.e. by specifying `transactions` in the `products`, `optional_products`, or `required_if_consented_products` array when calling `/link/token/create` or by making a previous call to `/transactions/sync` or `/transactions/get`). In those cases, the field controls the maximum number of days of transaction history that Plaid will request from the financial institution. The more transaction history is requested, the longer the historical update poll will take. If no value is specified, 90 days of history will be requested by default. If a value under 30 is provided, a minimum of 30 days of history will be requested.
@@ -20086,7 +20173,7 @@ components:
       properties:
         stream_ids:
           type: array
-          description: IDs of all the streams that will be merged into the first stream. This operation will retain the stream_id of the first stream.
+          description: IDs of all the streams that will be merged into the first stream. This operation will retain the `stream_id` of the first stream.
           items:
             type: string
       required:
@@ -20194,6 +20281,8 @@ components:
           description: Personal finance categories are now returned by default.
           deprecated: true
           x-hidden-from-docs: true
+        personal_finance_category_version:
+          $ref: '#/components/schemas/PersonalFinanceCategoryVersion'
     TransactionsRecurringGetResponse:
       type: object
       additionalProperties: true
@@ -20213,6 +20302,8 @@ components:
           type: string
           format: date-time
           description: Timestamp in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (`YYYY-MM-DDTHH:mm:ssZ`) indicating the last time transaction streams for the given account were updated on
+        personal_finance_category_version:
+          $ref: '#/components/schemas/PersonalFinanceCategoryVersion'
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
@@ -20357,6 +20448,8 @@ components:
           description: Counterparties and extra merchant fields are now returned by default.
           deprecated: true
           x-hidden-from-docs: true
+        personal_finance_category_version:
+          $ref: '#/components/schemas/PersonalFinanceCategoryVersion'
         days_requested:
           description: |-
             This field only applies to calls for Items where the Transactions product has not already been initialized (i.e., by specifying `transactions` in the `products`, `required_if_supported_products`, or `optional_products` array when calling `/link/token/create` or by making a previous call to `/transactions/sync` or `/transactions/get`). In those cases, the field controls the maximum number of days of transaction history that Plaid will request from the financial institution. The more transaction history is requested, the longer the historical update poll will take. If no value is specified, 90 days of history will be requested by default.
@@ -21448,6 +21541,8 @@ components:
           type: string
           format: date-time
           description: Timestamp in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (`YYYY-MM-DDTHH:mm:ssZ`) indicating the last time transaction streams for the given account were updated on
+        personal_finance_category_version:
+          $ref: '#/components/schemas/PersonalFinanceCategoryVersion'
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
@@ -22300,6 +22395,33 @@ components:
       - items
       - request_id
       - next_cursor
+    UserItemsAssociateRequest:
+      type: object
+      description: UserItemsAssociateRequest defines the request schema for `/user/items/associate`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        user_id:
+          $ref: '#/components/schemas/NewUserID'
+        item_ids:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemId'
+          description: An array of `item_id`s to be associated with the `user_id`.
+      required:
+      - user_id
+      - item_ids
+    UserItemsAssociateResponse:
+      type: object
+      additionalProperties: true
+      description: UserItemsAssociateResponse defines the response schema for `/user/items/associate`
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
     UserAccountIdentity:
       type: object
       nullable: true
@@ -22718,7 +22840,7 @@ components:
           $ref: '#/components/schemas/NetworkInsightsSchema'
         items:
           type: array
-          description: A list of Items associated with the provided access_tokens.
+          description: A list of Items associated with the provided `access_tokens`.
           items:
             $ref: '#/components/schemas/NetworkInsightsItem'
       required:
@@ -23533,6 +23655,8 @@ components:
           - cardless
           - open_ledger
           - valon
+          - gainbridge
+          - cardlytics
           description: The processor you are integrating with.
       required:
       - access_token
@@ -23787,6 +23911,7 @@ components:
           - cra_network_insights
           - cra_cashflow_insights
           - cra_monitoring
+          - cra_plaid_credit_score
           - layer
           - protect_linked_bank
           nullable: true
@@ -23848,6 +23973,7 @@ components:
           - balance_plus
           - identity
           - investments
+          - investments_auth
           - liabilities
           - transactions
           - signal
@@ -25883,7 +26009,7 @@ components:
         query:
           type: string
           description: |
-            For TRANSACTION_ID field, provide transaction_id. For NAME field, provide a string pattern.
+            For `TRANSACTION_ID` field, provide `transaction_id`. For `NAME` field, provide a string pattern.
       required:
       - field
       - type
@@ -25902,7 +26028,7 @@ components:
       - EXACT_MATCH
       - SUBSTRING_MATCH
       description: |
-        Transaction rule's match type. For TRANSACTION_ID field, EXACT_MATCH is available.
+        Transaction rule's match type. For `TRANSACTION_ID` field, `EXACT_MATCH` is available.
         Matches are case sensitive.
     TransactionsCategoryRule:
       title: TransactionsCategoryRule
@@ -27145,6 +27271,10 @@ components:
             `LOW`: This category may reflect the intent, but there may be other categories that are more accurate.
             `UNKNOWN`: We don’t know the confidence level for this category.
           nullable: true
+        version:
+          x-hidden-from-docs: true
+          type: string
+          description: The version of the personal finance category requested. Possible values are “v1” and “v2”
       required:
       - primary
       - detailed
@@ -29364,6 +29494,7 @@ components:
       - cra_network_insights
       - cra_cashflow_insights
       - cra_monitoring
+      - cra_plaid_credit_score
       - layer
       - pay_by_bank
       - protect_linked_bank
@@ -29687,7 +29818,7 @@ components:
     SecurityOverride:
       type: object
       title: SecurityOverride
-      description: Specify the security associated with the holding or investment transaction. When inputting custom security data to the Sandbox, Plaid will perform post-data-retrieval normalization and enrichment. These processes may cause the data returned by the Sandbox to be slightly different from the data you input. An ISO-4217 currency code and a security identifier (`ticker_symbol`, `cusip`, `isin`, or `sedol`) are required.
+      description: Specify the security associated with the holding or investment transaction. When inputting custom security data to the Sandbox, Plaid will perform post-data-retrieval normalization and enrichment. These processes may cause the data returned by the Sandbox to be slightly different from the data you input. An ISO-4217 currency code and a security identifier (`ticker_symbol`, `cusip`, or `isin`) are required.
       properties:
         isin:
           description: 12-character ISIN, a globally unique securities identifier. A verified CUSIP Global Services license is required to receive this data. This field will be null by default for new customers, and null for existing customers starting March 12, 2024. If you would like access to this field, please [request ISIN/CUSIP access here](https://docs.google.com/forms/d/e/1FAIpQLSd9asHEYEfmf8fxJTHZTAfAzW4dugsnSu-HS2J51f1mxwd6Sw/viewform).
@@ -29696,7 +29827,9 @@ components:
           description: 9-character CUSIP, an identifier assigned to North American securities. A verified CUSIP Global Services license is required to receive this data. This field will be null by default for new customers, and null for existing customers starting March 12, 2024. If you would like access to this field, please [request ISIN/CUSIP access here](https://docs.google.com/forms/d/e/1FAIpQLSd9asHEYEfmf8fxJTHZTAfAzW4dugsnSu-HS2J51f1mxwd6Sw/viewform).
           type: string
         sedol:
-          description: 7-character SEDOL, an identifier assigned to securities in the UK.
+          deprecated: true
+          x-hidden-from-docs: true
+          description: (Deprecated) 7-character SEDOL, an identifier assigned to securities in the UK.
           type: string
         name:
           description: A descriptive name for the security, suitable for display.
@@ -30814,10 +30947,10 @@ components:
       properties:
         error_type:
           type: string
-          description: RECAPTCHA_ERROR
+          description: '`RECAPTCHA_ERROR`'
         error_code:
           type: string
-          description: RECAPTCHA_REQUIRED
+          description: '`RECAPTCHA_REQUIRED`'
         display_message:
           type: string
         http_code:
@@ -32198,7 +32331,8 @@ components:
         sedol:
           nullable: true
           type: string
-          description: 7-character SEDOL, an identifier assigned to securities in the UK.
+          deprecated: true
+          description: (Deprecated) 7-character SEDOL, an identifier assigned to securities in the UK.
         institution_security_id:
           nullable: true
           type: string
@@ -32258,7 +32392,7 @@ components:
 
             In rare instances, a null value is returned when institutional data is insufficient to determine the security subtype.
 
-            Possible values: Possible values: asset backed security, bill, bond, bond with warrants, cash, cash management bill, common stock, convertible bond, convertible equity, cryptocurrency, depositary receipt, depositary receipt on debt, etf, float rating note, fund of funds, hedge fund, limited partnership unit, medium term note, money market debt, mortgage backed security, municipal bond, mutual fund, note, option, other, preferred convertible, preferred equity, private equity fund, real estate investment trust, structured equity product, treasury inflation protected securities, unit, warrant.
+            Possible values: `asset backed security`, `bill`, `bond`, `bond with warrants`, `cash`, `cash management bill`, `common stock`, `convertible bond`, `convertible equity`, `cryptocurrency`, `depositary receipt`, `depositary receipt on debt`, `etf`, `float rating note`, `fund of funds`, `hedge fund`, `limited partnership unit`, `medium term note`, `money market debt`, `mortgage backed security`, `municipal bond`, `mutual fund`, `note`, `option`, `other`, `preferred convertible`, `preferred equity`, `private equity fund`, `real estate investment trust`, `structured equity product`, `treasury inflation protected securities`, `unit`, `warrant`.
         close_price:
           type: number
           format: double
@@ -38294,6 +38428,7 @@ components:
       - home equity
       - loan
       - mortgage
+      - overdraft
       - line of credit
       - student
       - other
@@ -38835,6 +38970,13 @@ components:
           $ref: '#/components/schemas/LinkTokenCreateRequestCraOptionsBaseReport'
         cashflow_insights:
           $ref: '#/components/schemas/LinkTokenCreateRequestCraOptionsCashflowInsights'
+        plaid_credit_score:
+          $ref: '#/components/schemas/LinkTokenCreateRequestCraOptionsPlaidCreditScore'
+        include_investments:
+          type: boolean
+          nullable: true
+          x-hidden-from-docs: true
+          description: Indicates that investment data should be extracted from the linked account(s).
       required:
       - days_requested
     LinkTokenCreateRequestCraOptionsPartnerInsights:
@@ -38867,7 +39009,6 @@ components:
           description: Indicates that the report must include identity information. If identity information is not available, the report will fail.
     LinkTokenCreateRequestCraOptionsBaseReportGSEOptions:
       title: LinkTokenCreateRequestCraOptionsBaseReportGSEOptions
-      x-hidden-from-docs: true
       type: object
       description: Specifies options for initializing Link to create reports that can be shared with GSEs for mortgage verification.
       nullable: true
@@ -38888,6 +39029,14 @@ components:
           $ref: '#/components/schemas/PlaidCheckScoreVersion'
         attributes_version:
           $ref: '#/components/schemas/CashflowAttributesVersion'
+    LinkTokenCreateRequestCraOptionsPlaidCreditScore:
+      title: LinkTokenCreateRequestCraOptionsPlaidCreditScore
+      type: object
+      x-hidden-from-docs: true
+      description: Specifies options for initializing Link for use with the Plaid Credit Score product.
+      properties:
+        plaid_credit_score_version:
+          $ref: '#/components/schemas/PlaidCheckScoreVersion'
     LinkTokenCreateRequestCreditPartnerInsights:
       title: LinkTokenCreateRequestCreditPartnerInsights
       type: object
@@ -43345,27 +43494,27 @@ components:
           nullable: true
           default: true
         accounts_details_transactions:
-          description: Allow access to "accounts_details_transactions". Only used by certain partners. If relevant to the partner and unset, defaults to `true`.
+          description: Allow access to `accounts_details_transactions`. Only used by certain partners. If relevant to the partner and unset, defaults to `true`.
           type: boolean
           nullable: true
           default: true
         accounts_routing_number:
-          description: Allow access to "accounts_routing_number". Only used by certain partners. If relevant to the partner and unset, defaults to `true`.
+          description: Allow access to `accounts_routing_number`. Only used by certain partners. If relevant to the partner and unset, defaults to `true`.
           type: boolean
           nullable: true
           default: true
         accounts_statements:
-          description: Allow access to "accounts_statements". Only used by certain partners. If relevant to the partner and unset, defaults to `true`.
+          description: Allow access to `accounts_statements`. Only used by certain partners. If relevant to the partner and unset, defaults to `true`.
           type: boolean
           nullable: true
           default: true
         accounts_tax_statements:
-          description: Allow access to "accounts_tax_statements". Only used by certain partners. If relevant to the partner and unset, defaults to `true`.
+          description: Allow access to `accounts_tax_statements`. Only used by certain partners. If relevant to the partner and unset, defaults to `true`.
           type: boolean
           nullable: true
           default: true
         customers_profiles:
-          description: Allow access to "customers_profiles". Only used by certain partners. If relevant to the partner and unset, defaults to `true`.
+          description: Allow access to `customers_profiles`. Only used by certain partners. If relevant to the partner and unset, defaults to `true`.
           type: boolean
           nullable: true
           default: true
@@ -43668,49 +43817,49 @@ components:
           type: string
           nullable: true
           format: date-time
-          description: The last time account_balance_info was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
+          description: The last time `account_balance_info` was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
           example: "2023-02-08T10:00:00Z"
         account_routing_number:
           type: string
           nullable: true
           format: date-time
-          description: The last time account_routing_number was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
+          description: The last time `account_routing_number` was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
           example: "2023-02-08T10:00:00Z"
         contact_details:
           type: string
           nullable: true
           format: date-time
-          description: The last time contact_details was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
+          description: The last time `contact_details` was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
           example: "2023-02-08T10:00:00Z"
         transactions:
           type: string
           nullable: true
           format: date-time
-          description: The last time transactions was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
+          description: The last time `transactions` was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
           example: "2023-02-08T10:00:00Z"
         credit_and_loans:
           type: string
           nullable: true
           format: date-time
-          description: The last time credit_and_loans was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
+          description: The last time `credit_and_loans` was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
           example: "2023-02-08T10:00:00Z"
         investments:
           type: string
           nullable: true
           format: date-time
-          description: The last time investments was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
+          description: The last time `investments` was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
           example: "2023-02-08T10:00:00Z"
         payroll_info:
           type: string
           nullable: true
           format: date-time
-          description: The last time payroll_info was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
+          description: The last time `payroll_info` was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
           example: "2023-02-08T10:00:00Z"
         transaction_risk_info:
           type: string
           nullable: true
           format: date-time
-          description: The last time transaction_risk_info was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
+          description: The last time `transaction_risk_info` was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
           example: "2023-02-08T10:00:00Z"
       required:
       - application_id
@@ -43752,7 +43901,7 @@ components:
           description: |-
             A list of strings containing the full list of use cases the end user has consented to for the Item.
 
-            See the [full list](/docs/link/data-transparency-messaging-migration-guide/#updating-link-customizations) of use cases.
+            See the [full list](https://plaid.com/docs/link/data-transparency-messaging-migration-guide/#updating-link-customizations) of use cases.
           type: array
           items:
             type: string
@@ -43980,6 +44129,11 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_token:
           $ref: '#/components/schemas/UserToken'
+        user_id:
+          allOf:
+          - $ref: '#/components/schemas/NewUserID'
+          - description: A unique ID generated by Plaid representing the end user. Typically this ID will come from the `/user/create` response, when the endpoint is invoked with the `PLAID-NEW-USER-API-ENABLED` header. If this field is included, then the `user_token` object field is ignored.
+          - x-hidden-from-docs: true
         webhook_codes:
           type: array
           description: Webhook codes corresponding to the Cash Flow Updates events to be simulated.
@@ -44748,6 +44902,8 @@ components:
             Include `legacy_category` and `legacy_category_id` in the response (in addition to the default `personal_finance_category`).
 
             Categories are based on Plaid's legacy taxonomy. For a full list of legacy categories, see [`/categories/get`](https://plaid.com/docs/api/products/transactions/#categoriesget).
+        personal_finance_category_version:
+          $ref: '#/components/schemas/PersonalFinanceCategoryVersion'
     ClientProvidedTransaction:
       title: ClientProvidedTransaction
       type: object
@@ -44764,11 +44920,11 @@ components:
         client_user_id:
           x-hidden-from-docs: true
           type: string
-          description: A unique user id used to group transactions for a given user, as a unique identifier from your application. Personally identifiable information, such as an email address or phone number, should not be used in the client_user_id.
+          description: A unique user id used to group transactions for a given user, as a unique identifier from your application. Personally identifiable information, such as an email address or phone number, should not be used in the `client_user_id`.
         client_account_id:
           x-hidden-from-docs: true
           type: string
-          description: A unique account id used to group transactions for a given account, as a unique identifier from your application. Personally identifiable information, such as an email address or phone number, should not be used in the client_account_id.
+          description: A unique account id used to group transactions for a given account, as a unique identifier from your application. Personally identifiable information, such as an email address or phone number, should not be used in the `client_account_id`.
         account_type:
           x-hidden-from-docs: true
           type: string
@@ -44936,11 +45092,11 @@ components:
         client_user_id:
           x-hidden-from-docs: true
           type: string
-          description: A unique user id used to group transactions for a given user, as a unique identifier from your application. Personally identifiable information, such as an email address or phone number, should not be used in the client_user_id.
+          description: A unique user id used to group transactions for a given user, as a unique identifier from your application. Personally identifiable information, such as an email address or phone number, should not be used in the `client_user_id`.
         client_account_id:
           x-hidden-from-docs: true
           type: string
-          description: A unique account id used to group transactions for a given account, as a unique identifier from your application. Personally identifiable information, such as an email address or phone number, should not be used in the client_account_id.
+          description: A unique account id used to group transactions for a given account, as a unique identifier from your application. Personally identifiable information, such as an email address or phone number, should not be used in the `client_account_id`.
         account_type:
           x-hidden-from-docs: true
           type: string
@@ -45171,7 +45327,7 @@ components:
           $ref: '#/components/schemas/APISecret'
         client_user_id:
           type: string
-          description: A unique client-provided user_id to retrieve insights for.
+          description: A unique client-provided `client_user_id` to retrieve insights for.
       required:
       - client_user_id
     TransactionsUserInsightsGetResponse:
@@ -46798,6 +46954,7 @@ components:
           - cra_partner_insights
           - cra_network_insights
           - cra_monitoring
+          - cra_plaid_credit_score
         failed_products:
           type: array
           description: Specifies a list of products that have failed to generate for the report. Additional detail on what caused the failure can be found by calling the product /get endpoint.
@@ -46811,6 +46968,7 @@ components:
           - cra_partner_insights
           - cra_network_insights
           - cra_monitoring
+          - cra_plaid_credit_score
         item_ids:
           type: array
           items:
@@ -47798,6 +47956,11 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_token:
           $ref: '#/components/schemas/UserToken'
+        user_id:
+          allOf:
+          - $ref: '#/components/schemas/NewUserID'
+          - description: A unique ID generated by Plaid representing the end user. Typically this ID will come from the `/user/create` response, when the endpoint is invoked with the `PLAID-NEW-USER-API-ENABLED` header. If this field is included, then the `user_token` object field is ignored.
+          - x-hidden-from-docs: true
         webhook:
           type: string
           description: URL to which Plaid will send Monitoring Insights webhooks, for example when the requested Monitoring Insights is ready.
@@ -47857,6 +48020,11 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_token:
           $ref: '#/components/schemas/UserToken'
+        user_id:
+          allOf:
+          - $ref: '#/components/schemas/NewUserID'
+          - description: A unique ID generated by Plaid representing the end user. Typically this ID will come from the `/user/create` response, when the endpoint is invoked with the `PLAID-NEW-USER-API-ENABLED` header. If this field is included, then the `user_token` object field is ignored.
+          - x-hidden-from-docs: true
         consumer_report_permissible_purpose:
           $ref: '#/components/schemas/MonitoringConsumerReportPermissiblePurpose'
       required:
@@ -48144,6 +48312,11 @@ components:
           $ref: '#/components/schemas/UserToken'
         third_party_user_token:
           $ref: '#/components/schemas/ThirdPartyUserToken'
+        user_id:
+          allOf:
+          - $ref: '#/components/schemas/NewUserID'
+          - description: A unique ID generated by Plaid representing the end user. Typically this ID will come from the `/user/create` response, when the endpoint is invoked with the `PLAID-NEW-USER-API-ENABLED` header. If this field is included, then the `user_token` object field is ignored.
+          - x-hidden-from-docs: true
         add_ons:
           type: array
           description: Use this field to include other reports in the PDF.
@@ -48175,6 +48348,11 @@ components:
           $ref: '#/components/schemas/UserToken'
         third_party_user_token:
           $ref: '#/components/schemas/ThirdPartyUserToken'
+        user_id:
+          allOf:
+          - $ref: '#/components/schemas/NewUserID'
+          - description: A unique ID generated by Plaid representing the end user. Typically this ID will come from the `/user/create` response, when the endpoint is invoked with the `PLAID-NEW-USER-API-ENABLED` header. If this field is included, then the `user_token` object field is ignored.
+          - x-hidden-from-docs: true
         item_ids:
           type: array
           description: The item IDs to include in the Base Report. If not provided, all items associated with the user will be included.
@@ -49937,7 +50115,7 @@ components:
           $ref: '#/components/schemas/BeaconAccountRiskEvaluateRequestOptions'
         client_user_id:
           type: string
-          description: A unique ID that identifies the end user in your system. This ID is used to correlate requests by a user with multiple evaluations and/or multiple linked accounts. Personally identifiable information, such as an email address or phone number, should not be used in the client_user_id.
+          description: A unique ID that identifies the end user in your system. This ID is used to correlate requests by a user with multiple evaluations and/or multiple linked accounts. Personally identifiable information, such as an email address or phone number, should not be used in the `client_user_id`.
           minLength: 1
           maxLength: 36
         client_evaluation_id:
@@ -52793,7 +52971,7 @@ components:
       - is_shareable
       - template_id
       - gave_consent
-      description: Request schema for '/identity_verification/create'
+      description: Request schema for `/identity_verification/create`
     IdentityVerificationCreateRequestUser:
       description: |-
         User information collected outside of Link, most likely via your own onboarding process.
@@ -56045,6 +56223,11 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_token:
           $ref: '#/components/schemas/UserToken'
+        user_id:
+          allOf:
+          - $ref: '#/components/schemas/NewUserID'
+          - description: A unique ID generated by Plaid representing the end user. Typically this ID will come from the `/user/create` response, when the endpoint is invoked with the `PLAID-NEW-USER-API-ENABLED` header. If this field is included, then the `user_token` object field is ignored.
+          - x-hidden-from-docs: true
         third_party_user_token:
           $ref: '#/components/schemas/ThirdPartyUserToken'
     CraCheckReportIncomeInsightsGetResponse:
@@ -56545,6 +56728,11 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_token:
           $ref: '#/components/schemas/UserToken'
+        user_id:
+          allOf:
+          - $ref: '#/components/schemas/NewUserID'
+          - description: A unique ID generated by Plaid representing the end user. Typically this ID will come from the `/user/create` response, when the endpoint is invoked with the `PLAID-NEW-USER-API-ENABLED` header. If this field is included, then the `user_token` object field is ignored.
+          - x-hidden-from-docs: true
         webhook:
           type: string
           description: |
@@ -56573,12 +56761,20 @@ components:
           - cra_cashflow_insights
           - cra_partner_insights
           - cra_network_insights
+          - cra_plaid_credit_score
         base_report:
           $ref: '#/components/schemas/CraCheckReportCreateBaseReportOptions'
         cashflow_insights:
           $ref: '#/components/schemas/CraCheckReportCashflowInsightsGetOptions'
         partner_insights:
           $ref: '#/components/schemas/CraCheckReportCreatePartnerInsightsOptions'
+        plaid_credit_score:
+          $ref: '#/components/schemas/CraCheckReportPlaidCreditScoreGetOptions'
+        include_investments:
+          type: boolean
+          nullable: true
+          x-hidden-from-docs: true
+          description: Indicates that investment data should be extracted from the linked account(s).
         consumer_report_permissible_purpose:
           $ref: '#/components/schemas/ConsumerReportPermissiblePurpose'
       required:
@@ -56632,6 +56828,11 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_token:
           $ref: '#/components/schemas/UserToken'
+        user_id:
+          allOf:
+          - $ref: '#/components/schemas/NewUserID'
+          - description: A unique ID generated by Plaid representing the end user. Typically this ID will come from the `/user/create` response, when the endpoint is invoked with the `PLAID-NEW-USER-API-ENABLED` header. If this field is included, then the `user_token` object field is ignored.
+          - x-hidden-from-docs: true
         third_party_user_token:
           $ref: '#/components/schemas/ThirdPartyUserToken'
         partner_insights:
@@ -57091,10 +57292,31 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_token:
           $ref: '#/components/schemas/UserToken'
+        user_id:
+          allOf:
+          - $ref: '#/components/schemas/NewUserID'
+          - description: A unique ID generated by Plaid representing the end user. Typically this ID will come from the `/user/create` response, when the endpoint is invoked with the `PLAID-NEW-USER-API-ENABLED` header. If this field is included, then the `user_token` object field is ignored.
+          - x-hidden-from-docs: true
         third_party_user_token:
           $ref: '#/components/schemas/ThirdPartyUserToken'
         options:
           $ref: '#/components/schemas/CraCheckReportCashflowInsightsGetOptions'
+    CraCheckReportPlaidCreditScoreGetRequest:
+      title: CraCheckReportPlaidCreditScoreGetRequest
+      x-hidden-from-docs: true
+      type: object
+      description: CraCheckReportPlaidCreditScoreGetRequest defines the request schema for `/cra/check_report/plaid_credit_score/get`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        user_token:
+          $ref: '#/components/schemas/UserToken'
+        third_party_user_token:
+          $ref: '#/components/schemas/ThirdPartyUserToken'
+        options:
+          $ref: '#/components/schemas/CraCheckReportPlaidCreditScoreGetOptions'
     CraCheckReportCreateBaseReportOptions:
       title: CraCheckReportCreateBaseReportOptions
       type: object
@@ -57114,7 +57336,6 @@ components:
           description: Indicates that the report must include identity information. If identity information is not available, the report will fail.
     CraCheckReportGSEOptions:
       title: CraCheckReportGSEOptions
-      x-hidden-from-docs: true
       type: object
       nullable: true
       description: Specifies options for creating reports that can be shared with GSEs for mortgage verification.
@@ -57136,16 +57357,24 @@ components:
           $ref: '#/components/schemas/PlaidCheckScoreVersion'
         attributes_version:
           $ref: '#/components/schemas/CashflowAttributesVersion'
+    CraCheckReportPlaidCreditScoreGetOptions:
+      title: CraCheckReportPlaidCreditScoreGetOptions
+      type: object
+      nullable: true
+      x-hidden-from-docs: true
+      description: Defines configuration options to generate the Plaid Credit Score
+      properties:
+        plaid_credit_score_version:
+          $ref: '#/components/schemas/PlaidCheckScoreVersion'
     PlaidCheckScoreVersion:
       x-hidden-from-docs: true
       type: string
-      description: The version of the Plaid Check Score
+      description: The version of the Plaid Credit Score
       nullable: true
       enum:
       - v1.0
       - v2.0
     GSEReportType:
-      x-hidden-from-docs: true
       enum:
       - VOA
       - EMPLOYMENT_REFRESH
@@ -57214,11 +57443,66 @@ components:
         error_reason:
           type: string
           nullable: true
-          description: Human-readable description of why the Plaid Check score could not be computed.
+          description: Human-readable description of why the Plaid Credit score could not be computed.
     CashflowAttributesSchema:
       type: object
       title: CashflowAttributes
       description: A map of cashflow attributes, where the key is a string, and the value is a float, int, or boolean.
+    CraCheckReportPlaidCreditScoreGetResponse:
+      title: CraCheckReportPlaidCreditScoreGetResponse
+      additionalProperties: true
+      x-hidden-from-docs: true
+      type: object
+      description: CraCheckReportPlaidCreditScoreGetResponse defines the response schema for `/cra/check_report/plaid_credit_score/get`.
+      properties:
+        report:
+          $ref: '#/components/schemas/CraPlaidCreditScoreReport'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+        warnings:
+          type: array
+          description: If the Plaid Credit Score generation was successful but a subset of data could not be retrieved, this array will contain information about the errors causing information to be missing
+          items:
+            $ref: '#/components/schemas/CheckReportWarning'
+      required:
+      - report
+      - request_id
+    CraPlaidCreditScoreReport:
+      type: object
+      description: Contains data for the CRA Plaid Credit Score Report.
+      additionalProperties: true
+      properties:
+        report_id:
+          type: string
+          description: The unique identifier associated with the Network Attributes report object.
+        generated_time:
+          type: string
+          description: The time when the Network Attributes Report was generated.
+          format: date-time
+        plaid_credit_score:
+          $ref: '#/components/schemas/PlaidCreditScore'
+      required:
+      - report_id
+      - generated_time
+    PlaidCreditScore:
+      type: object
+      additionalProperties: true
+      description: The results of the Plaid Credit Score
+      nullable: true
+      properties:
+        score:
+          type: integer
+          description: The score returned by the Plaid Credit Score model. Will be an integer in the range 1 to 99.
+          nullable: true
+        reason_codes:
+          type: array
+          description: The reasons for an individual having risk according to the Plaid Credit score.
+          items:
+            type: string
+        error_reason:
+          type: string
+          nullable: true
+          description: Human-readable description of why the Plaid Credit score could not be computed.
     CraCheckReportNetworkInsightsGetRequest:
       title: CraCheckReportNetworkInsightsGetRequest
       type: object
@@ -57230,6 +57514,11 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_token:
           $ref: '#/components/schemas/UserToken'
+        user_id:
+          allOf:
+          - $ref: '#/components/schemas/NewUserID'
+          - description: A unique ID generated by Plaid representing the end user. Typically this ID will come from the `/user/create` response, when the endpoint is invoked with the `PLAID-NEW-USER-API-ENABLED` header. If this field is included, then the `user_token` object field is ignored.
+          - x-hidden-from-docs: true
         third_party_user_token:
           $ref: '#/components/schemas/ThirdPartyUserToken'
     CraCheckReportNetworkInsightsGetResponse:
@@ -57313,6 +57602,11 @@ components:
           $ref: '#/components/schemas/CraCheckReportVerificationGetEmploymentRefreshOptions'
         user_token:
           $ref: '#/components/schemas/UserToken'
+        user_id:
+          allOf:
+          - $ref: '#/components/schemas/NewUserID'
+          - description: A unique ID generated by Plaid representing the end user. Typically this ID will come from the `/user/create` response, when the endpoint is invoked with the `PLAID-NEW-USER-API-ENABLED` header. If this field is included, then the `user_token` object field is ignored.
+          - x-hidden-from-docs: true
       required:
       - reports_requested
     CraCheckReportVerificationGetReportType:
@@ -58273,7 +58567,7 @@ components:
       title: TaxpayerIdentifiers
       type: object
       additionalProperties: true
-      description: The collection of TAXPAYER_IDENTIFICATION elements
+      description: The collection of `TAXPAYER_IDENTIFICATION` elements
       properties:
         TAXPAYER_IDENTIFIER:
           $ref: '#/components/schemas/TaxpayerIdentifier'
@@ -58283,7 +58577,7 @@ components:
       title: TaxpayerIdentifier
       type: object
       additionalProperties: true
-      description: Information about the Taxpayer identification values assigned to the individual or legal entity.Information about the Taxpayer identification values assigned to the individual or legal entity.
+      description: Information about the Taxpayer identification values assigned to the individual or legal entity.
       properties:
         TaxpayerIdentifierType:
           $ref: '#/components/schemas/TaxpayerIdentifierType'
@@ -59503,8 +59797,34 @@ components:
           $ref: '#/components/schemas/APISecret'
         access_token:
           $ref: '#/components/schemas/AccessToken'
+        reason_code:
+          $ref: '#/components/schemas/ItemRemoveReasonCode'
+        reason_note:
+          type: string
+          nullable: true
+          maxLength: 512
+          description: Additional context or details about the reason for removing the item. Personally identifiable information, such as an email address or phone number, should not be included in the `reason_note`.
       required:
       - access_token
+    ItemRemoveReasonCode:
+      type: string
+      description: |
+        The reason for removing the item
+
+        `FRAUD_FIRST_PARTY`: The end user who owns the connected bank account committed fraud
+        `FRAUD_FALSE_IDENTITY`: The end user created the connection using false identity information or stolen credentials
+        `FRAUD_ABUSE`: The end user is abusing the client's service or platform through their connected account
+        `FRAUD_OTHER`: Other fraud-related reasons involving the end user not covered by the specific fraud categories
+        `CONNECTION_IS_NON_FUNCTIONAL`: The connection to the end user's financial institution is broken and cannot be restored
+        `OTHER`: Any other reason for removing the connection not covered by the above categories
+      nullable: true
+      enum:
+      - FRAUD_FIRST_PARTY
+      - FRAUD_FALSE_IDENTITY
+      - FRAUD_ABUSE
+      - FRAUD_OTHER
+      - CONNECTION_IS_NON_FUNCTIONAL
+      - OTHER
     ItemRemoveResponse:
       type: object
       additionalProperties: true
@@ -59695,6 +60015,7 @@ components:
       - DATABASE_INSIGHTS
       - TRANSFER_MIGRATED
       - INVESTMENTS_FALLBACK
+      - null
     ItemImportRequestOptions:
       type: object
       description: An optional object to configure `/item/import` request.
@@ -59803,7 +60124,7 @@ components:
           - cra_monitoring
           - layer
         consent_expiration_time:
-          description: The date and time at which the Item's access consent will expire, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format. If the Item does not have consent expiration scheduled, this field will be `null`. Currently, only institutions in Europe and a small number of institutions in the US have expiring consent. For a list of US institutions that currently expire consent, see the [OAuth Guide](https://plaid.com/docs/link/oauth/#refreshing-item-consent). Closer to the 1033 compliance deadline of April 1, 2026, expiration times will be populated more widely. For more details on 1033-related consent expiration that may be enforced in the future, see [Data Transparency Messaging consent expiration](https://plaid.com/docs/link/data-transparency-messaging-migration-guide/#consent-expiration-and-reauthorization).
+          description: The date and time at which the Item's access consent will expire, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format. If the Item does not have consent expiration scheduled, this field will be `null`. Currently, only institutions in Europe and a small number of institutions in the US have expiring consent. For a list of US institutions that currently expire consent, see the [OAuth Guide](https://plaid.com/docs/link/oauth/#refreshing-item-consent).
           nullable: true
           type: string
           format: date-time
@@ -59853,14 +60174,21 @@ components:
       description: A data scope for the products that a user can consent to in [Data Transparency Messaging](/docs/link/data-transparency-messaging-migration-guide)
       type: string
       enum:
-      - account_and_balance_info
+      - account_balance_info
       - contact_info
-      - account_and_routing_numbers
+      - account_routing_number
       - transactions
-      - credit_and_loans
+      - credit_loan_info
       - investments
+      - payroll_info
+      - income_verification_paystubs_info
+      - income_verification_w2s_info
+      - income_verification_bank_statements
+      - income_verification_employment_info
       - bank_statements
       - risk_info
+      - network_insights_lite
+      - fraud_info
     ItemStatus:
       description: An object with information about the status of the Item.
       type: object
@@ -59941,10 +60269,10 @@ components:
       description: |-
         A JSON string containing a space-separated list of scopes associated with this token, in the format described in [https://datatracker.ietf.org/doc/html/rfc6749#section-3.3](https://datatracker.ietf.org/doc/html/rfc6749#section-3.3). Currently accepted values are:
 
-        - `user:read` allows reading user data.
-        - `user:write` allows writing user data.
-        - `exchange` allows exchanging a token using the `urn:plaid:params:oauth:user-token` grant type.
-        - `mcp:dashboard` allows access to the MCP dashboard server.
+        `user:read` allows reading user data.
+        `user:write` allows writing user data.
+        `exchange` allows exchanging a token using the `urn:plaid:params:oauth:user-token` grant type.
+        `mcp:dashboard` allows access to the MCP dashboard server.
       example: user:read user:write exchange
     OAuthErrorCode:
       title: OAuth Error Code
@@ -59983,7 +60311,7 @@ components:
       - refresh_token
       - urn:ietf:params:oauth:grant-type:token-exchange
       - client_credentials
-      description: "The type of OAuth grant being requested:\n  \n- `client_credentials` allows exchanging a client id and client secret for a refresh and access token.\n- `refresh_token` allows refreshing an access token using a refresh token. When using this grant type, only the `refresh_token` field is required (along with the `client_id` and `client_secret`).\n- `urn:ietf:params:oauth:grant-type:token-exchange` allows exchanging a subject token for an OAuth token. When using this grant type, the `audience`, `subject_token` and `subject_token_type` fields are required.\nThese grants are defined in their respective RFCs. `refresh_token` and `client_credentials` are defined in RFC 6749 and `urn:ietf:params:oauth:grant-type:token-exchange` is defined in RFC 8693."
+      description: "The type of OAuth grant being requested:\n  \n`client_credentials` allows exchanging a client id and client secret for a refresh and access token.\n`refresh_token` allows refreshing an access token using a refresh token. When using this grant type, only the `refresh_token` field is required (along with the `client_id` and `client_secret`).\n`urn:ietf:params:oauth:grant-type:token-exchange` allows exchanging a subject token for an OAuth token. When using this grant type, the `audience`, `subject_token` and `subject_token_type` fields are required.\nThese grants are defined in their respective RFCs. `refresh_token` and `client_credentials` are defined in RFC 6749 and `urn:ietf:params:oauth:grant-type:token-exchange` is defined in RFC 8693."
     OAuthSubjectTokenType:
       type: string
       enum:
@@ -59991,9 +60319,8 @@ components:
       - urn:plaid:params:oauth:user-token
       description: |-
         The type of the subject token.
-
-        - `urn:plaid:params:tokens:user` allows exchanging a Plaid-issued user token for an OAuth token. When using this token type, `audience` must be the same as the `client_id`. `subject_token` must be a Plaid-issued user token issued from the `/user/create` endpoint.
-        - `urn:plaid:params:oauth:user-token` allows exchanging a refresh token for an OAuth token to another `client_id`. The other `client_id` is provided in `audience`. `subject_token` must be an OAuth refresh token issued from the `/oauth/token` endpoint.
+        `urn:plaid:params:tokens:user` allows exchanging a Plaid-issued user token for an OAuth token. When using this token type, `audience` must be the same as the `client_id`. `subject_token` must be a Plaid-issued user token issued from the `/user/create` endpoint.
+        `urn:plaid:params:oauth:user-token` allows exchanging a refresh token for an OAuth token to another `client_id`. The other `client_id` is provided in `audience`. `subject_token` must be an OAuth refresh token issued from the `/oauth/token` endpoint.
     OAuthTokenRequest:
       type: object
       required:
@@ -60451,7 +60778,7 @@ components:
           description: |-
             The Plaid `account_id` of the account that is the funding source for the proposed transaction. The `account_id` is returned in the `/accounts/get` endpoint as well as the [`onSuccess`](/docs/link/ios/#link-ios-onsuccess-linkSuccess-metadata-accounts-id) callback metadata.
 
-            This will return an [`INVALID_ACCOUNT_ID`](/docs/errors/invalid-input/#invalid_account_id) error if the account has been removed at the bank or if the `account_id` is no longer valid.
+            This will return an [`INVALID_ACCOUNT_ID`](https://plaid.com/docs/errors/invalid-input/#invalid_account_id) error if the account has been removed at the bank or if the `account_id` is no longer valid.
         client_transaction_id:
           type: string
           description: The unique ID that you would like to use to refer to this evaluation attempt - for example, a payment attempt ID. You will use this later to debug this evaluation, and/or report an ACH return, etc. The max length for this field is 36 characters.
@@ -60541,7 +60868,7 @@ components:
           description: |-
             The Plaid `account_id` of the account that is the funding source for the proposed transaction. The `account_id` is returned in the `/accounts/get` endpoint as well as the [`onSuccess`](/docs/link/ios/#link-ios-onsuccess-linkSuccess-metadata-accounts-id) callback metadata.
 
-            This will return an [`INVALID_ACCOUNT_ID`](/docs/errors/invalid-input/#invalid_account_id) error if the account has been removed at the bank or if the `account_id` is no longer valid.
+            This will return an [`INVALID_ACCOUNT_ID`](https://plaid.com/docs/errors/invalid-input/#invalid_account_id) error if the account has been removed at the bank or if the `account_id` is no longer valid.
         client_transaction_id:
           type: string
           description: The unique ID that you would like to use to refer to this transaction. For your convenience mapping your internal data, you could use your internal ID/identifier for this transaction. The max length for this field is 36 characters.
@@ -60610,7 +60937,7 @@ components:
           description: |-
             `true` if the ACH transaction was initiated, `false` otherwise.
 
-            This field must be returned as a boolean. If formatted incorrectly, this will result in an [`INVALID_FIELD`](/docs/errors/invalid-request/#invalid_field) error.
+            This field must be returned as a boolean. If formatted incorrectly, this will result in an [`INVALID_FIELD`](https://plaid.com/docs/errors/invalid-request/#invalid_field) error.
         days_funds_on_hold:
           type: integer
           description: |-
@@ -60665,7 +60992,7 @@ components:
           description: |-
             Must be a valid ACH return code (e.g. "R01")
 
-            If formatted incorrectly, this will result in an [`INVALID_FIELD`](/docs/errors/invalid-request/#invalid_field) error.
+            If formatted incorrectly, this will result in an [`INVALID_FIELD`](https://plaid.com/docs/errors/invalid-request/#invalid_field) error.
         returned_at:
           type: string
           format: date-time
@@ -60802,7 +61129,7 @@ components:
           description: |-
             `true` if the ACH transaction was initiated, `false` otherwise.
 
-            This field must be returned as a boolean. If formatted incorrectly, this will result in an [`INVALID_FIELD`](/docs/errors/invalid-request/#invalid_field) error.
+            This field must be returned as a boolean. If formatted incorrectly, this will result in an [`INVALID_FIELD`](https://plaid.com/docs/errors/invalid-request/#invalid_field) error.
         days_funds_on_hold:
           type: integer
           description: |-
@@ -60855,7 +61182,7 @@ components:
           description: |-
             Must be a valid ACH return code (e.g. "R01")
 
-            If formatted incorrectly, this will result in an [`INVALID_FIELD`](/docs/errors/invalid-request/#invalid_field) error.
+            If formatted incorrectly, this will result in an [`INVALID_FIELD`](https://plaid.com/docs/errors/invalid-request/#invalid_field) error.
         returned_at:
           type: string
           format: date-time
@@ -60928,6 +61255,7 @@ components:
       - score
     CustomerInitiatedRiskTier:
       x-hidden-from-docs: true
+      deprecated: true
       description: "DEPRECATED. Use Signal Rules instead to transform the `score` into a useful action. \n\nA tier corresponding to the projected likelihood that the transaction, if initiated, will be subject to a return.\n\nIn the `customer_initiated_return_risk` object, there are five risk tiers corresponding to the scores:\n  1: Predicted customer-initiated return incidence rate between 0.00% - 0.02%\n  2: Predicted customer-initiated return incidence rate between 0.02% - 0.05%\n  3: Predicted customer-initiated return incidence rate between 0.05% - 0.1%\n  4: Predicted customer-initiated return incidence rate between 0.1% - 0.5%\n  5: Predicted customer-initiated return incidence rate greater than 0.5%\n"
       type: integer
       minimum: 1
@@ -60946,6 +61274,7 @@ components:
       - score
     BankInitiatedRiskTier:
       x-hidden-from-docs: true
+      deprecated: true
       description: "DEPRECATED. Use Signal Rules instead to transform the `score` into a useful action.  \n\nIn the `bank_initiated_return_risk` object, there are eight risk tiers corresponding to the scores:\n  1: Predicted bank-initiated return incidence rate between 0.0% - 0.5%\n  2: Predicted bank-initiated return incidence rate between 0.5% - 1.5%\n  3: Predicted bank-initiated return incidence rate between 1.5% - 3%\n  4: Predicted bank-initiated return incidence rate between 3% - 5%\n  5: Predicted bank-initiated return incidence rate between 5% - 10%\n  6: Predicted bank-initiated return incidence rate between 10% - 15%\n  7: Predicted bank-initiated return incidence rate between 15% and 50%\n  8: Predicted bank-initiated return incidence rate greater than 50%\n"
       type: integer
       minimum: 1
@@ -61553,6 +61882,11 @@ components:
         days_since_account_opening:
           type: integer
           description: The number of days since the bank account was opened, as reported by the financial institution
+          nullable: true
+        balance_to_transaction_amount_ratio:
+          type: number
+          format: double
+          description: Taking `available_or_current_balance` and dividing it by the transaction amount. Useful to say “10% buffer”, for example. This is a convenience function to build Signal Rules upon.
           nullable: true
     StatementsListRequest:
       title: StatementsListRequest
