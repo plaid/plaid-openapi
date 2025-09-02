@@ -1,9 +1,43 @@
+### 2020-09-14_1.664.0
+- Add `investments_auth` to enum values for the `additional_consented_products` array in the `/link/token/create` request schema.
+
+### 2020-09-14_1.663.3
+- (beta) Add `cra_plaid_credit_score` support to `link/token/create`
+- (beta) Add `cra_plaid_credit_score` support to `cra/check_report/create`
+- (beta) Add `cra/check_report/plaid_credit_score/get` endpoint
+
+### 2020-09-14_1.663.2
+- Add `user_id` to `cra/*` endpoints
+
+### 2020-09-14_1.663.1
+- Add `overdraft` account type to the `LoanAccountSubtype` object, where it was erroneously missing 
+- Correct missing and incorrect enum values for `ItemConsentedDataScope` object
+
+### 2020-09-14_1.663.0
+- (beta) Add `/user/items/associate` endpoint
+
+### 2020-09-14_1.662.1
+- Internal changes only
+
+### 2020-09-14_1.662.0
+- Add `balance_to_transaction_amount_ratio` to `/signal/evaluate`
+
+### 2020-09-14_1.661.0
+- Add `personal_finance_category_version` to `/transactions/get`, `/transactions/sync` and `/transactions/enrich` request options as well as version field in response.
+
+### 2020-09-14_1.660.0
+- Add `gse_options` to `base_report` options in `/link/token/create` and `cra/check_report/create`
+
+### 2020-09-14_1.659.0
+- Deprecate the `sedol` field in the Investments `Security` object. 
+- Deprecate the `sedol` field in the Investments `SecurityOverride` object. 
+
 ### 2020-09-14_1.658.0
 - (beta) Add `user_id` field to `/session/token/create` request.
 - [BREAKING for Go] (beta) Make `user` object optional in `/session/token/create` if `user_id` is included.
 
 ### 2020-09-14_1.657.0
-Add Add `subtype` property to the `Security` model.
+- Add `subtype` property to the `Security` model.
 
 ### 2020-09-14_1.656.1
 - Renamed `protect_sdk_session_id` field in the request of `/protect/event/send` to `protect_session_id` for consistency across endpoints.
