@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.667.0
+  version: 2020-09-14_1.667.1
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -23564,6 +23564,7 @@ components:
       - primary_address
     ClientUserIdentityName:
       type: object
+      nullable: true
       description: User name information.
       properties:
         given_name:
@@ -63491,3 +63492,169 @@ components:
       nullable: true
       additionalProperties: true
       description: Event fraud attributes as an arbitrary set of key-value pairs.
+    ProtectIncidentEvent:
+      nullable: true
+      type: object
+      additionalProperties: true
+      description: details about the incident event.
+      properties:
+        protect_event_id:
+          type: string
+          nullable: true
+          description: A globally unique identifier representing a Protect event that may be associated with this incident.
+        link_session_id:
+          type: string
+          nullable: true
+          description: A unique identifier for a Link session that may be associated with this incident.
+        idv_session_id:
+          type: string
+          nullable: true
+          description: A unique identifier for an Identity Verification session that may be associated with this incident.
+        signal_client_transaction_id:
+          type: string
+          nullable: true
+          description: The unique ID used to refer to a Signal transaction evaluation that may be associated with this incident.
+        internal_reference:
+          type: string
+          nullable: true
+          description: A unique ID representing the incident in your system. Personally identifiable information, such as an email address or phone number, should not be used in this field.
+        time:
+          type: string
+          format: date-time
+          nullable: true
+          description: The timestamp when the incident occurred, in ISO 8601 format (e.g., '2020-07-24T03:26:02Z').
+        amount:
+          $ref: '#/components/schemas/ProtectIncidentAmount'
+    ProtectIncidentAmount:
+      type: object
+      nullable: true
+      additionalProperties: true
+      description: The monetary amount associated with the incident.
+      properties:
+        iso_currency_code:
+          type: string
+          nullable: true
+          default: USD
+          description: The ISO-4217 currency code of the incident amount. Defaults to `USD` if not specified.
+        value:
+          type: number
+          format: double
+          description: The monetary value of the incident amount.
+      required:
+      - value
+    ProtectReportConfidence:
+      type: string
+      enum:
+      - CONFIRMED
+      - SUSPECTED
+      description: |-
+        The confidence level of the incident report.
+        `CONFIRMED` indicates the incident has been verified and definitively occurred.
+
+        `SUSPECTED` indicates the incident is believed to have occurred but has not been fully verified.
+    ProtectReportType:
+      type: string
+      enum:
+      - USER_ACCOUNT_TAKEOVER
+      - FALSE_IDENTITY
+      - STOLEN_IDENTITY
+      - SYNTHETIC_IDENTITY
+      - MULTIPLE_USER_ACCOUNTS
+      - SCAM_VICTIM
+      - BANK_ACCOUNT_TAKEOVER
+      - BANK_CONNECTION_REVOKED
+      - CARD_TESTING
+      - UNAUTHORIZED_TRANSACTION
+      - CARD_CHARGEBACK
+      - ACH_RETURN
+      - DISPUTE
+      - FIRST_PARTY_FRAUD
+      - MISSED_PAYMENT
+      - LOAN_STACKING
+      - MONEY_LAUNDERING
+      - NO_FRAUD
+      - OTHER
+      description: |-
+        The type of incident being reported.
+
+        `USER_ACCOUNT_TAKEOVER` - Indicates that a legitimate user's account was accessed or controlled by an unauthorized party.
+
+        `FALSE_IDENTITY` - Indicates that a user created an account using stolen or fabricated identity information.
+
+        `STOLEN_IDENTITY` - Indicates that a user created an account using identity information belonging to a real individual without their consent.
+
+        `SYNTHETIC_IDENTITY` - Indicates that a user created an account using a fake or partially fabricated identity (e.g., combining real and fake information to form a new persona).
+
+        `MULTIPLE_USER_ACCOUNTS` - Indicates that the same individual is operating multiple accounts in violation of policy.
+
+        `SCAM_VICTIM` - Indicates that the user was tricked into authorizing or sending funds as part of a scam.
+
+        `BANK_ACCOUNT_TAKEOVER` - Indicates that a user's linked bank account was accessed or misused by an unauthorized party.
+
+        `BANK_CONNECTION_REVOKED` - Indicates that a linked bank account connection was revoked by the financial institution, often due to suspected misuse, fraud, or security concerns.
+
+        `CARD_TESTING` - Indicates that a card was used in small or repeated transactions to test its validity.
+
+        `UNAUTHORIZED_TRANSACTION` - Indicates that a transaction was made without the user's consent or authorization.
+
+        `CARD_CHARGEBACK` - Indicates that a card transaction was reversed via a chargeback claim.
+
+        `ACH_RETURN` - Indicates that an ACH transaction was returned or reversed by the bank.
+
+        `DISPUTE` - Indicates that a user filed a dispute regarding a transaction or account activity.
+
+        `FIRST_PARTY_FRAUD` - Indicates that a user intentionally misrepresented themselves or their actions for financial gain.
+
+        `MISSED_PAYMENT` - Indicates that a user failed to make a required payment on time.
+
+        `LOAN_STACKING` - Indicates that a user applied for or took out multiple loans simultaneously beyond their ability to repay.
+
+        `MONEY_LAUNDERING` - Indicates that funds are being moved through accounts to obscure their illicit origin.
+
+        `NO_FRAUD` - Indicates that an investigation determined no fraudulent activity occurred on user/event (positive label)
+
+        `OTHER` - Indicates that the case involves fraud or financial risk not covered by other report types. Requires notes describing the report.
+    ProtectReportSource:
+      type: string
+      enum:
+      - INTERNAL_REVIEW
+      - USER_SELF_REPORTED
+      - BANK_FEEDBACK
+      - NETWORK_FEEDBACK
+      - AUTOMATED_SYSTEM
+      - THIRD_PARTY_ALERT
+      - OTHER
+      description: |-
+        The source that identified or reported the incident.
+
+        `INTERNAL_REVIEW` - Incident was identified through internal fraud investigations or review processes.
+
+        `USER_SELF_REPORTED` - Incident was reported directly by the affected user.
+
+        `BANK_FEEDBACK` - Incident was identified through bank feedback, including ACH returns and connection revocations.
+
+        `NETWORK_FEEDBACK` - Incident was identified through card network alerts or chargebacks.
+
+        `AUTOMATED_SYSTEM` - Incident was detected by automated systems such as fraud models or rule engines.
+
+        `THIRD_PARTY_ALERT` - Incident was identified through external vendor or consortium alerts.
+
+        `OTHER` - Incident was identified through a source not covered by other categories.
+    ProtectBankAccount:
+      type: object
+      nullable: true
+      additionalProperties: true
+      description: Bank account information associated with the incident.
+      properties:
+        account_id:
+          type: string
+          nullable: true
+          description: Plaid's unique identifier for the account.
+        account_number:
+          type: string
+          nullable: true
+          description: Full account number of the bank account.
+        routing_number:
+          type: string
+          nullable: true
+          description: Routing number of the bank account. Must be present if `account_number` is present.

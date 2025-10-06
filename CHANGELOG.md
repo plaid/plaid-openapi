@@ -1,3 +1,6 @@
+### 2020-09-14_1.667.1
+- (beta) Allow ClientUserIdentityName to be nullable
+
 ### 2020-09-14_1.667.0
 - Add `errors` field to `institutions` objects in `/partner/customer/oauth_institutions/get` response
 
