@@ -1,3 +1,15 @@
+### 2020-09-14_1.667.4
+- Fixed a broken documentation link
+
+### 2020-09-14_1.667.3
+- Add cra_partner_insights as possible add_ons for `cra/check_report/pdf/get`
+
+### 2020-09-14_1.667.2
+- (beta) updated street_1, city, region, and postal_code to no longer be required
+
+### 2020-09-14_1.667.1
+- (beta) Allow ClientUserIdentityName to be nullable
+
 ### 2020-09-14_1.667.0
 - Add `errors` field to `institutions` objects in `/partner/customer/oauth_institutions/get` response
 
