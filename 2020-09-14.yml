@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.670.0
+  version: 2020-09-14_1.671.5
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -40,6 +40,12 @@ paths:
                     asset_report_token: assets-sandbox-6f12f5bb-22dd-4855-b918-f47ec439198a
                     asset_report_id: 1f414183-220c-44f5-b0c8-bc0e6d4053bb
                     request_id: Iam3b
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: assetReportCreate
       description: |-
         The `/asset_report/create` endpoint initiates the process of creating an Asset Report, which can then be retrieved by passing the `asset_report_token` return value to the `/asset_report/get` or `/asset_report/pdf/get` endpoints.
@@ -281,6 +287,12 @@ paths:
                         ssn: 111-22-1234
                     request_id: GVzMdiDd8DDAQK4
                     warnings: []
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: assetReportGet
       description: |-
         The `/asset_report/get` endpoint retrieves the Asset Report in JSON format. Before calling `/asset_report/get`, you must first create the Asset Report using `/asset_report/create` (or filter an Asset Report using `/asset_report/filter`) and then wait for the [`PRODUCT_READY`](https://plaid.com/docs/api/products/assets/#product_ready) webhook to fire, indicating that the Report is ready to be retrieved.
@@ -309,6 +321,12 @@ paths:
             application/pdf:
               schema:
                 $ref: '#/components/schemas/AssetReportPDFGetResponse'
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: assetReportPdfGet
       description: |-
         The `/asset_report/pdf/get` endpoint retrieves the Asset Report in PDF format. Before calling `/asset_report/pdf/get`, you must first create the Asset Report using `/asset_report/create` (or filter an Asset Report using `/asset_report/filter`) and then wait for the [`PRODUCT_READY`](https://plaid.com/docs/api/products/assets/#product_ready) webhook to fire, indicating that the Report is ready to be retrieved.
@@ -343,6 +361,12 @@ paths:
                     asset_report_id: c33ebe8b-6a63-4d74-a83d-d39791231ac0
                     asset_report_token: assets-sandbox-8218d5f8-6d6d-403d-92f5-13a9afaa4398
                     request_id: NBZaq
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: assetReportRefresh
       description: |-
         An Asset Report is an immutable snapshot of a user's assets. In order to "refresh" an Asset Report you created previously, you can use the `/asset_report/refresh` endpoint to create a new Asset Report based on the old one, but with the most recent data available.
@@ -375,6 +399,12 @@ paths:
                     asset_report_token: assets-sandbox-bc410c6a-4653-4c75-985c-e757c3497c5c
                     asset_report_id: fdc09207-0cef-4d88-b5eb-0d970758ebd9
                     request_id: qEg07
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: assetReportFilter
       description: |-
         By default, an Asset Report will contain all of the accounts on a given Item. In some cases, you may not want the Asset Report to contain all accounts. For example, you might have the end user choose which accounts are relevant in Link using the Account Select view, which you can enable in the dashboard. Or, you might always exclude certain account types or subtypes, which you can identify by using the `/accounts/get` endpoint. To narrow an Asset Report to only a subset of accounts, use the `/asset_report/filter` endpoint.
@@ -410,6 +440,12 @@ paths:
                   value:
                     removed: true
                     request_id: I6zHN
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: assetReportRemove
       description: |-
         The `/item/remove` endpoint allows you to invalidate an `access_token`, meaning you will not be able to create new Asset Reports with it. Removing an Item does not affect any Asset Reports or Audit Copies you have already created, which will remain accessible until you remove them specifically.
@@ -441,6 +477,12 @@ paths:
                   value:
                     audit_copy_token: a-sandbox-3TAU2CWVYBDVRHUCAAAI27ULU4
                     request_id: Iam3b
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: assetReportAuditCopyCreate
       description: |-
         Plaid can provide an Audit Copy of any Asset Report directly to a participating third party on your behalf. For example, Plaid can supply an Audit Copy directly to Fannie Mae on your behalf if you participate in the Day 1 Certainty™ program. An Audit Copy contains the same underlying data as the Asset Report.
@@ -473,7 +515,50 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AssetReportGetResponse'
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: '`/asset_report/audit_copy/get` allows auditors to get a copy of an Asset Report that was previously shared via the `/asset_report/audit_copy/create` endpoint.  The caller of `/asset_report/audit_copy/create` must provide the `audit_copy_token` to the auditor.  This token can then be used to call `/asset_report/audit_copy/create`.'
+  /asset_report/audit_copy/pdf/get:
+    post:
+      tags:
+      - plaid
+      summary: Retrieve a PDF Asset Report Audit Copy
+      externalDocs:
+        url: /none/
+      responses:
+        "200":
+          description: A PDF of the Asset Report Audit Copy
+          content:
+            application/pdf:
+              schema:
+                $ref: '#/components/schemas/AssetReportAuditCopyPdfGetResponse'
+              examples:
+                example-1:
+                  value: JVBERi0xLjQKJeLjz9MKMyAwIG9iaiA8PC9MZW5ndGggNDY2MS9GaWx0ZXIvRmxhdGVEZWNvZGU+PnN0cmVhbQp4nF2SyY4cMRBF94VdzI0O...
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      operationId: assetReportAuditCopyPdfGet
+      description: |-
+        The `/asset_report/audit_copy/pdf/get` endpoint retrieves an Asset Report Audit Copy in PDF format. The caller must provide the `audit_copy_token` that was shared via the `/asset_report/audit_copy/create` endpoint.
+
+        The response to `/asset_report/audit_copy/pdf/get` is the PDF binary data. The `request_id` is returned in the `Plaid-Request-ID` header.
+
+        [View a sample PDF Asset Report](https://plaid.com/documents/sample-asset-report.pdf).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssetReportAuditCopyPdfGetRequest'
+        description: ""
   /asset_report/audit_copy/remove:
     post:
       tags:
@@ -493,6 +578,12 @@ paths:
                   value:
                     removed: true
                     request_id: m8MDnv9okwxFNBV
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: assetReportAuditCopyRemove
       requestBody:
         required: true
@@ -528,6 +619,12 @@ paths:
                   value:
                     subscription_id: f17efbdd-caab-4278-8ece-963511cd3d51
                     request_id: GVzMdiDd8DDAQK4
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: This endpoint allows you to subscribe to insights for a user's linked CRA items, which are updated between one and four times per day (best-effort).
   /cra/monitoring_insights/unsubscribe:
     post:
@@ -554,6 +651,12 @@ paths:
                 example-1:
                   value:
                     request_id: GVzMdiDd8DDAQK4
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: This endpoint allows you to unsubscribe from previously subscribed Monitoring Insights.
   /cra/monitoring_insights/get:
     post:
@@ -1465,6 +1568,12 @@ paths:
                           unofficial_currency_code: null
                         type: depository
                     request_id: m8MDnv9okwxFNBV
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: This endpoint allows you to retrieve a Cash Flow Updates report by passing in the `user_token` referred to in the webhook you received.
   /credit/audit_copy_token/update:
     post:
@@ -1485,6 +1594,12 @@ paths:
                   value:
                     request_id: eYupqX1mZkEuQRx
                     updated: true
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: creditAuditCopyTokenUpdate
       description: The `/credit/audit_copy_token/update` endpoint updates an existing  Audit Copy Token by adding the report tokens in the `report_tokens` field to the `audit_copy_token`. If the Audit Copy Token already contains a report of a certain type, it will be replaced with the token provided in the `report_tokens` field.
       requestBody:
@@ -1817,6 +1932,12 @@ paths:
                             iso_currency_code: USD
                             unofficial_currency_code: null
                         warnings: []
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       externalDocs:
         url: /api/products/check/#cracheck_reportincome_insightsget
       operationId: craCheckReportIncomeInsightsGet
@@ -2783,6 +2904,12 @@ paths:
                       report_id: f3bb434f-1c9b-4ef2-b76c-3d1fd08156ec
                     warnings: []
                     request_id: FibfL8t3s71KJnj
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: This endpoint allows you to retrieve the Base Report for your user, allowing you to receive comprehensive bank account and cash flow data. You should call this endpoint after you've received a `CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`. If the most recent consumer report for the user doesn't have sufficient data to generate the base report, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.
   /cra/check_report/pdf/get:
     post:
@@ -2799,6 +2926,12 @@ paths:
               examples:
                 example-1:
                   value: JVBERi0xLjQKJeLjz9MKMyAwIG9iaiA8PC9MZW5ndGggNDY2MS9GaWx0ZXIvRmxhdGVEZWNvZGU+PnN0cmVhbQp4nF2SyY4cMRBF94VdzI0O...
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       externalDocs:
         url: /api/products/check/#cracheck_reportpdfget
       operationId: craCheckReportPdfGet
@@ -2825,6 +2958,12 @@ paths:
                 example-1:
                   value:
                     request_id: LhQf0THi8SH1yJm
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       externalDocs:
         url: /api/products/check/#cracheck_reportcreate
       operationId: craCheckReportCreate
@@ -3242,6 +3381,12 @@ paths:
                           item_id: AZMP7JrGXgtPd3AQMeg7hwMKgk5E8qU1V5ME7
                           last_update_time: "2023-03-30T18:25:26Z"
                     warnings: []
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       externalDocs:
         url: /api/products/check/#cracheck_reportverificationget
       operationId: craCheckReportVerificationGet
@@ -3268,6 +3413,12 @@ paths:
               examples:
                 example-1:
                   value: JVBERi0xLjQKJeLjz9MKMyAwIG9iaiA8PC9MZW5ndGggNDY2MS9GaWx0ZXIvRmxhdGVEZWNvZGU+PnN0cmVhbQp4nF2SyY4cMRBF94VdzI0O...
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       externalDocs:
         url: /api/products/check/#cracheck_reportverificationpdfget
       operationId: craCheckReportVerificationPdfGet
@@ -3294,6 +3445,12 @@ paths:
                 example-1:
                   value:
                     request_id: LhQf0THi8SH1yJm
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: craLoansApplicationsRegister
       externalDocs:
         url: /none/
@@ -3320,6 +3477,12 @@ paths:
                 example-1:
                   value:
                     request_id: LhQf0THi8SH1yJm
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: craLoansRegister
       externalDocs:
         url: /none/
@@ -3346,6 +3509,12 @@ paths:
                 example-1:
                   value:
                     request_id: LhQf0THi8SH1yJm
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: craLoansUpdate
       externalDocs:
         url: /none/
@@ -3372,6 +3541,12 @@ paths:
                 example-1:
                   value:
                     request_id: LhQf0THi8SH1yJm
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: craLoansUnregister
       externalDocs:
         url: /none/
@@ -3394,6 +3569,12 @@ paths:
             application/pdf:
               schema:
                 $ref: '#/components/schemas/ConsumerReportPDFGetResponse'
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: consumerReportPdfGet
       externalDocs:
         url: /none/
@@ -3556,6 +3737,12 @@ paths:
                         year: 2023
                         date_posted: "2023-05-01"
                     request_id: eYupqX1mZkEuQRx
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: statementsList
       description: The `/statements/list` endpoint retrieves a list of all statements associated with an item.
       requestBody:
@@ -3579,6 +3766,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StatementsDownloadResponse'
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: statementsDownload
       description: The `/statements/download` endpoint retrieves a single statement PDF in binary format.  The response will contain a `Plaid-Content-Hash` header containing a SHA 256 checksum of the statement. This can be used to verify that the file being sent by Plaid is the same file that was downloaded to your system.
       requestBody:
@@ -3606,6 +3799,12 @@ paths:
                 example-1:
                   value:
                     request_id: eYupqX1mZkEuQRx
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: statementsRefresh
       description: '`/statements/refresh` initiates an on-demand extraction to fetch the statements for the provided dates.'
       requestBody:
@@ -5565,7 +5764,7 @@ paths:
               examples:
                 example-1:
                   value:
-                    request_id: 7fe31f2c-d3db-49f8-9e45-b13cf1eaa1eb
+                    request_id: 4zlKapIkTm8p5KM
                     user_id: usr_8c3ZbDBYjaqUXZ
                     results:
                     - item_id: Fd7bjNrDLJfGvZWwnkQlfxwoNz54B5C97ejBr
@@ -5624,7 +5823,7 @@ paths:
               examples:
                 example-1:
                   value:
-                    request_id: 7fe31f2c-d3db-49f8-9e45-b13cf1eaa1eb
+                    request_id: 4zlKapIkTm8p5KM
                     user_id: usr_8c3ZbDBYjaqUXZ
                     results:
                     - item_id: Fd7bjNrDLJfGvZWwnkQlfxwoNz54B5C97ejBr
@@ -6493,6 +6692,12 @@ paths:
                       webhook: https://www.example.com/webhook
                       auth_method: INSTANT_AUTH
                     request_id: LhQf0THi8SH1yJk
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |-
         The `/accounts/balance/get` endpoint returns the real-time balance for each of an Item's accounts. While other endpoints, such as `/accounts/get`, return a balance object,  `/accounts/balance/get` forces the available and current balance fields to be refreshed rather than cached. This endpoint can be used for existing Items that were added via any of Plaid’s other products. This endpoint can be used as long as Link has been initialized with any other product, `balance` itself is not a product that can be used to initialize Link. As this endpoint triggers a synchronous request for fresh data, latency may be higher than for other Plaid endpoints (typically less than 10 seconds, but occasionally up to 30 seconds or more); if you encounter errors, you may find it necessary to adjust your timeout period when making requests.
 
@@ -6650,6 +6855,12 @@ paths:
                       webhook: https://www.genericwebhookurl.com/webhook
                       auth_method: INSTANT_AUTH
                     request_id: 3nARps6TOYtbACO
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |-
         The `/identity/get` endpoint allows you to retrieve various account holder information on file with the financial institution, including names, emails, phone numbers, and addresses. Only name data is guaranteed to be returned; other fields will be empty arrays if not provided by the institution.
 
@@ -6740,6 +6951,12 @@ paths:
                       update_type: background
                       webhook: https://www.example.com/webhook
                     request_id: b5jvmskusjwX5Gs
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       requestBody:
         required: true
         content:
@@ -6829,6 +7046,12 @@ paths:
                       webhook: https://www.genericwebhookurl.com/webhook
                       auth_method: INSTANT_AUTH
                     request_id: 3nARps6TOYtbACO
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |-
         The `/identity/match` endpoint generates a match score, which indicates how well the provided identity data matches the identity information on file with the account holder's financial institution.
 
@@ -9335,20 +9558,28 @@ paths:
                   value:
                     user_id: plaid-user-6009db6e
                     latest_scored_event:
-                      event_id: protect-event-2be8498f
+                      event_id: ptevt_cYNnF8xYE1v1om
+                      event_type: LINK_COMPLETE
                       timestamp: "2020-07-24T03:26:02Z"
                       trust_index:
                         score: 86
-                        model: ti-pro-1.0
+                        model: trust_index.1.0.1
                         subscores:
                           device_and_connection:
                             score: 87
                           bank_account_insights:
                             score: 85
                       fraud_attributes:
-                        num_distinct_names_on_accounts: 3
-                        identity_match_idv_bank_account: true
-                        idv_id_doc_passed: true
+                        link_session.linked_bank_accounts.user_pi_matches_owners: true
+                        link_session.linked_bank_accounts.connected_apps.days_since_first_connection: 582
+                        session.challenged_with_mfa: false
+                        user.bank_accounts.num_of_frozen_or_restricted_accounts: 0
+                        user.linked_bank_accounts.num_family_names: 1
+                        user.linked_bank_accounts.num_of_connected_banks: 1
+                        user.link_sessions.days_since_first_link_session: 150
+                        user.pi.email.history_yrs: 7.03
+                        user.pi.email.num_social_networks_linked: 12
+                        user.pi.ssn.user_likely_has_better_ssn: false
                     request_id: saKrIBuEB9qJZng
       operationId: protectUserInsightsGet
       description: Use this endpoint to get basic information about a user as it relates to their fraud profile with Protect.
@@ -9402,19 +9633,27 @@ paths:
               examples:
                 example-1:
                   value:
-                    event_id: protect-event-2be8498f
+                    event_id: ptevt_cYNnF8xYE1v1om
+                    event_type: LINK_COMPLETE
                     trust_index:
                       score: 86
-                      model: ti-pro-1.0
+                      model: trust_index.1.0.1
                       subscores:
                         device_and_connection:
                           score: 87
                         bank_account_insights:
                           score: 85
                       fraud_attributes:
-                        num_distinct_names_on_accounts: 3
-                        identity_match_idv_bank_account: true
-                        idv_id_doc_passed: true
+                        link_session.linked_bank_accounts.user_pi_matches_owners: true
+                        link_session.linked_bank_accounts.connected_apps.days_since_first_connection: 582
+                        session.challenged_with_mfa: false
+                        user.bank_accounts.num_of_frozen_or_restricted_accounts: 0
+                        user.linked_bank_accounts.num_family_names: 1
+                        user.linked_bank_accounts.num_of_connected_banks: 1
+                        user.link_sessions.days_since_first_link_session: 150
+                        user.pi.email.history_yrs: 7.03
+                        user.pi.email.num_social_networks_linked: 12
+                        user.pi.ssn.user_likely_has_better_ssn: false
                     request_id: saKrIBuEB9qJZng
       operationId: protectEventSend
       description: Send a new event to enrich user data and optionally get a Trust Index score for the event.
@@ -9441,28 +9680,28 @@ paths:
               examples:
                 example-1:
                   value:
-                    event_id: protect-event-2be8498f
+                    event_id: ptevt_cYNnF8xYE1v1om
+                    event_type: LINK_COMPLETE
                     timestamp: "2020-07-24T03:26:02Z"
                     trust_index:
                       score: 86
-                      model: ti-pro-1.0
+                      model: trust_index.1.0.1
                       subscores:
                         device_and_connection:
                           score: 87
                         bank_account_insights:
                           score: 85
                     fraud_attributes:
-                      num_distinct_names_on_accounts: 3
-                      identity_match_idv_bank_account: true
-                      idv_id_doc_passed: true
-                      bank_accounts:
-                      - account_name: Premium Checking
-                        account_type: checking
-                        institution_name: Huntington Credit Union
-                        account_age_days: 144
-                        num_distinct_owner_names: 3
-                      - account_name: Credit ***8889
-                        account_type: credit
+                      link_session.linked_bank_accounts.user_pi_matches_owners: true
+                      link_session.linked_bank_accounts.connected_apps.days_since_first_connection: 582
+                      session.challenged_with_mfa: false
+                      user.bank_accounts.num_of_frozen_or_restricted_accounts: 0
+                      user.linked_bank_accounts.num_family_names: 1
+                      user.linked_bank_accounts.num_of_connected_banks: 1
+                      user.link_sessions.days_since_first_link_session: 150
+                      user.pi.email.history_yrs: 7.03
+                      user.pi.email.num_social_networks_linked: 12
+                      user.pi.ssn.user_likely_has_better_ssn: false
                     request_id: saKrIBuEB9qJZng
       operationId: protectEventGet
       description: Get information about a user event including Trust Index score and fraud attributes.
@@ -9531,6 +9770,12 @@ paths:
                         account_id: vzeNDwK7KQIm4yEog683uElbp9GRLEFXGK98D
                         sort_code: "601613"
                     request_id: 1zlMf
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |
         The `/processor/auth/get` endpoint returns the bank account and bank identification number (such as the routing number, for US accounts), for a checking, savings, or cash management account that''s associated with a given `processor_token`. The endpoint also returns high-level account data and balances when available.
 
@@ -9574,6 +9819,12 @@ paths:
                       type: depository
                     institution_id: ins_109508
                     request_id: 1zlMf
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |
         This endpoint returns the account associated with a given processor token.
 
@@ -9687,6 +9938,12 @@ paths:
                       fixed_income: null
                     request_id: 24MxmGFZz89Xg2f
                     is_investments_fallback_item: false
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |
         This endpoint returns the stock position data of the account associated with a given processor token.
       requestBody:
@@ -10608,6 +10865,12 @@ paths:
                       mortgage: []
                       student: []
                     request_id: dTnnm60WgKGLnKL
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |-
         The `/processor/liabilities/get` endpoint returns various details about a loan or credit account. Liabilities data is available primarily for US financial institutions, with some limited coverage of Canadian institutions. Currently supported account types are account type `credit` with account subtype `credit card` or `paypal`, and account type `loan` with account subtype `student` or `mortgage`.
 
@@ -10690,6 +10953,12 @@ paths:
                       subtype: checking
                       type: depository
                     request_id: eOPkBl6t33veI2J
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: The `/processor/identity/get` endpoint allows you to retrieve various account holder information on file with the financial institution, including names, emails, phone numbers, and addresses.
       requestBody:
         required: true
@@ -10741,6 +11010,12 @@ paths:
                       subtype: checking
                       type: depository
                     request_id: 3nARps6TOYtbACO
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |-
         The `/processor/identity/match` endpoint generates a match score, which indicates how well the provided identity data matches the identity information on file with the account holder's financial institution.
 
@@ -10784,6 +11059,12 @@ paths:
                       subtype: checking
                       type: depository
                     request_id: 1zlMf
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: 'The `/processor/balance/get` endpoint returns the real-time balance for each of an Item''s accounts. While other endpoints may return a balance object, only `/processor/balance/get` forces the available and current balance fields to be refreshed rather than cached. '
       requestBody:
         required: true
@@ -10833,6 +11114,12 @@ paths:
                       webhook: https://www.genericwebhookurl.com/webhook
                       auth_method: INSTANT_AUTH
                     request_id: vYK11LNTfRoAMbj
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: The POST `/item/webhook/update` allows you to update the webhook URL associated with an Item. This request triggers a [`WEBHOOK_UPDATE_ACKNOWLEDGED`](https://plaid.com/docs/api/items/#webhook_update_acknowledged) webhook to the newly specified webhook URL.
       requestBody:
         required: true
@@ -10860,6 +11147,12 @@ paths:
                   value:
                     new_access_token: access-sandbox-8ab976e6-64bc-4b38-98f7-731e7a349970
                     request_id: m8MDnv9okwxFNBV
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |
         By default, the `access_token` associated with an Item does not expire and should be stored in a persistent, secure manner.
 
@@ -10899,6 +11192,12 @@ paths:
                       x: hKXLGIjWvCBv-cP5euCTxl8g9GLG9zHo_3pO5NN1DwQ
                       "y": shhexqPB7YffGn6fR6h2UhTSuCtPmfzQJ6ENVIoO4Ys
                     request_id: RZ6Omi1bzzwDaLo
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |-
         Plaid signs all outgoing webhooks and provides JSON Web Tokens (JWTs) so that you can verify the authenticity of any incoming webhooks to your application. A message signature is included in the `Plaid-Verification` header.
 
@@ -11090,6 +11389,12 @@ paths:
                         ytd_interest_paid: 280.55
                         ytd_principal_paid: 271.65
                     request_id: dTnnm60WgKGLnKL
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       requestBody:
         required: true
         content:
@@ -11120,6 +11425,12 @@ paths:
                   value:
                     recipient_id: recipient-id-sandbox-9b6b4679-914b-445b-9450-efbdb80296f6
                     request_id: 4zlKapIkTm8p5KM
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |
         Create a payment recipient for payment initiation.  The recipient must be in Europe, within a country that is a member of the Single Euro Payment Area (SEPA) or a non-Eurozone country [supported](https://plaid.com/global) by Plaid. For a standing order (recurring) payment, the recipient must be in the UK.
 
@@ -11153,6 +11464,12 @@ paths:
                     refund_id: wallet-transaction-id-production-c5f8cd31-6cae-4cad-9b0d-f7c10be9cc4b
                     request_id: HtlKzBX0fMeF7mU
                     status: INITIATED
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |
         Reverse a settled payment from a Plaid virtual account.
 
@@ -11202,6 +11519,12 @@ paths:
                       postal_code: SE14 8JW
                       country: GB
                     request_id: 4zlKapIkTm8p5KM
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: Get details about a payment recipient you have previously created.
       requestBody:
         required: true
@@ -11239,6 +11562,12 @@ paths:
                         postal_code: SE14 8JW
                         country: GB
                     request_id: 4zlKapIkTm8p5KM
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: The `/payment_initiation/recipient/list` endpoint list the payment recipients that you have previously created.
       requestBody:
         required: true
@@ -11267,6 +11596,12 @@ paths:
                     payment_id: payment-id-sandbox-feca8a7a-5591-4aef-9297-f3062bb735d3
                     status: PAYMENT_STATUS_INPUT_NEEDED
                     request_id: 4ciYVmesrySiUAB
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |-
         After creating a payment recipient, you can use the `/payment_initiation/payment/create` endpoint to create a payment to that recipient.  Payments can be one-time or standing order (recurring) and can be denominated in either EUR, GBP or other chosen [currency](https://plaid.com/docs/api/products/payment-initiation/#payment_initiation-payment-create-request-amount-currency).  If making domestic GBP-denominated payments, your recipient must have been created with BACS numbers. In general, EUR-denominated payments will be sent via SEPA Credit Transfer, GBP-denominated payments will be sent via the Faster Payments network and for non-Eurozone markets typically via the local payment scheme, but the payment network used will be determined by the institution. Payments sent via Faster Payments will typically arrive immediately, while payments sent via SEPA Credit Transfer or other local payment schemes will typically arrive in one business day.
 
@@ -11302,6 +11637,12 @@ paths:
                     payment_token: payment-token-sandbox-feca8a7a-5591-4aef-9297-f3062bb735d3
                     payment_token_expiration_time: "2020-01-01T00:00:00Z"
                     request_id: 4ciYVmesrySiUAB
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |-
         The `/payment_initiation/payment/token/create` endpoint has been deprecated. New Plaid customers will be unable to use this endpoint, and existing customers are encouraged to migrate to the newer, `link_token`-based flow. The recommended flow is to provide the `payment_id` to `/link/token/create`, which returns a `link_token` used to initialize Link.
 
@@ -11333,6 +11674,12 @@ paths:
                     consent_id: consent-id-production-feca8a7a-5491-4444-9999-f3062bb735d3
                     status: UNAUTHORISED
                     request_id: 4ciYmmesdqSiUAB
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |-
         The `/payment_initiation/consent/create` endpoint is used to create a payment consent, which can be used to initiate payments on behalf of the user. Payment consents are created with `UNAUTHORISED` status by default and must be authorised by the user before payments can be initiated.
 
@@ -11381,6 +11728,12 @@ paths:
                         interval: WEEK
                         alignment: CALENDAR
                     type: SWEEPING
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: The `/payment_initiation/consent/get` endpoint can be used to check the status of a payment consent, as well as to receive basic information such as recipient and constraints.
       requestBody:
         required: true
@@ -11407,6 +11760,12 @@ paths:
                 example-1:
                   value:
                     request_id: 4ciYaaesdqSiUAB
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: The `/payment_initiation/consent/revoke` endpoint can be used to revoke the payment consent. Once the consent is revoked, it is not possible to initiate payments using it.
       requestBody:
         required: true
@@ -11435,6 +11794,12 @@ paths:
                     payment_id: payment-id-sandbox-feca8a7a-5591-4aef-9297-f3062bb735d3
                     request_id: 4ciYccesdqSiUAB
                     status: PAYMENT_STATUS_INITIATED
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: The `/payment_initiation/consent/payment/execute` endpoint can be used to execute payments using payment consent.
       requestBody:
         required: true
@@ -11462,6 +11827,12 @@ paths:
                   value:
                     reset_login: true
                     request_id: m8MDnv9okwxFNBV
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |-
         `/sandbox/item/reset_login/` forces an Item into an `ITEM_LOGIN_REQUIRED` state in order to simulate an Item whose login is no longer valid. This makes it easy to test Link's [update mode](https://plaid.com/docs/link/update-mode) flow in the Sandbox environment.  After calling `/sandbox/item/reset_login`, You can then use Plaid Link update mode to restore the Item to a good state. An `ITEM_LOGIN_REQUIRED` webhook will also be fired after a call to this endpoint, if one is associated with the Item.
 
@@ -11492,6 +11863,12 @@ paths:
                 example-1:
                   value:
                     request_id: 1vwmF5TBQwiqfwP
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |-
         The `/sandbox/item/set_verification_status` endpoint can be used to change the verification status of an Item in in the Sandbox in order to simulate the Automated Micro-deposit flow.
 
@@ -11522,6 +11899,12 @@ paths:
                   value:
                     reset_login: true
                     request_id: n7XQnv8ozwyFPBC
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |-
         `/sandbox/user/reset_login/` functions the same as `/sandbox/item/reset_login`, but will modify Items related to a User. This endpoint forces each Item into an `ITEM_LOGIN_REQUIRED` state in order to simulate an Item whose login is no longer valid. This makes it easy to test Link's [update mode](https://plaid.com/docs/link/update-mode) flow in the Sandbox environment.  After calling `/sandbox/user/reset_login`, You can then use Plaid Link update mode to restore Items associated with the User to a good state. An `ITEM_LOGIN_REQUIRED` webhook will also be fired after a call to this endpoint, if one is associated with the Item.
 
@@ -11554,6 +11937,12 @@ paths:
                     access_token: access-sandbox-de3ce8ef-33f8-452c-a685-8671031fc0f6
                     item_id: M5eVJqLnv3tbzdngLDp9FL5OlDNxlNhlE55op
                     request_id: Aim3b
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |-
         Exchange a Link `public_token` for an API `access_token`. Link hands off the `public_token` client-side via the `onSuccess` callback once a user has successfully created an Item. The `public_token` is ephemeral and expires after 30 minutes. An `access_token` does not expire, but can be revoked by calling `/item/remove`.
 
@@ -11584,6 +11973,12 @@ paths:
                   value:
                     public_token: public-sandbox-b0e2c4ee-a763-4df5-bfe9-46a46bce993d
                     request_id: Aim3b
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |-
         Note: As of July 2020, the `/item/public_token/create` endpoint is deprecated. Instead, use `/link/token/create` with an `access_token` to create a Link token for use with [update mode](https://plaid.com/docs/link/update-mode).
 
@@ -11619,6 +12014,12 @@ paths:
                     user_token: user-sandbox-b0e2c4ee-a763-4df5-bfe9-46a46bce993d
                     user_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
                     request_id: Aim3b
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |-
         This endpoint should be called for each of your end users before they begin a Plaid Check or Income flow, or a Multi-Item Link flow. This provides you a single token to access all data associated with the user. You should only create one per end user.
 
@@ -11719,6 +12120,12 @@ paths:
                 example-1:
                   value:
                     request_id: Aim3b
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: This endpoint is used to update user information associated with an existing `user_token`. It can also be used to enable an existing `user_token` for use with Consumer Reports by Plaid Check, by adding a `consumer_report_user_identity` object to the user. Plaid Check Consumer Reports can only be created for US-based users; the user's address country must be `US`.
       requestBody:
         required: true
@@ -11747,6 +12154,12 @@ paths:
                 example-1:
                   value:
                     request_id: Aim3b
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |-
         `/user/remove` deletes a user token and and associated information, including any Items associated with the token.
         Any subsequent calls to retrieve information using the same user token will result in an error stating the user does not exist.
@@ -11807,6 +12220,12 @@ paths:
                       webhook: https://plaid.com/example/hook
                       consent_expiration_time: null
                     request_id: m8MDnv9okwxFNBV
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: Returns Items associated with a User along with their corresponding statuses.
       requestBody:
         required: true
@@ -11864,6 +12283,12 @@ paths:
                       consent_expiration_time: null
                     request_id: m8MDnv9okwxFNBV
                     next_cursor: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: Returns Items associated with a User along with their corresponding statuses.
       requestBody:
         required: true
@@ -12016,6 +12441,12 @@ paths:
                           num_w2s_retrieved: 1
                           institution_id: ins_92
                       session_start_time: "2022-09-26T23:40:30.946225Z"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |-
         This endpoint can be used for your end users after they complete the Link flow. This endpoint returns a list of Link sessions that your user completed, where each session includes the results from the Link flow.
 
@@ -12059,6 +12490,12 @@ paths:
                       sort_code: "601613"
                     iban: null
                     request_id: aEAQmewMzlVa1k6
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |-
         The `/payment_initiation/payment/get` endpoint can be used to check the status of a payment, as well as to receive basic information such as recipient and payment amount. In the case of standing orders, the `/payment_initiation/payment/get` endpoint will provide information about the status of the overall standing order itself; the API cannot be used to retrieve payment status for individual payments within a standing order.
 
@@ -12106,6 +12543,12 @@ paths:
                       iban: null
                     next_cursor: "2020-01-01T00:00:00Z"
                     request_id: aEAQmewMzlVa1k6
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       requestBody:
         required: true
         content:
@@ -12476,6 +12919,12 @@ paths:
                       industry: null
                       option_contract: null
                       fixed_income: null
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: investmentsHoldingsGet
       description: The `/investments/holdings/get` endpoint allows developers to receive user-authorized stock position data for `investment`-type accounts.
       requestBody:
@@ -12665,6 +13114,12 @@ paths:
                       option_contract: null
                       fixed_income: null
                     total_investment_transactions: 3
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: investmentsTransactionsGet
       description: |-
         The `/investments/transactions/get` endpoint allows developers to retrieve up to 24 months of user-authorized transaction data for investment accounts.
@@ -12972,6 +13427,12 @@ paths:
                       numbers: INSTITUTION
                       owners: INSTITUTION
                       holdings: INSTITUTION
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: investmentsAuthGet
       description: The `/investments/auth/get` endpoint allows developers to receive user-authorized data to facilitate the transfer of holdings
       requestBody:
@@ -12999,6 +13460,12 @@ paths:
                   value:
                     processor_token: processor-sandbox-0asd1-a92nc
                     request_id: xrQNYZ7Zoh6R7gV
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: processorTokenCreate
       description: Used to create a token suitable for sending to one of Plaid's partners to enable integrations. Note that Stripe partnerships use bank account tokens instead; see `/processor/stripe/bank_account_token/create` for creating tokens for use with Stripe integrations. If using multiple processors, multiple different processor tokens can be created for a single access token. Once created, a processor token for a given Item can be modified by calling `/processor/token/permissions/set`. To revoke the processor's access, the entire Item must be deleted by calling `/item/remove`.
       requestBody:
@@ -13026,6 +13493,12 @@ paths:
                 example-1:
                   value:
                     request_id: xrQNYZ7Zoh6R7gV
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: processorTokenPermissionsSet
       description: Used to control a processor's access to products on the given processor token. By default, a processor will have access to all available products on the corresponding item. To restrict access to a particular set of products, call this endpoint with the desired products. To restore access to all available products, call this endpoint with an empty list. This endpoint can be called multiple times as your needs and your processor's needs change.
       requestBody:
@@ -13056,6 +13529,12 @@ paths:
                     - auth
                     - balance
                     - identity
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: processorTokenPermissionsGet
       description: Used to get a processor token's product permissions. The `products` field will be an empty list if the processor can access all available products.
       requestBody:
@@ -13083,6 +13562,12 @@ paths:
                 example-1:
                   value:
                     request_id: vYK11LNTfRoAMbj
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: This endpoint allows you, the processor, to update the webhook URL associated with a processor token. This request triggers a `WEBHOOK_UPDATE_ACKNOWLEDGED` webhook to the newly specified webhook URL.
       requestBody:
         required: true
@@ -13109,6 +13594,12 @@ paths:
                   value:
                     stripe_bank_account_token: btok_5oEetfLzPklE1fwJZ7SG
                     request_id: xrQNYZ7Zoh6R7gV
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: processorStripeBankAccountTokenCreate
       description: |2-
 
@@ -13138,6 +13629,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProcessorTokenCreateResponse'
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: processorApexProcessorTokenCreate
       description: Used to create a token suitable for sending to Apex to enable Plaid-Apex integrations.
       requestBody:
@@ -13165,6 +13662,12 @@ paths:
                   value:
                     access_token: access-sandbox-99ace160-3cf7-4e51-a083-403633425815
                     request_id: ewIBAn6RZirsk4W
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: itemImport
       description: |-
         `/item/import` creates an Item via your Plaid Exchange Integration and returns an `access_token`. As part of an `/item/import` request, you will include a User ID (`user_auth.user_id`) and Authentication Token (`user_auth.auth_token`) that enable data aggregation through your Plaid Exchange API endpoints. These authentication principals are to be chosen by you.
@@ -13197,6 +13700,12 @@ paths:
                     link_token: link-sandbox-af1a0311-da53-4636-b754-dd15cc058176
                     expiration: "2020-03-27T12:56:34Z"
                     request_id: XQVgFigpGHXkb0b
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |-
         The `/link/token/create` endpoint creates a `link_token`, which is required as a parameter when initializing Link. Once Link has been initialized, it returns a `public_token`. For most Plaid products, the `public_token` is saved and exchanged for an `access_token` via `/item/public_token/exchange` as part of the main Link flow. For more details, see the [Link flow overview](https://plaid.com/docs/link/#link-flow-overview).
 
@@ -13425,6 +13934,12 @@ paths:
                       redirect_uri: null
                       webhook: https://webhook.site/dc9c138f-75de-4db1-883a-a4add4b7eb7e
                     request_id: Pxpgzy0Wjvn99mY
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |-
         The `/link/token/get` endpoint gets information about a Link session, including all callbacks fired during the session along with their metadata, including the public token. This endpoint is used with Link flows that don't provide a public token via frontend callbacks, such as the [Hosted Link flow](https://plaid.com/docs/link/hosted-link/) and the [Multi-Item Link flow](https://plaid.com/docs/link/multi-item-link/). It also can be useful for debugging purposes.
 
@@ -13456,6 +13971,12 @@ paths:
                   value:
                     link_token: link-sandbox-33792986-2b9c-4b80-b1f2-518caaac6183
                     request_id: u0ydFs493XjyTYn
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |-
         Exchange an OAuth `link_correlation_id` for the corresponding `link_token`. The `link_correlation_id` is only available for `payment_initiation` products and is provided to the client via the OAuth `redirect_uri` as a query parameter.
         The `link_correlation_id` is ephemeral and expires in a brief period, after which it can no longer be exchanged for the `link_token`.
@@ -13488,6 +14009,12 @@ paths:
                       link_token: link-sandbox-af1a0311-da53-4636-b754-dd15cc058176
                       expiration: "2020-03-27T12:56:34Z"
                     request_id: XQVgFigpGHXkb0b
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: '`/session/token/create` is used to create a Link token for Layer. The returned Link token is used as an parameter when initializing the Link SDK. For more details, see the [Link flow overview](https://plaid.com/docs/link/#link-flow-overview).'
       requestBody:
         required: true
@@ -15437,7 +15964,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
-      description: Use the `/transfer/platform/requirement/submit` endpoint to submit additional onboarding information that is needed by Plaid to approve or decline the originator.
+      description: Use the `/transfer/platform/requirement/submit` endpoint to submit additional onboarding information that is needed by Plaid to approve or decline the originator. See [Requirement type schema documentation](https://docs.google.com/document/d/1NEQkTD0sVK50iAQi6xHigrexDUxZ4QxXqSEfV_FFTiU/) for a list of requirement types and possible values.
       requestBody:
         required: true
         content:
@@ -16326,6 +16853,12 @@ paths:
                   value:
                     reset_login: true
                     request_id: m8MDnv9okwxFNBV
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |-
         `/sandbox/payment_profile/reset_login/` forces a Payment Profile into a state where the login is no longer valid. This makes it easy to test update mode for Payment Profile in the Sandbox environment.
 
@@ -16401,6 +16934,12 @@ paths:
                       confidence_score: 1
                       employer_id: emp_1
                     request_id: ixTBLZGvhD4NnmB
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |-
         `/employers/search` allows you the ability to search Plaid’s database of known employers, for use with Deposit Switch. You can use this endpoint to look up a user's employer in order to confirm that they are supported. Users with non-supported employers can then be routed out of the Deposit Switch flow.
 
@@ -16432,6 +16971,12 @@ paths:
                   value:
                     income_verification_id: f2a826d7-25cf-483b-a124-c40beb64b732
                     request_id: lMjeOeu9X1VUh1F
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: '`/income/verification/create` begins the income verification process by returning an `income_verification_id`. You can then provide the `income_verification_id` to `/link/token/create` under the `income_verification` parameter in order to create a Link instance that will prompt the user to go through the income verification flow. Plaid will fire an `INCOME` webhook once the user completes the Payroll Income flow, or when the uploaded documents in the Document Income flow have finished processing. '
       requestBody:
         required: true
@@ -16543,6 +17088,12 @@ paths:
                         start_date: "2020-12-01"
                         pay_frequency: PAY_FREQUENCY_BIWEEKLY
                     request_id: 2pxQ59buGdsHRef
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       requestBody:
         required: true
         content:
@@ -16571,6 +17122,12 @@ paths:
               schema:
                 type: string
                 format: binary
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |-
         `/income/verification/documents/download` provides the ability to download the source documents associated with the verification.
 
@@ -16703,6 +17260,12 @@ paths:
                     request_id: lMjeOeu9X1VUh1F
                     precheck_id: n9elqYlvYm
                     confidence: HIGH
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |-
         `/income/verification/precheck` is an optional endpoint that can be called before initializing a Link session for income verification. It evaluates whether a given user is supportable by digital income verification and returns a `precheck_id` that can be provided to `/link/token/create`. If the user is eligible for digital verification, providing the `precheck_id` in this way will generate a Link UI optimized for the end user and their specific employer. If the user cannot be confirmed as eligible, the `precheck_id` can still be provided to `/link/token/create` and the user can still use the income verification flow, but they may be required to manually upload a paystub to verify their income.
 
@@ -16746,6 +17309,12 @@ paths:
                         position_id: "8888"
                         payroll_id: "1234567"
                     request_id: LhQf0THi8SH1yJm
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |-
         `/employment/verification/get` returns a list of employments through a user payroll that was verified by an end user.
 
@@ -16775,6 +17344,12 @@ paths:
                   value:
                     audit_copy_token: a-production-3tau2cwvybdvrhucaaai27ulu4
                     request_id: Iam3b
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: creditAuditCopyTokenCreate
       description: |-
         Plaid can create an Audit Copy token of an Asset Report and/or Income Report to share with participating Government Sponsored Entity (GSE). If you participate in the Day 1 Certainty™ program, Plaid can supply an Audit Copy token directly to Fannie Mae on your behalf. An Audit Copy token contains the same underlying data as the Asset Report and/or Income Report (result of `/credit/payroll_income/get`).
@@ -16805,6 +17380,12 @@ paths:
                   value:
                     removed: true
                     request_id: m8MDnv9okwxFNBV
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: creditReportAuditCopyRemove
       requestBody:
         required: true
@@ -16906,6 +17487,12 @@ paths:
                               StatusCode: success
                               StatusDescription: null
                     request_id: eYupqX1mZkEuQRx
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: creditAssetReportFreddieMacGet
       description: The `credit/asset_report/freddie_mac/get` endpoint retrieves the Asset Report in Freddie Mac's JSON format.
       requestBody:
@@ -17061,6 +17648,12 @@ paths:
                               StatusCode: success
                               StatusDescription: null
                     request_id: eYupqX1mZkEuQRx
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: creditFreddieMacReportsGet
       description: The `credit/asset_report/freddie_mac/get` endpoint retrieves the Verification of Assets and Verification of Employment reports.
       requestBody:
@@ -17148,6 +17741,12 @@ paths:
                               primary: false
                               type: mobile
                       warnings: []
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       externalDocs:
         url: /api/products/income/#creditbank_employmentget
       operationId: creditBankEmploymentGet
@@ -17417,6 +18016,12 @@ paths:
                         item_id: L8EKo4GydxSKmJQGmXyPuDkeNn4rg9fP3MKLv
                         last_updated_time: "2024-08-21T18:10:47.367335Z"
                     request_id: MLM1fFu4fbVg7KR
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       externalDocs:
         url: /api/products/income/#creditbank_incomeget
       operationId: creditBankIncomeGet
@@ -17439,6 +18044,12 @@ paths:
             application/pdf:
               schema:
                 $ref: '#/components/schemas/CreditBankIncomePDFGetResponse'
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       externalDocs:
         url: /api/products/income/#creditbank_incomepdfget
       operationId: creditBankIncomePdfGet
@@ -17475,6 +18086,12 @@ paths:
                 example-1:
                   value:
                     request_id: LhQf0THi8SH1yJm
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
   /credit/bank_income/webhook/update:
     post:
       summary: Subscribe and unsubscribe to proactive notifications for a user's income profile
@@ -17504,6 +18121,12 @@ paths:
                 example-1:
                   value:
                     request_id: LhQf0THi8SH1yJm
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
   /credit/payroll_income/parsing_config/update:
     post:
       summary: Update the parsing configuration for a document income verification
@@ -17530,6 +18153,12 @@ paths:
                 example-1:
                   value:
                     request_id: LhQf0THi8SH1yJm
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
   /credit/bank_statements/uploads/get:
     post:
       summary: Retrieve data for a user's uploaded bank statements
@@ -17867,6 +18496,12 @@ paths:
                         processing_status: PROCESSING_COMPLETE
                       updated_at: "2022-08-02T21:14:54Z"
                     request_id: 2pxQ59buGdsHRef
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
   /credit/payroll_income/risk_signals/get:
     post:
       summary: Retrieve fraud insights for a user's manually uploaded document(s).
@@ -17928,6 +18563,12 @@ paths:
                             type: METADATA_DATES_OUTSIDE_WINDOW
                             page_number: 0
                     request_id: LhQf0THi8SH1yJm
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
   /credit/payroll_income/precheck:
     post:
       deprecated: true
@@ -17949,6 +18590,12 @@ paths:
                   value:
                     request_id: lMjeOeu9X1VUh1F
                     confidence: HIGH
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |-
         `/credit/payroll_income/precheck` is an optional endpoint that can be called before initializing a Link session for income verification. It evaluates whether a given user is supportable by digital income verification. If the user is eligible for digital verification, that information will be associated with the user token, and in this way will generate a Link UI optimized for the end user and their specific employer. If the user cannot be confirmed as eligible, the user can still use the income verification flow, but they may be required to manually upload a paystub to verify their income.
 
@@ -17996,6 +18643,12 @@ paths:
                         employee_type: FULL_TIME
                         last_paystub_date: "2022-01-15"
                     request_id: LhQf0THi8SH1yJm
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: '`/credit/employment/get` returns a list of items with employment information from a user''s payroll provider that was verified by an end user.'
       requestBody:
         required: true
@@ -18062,6 +18715,12 @@ paths:
                   value:
                     relay_token: credit-relay-production-3TAU2CWVYBDVRHUCAAAI27ULU4
                     request_id: Iam3b
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |-
         Plaid can share an Asset Report directly with a participating third party on your behalf. The shared Asset Report is the exact same Asset Report originally created in `/asset_report/create`.
 
@@ -18301,6 +18960,12 @@ paths:
                         ssn: 111-22-1234
                     request_id: GVzMdiDd8DDAQK4
                     warnings: []
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: '`/credit/relay/get` allows third parties to receive a report that was shared with them, using a `relay_token` that was created by the report owner.'
   /credit/relay/pdf/get:
     post:
@@ -18314,6 +18979,12 @@ paths:
             application/pdf:
               schema:
                 $ref: '#/components/schemas/CreditRelayPDFGetResponse'
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: creditRelayPdfGet
       externalDocs:
         url: /api/products/assets/#creditrelaypdfget
@@ -18351,6 +19022,12 @@ paths:
                     relay_token: credit-relay-sandbox-8218d5f8-6d6d-403d-92f5-13a9afaa4398
                     request_id: NBZaq
                     asset_report_id: bf3a0490-344c-4620-a219-2693162e4b1d
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: creditRelayRefresh
       description: The `/credit/relay/refresh` endpoint allows third parties to refresh a report that was relayed to them, using a `relay_token` that was created by the report owner. A new report will be created with the original report parameters, but with the most recent data available based on the `days_requested` value of the original report.
       requestBody:
@@ -18379,6 +19056,12 @@ paths:
                   value:
                     removed: true
                     request_id: m8MDnv9okwxFNBV
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       operationId: creditRelayRemove
       requestBody:
         required: true
@@ -18766,6 +19449,12 @@ paths:
                         account: "12345678"
                         sort_code: "123456"
                     status: ACTIVE
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: Create an e-wallet. The response is the newly created e-wallet object.
       requestBody:
         required: true
@@ -18820,6 +19509,12 @@ paths:
                         iban: NL91ABNA0417164300
                         bic: ABNANL2A
                     status: ACTIVE
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: Fetch an e-wallet. The response includes the current balance.
       requestBody:
         required: true
@@ -18869,6 +19564,12 @@ paths:
                           bic: HBUKGB4B
                       status: ACTIVE
                     request_id: 4zlKapIkTm8p5KM
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: This endpoint lists all e-wallets in descending order of creation.
       requestBody:
         required: true
@@ -18897,6 +19598,12 @@ paths:
                     transaction_id: wallet-transaction-id-production-53e58b32-fc1c-46fe-bbd6-e584b27a88
                     status: EXECUTED
                     request_id: 4zlKapIkTm8p5KM
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: |-
         Execute a transaction using the specified e-wallet.
         Specify the e-wallet to debit from, the counterparty to credit to, the idempotency key to prevent duplicate transactions, the amount and reference for the transaction.
@@ -18964,6 +19671,12 @@ paths:
                       name: John Smith
                     request_id: 4zlKapIkTm8p5KM
                     related_transactions: []
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: Fetch a specific e-wallet transaction
       requestBody:
         required: true
@@ -19027,6 +19740,12 @@ paths:
                         name: John Smith
                       related_transactions: []
                     request_id: 4zlKapIkTm8p5KM
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
       description: This endpoint lists the latest transactions of the specified e-wallet. Transactions are returned in descending order by the `created_at` time.
       requestBody:
         required: true
@@ -19396,6 +20115,76 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/TransactionsUserInsightsGetRequest'
+  /beta/ewa_report/v1/get:
+    x-hidden-from-docs: true
+    post:
+      tags:
+      - plaid
+      summary: Get EWA Score Report
+      externalDocs:
+        url: /api/products/beta/#betaewareportv1get
+      operationId: betaEwaReportV1Get
+      description: |-
+        The `/beta/ewa_report/v1/get` endpoint provides an Earned Wage Access (EWA) score that quantifies the delinquency risk associated with a given item. The score is derived from a combination of cashflow patterns and network-based behavioral features.
+
+        The response returns a list of EWA scores, where each score corresponds to a potential advance amount range. These scores estimate the likelihood of repayment for advances within that range.
+
+        Score range: 1–99
+
+        Interpretation: Higher scores indicate a greater likelihood of repayment.
+
+        This endpoint enables clients to assess repayment risk and make data-driven decisions when determining eligibility or limits for earned wage advances.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BetaEwaReportV1GetRequest'
+            examples:
+              example-1:
+                value:
+                  access_token: access-sandbox-71e02f71-0960-4a27-abd2-5631e04f2175
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BetaEwaReportV1GetResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: 4zlKapIkTm8p5KM
+                    ewa_report_id: bbfc5174-5433-4648-8d93-9fec6a0c0966
+                    generation_time: "2025-10-29T03:32:11Z"
+                    ewa_scores:
+                    - lowest_amount: 0
+                      highest_amount: 25
+                      score: 75
+                    - lowest_amount: 25
+                      highest_amount: 40
+                      score: 72
+                    - lowest_amount: 50
+                      highest_amount: 100
+                      score: 68
+                    - lowest_amount: 100
+                      highest_amount: 200
+                      score: 65
+                    - lowest_amount: 200
+                      highest_amount: 300
+                      score: 60
+                    - lowest_amount: 300
+                      highest_amount: 400
+                      score: 55
+                    - lowest_amount: 400
+                      highest_amount: 500
+                      score: 50
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
   /issues/search:
     post:
       tags:
@@ -20259,6 +21048,12 @@ paths:
                   category: eCommerce
                   connection_count: 209
                   third_party_legal_name: Another Example Client LLC
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
   /fdx/recipient/{recipientId}:
     x-hidden-from-docs: true
     get:
@@ -20292,6 +21087,12 @@ paths:
                 client_name: My Example Client
                 logo_uri: https://client-logos.plaid.com/logo.png
                 third_party_legal_name: My Example Client LLC
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
   /network_insights/report/get:
     post:
       summary: Retrieve network insights for the provided `access_tokens`
@@ -22164,6 +22965,7 @@ components:
         webhook:
           type: string
           description: Specify a webhook to associate with the new Item.
+          format: url
         override_username:
           $ref: '#/components/schemas/SandboxOverrideUsername'
         override_password:
@@ -23441,6 +24243,11 @@ components:
           $ref: '#/components/schemas/ConsumerReportUserIdentity'
         identity:
           $ref: '#/components/schemas/ClientUserIdentity'
+        with_upgraded_user:
+          x-hidden-from-docs: true
+          description: When `true`, a new user will be created and a `user_id` will be returned. Otherwise, a legacy user will be created and a `user_token` will be returned.
+          default: false
+          type: boolean
       required:
       - client_user_id
     UserCreateResponse:
@@ -25075,6 +25882,7 @@ components:
           - gainbridge
           - cardlytics
           - pinwheel
+          - thread_bank
           description: The processor you are integrating with.
       required:
       - access_token
@@ -25160,6 +25968,7 @@ components:
         webhook:
           type: string
           description: The new webhook URL to associate with the processor token. To remove a webhook from a processor token, set to `null`.
+          format: url
           nullable: true
       required:
       - processor_token
@@ -25399,6 +26208,7 @@ components:
         webhook:
           type: string
           description: The destination URL to which any webhooks should be sent. Note that webhooks for Payment Initiation (e-wallet transactions only), Transfer, Bank Transfer (including Auth micro-deposit notification webhooks), Monitor, and Identity Verification are configured via the Dashboard instead. In update mode, this field will not have an effect; to update the webhook receiver endpoint for an existing Item, use `/item/webhook/update` instead.
+          format: url
         access_token:
           type: string
           description: The `access_token` associated with the Item to update or reference, used when updating, modifying, or accessing an existing `access_token`. Used when launching Link in update mode, when completing the Same-day (manual) Micro-deposit flow, or (optionally) when initializing Link for a returning user as part of the Transfer UI flow.
@@ -25430,7 +26240,7 @@ components:
           $ref: '#/components/schemas/LinkTokenEUConfig'
         institution_id:
           type: string
-          description: Used for certain Europe-only configurations, as well as certain legacy use cases in other regions.
+          description: Used for certain legacy use cases
         payment_configuration:
           $ref: '#/components/schemas/LinkTokenCreateRequestPaymentConfiguration'
         payment_initiation:
@@ -25535,6 +26345,8 @@ components:
         other:
           $ref: '#/components/schemas/OtherFilter'
     LinkTokenEUConfig:
+      x-hidden-from-docs: true
+      deprecated: true
       description: Configuration parameters for EU flows
       type: object
       properties:
@@ -25639,6 +26451,7 @@ components:
         webhook:
           type: string
           description: The destination URL to which any webhooks should be sent. If you use the same webhook listener for all Sandbox or all Production activity, set this value in the Layer template editor in the Dashboard instead. Only provide a value in this field if you need to use multiple webhook URLs per environment (an uncommon use case). If provided, a value in this field will take priority over webhook values set in the Layer template editor.
+          format: url
       required:
       - template_id
     SessionTokenCreateRequestUser:
@@ -26483,6 +27296,7 @@ components:
         webhook:
           type: string
           description: The `webhook` specified in the `/link/token/create` call.
+          format: url
           nullable: true
         country_codes:
           type: array
@@ -30968,7 +31782,6 @@ components:
       - cra_cashflow_insights
       - cra_monitoring
       - cra_lend_score
-      - cra_plaid_credit_score
       - layer
       - pay_by_bank
       - protect_linked_bank
@@ -32562,7 +33375,7 @@ components:
           webhook_type: PROTECT
           webhook_code: PROTECT_USER_EVENT
           user_id: plaid-user-6009db6e
-          event_id: protect-event-2be8498f
+          event_id: ptevt_cYNnF8xYE1v1om
           timestamp: "2020-07-24T03:26:02Z"
           event_type: LINK_COMPLETE
       properties:
@@ -38173,6 +38986,7 @@ components:
         redirect_uri:
           type: string
           description: URL the end customer will be redirected to after completing questions in Plaid-hosted onboarding flow.
+          format: url
       required:
       - originator_client_id
       - redirect_uri
@@ -38274,6 +39088,7 @@ components:
         website:
           description: The website of the originator.
           type: string
+          format: url
         naics_code:
           description: The NAICS code of the originator.
           type: string
@@ -38640,7 +39455,7 @@ components:
           description: The client ID of the originator
         requirement_submissions:
           type: array
-          description: Use the `/transfer/platform/requirement/submit` endpoint to submit a list of requirement submissions that all relate to the originator. Must contain between 1 and 50 requirement submissions.
+          description: Use the `/transfer/platform/requirement/submit` endpoint to submit a list of requirement submissions that all relate to the originator. Must contain between 1 and 50 requirement submissions. See [Requirement type schema documentation](https://docs.google.com/document/d/1NEQkTD0sVK50iAQi6xHigrexDUxZ4QxXqSEfV_FFTiU/) for a list of requirements and possible values.
           items:
             $ref: '#/components/schemas/TransferPlatformRequirementSubmission'
           maxItems: 50
@@ -38655,10 +39470,10 @@ components:
       properties:
         requirement_type:
           type: string
-          description: The type of requirement being submitted
+          description: The type of requirement being submitted. See [Requirement type schema documentation](https://docs.google.com/document/d/1NEQkTD0sVK50iAQi6xHigrexDUxZ4QxXqSEfV_FFTiU/) for a list of requirement types and possible values.
         value:
           type: string
-          description: The value of the requirement, which can be a string or an object depending on the `requirement_type`. If it is an object, the object should be JSON marshaled into a string. See the documentation on this endpoint for more information and examples.
+          description: The value of the requirement, which can be a string or an object depending on the `requirement_type`. If it is an object, the object should be JSON marshaled into a string. See [Requirement type schema documentation](https://docs.google.com/document/d/1NEQkTD0sVK50iAQi6xHigrexDUxZ4QxXqSEfV_FFTiU/) for a list of requirement types and possible values.
         person_id:
           type: string
           format: uuid
@@ -39084,6 +39899,7 @@ components:
         webhook:
           type: string
           description: The webhook URL to which a `PLATFORM_ONBOARDING_UPDATE` webhook should be sent.
+          format: url
       required:
       - originator_client_id
       - tos_acceptance_metadata
@@ -39322,6 +40138,7 @@ components:
         webhook:
           type: string
           description: The webhook URL to which a `TRANSFER_EVENTS_UPDATE` webhook should be sent.
+          format: url
       required:
       - transfer_id
       - event_type
@@ -39361,6 +40178,7 @@ components:
         webhook:
           type: string
           description: The webhook URL to which a `TRANSFER_EVENTS_UPDATE` webhook should be sent.
+          format: url
       required:
       - refund_id
       - event_type
@@ -39416,6 +40234,7 @@ components:
         webhook:
           type: string
           description: The webhook URL to which a `TRANSFER_EVENTS_UPDATE` webhook should be sent.
+          format: url
     SandboxTransferLedgerSimulateAvailableRequest:
       title: SandboxTransferLedgerSimulateAvailableRequest
       type: object
@@ -39440,6 +40259,7 @@ components:
         webhook:
           type: string
           description: The webhook URL to which a `TRANSFER_EVENTS_UPDATE` webhook should be sent.
+          format: url
     SandboxTransferTestClockCreateRequest:
       title: SandboxTransferTestClockCreateRequest
       type: object
@@ -40110,6 +40930,7 @@ components:
         url:
           type: string
           nullable: true
+          format: url
           description: The URL for the employer's public website
     IncomeVerificationPrecheckEmployerAddress:
       title: IncomeVerificationPrecheckEmployerAddress
@@ -40447,7 +41268,6 @@ components:
         include_investments:
           type: boolean
           nullable: true
-          x-hidden-from-docs: true
           description: Indicates that investment data should be extracted from the linked account(s).
       required:
       - days_requested
@@ -44684,6 +45504,7 @@ components:
           type: string
           description: URL to which Plaid will send webhooks when the Secondary Client successfully retrieves an Asset Report by calling `/credit/relay/get`.
           nullable: true
+          format: url
       required:
       - report_tokens
       - secondary_client_id
@@ -44759,6 +45580,7 @@ components:
         webhook:
           type: string
           description: The URL registered to receive webhooks when the report of a relay token has been refreshed.
+          format: url
           nullable: true
       required:
       - relay_token
@@ -44815,6 +45637,7 @@ components:
         webhook:
           type: string
           description: The URL to which the webhook should be sent.
+          format: url
       required:
       - webhook
     SandboxBankTransferFireWebhookResponse:
@@ -44839,6 +45662,7 @@ components:
         webhook:
           type: string
           description: The URL to which the webhook should be sent.
+          format: url
       required:
       - webhook
     SandboxTransferFireWebhookResponse:
@@ -45518,6 +46342,7 @@ components:
         webhook:
           type: string
           description: The URL to which the webhook should be sent.
+          format: url
         verification_status:
           type: string
           enum:
@@ -45564,6 +46389,7 @@ components:
         webhook_override:
           type: string
           description: The URL to which the webhook should be sent. If provided, this will override the URL set in the dashboard.
+          format: url
         webhook_code:
           $ref: '#/components/schemas/SandboxBankIncomeWebhookFireRequestWebhookCode'
         webhook_fields:
@@ -47102,6 +47928,56 @@ components:
       - merchant_name
       - average_days_apart
       - is_active
+    BetaEwaReportV1GetRequest:
+      x-hidden-from-docs: true
+      type: object
+      description: BetaEwaReportV1GetRequest defines the request schema for `/beta/ewa_report/v1/get`
+      properties:
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+      required:
+      - access_token
+    BetaEwaReportV1GetResponse:
+      x-hidden-from-docs: true
+      type: object
+      description: BetaEwaReportV1GetResponse defines the response schema for `/beta/ewa_report/v1/get`
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+        ewa_report_id:
+          type: string
+          description: Unique identifier for the generated EWA score group.
+        generation_time:
+          type: string
+          format: date-time
+          description: The date and time when `ewa_scores` was generated, in ISO 8601 format (e.g. "2018-04-12T03:32:11Z").
+        ewa_scores:
+          type: array
+          description: A list of earned wage access (EWA) scoring entries that map potential advance amounts to repayment likelihood scores. The predefined advance amount ranges are `[0, 25]`, `[25, 50]`, `[50, 100]`, `[100, 200]`, `[200, 300]`, `[300, 400]`, and `[400, 500]`.
+          items:
+            $ref: '#/components/schemas/EWAScore'
+      additionalProperties: true
+    EWAScore:
+      x-hidden-from-docs: true
+      type: object
+      description: EWAScore represents an earned wage access score for a specific advance amount range.
+      properties:
+        lowest_amount:
+          type: number
+          format: float
+          description: Float value representing the lower bound (inclusive) of the advance amount range associated with a specific EWA score.
+        highest_amount:
+          type: number
+          format: float
+          description: Float value representing the upper bound (exclusive) of the advance amount range associated with a specific EWA score.
+        score:
+          type: integer
+          description: EWA score for the corresponding amount bucket. Scores range from 1-99, where a higher score indicates a higher likelihood of repayment.
+      additionalProperties: true
     IssuesSearchRequest:
       type: object
       description: IssuesSearchRequest defines the request schema for `/issues/search`.
@@ -47130,8 +48006,7 @@ components:
             $ref: '#/components/schemas/Issue'
           description: A list of issues affecting the Item, session, or request passed in, conforming to the Issues data model. An empty list indicates that no matching issues were found.
         request_id:
-          type: string
-          description: A unique identifier for the API request.
+          $ref: '#/components/schemas/RequestID'
     IssuesSubscribeRequest:
       type: object
       description: IssuesSubscribeRequest defines the request schema for `/issues/subscribe`.
@@ -47155,8 +48030,7 @@ components:
       additionalProperties: true
       properties:
         request_id:
-          type: string
-          description: A unique identifier for the API request.
+          $ref: '#/components/schemas/RequestID'
       required:
       - request_id
     IssuesStatus:
@@ -47220,8 +48094,7 @@ components:
         issue:
           $ref: '#/components/schemas/Issue'
         request_id:
-          type: string
-          description: A unique identifier for the API request.
+          $ref: '#/components/schemas/RequestID'
     UserTransactionsRefreshRequest:
       type: object
       description: UserTransactionsRefreshRequest defines the request schema for `user/transactions/refresh`
@@ -49215,7 +50088,7 @@ components:
       description: |-
         Contains the state of a completed Link session, along with the public token(s) if available.
 
-        By default, this webhook is sent only for sessions enabled for the Hosted Link flow (including Link Recovery flows) or a Multi-Item Link flow. If you would like to receive this webhook for other sessions, contact your Account Manager or Support. This enablement will also enable the `EVENTS` webhook for all Link sessions and the ability to use `/link/token/get` to retrieve events for non-Hosted-Link sessions.
+        By default, this webhook is sent only for sessions enabled for the Hosted Link flow (including Link Recovery flows), a Multi-Item Link flow, or a Layer flow. If you would like to receive this webhook for other sessions, contact your Account Manager or Support. This enablement will also enable the `EVENTS` webhook for all Link sessions and the ability to use `/link/token/get` to retrieve events for non-Hosted-Link sessions.
       properties:
         webhook_type:
           type: string
@@ -49415,6 +50288,7 @@ components:
           type: string
           description: URL to which Plaid will send Assets webhooks, for example when the requested Asset Report is ready.
           nullable: true
+          format: url
         include_fast_report:
           deprecated: true
           type: boolean
@@ -49492,6 +50366,7 @@ components:
           type: string
           description: URL to which Plaid will send Assets webhooks, for example when the requested Asset Report is ready.
           nullable: true
+          format: url
         user:
           $ref: '#/components/schemas/AssetReportUser'
     AssetReportRefreshResponse:
@@ -49715,7 +50590,7 @@ components:
       required:
       - removed
       - request_id
-    AssetReportAuditCopyPDFGetRequest:
+    AssetReportAuditCopyPdfGetRequest:
       type: object
       description: AssetReportAuditCopyPDFGetRequest defines the request schema for `/asset_report/audit_copy/pdf/get`
       properties:
@@ -49730,7 +50605,7 @@ components:
           $ref: '#/components/schemas/AssetReportPDFGetRequestOptions'
       required:
       - audit_copy_token
-    AssetReportAuditCopyPDFGetResponse:
+    AssetReportAuditCopyPdfGetResponse:
       format: binary
       type: string
       description: AssetReportAuditCopyPDFGetResponse defines the response schema for `/asset_report/audit_copy/pdf/get`
@@ -49755,6 +50630,7 @@ components:
         webhook:
           type: string
           description: URL to which Plaid will send Cash Flow Updates webhooks, for example when the requested Cash Flow Updates report is ready.
+          format: url
         income_categories:
           type: array
           description: Income categories to include in Cash Flow Updates. If empty or `null`, this field will default to including all possible categories.
@@ -51391,7 +52267,21 @@ components:
       additionalProperties: true
       properties:
         amount:
-          $ref: '#/components/schemas/AmountWithCurrency'
+          type: number
+          format: double
+          nullable: true
+          description: The total value of all the aggregated transactions in this expenditure category.
+        iso_currency_code:
+          type: string
+          description: The ISO-4217 currency code of the amount. Always `null` if `unofficial_currency_code` is non-`null`.
+          nullable: true
+        unofficial_currency_code:
+          type: string
+          nullable: true
+          description: |-
+            The unofficial currency code associated with the amount. Always `null` if `iso_currency_code` is non-`null`.
+
+            See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `unofficial_currency_code`s.
         monthly_average:
           $ref: '#/components/schemas/MonthlyAverage'
         transactions_count:
@@ -51558,16 +52448,16 @@ components:
       properties:
         nsf_overdraft_transactions_count:
           type: integer
-          description: The number of NSF and overdraft fee transactions in the time range for the report in the given report.
+          description: The number of net NSF fee transactions in the time range for the report (not counting any fees that were reversed within that time range).
         nsf_overdraft_transactions_count_30d:
           type: integer
-          description: The number of NSF and overdraft fee transactions in the last 30 days for a given report.
+          description: The number of net NSF fee transactions in the last 30 days in the report (not counting any fees that were reversed within that time range).
         nsf_overdraft_transactions_count_60d:
           type: integer
-          description: The number of NSF and overdraft fee transactions in the last 60 days for a given report.
+          description: The number of net NSF fee transactions in the last 60 days in the report (not counting any fees that were reversed within that time range).
         nsf_overdraft_transactions_count_90d:
           type: integer
-          description: The number of NSF and overdraft fee transactions in the last 90 days for a given report.
+          description: The number of net NSF fee transactions in the last 90 days in the report (not counting any fees that were reversed within that time range).
         total_inflow_amount:
           $ref: '#/components/schemas/TotalReportInflowAmount'
         total_inflow_amount_30d:
@@ -52180,16 +53070,16 @@ components:
           nullable: true
         nsf_overdraft_transactions_count:
           type: integer
-          description: The number of NSF and overdraft fee transactions in the time range for the report in the given account.
+          description: The number of net NSF fee transactions for a given account within the report time range (not counting any fees that were reversed within the time range).
         nsf_overdraft_transactions_count_30d:
           type: integer
-          description: The number of NSF and overdraft fee transactions in the last 30 days for a given account.
+          description: The number of net NSF fee transactions within the last 30 days for a given account (not counting any fees that were reversed within the time range).
         nsf_overdraft_transactions_count_60d:
           type: integer
-          description: The number of NSF and overdraft fee transactions in the last 60 days for a given account.
+          description: The number of net NSF fee transactions within the last 60 days for a given account (not counting any fees that were reversed within the time range).
         nsf_overdraft_transactions_count_90d:
           type: integer
-          description: The number of NSF and overdraft fee transactions in the last 90 days for a given account.
+          description: The number of net NSF fee transactions within the last 90 days for a given account (not counting any fees that were reversed within the time range).
         total_inflow_amount:
           $ref: '#/components/schemas/TotalInflowAmount'
         total_inflow_amount_30d:
@@ -55305,6 +56195,29 @@ components:
       example: "123456789"
       title: IDNumberValue
       description: Value of identity document value typed in by user. Alpha-numeric, with all formatting characters stripped. For specific format requirements by ID type, see [Hybrid Input Validation](https://plaid.com/docs/identity-verification/hybrid-input-validation/).
+    IDVProtectEvent:
+      x-hidden-from-docs: true
+      description: Information about a Protect event including Trust Index score and fraud attributes.
+      type: object
+      additionalProperties: true
+      properties:
+        event_id:
+          type: string
+          description: The event ID.
+        timestamp:
+          type: string
+          format: date-time
+          description: The timestamp of the event, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format, e.g. `"2017-09-14T14:42:19.350Z"`
+        trust_index:
+          $ref: '#/components/schemas/TrustIndex'
+        fraud_attributes:
+          $ref: '#/components/schemas/FraudAttributes'
+      required:
+      - event_id
+      - timestamp
+      - trust_index
+      - fraud_attributes
+      nullable: true
     IPAddress:
       description: An IPv4 or IPV6 address.
       type: string
@@ -55381,6 +56294,8 @@ components:
           $ref: '#/components/schemas/PlaidUserIDNullable'
         redacted_at:
           $ref: '#/components/schemas/TimestampNullable'
+        latest_scored_protect_event:
+          $ref: '#/components/schemas/IDVProtectEvent'
       required:
       - id
       - client_user_id
@@ -55606,6 +56521,8 @@ components:
           $ref: '#/components/schemas/PlaidUserIDNullable'
         redacted_at:
           $ref: '#/components/schemas/TimestampNullable'
+        latest_scored_protect_event:
+          $ref: '#/components/schemas/IDVProtectEvent'
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
@@ -55762,6 +56679,8 @@ components:
           $ref: '#/components/schemas/PlaidUserIDNullable'
         redacted_at:
           $ref: '#/components/schemas/TimestampNullable'
+        latest_scored_protect_event:
+          $ref: '#/components/schemas/IDVProtectEvent'
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
@@ -55994,6 +56913,8 @@ components:
           $ref: '#/components/schemas/PlaidUserIDNullable'
         redacted_at:
           $ref: '#/components/schemas/TimestampNullable'
+        latest_scored_protect_event:
+          $ref: '#/components/schemas/IDVProtectEvent'
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
@@ -59029,6 +59950,8 @@ components:
             $ref: '#/components/schemas/CraPredictionInterval'
         employer:
           $ref: '#/components/schemas/CraBankIncomeEmployer'
+        income_provider:
+          $ref: '#/components/schemas/CraBankIncomeIncomeProvider'
         historical_summary:
           type: array
           items:
@@ -59065,6 +59988,21 @@ components:
           nullable: true
       required:
       - name
+    CraBankIncomeIncomeProvider:
+      description: The object containing data about the income provider.
+      type: object
+      additionalProperties: true
+      x-hidden-from-docs: true
+      properties:
+        name:
+          type: string
+          description: The name of the income provider.
+        is_normalized:
+          type: boolean
+          description: Indicates whether the income provider name is normalized by comparing it against a canonical set of known providers.
+      required:
+      - name
+      - is_normalized
     CraBankIncomeSummary:
       type: object
       description: Summary for income across all income sources and items (max history of 730 days).
@@ -59289,6 +60227,7 @@ components:
           - description: A unique ID generated by Plaid representing the end user. Typically, this ID will come from the `/user/create` response, when the endpoint is invoked with the `PLAID-NEW-USER-API-ENABLED` header. If this field is included, then the `user_token` object field is ignored.
         webhook:
           type: string
+          format: url
           description: |
             The destination URL to which webhooks will be sent
         days_requested:
@@ -59329,7 +60268,6 @@ components:
         include_investments:
           type: boolean
           nullable: true
-          x-hidden-from-docs: true
           description: Indicates that investment data should be extracted from the linked account(s).
         consumer_report_permissible_purpose:
           $ref: '#/components/schemas/ConsumerReportPermissiblePurpose'
@@ -59868,6 +60806,11 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_token:
           $ref: '#/components/schemas/UserToken'
+        user_id:
+          x-hidden-from-docs: true
+          allOf:
+          - $ref: '#/components/schemas/NewUserID'
+          - description: A unique ID generated by Plaid representing the end user. Typically, this ID will come from the `/user/create` response, when the endpoint is invoked with the `PLAID-NEW-USER-API-ENABLED` header. If this field is included, then the `user_token` object field is ignored.
         third_party_user_token:
           $ref: '#/components/schemas/ThirdPartyUserToken'
         options:
@@ -60485,7 +61428,7 @@ components:
           nullable: true
         nsf_overdraft_transactions_count:
           type: number
-          description: The number of NSF and overdraft fee transactions in the time range for the report in the given account.
+          description: The number of net NSF fee transactions in the time range for the report in the given account (not counting any fees that were reversed within the time range).
       required:
       - available
       - current
@@ -62469,6 +63412,7 @@ components:
         webhook:
           type: string
           description: The new webhook URL to associate with the Item. To remove a webhook from an Item, set to `null`.
+          format: url
           nullable: true
       required:
       - access_token
@@ -62644,6 +63588,7 @@ components:
       properties:
         webhook:
           type: string
+          format: url
           description: |
             Specifies a webhook URL to associate with an Item. Plaid fires a webhook if credentials fail.
     ItemImportRequestUserAuth:
@@ -63420,8 +64365,10 @@ components:
           description: The transaction amount, in USD (e.g. `102.05`)
         user_present:
           type: boolean
-          description: '`true` if the end user is present while initiating the ACH transfer and the endpoint is being called; `false` otherwise (for example, when the ACH transfer is scheduled and the end user is not present, or you call this endpoint after the ACH transfer but before submitting the Nacha file for ACH processing). When using a Balance-only ruleset, this field is ignored.'
+          description: '`true` if the end user is present while initiating the ACH transfer and the endpoint is being called; `false` otherwise (for example, when the ACH transfer is scheduled and the end user is not present, or you call this endpoint after the ACH transfer but before submitting the Nacha file for ACH processing). When using a Balance-only ruleset, this field is ignored. This field is not currently used as part of Signal Transaction Score evaluations, but may be used in the future.'
           nullable: true
+          deprecated: true
+          x-hidden-from-docs: true
         client_user_id:
           type: string
           description: A unique ID that identifies the end user in your system. This ID is used to correlate requests by a user with multiple Items. Personally identifiable information, such as an email address or phone number, should not be used in the `client_user_id`.
@@ -64777,6 +65724,46 @@ components:
         client_user_id:
           type: string
           description: A unique ID representing the end user. Either `user_id` or `client_user_id` must be provided.
+    ProtectReport:
+      type: object
+      additionalProperties: true
+      description: A Protect report associated with a user. Contains details about documented incidents, which may include fraud, investigation outcomes, or other risk events.
+      properties:
+        report_id:
+          type: string
+          description: A unique identifier representing the submitted report.
+        incident_event:
+          $ref: '#/components/schemas/ProtectIncidentEventResponse'
+        report_confidence:
+          $ref: '#/components/schemas/ProtectReportConfidence'
+        report_type:
+          $ref: '#/components/schemas/ProtectReportType'
+        report_source:
+          $ref: '#/components/schemas/ProtectReportSource'
+        bank_account:
+          $ref: '#/components/schemas/ProtectBankAccount'
+        ach_return_code:
+          type: string
+          nullable: true
+          description: ACH return code if the report type is `ACH_RETURN` (e.g. `R01`).
+        notes:
+          type: string
+          nullable: true
+          description: Additional context or details about the report.
+        created_at:
+          type: string
+          format: date-time
+          description: The timestamp when the report was created, in ISO 8601 format (e.g., '2020-07-24T03:26:02Z').
+      required:
+      - report_id
+      - incident_event
+      - report_confidence
+      - report_type
+      - report_source
+      - bank_account
+      - ach_return_code
+      - notes
+      - created_at
     ProtectUserInsightsGetResponse:
       type: object
       additionalProperties: true
@@ -64787,6 +65774,11 @@ components:
           description: The Plaid User ID. If a `client_user_id` was provided in the request instead of a `user_id`, a new `user_id` will be generated if one doesn't already exist for that `client_user_id`.
         latest_scored_event:
           $ref: '#/components/schemas/LatestScoredEvent'
+        reports:
+          type: array
+          description: List of Protect reports associated with this user, limited to the most recent 100 reports in reverse chronological order (newest first).
+          items:
+            $ref: '#/components/schemas/ProtectReport'
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
@@ -64970,6 +65962,43 @@ components:
           allOf:
           - $ref: '#/components/schemas/AccessTokenNullable'
           - description: An access token associated with the Item related to this incident.
+    ProtectIncidentEventResponse:
+      nullable: true
+      type: object
+      additionalProperties: true
+      description: Details about the incident event.
+      properties:
+        protect_event_id:
+          type: string
+          nullable: true
+          description: A globally unique identifier representing a Protect event that may be associated with this incident.
+        link_session_id:
+          type: string
+          nullable: true
+          description: A unique identifier for a Link session that may be associated with this incident.
+        idv_session_id:
+          type: string
+          nullable: true
+          description: A unique identifier for an Identity Verification session that may be associated with this incident.
+        signal_client_transaction_id:
+          type: string
+          nullable: true
+          description: The unique ID used to refer to a Signal transaction evaluation that may be associated with this incident.
+        internal_reference:
+          type: string
+          nullable: true
+          description: A unique ID representing the incident in your system. Personally identifiable information, such as an email address or phone number, should not be used in this field.
+        time:
+          type: string
+          format: date-time
+          nullable: true
+          description: The timestamp when the incident occurred, in ISO 8601 format (e.g., '2020-07-24T03:26:02Z').
+        amount:
+          $ref: '#/components/schemas/ProtectIncidentAmount'
+        item_id:
+          type: string
+          nullable: true
+          description: The `item_id` associated with the Item related to this incident.
     ProtectIncidentAmount:
       type: object
       nullable: true

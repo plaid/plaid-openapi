@@ -1,3 +1,22 @@
+### 2020-09-14_1.671.5
+
+### 2020-09-14_1.671.4
+
+### 2020-09-14_1.671.4
+- (beta) Rename `require_upgraded_user` boolean field in `/user/create` to `with_upgraded_user`
+
+### 2020-09-14_1.671.3
+- Add `IncomeProvider` to `/cra/check_report/income_insights/get`
+
+### 2020-09-14_1.671.2
+- (beta) Add `require_upgraded_user` boolean field to the `/user/create` request
+
+### 2020-09-14_1.671.1
+- Remove PlaidError schema from irrelevant endpoints
+
+### 2020-09-14_1.671.0
+- Add missing PlaidError schema to all endpoints
+
 ### 2020-09-14_1.670.0
 - Add support for investments to `/cra/check_report/verification/get`
 
