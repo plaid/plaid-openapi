@@ -1,3 +1,15 @@
+### 2020-09-14_1.674.0
+- [Breaking] make user_token not required for `cra/monitoring_insights/get`, `cra/check_report/create` and `cra/monitoring_insights/subscribe`
+
+### 2020-09-14_1.673.4
+- (beta) Remove unused IDENTITY_ERROR error type
+
+### 2020-09-14_1.673.3
+- Fix validation errors in OpenAPI spec
+
+### 2020-09-14_1.673.2
+- Add `network_insights` to `cra_options`
+
 ### 2020-09-14_1.673.1
 - Add `income_provider` field to `bank_income_sources` objects returned by `/cra/check_report/income_insights/get`
 
