@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.674.0
+  version: 2020-09-14_1.675.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -3174,9 +3174,9 @@ paths:
                       report_id: ee093cb0-e3f2-42d1-9dbc-8d8408964194
                       generated_time: "2022-01-31T22:47:53Z"
                       network_attributes:
-                        plaid_conn_user_lifetime__lending_count: 5
-                        plaid_conn_user_lifetime__personal_lending_flag: true
-                        plaid_conn_user_lifetime__cash_advance_primary_count: 0
+                        plaid_conn_user_lifetime_lending_count: 5
+                        plaid_conn_user_lifetime_personal_lending_flag: 1
+                        plaid_conn_user_lifetime_cash_advance_primary_count: 0
                       items:
                       - institution_id: ins_0
                         institution_name: Plaid Bank
@@ -9820,6 +9820,156 @@ paths:
   /idv_classic/profiles: {}
   /idv_classic/identity_searches/jobs/:id: {}
   /idv_classic/identity_assessments/:id: {}
+  /business_verification/get:
+    post:
+      x-hidden-from-docs: true
+      summary: Get a business verification
+      operationId: businessVerificationGet
+      externalDocs:
+        url: /api/products/business-verification/#businessverificationget
+      tags:
+      - plaid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BusinessVerificationGetResponse'
+              examples:
+                example-1:
+                  value:
+                    id: busver_52xR9LKo77r1Np
+                    client_user_id: your-db-id-3b24110
+                    created_at: "2020-07-24T03:26:02Z"
+                    completed_at: "2020-07-24T03:26:02Z"
+                    redacted_at: "2020-07-24T03:26:02Z"
+                    status: success
+                    search_terms:
+                      name: Acme Corporation
+                      address:
+                        street: 123 Main St.
+                        street2: Unit 42
+                        city: Pawnee
+                        region: IN
+                        postal_code: "46001"
+                        country: US
+                      website: https://example.com
+                      phone_number: "+14025671234"
+                      email_address: user@example.com
+                    kyb_check:
+                      status: success
+                      score: 85
+                      name:
+                        summary: match
+                      address:
+                        summary: match
+                      website:
+                        summary: match
+                      match_details:
+                        name: Acme Corporation
+                        entity_type: llc
+                        addresses:
+                        - street: 123 Main St.
+                          street2: Unit 42
+                          city: Pawnee
+                          region: IN
+                          postal_code: "46001"
+                          country: US
+                          is_primary: true
+                        phone_numbers:
+                        - number: "+12345678909"
+                        email_addresses:
+                        - email_address: business@example.com
+                        websites:
+                        - url: https://example.com
+                        formation_date: "1990-05-29"
+                    risk_check:
+                      status: success
+                      score: 92
+                    request_id: saKrIBuEB9qJZng
+      description: Retrieve the current state of a specific business verification.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BusinessVerificationGetRequest'
+        required: true
+  /business_verification/create:
+    post:
+      x-hidden-from-docs: true
+      summary: Create a business verification
+      operationId: businessVerificationCreate
+      externalDocs:
+        url: /api/products/business-verification/#businessverificationcreate
+      tags:
+      - plaid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BusinessVerificationCreateResponse'
+              examples:
+                example-1:
+                  value:
+                    id: busver_52xR9LKo77r1Np
+                    client_user_id: your-db-id-3b24110
+                    created_at: "2020-07-24T03:26:02Z"
+                    completed_at: "2020-07-24T03:26:02Z"
+                    redacted_at: "2020-07-24T03:26:02Z"
+                    status: success
+                    search_terms:
+                      name: Acme Corporation
+                      address:
+                        street: 123 Main St.
+                        street2: Unit 42
+                        city: Pawnee
+                        region: IN
+                        postal_code: "46001"
+                        country: US
+                      website: https://example.com
+                      phone_number: "+14025671234"
+                      email_address: user@example.com
+                    kyb_check:
+                      status: success
+                      score: 85
+                      name:
+                        summary: match
+                      address:
+                        summary: match
+                      website:
+                        summary: match
+                      match_details:
+                        name: Acme Corporation
+                        entity_type: llc
+                        addresses:
+                        - street: 123 Main St.
+                          street2: Unit 42
+                          city: Pawnee
+                          region: IN
+                          postal_code: "46001"
+                          country: US
+                          is_primary: true
+                        phone_numbers:
+                        - number: "+12345678909"
+                        email_addresses:
+                        - email_address: business@example.com
+                        websites:
+                        - url: https://example.com
+                        formation_date: "1990-05-29"
+                    risk_check:
+                      status: success
+                      score: 92
+                    request_id: saKrIBuEB9qJZng
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BusinessVerificationCreateRequest'
+        required: true
+      description: Create a new business verification to check a business's identity and risk profile.
   /processor/auth/get:
     post:
       tags:
@@ -12275,6 +12425,48 @@ paths:
               $ref: '#/components/schemas/UserRemoveRequest'
       parameters:
       - $ref: '#/components/parameters/PlaidNewUserApiEnabledHeader'
+  /user/products/terminate:
+    x-hidden-from-docs: true
+    post:
+      tags:
+      - plaid
+      summary: Terminate user-based products
+      externalDocs:
+        url: /api/users/#userproductsterminate
+      operationId: userProductsTerminate
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProductsTerminateResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: TxlxEcCmP9HTTT
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      description: '`/user/products/terminate` terminates user-based recurring subscriptions for a given client user. This will remove user-based products (Financial Management, Protect, and CRA products) from all items associated with the user.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProductsTerminateRequest'
+            examples:
+              example-1:
+                value:
+                  user_id: usr_8c3ZbDBYjaqUXZ
+              example-2:
+                value:
+                  user_id: usr_8c3ZbDBYjaqUXZ
+                  products:
+                  - transactions
   /user/items/get:
     post:
       tags:
@@ -21219,9 +21411,9 @@ paths:
                       report_id: ee093cb0-e3f2-42d1-9dbc-8d8408964194
                       generated_time: "2022-01-31T22:47:53Z"
                       network_attributes:
-                        plaid_conn_user_lifetime__lending_count: 5
-                        plaid_conn_user_lifetime__personal_lending_flag: true
-                        plaid_conn_user_lifetime__cash_advance_primary_count: 0
+                        plaid_conn_user_lifetime_lending_count: 5
+                        plaid_conn_user_lifetime_personal_lending_flag: 1
+                        plaid_conn_user_lifetime_cash_advance_primary_count: 0
                       items:
                       - institution_id: ins_0
                         institution_name: Plaid Bank
@@ -24452,6 +24644,32 @@ components:
       type: object
       additionalProperties: true
       description: UserRemoveResponse defines the response schema for `/user/remove`
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
+    UserProductsTerminateRequest:
+      type: object
+      description: UserProductsTerminateRequest defines the request schema for `/user/products/terminate`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        user_id:
+          $ref: '#/components/schemas/NewUserID'
+        products:
+          type: array
+          description: An optional list of user-based products to terminate. If not provided, all user-based products will be terminated.
+          items:
+            $ref: '#/components/schemas/UserBasedProducts'
+      required:
+      - user_id
+    UserProductsTerminateResponse:
+      type: object
+      additionalProperties: true
+      description: UserProductsTerminateResponse defines the response schema for `/user/products/terminate`
       properties:
         request_id:
           $ref: '#/components/schemas/RequestID'
@@ -31856,6 +32074,22 @@ components:
       - pay_by_bank
       - protect_linked_bank
       description: A list of products that an institution can support. All Items must be initialized with at least one product. The Balance product is always available and does not need to be specified during initialization.
+      type: string
+    UserBasedProducts:
+      title: UserBasedProducts
+      enum:
+      - cra_base_report
+      - cra_income_insights
+      - cra_partner_insights
+      - cra_network_insights
+      - cra_cashflow_insights
+      - cra_monitoring
+      - cra_lend_score
+      - investments
+      - liabilities
+      - protect_linked_bank
+      - transactions
+      description: A list of user-based products. User-based products include Financial Management products, Protect products, CRA products, and subscription products.
       type: string
     ProductStatus:
       title: ProductStatus
@@ -46518,8 +46752,6 @@ components:
           items:
             $ref: '#/components/schemas/CashFlowUpdatesEventWebhookCodes'
           nullable: true
-      required:
-      - user_token
     SandboxCraCashflowUpdatesUpdateResponse:
       title: SandboxCraCashflowUpdatesUpdateResponse
       additionalProperties: true
@@ -55477,16 +55709,391 @@ components:
       - item_ids
       - request_id
       type: object
+    BusinessAddress:
+      type: object
+      description: Physical address of a business. Used for input requests and as base for response schemas.
+      properties:
+        street:
+          $ref: '#/components/schemas/Street'
+        street2:
+          $ref: '#/components/schemas/Street2'
+        city:
+          $ref: '#/components/schemas/City'
+        region:
+          $ref: '#/components/schemas/Region'
+        postal_code:
+          $ref: '#/components/schemas/PostalCode'
+        country:
+          $ref: '#/components/schemas/GenericCountryCode'
+      required:
+      - street
+      - city
+      - country
+      additionalProperties: true
+    BusinessEmailAddress:
+      type: object
+      description: Email address associated with a business
+      properties:
+        email_address:
+          type: string
+          format: email
+          description: Email address of the business
+          example: business@example.com
+      required:
+      - email_address
+      additionalProperties: true
+    BusinessEntityType:
+      description: The legal structure or type of business entity
+      type: string
+      enum:
+      - sole_proprietorship
+      - general_partnership
+      - llc
+      - llp
+      - lllp
+      - lp
+      - c_corporation
+      - s_corporation
+      - b_corporation
+      - nonprofit
+      - cooperative
+      - trust
+      - professional_association
+      - professional_corporation
+      - trade_name
+      - bank
+      - credit_union
+      - insurance
+      - other
+      - unknown
+      example: llc
+      title: BusinessEntityType
+    BusinessFieldMatchSummary:
+      type: object
+      description: Summary of how a specific business field matched against data provider results
+      properties:
+        summary:
+          $ref: '#/components/schemas/MatchSummaryCode'
+      required:
+      - summary
+      additionalProperties: true
+    BusinessKYBCheck:
+      type: object
+      description: Results from the KYB (Know Your Business) identity verification check
+      properties:
+        status:
+          $ref: '#/components/schemas/BusinessVerificationStatus__KYBCheck'
+        score:
+          type: integer
+          description: A score from 0 to 100 indicating the confidence in KYB (Know Your Business) identity assessment for the business
+          example: 85
+        name:
+          $ref: '#/components/schemas/BusinessFieldMatchSummary'
+        address:
+          $ref: '#/components/schemas/BusinessFieldMatchSummary'
+        website:
+          $ref: '#/components/schemas/BusinessFieldMatchSummary'
+        match_details:
+          $ref: '#/components/schemas/BusinessKYBMatchDetails'
+      required:
+      - status
+      - score
+      - name
+      - address
+      - website
+      - match_details
+      nullable: true
+      additionalProperties: true
+    BusinessKYBMatchDetails:
+      type: object
+      description: Detailed information about the business from data provider results
+      properties:
+        name:
+          type: string
+          description: The business name from the data provider
+          example: Acme Corporation
+        entity_type:
+          $ref: '#/components/schemas/BusinessEntityType'
+        addresses:
+          type: array
+          description: Addresses associated with the business
+          items:
+            $ref: '#/components/schemas/ProviderBusinessAddress'
+        phone_numbers:
+          type: array
+          description: Phone numbers associated with the business
+          items:
+            $ref: '#/components/schemas/BusinessPhoneNumber'
+        email_addresses:
+          type: array
+          description: Email addresses associated with the business
+          items:
+            $ref: '#/components/schemas/BusinessEmailAddress'
+        websites:
+          type: array
+          description: Websites associated with the business
+          items:
+            $ref: '#/components/schemas/BusinessWebsite'
+        formation_date:
+          $ref: '#/components/schemas/ISO8601DateNullable'
+      required:
+      - name
+      - entity_type
+      - addresses
+      - phone_numbers
+      - email_addresses
+      - websites
+      - formation_date
+      nullable: true
+      additionalProperties: true
+    BusinessName:
+      type: string
+      title: BusinessName
+      example: Acme Corporation
+      description: The name of the business. Must have at least one character and a maximum length of 500 characters.
+    BusinessPhoneNumber:
+      type: object
+      description: Phone number associated with a business
+      properties:
+        number:
+          type: string
+          description: Phone number in E.164 format
+          example: "+12345678909"
+      required:
+      - number
+      additionalProperties: true
+    BusinessRiskCheck:
+      type: object
+      description: Results from the business risk assessment check
+      properties:
+        status:
+          $ref: '#/components/schemas/BusinessVerificationStatus__RiskCheck'
+        score:
+          type: integer
+          description: A score from 0 to 100 indicating the risk assessment for the business
+          example: 92
+      required:
+      - status
+      - score
+      nullable: true
+      additionalProperties: true
+    BusinessSearchTerms:
+      type: object
+      description: The business information that was used to perform the verification search
+      properties:
+        name:
+          $ref: '#/components/schemas/BusinessName'
+        address:
+          $ref: '#/components/schemas/BusinessSearchTermsAddress'
+        website:
+          $ref: '#/components/schemas/URLNullable'
+        phone_number:
+          $ref: '#/components/schemas/WatchlistScreeningPhoneNumberNullable'
+        email_address:
+          $ref: '#/components/schemas/EmailAddressNullable'
+      required:
+      - name
+      - address
+      - website
+      - phone_number
+      - email_address
+      additionalProperties: true
+    BusinessSearchTermsAddress:
+      type: object
+      description: Physical address of a business in response
+      additionalProperties: true
+      properties:
+        street:
+          $ref: '#/components/schemas/Street'
+        street2:
+          $ref: '#/components/schemas/Street2'
+        city:
+          $ref: '#/components/schemas/City'
+        region:
+          $ref: '#/components/schemas/Region'
+        postal_code:
+          $ref: '#/components/schemas/PostalCode'
+        country:
+          $ref: '#/components/schemas/GenericCountryCode'
+      required:
+      - street
+      - city
+      - country
+      - street2
+      - region
+      - postal_code
+    BusinessVerificationCreateRequest:
+      type: object
+      description: Request input for creating a business verification
+      properties:
+        client_user_id:
+          $ref: '#/components/schemas/ClientUserID'
+        business:
+          $ref: '#/components/schemas/BusinessVerificationCreateRequestBusiness'
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+      required:
+      - client_user_id
+      - business
+    BusinessVerificationCreateRequestBusiness:
+      type: object
+      description: Business information provided in the verification request
+      properties:
+        name:
+          $ref: '#/components/schemas/BusinessName'
+        address:
+          $ref: '#/components/schemas/BusinessAddress'
+        website:
+          $ref: '#/components/schemas/URL'
+        phone_number:
+          $ref: '#/components/schemas/WatchlistScreeningPhoneNumber'
+        email:
+          $ref: '#/components/schemas/EmailAddress'
+      required:
+      - name
+      - address
+      additionalProperties: true
+    BusinessVerificationCreateResponse:
+      description: A business verification represents a check of a business's identity and risk profile, including information collected about the business and results from third-party data providers.
+      additionalProperties: true
+      properties:
+        id:
+          $ref: '#/components/schemas/BusinessVerificationID'
+        client_user_id:
+          $ref: '#/components/schemas/ClientUserID'
+        created_at:
+          $ref: '#/components/schemas/Timestamp'
+        completed_at:
+          $ref: '#/components/schemas/TimestampNullable'
+        redacted_at:
+          $ref: '#/components/schemas/TimestampNullable'
+        status:
+          $ref: '#/components/schemas/BusinessVerificationStatus__Overall'
+        search_terms:
+          $ref: '#/components/schemas/BusinessSearchTerms'
+        kyb_check:
+          $ref: '#/components/schemas/BusinessKYBCheck'
+        risk_check:
+          $ref: '#/components/schemas/BusinessRiskCheck'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - id
+      - client_user_id
+      - created_at
+      - completed_at
+      - redacted_at
+      - status
+      - search_terms
+      - kyb_check
+      - risk_check
+      - request_id
+      type: object
+    BusinessVerificationGetRequest:
+      description: Request input for fetching a business verification
+      type: object
+      properties:
+        business_verification_id:
+          $ref: '#/components/schemas/BusinessVerificationID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+      required:
+      - business_verification_id
+    BusinessVerificationGetResponse:
+      description: A business verification represents a check of a business's identity and risk profile, including information collected about the business and results from third-party data providers.
+      additionalProperties: true
+      properties:
+        id:
+          $ref: '#/components/schemas/BusinessVerificationID'
+        client_user_id:
+          $ref: '#/components/schemas/ClientUserID'
+        created_at:
+          $ref: '#/components/schemas/Timestamp'
+        completed_at:
+          $ref: '#/components/schemas/TimestampNullable'
+        redacted_at:
+          $ref: '#/components/schemas/TimestampNullable'
+        status:
+          $ref: '#/components/schemas/BusinessVerificationStatus__Overall'
+        search_terms:
+          $ref: '#/components/schemas/BusinessSearchTerms'
+        kyb_check:
+          $ref: '#/components/schemas/BusinessKYBCheck'
+        risk_check:
+          $ref: '#/components/schemas/BusinessRiskCheck'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - id
+      - client_user_id
+      - created_at
+      - completed_at
+      - redacted_at
+      - status
+      - search_terms
+      - kyb_check
+      - risk_check
+      - request_id
+      type: object
+    BusinessVerificationID:
+      type: string
+      format: cognito_id
+      example: busver_52xR9LKo77r1Np
+      title: BusinessVerificationID
+      description: ID of the associated business verification.
+    BusinessVerificationStatus__KYBCheck:
+      type: string
+      enum:
+      - active
+      - success
+      - failed
+      example: success
+      title: BusinessVerificationStatus
+      description: Status of the KYB (Know Your Business) identity assessment check
+    BusinessVerificationStatus__Overall:
+      type: string
+      enum:
+      - active
+      - success
+      - failed
+      example: success
+      title: BusinessVerificationStatus
+      description: Status of the overall business verification
+    BusinessVerificationStatus__RiskCheck:
+      type: string
+      enum:
+      - active
+      - success
+      - failed
+      example: success
+      title: BusinessVerificationStatus
+      description: Status of the business risk assessment check
+    BusinessWebsite:
+      type: object
+      description: Website associated with a business
+      properties:
+        url:
+          type: string
+          format: uri
+          description: URL of the business website
+          example: https://example.com
+      required:
+      - url
+      additionalProperties: true
     City:
       type: string
       example: Pawnee
       title: CityName
-      description: City from the end user's address. A string with at least one non-whitespace alphabetical character, with a max length of 100 characters.
+      description: City from the address. A string with at least one non-whitespace alphabetical character, with a max length of 100 characters.
     CityNullable:
       type: string
       example: Pawnee
       title: CityName
-      description: City from the end user's address. A string with at least one non-whitespace alphabetical character, with a max length of 100 characters.
+      description: City from the address. A string with at least one non-whitespace alphabetical character, with a max length of 100 characters.
       nullable: true
     ClientUserID:
       type: string
@@ -57869,6 +58476,34 @@ components:
 
         `exact` - Matches must be nearly exact. This sensitivity will only show hits with exact or nearly exact name matches with only basic correction such as extraneous symbols and capitalization. This setting is generally not recommended unless you have a very specific use case.
       title: ProgramNameSensitivity
+    ProviderBusinessAddress:
+      description: Detailed address information for a business from data provider
+      properties:
+        street:
+          $ref: '#/components/schemas/Street'
+        street2:
+          $ref: '#/components/schemas/Street2'
+        city:
+          $ref: '#/components/schemas/City'
+        region:
+          $ref: '#/components/schemas/Region'
+        postal_code:
+          $ref: '#/components/schemas/PostalCode'
+        country:
+          $ref: '#/components/schemas/GenericCountryCode'
+        is_primary:
+          type: boolean
+          description: Whether this is the primary address for the business
+          example: true
+      required:
+      - street
+      - city
+      - country
+      - is_primary
+      - street2
+      - region
+      - postal_code
+      type: object
     ProxyType:
       type: string
       description: |-
@@ -64406,6 +65041,7 @@ components:
       - FRAUD
       - CONSENT
       - NEW_DATA
+      - TOKENIZED_ACCOUNT_NUMBER
       description: Category of Notification
     FDXTimestamp:
       title: Timestamp
@@ -64423,6 +65059,7 @@ components:
       - SERVICE
       - BALANCE
       - PLANNED_OUTAGE
+      - TAN_REVOKED
       description: Type of Notification
     FDXNotificationSeverity:
       type: string
@@ -64442,6 +65079,24 @@ components:
       - HIGH
       - MEDIUM
       - LOW
+    FDXEventStatus:
+      title: FDX Event Status
+      description: Current status of indicated entity after reported event change. Not all statuses will be supported on all entity types by all data providers
+      type: string
+      enum:
+      - ACTIVE
+      - EXPIRED
+      - REVOKED
+      - SUSPENDED
+    FDXUpdateReason:
+      title: FDX Update Reason
+      description: Reason for lifecycle event status change
+      type: string
+      enum:
+      - BUSINESS_RULE
+      - SECURITY_EVENT
+      - USER_ACTION
+      - OTHER
     FDXPartyType:
       title: Party Type
       description: Identifies the type of a party
@@ -64535,6 +65190,8 @@ components:
           description: ID for the origination entity related to the notification
         idType:
           $ref: '#/components/schemas/FDXNotificationPayloadIdType'
+        event:
+          $ref: '#/components/schemas/FDXLifecycleEvent'
         customFields:
           type: array
           items:
@@ -64613,6 +65270,22 @@ components:
       - sentOn
       - category
       - notificationPayload
+    FDXLifecycleEvent:
+      title: FDX Lifecycle Event entity
+      description: Details of consent or payment network identifier or other entity's revocation request or other lifecycle status change event
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/FDXEventStatus'
+        reason:
+          $ref: '#/components/schemas/FDXUpdateReason'
+        otherReason:
+          description: Additional information or description of an `OTHER` reason
+          type: string
+        initiator:
+          $ref: '#/components/schemas/FDXPartyType'
+        updatedTime:
+          $ref: '#/components/schemas/FDXTimestamp'
     SignalEvaluateRequest:
       title: SignalEvaluateRequest
       description: SignalEvaluateRequest defines the request schema for `/signal/evaluate`
