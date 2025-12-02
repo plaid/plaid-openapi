@@ -1,3 +1,9 @@
+### 2020-09-14_1.675.0
+- [Breaking for Go] make user_token not required for `sandbox/cra/cashflow_updates/update`
+
+### 2020-09-14_1.674.1
+- (beta) Add `/user/products/terminate` endpoint
+
 ### 2020-09-14_1.674.0
 - [Breaking] make user_token not required for `cra/monitoring_insights/get`, `cra/check_report/create` and `cra/monitoring_insights/subscribe`
 
