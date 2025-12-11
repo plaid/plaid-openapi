@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.675.0
+  version: 2020-09-14_1.680.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -1574,7 +1574,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
-      description: This endpoint allows you to retrieve a Cash Flow Updates report by passing in the `user_token` referred to in the webhook you received.
+      description: This endpoint allows you to retrieve a Cash Flow Updates report by passing in the `user_id` referred to in the webhook you received.
   /credit/audit_copy_token/update:
     post:
       tags:
@@ -1945,7 +1945,7 @@ paths:
       externalDocs:
         url: /api/products/check/#cracheck_reportincome_insightsget
       operationId: craCheckReportIncomeInsightsGet
-      description: This endpoint allows you to retrieve the Income Insights report for your user.  You should call this endpoint after you've received a `CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`. If the most recent consumer report for the user doesn’t have sufficient data to generate the base report, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.
+      description: This endpoint allows you to retrieve the Income Insights report for your user. You should call this endpoint after you've received a `CHECK_REPORT_READY` or a `USER_CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`. If the most recent consumer report for the user doesn’t have sufficient data to generate the base report, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.
       requestBody:
         required: true
         content:
@@ -2914,7 +2914,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
-      description: This endpoint allows you to retrieve the Base Report for your user, allowing you to receive comprehensive bank account and cash flow data. You should call this endpoint after you've received a `CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`. If the most recent consumer report for the user doesn't have sufficient data to generate the base report, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.
+      description: This endpoint allows you to retrieve the Base Report for your user, allowing you to receive comprehensive bank account and cash flow data. You should call this endpoint after you've received a `CHECK_REPORT_READY` or a `USER_CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`. If the most recent consumer report for the user doesn't have sufficient data to generate the base report, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.
   /cra/check_report/pdf/get:
     post:
       summary: Retrieve Consumer Reports as a PDF
@@ -2939,7 +2939,7 @@ paths:
       externalDocs:
         url: /api/products/check/#cracheck_reportpdfget
       operationId: craCheckReportPdfGet
-      description: '`/cra/check_report/pdf/get` retrieves the most recent Consumer Report in PDF format. By default, the most recent Base Report (if it exists) for the user will be returned. To request that the most recent Income Insights report be included in the PDF as well, use the `add-ons` field.'
+      description: '`/cra/check_report/pdf/get` retrieves the most recent Consumer Report in PDF format. By default, the most recent Base Report (if it exists) for the user will be returned. To request that the most recent Partner Insights or Income Insights report be included in the PDF as well, use the `add-ons` field.'
       requestBody:
         required: true
         content:
@@ -2971,7 +2971,10 @@ paths:
       externalDocs:
         url: /api/products/check/#cracheck_reportcreate
       operationId: craCheckReportCreate
-      description: "The primary purpose of `/cra/check_report/create` is to refresh data in an existing report. A Consumer Report will last for 24 hours before expiring; you should call any `/get` endpoints on the report before it expires. If a report expires, you can call `/cra/check_report/create` again to re-generate it and refresh the data in the report.\n\n`/cra/check_report/create` can also be used to create a new report if `consumer_report_permissible_purpose` was omitted during Link token creation. However, using the endpoint in this way is not recommended. Instead, `consumer_report_permissible_purpose` should always be specified when calling `/link/token/create` for Plaid CRA products; this will reduce latency and simplify the integration process. If you provide a `consumer_report_permissible_purpose` during Link token creation, then Plaid Check will automatically begin creating a Consumer Report once the user completes the Link process, and it is not necessary to call `/cra/check_report/create` before retrieving the report. "
+      description: |-
+        The primary purpose of `/cra/check_report/create` is to refresh data in an existing report. A Consumer Report will last for 24 hours before expiring; you should call any `/get` endpoints on the report before it expires. If a report expires, you can call `/cra/check_report/create` again to re-generate it and refresh the data in the report.
+
+        `/cra/check_report/create` can also be used to create a new report if `consumer_report_permissible_purpose` was omitted during Link token creation. However, using the endpoint in this way is not recommended. Instead, `consumer_report_permissible_purpose` should always be specified when calling `/link/token/create` for Plaid CRA products; this will reduce latency and simplify the integration process. If you provide a `consumer_report_permissible_purpose` during Link token creation, then Plaid Check will automatically begin creating a Consumer Report once the user completes the Link process, and it is not necessary to call `/cra/check_report/create` before retrieving the report.
       requestBody:
         required: true
         content:
@@ -3063,7 +3066,7 @@ paths:
         url: /api/products/check/#cracheck_reportpartner_insightsget
       operationId: craCheckReportPartnerInsightsGet
       description: |-
-        This endpoint allows you to retrieve the Partner Insights report for your user. You should call this endpoint after you've received the `CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`. If the most recent consumer report for the user doesn’t have sufficient data to generate the base report, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.
+        This endpoint allows you to retrieve the Partner Insights report for your user. You should call this endpoint after you've received a `CHECK_REPORT_READY` or a `USER_CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`. If the most recent consumer report for the user doesn’t have sufficient data to generate the base report, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.
 
         If you did not initialize Link with the `credit_partner_insights` product or have generated a report using `/cra/check_report/create`, we will call our partners to generate the insights when you call this endpoint. In this case, you may optionally provide parameters under `options` to configure which insights you want to receive.
       requestBody:
@@ -3103,7 +3106,7 @@ paths:
         url: /api/products/check/#cracheck_reportcashflow_insightsget
       operationId: craCheckReportCashflowInsightsGet
       description: |-
-        This endpoint allows you to retrieve the Cashflow Insights report for your user. You should call this endpoint after you've received the `CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`. If the most recent consumer report for the user doesn’t have sufficient data to generate the insights, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.
+        This endpoint allows you to retrieve the Cashflow Insights report for your user. You should call this endpoint after you've received a `CHECK_REPORT_READY` or a `USER_CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`. If the most recent consumer report for the user doesn’t have sufficient data to generate the insights, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.
 
         If you did not initialize Link with the `cra_cashflow_insights` product or have generated a report using `/cra/check_report/create`, we will generate the insights when you call this endpoint. In this case, you may optionally provide parameters under `options` to configure which insights you want to receive.
       requestBody:
@@ -3145,7 +3148,7 @@ paths:
         url: /api/products/check/#cracheck_reportlend_scoreget
       operationId: craCheckReportLendScoreGet
       description: |-
-        This endpoint allows you to retrieve the LendScore report for your user. You should call this endpoint after you've received the `CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`. If the most recent consumer report for the user doesn’t have sufficient data to generate the insights, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.
+        This endpoint allows you to retrieve the LendScore report for your user. You should call this endpoint after you've received a `CHECK_REPORT_READY` or a `USER_CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`. If the most recent consumer report for the user doesn’t have sufficient data to generate the insights, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.
 
         If you did not initialize Link with the `cra_lend_score` product or call `/cra/check_report/create` with the `cra_lend_score` product, Plaid will generate the insights when you call this endpoint. In this case, you may optionally provide parameters under `options` to configure which insights you want to receive.
       requestBody:
@@ -3191,7 +3194,7 @@ paths:
         url: /api/products/check/#cracheck_reportnetwork_insightsget
       operationId: craCheckReportNetworkInsightsGet
       description: |-
-        This endpoint allows you to retrieve the Network Insights product for your user. You should call this endpoint after you've received the `CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`. If the most recent consumer report for the user doesn’t have sufficient data to generate the report, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.
+        This endpoint allows you to retrieve the Network Insights product for your user. You should call this endpoint after you've received a `CHECK_REPORT_READY` or a `USER_CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`. If the most recent consumer report for the user doesn’t have sufficient data to generate the report, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.
 
         If you did not initialize Link with the `cra_network_attributes` product or have generated a report using `/cra/check_report/create`, Plaid will generate the attributes when you call this endpoint.
       requestBody:
@@ -3391,7 +3394,7 @@ paths:
       externalDocs:
         url: /api/products/check/#cracheck_reportverificationget
       operationId: craCheckReportVerificationGet
-      description: "This endpoint allows you to retrieve verification reports for a user. To obtain a VoA or Employment Refresh report, you need to make sure that `cra_base_report` is included in the `products` parameter when calling `/link/token/create` or `/cra/check_report/create`. \n\nYou should call this endpoint after you've received a `CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`.\n\nIf the most recent consumer report for the user doesn’t have sufficient data to generate the report, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.\""
+      description: "This endpoint allows you to retrieve verification reports for a user. To obtain a VoA or Employment Refresh report, you need to make sure that `cra_base_report` is included in the `products` parameter when calling `/link/token/create` or `/cra/check_report/create`. \n\nYou should call this endpoint after you've received a `CHECK_REPORT_READY` or a `USER_CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`.\n\nIf the most recent consumer report for the user doesn’t have sufficient data to generate the report, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.\""
       requestBody:
         required: true
         content:
@@ -3425,7 +3428,7 @@ paths:
       description: |-
         The `/cra/check_report/verification/pdf/get` endpoint retrieves the most recent Consumer Report in PDF format,
         specifically formatted for Home Lending verification use cases. Before calling this endpoint, ensure that you've created a
-        VOA report through Link or the `/cra/check_report/create` endpoint, and have received the `CHECK_REPORT_READY` webhook.
+        VOA report through Link or the `/cra/check_report/create` endpoint, and have received a `CHECK_REPORT_READY` or a `USER_CHECK_REPORT_READY` webhook.
 
         The response to `/cra/check_report/verification/pdf/get` is the PDF binary data. The `request_id`  is returned in the `Plaid-Request-ID` header.
       requestBody:
@@ -6362,7 +6365,7 @@ paths:
       description: |-
         Send a request to the `/categories/get` endpoint to get detailed information on legacy categories returned by Plaid. This endpoint does not require authentication.
 
-        All implementations are recommended to [use the newer `personal_finance_category` taxonomy](https://plaid.com/docs/transactions/pfc-migration/) instead of the legacy `category` taxonomy supported by this endpoint. The [`personal_finance_category taxonomy` CSV file](https://plaid.com/documents/transactions-personal-finance-category-taxonomy.csv) is available for download and is not accessible via API.
+        All implementations are recommended to [use the newer `personal_finance_category` taxonomy](https://plaid.com/docs/transactions/pfc-migration/) instead of the legacy `category` taxonomy supported by this endpoint.
       responses:
         "200":
           description: success
@@ -7330,6 +7333,10 @@ paths:
                           score: 0
                         stolen_identity:
                           score: 0
+                      facial_duplicates:
+                      - id: idv_52xR9LKo77r1Np
+                        similarity: 95
+                        matched_after_completed: true
                     verify_sms:
                       status: success
                       verifications:
@@ -7537,6 +7544,10 @@ paths:
                           score: 0
                         stolen_identity:
                           score: 0
+                      facial_duplicates:
+                      - id: idv_52xR9LKo77r1Np
+                        similarity: 95
+                        matched_after_completed: true
                     verify_sms:
                       status: success
                       verifications:
@@ -7746,6 +7757,10 @@ paths:
                             score: 0
                           stolen_identity:
                             score: 0
+                        facial_duplicates:
+                        - id: idv_52xR9LKo77r1Np
+                          similarity: 95
+                          matched_after_completed: true
                       verify_sms:
                         status: success
                         verifications:
@@ -7961,6 +7976,10 @@ paths:
                           score: 0
                         stolen_identity:
                           score: 0
+                      facial_duplicates:
+                      - id: idv_52xR9LKo77r1Np
+                        similarity: 95
+                        matched_after_completed: true
                     verify_sms:
                       status: success
                       verifications:
@@ -12264,6 +12283,10 @@ paths:
               examples:
                 example-1:
                   value:
+                    user_id: usr_9nSp2KuZ2x4JDw
+                    request_id: Aim3b
+                example-2:
+                  value:
                     user_token: user-sandbox-b0e2c4ee-a763-4df5-bfe9-46a46bce993d
                     user_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
                     request_id: Aim3b
@@ -12273,14 +12296,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
-      description: |-
-        This endpoint should be called for each of your end users before they begin a Plaid Check or Income flow, or a Multi-Item Link flow. This provides you a single token to access all data associated with the user. You should only create one per end user.
-
-        The `consumer_report_user_identity` object must be present in order to create a Plaid Check Consumer Report for a user. If it is not provided during the `/user/create` call, it can be added later by calling `/user/update`. Plaid Check Consumer Reports can only be created for US-based users; the user's address country must be `US`.
-
-        If you call the endpoint multiple times with the same `client_user_id`, the first creation call will succeed and the rest will fail with an error message indicating that the user has been created for the given `client_user_id`.
-
-        Ensure that you store the `user_token` along with your user's identifier in your database, as it is not possible to retrieve a previously created `user_token`.
+      description: "For Plaid products and flows that use the user object, `/user/create` provides you a single token to access all data associated with the user. You must call this endpoint before calling `/link/token/create` if you are using any of the following: Plaid Check, Income Verification, Multi-Item Link, or Plaid Protect.\n\nFor customers who began using this endpoint on or after December 10, 2025, this endpoint takes a `client_user_id` and an `identity` object and will return a `user_id`. For customers who began using it before that date, the endpoint takes a `client_user_id` and a `consumer_report_user_identity` object and will return a `user_token` and `user_id`. For more details, see [New User APIs](https://plaid.com/docs/api/users/user-apis).\n\nIn order to create a Plaid Check Consumer Report for a user, the `identity` (new) or `consumer_report_user_identity` (legacy) object must be present. If it is not provided during the `/user/create` call, it can be added later by calling `/user/update`. \n\nIn order to generate a Plaid Check Consumer Report, the following `identity` fields, at minimum, are required and must be non-empty: `name`, `date_of_birth`, `emails`, `phone_numbers`, and `addresses`, (with at least one email, phone number, and address designated as `primary`). Plaid Check Consumer Reports can only be created for US-based users; the user's address country must be `US`. If creating a report for sharing with a GSE such as Fannie or Freddie, the user's full SSN must be provided via the `id_numbers` field. Providing at least a partial SSN is also strongly recommended for all use cases, since it improves the accuracy of matching user records during compliance processes such as file disclosure, dispute, or security freeze requests.\n\nWhen using Plaid Protect, it is highly recommended that you provide an `identity` object to better identify and block fraud across your Link sessions. \n\nPlaid will normalize identity fields before storing them and utilize the same identity across different user-based products."
       requestBody:
         required: true
         content:
@@ -12290,11 +12306,10 @@ paths:
       parameters:
       - $ref: '#/components/parameters/PlaidNewUserApiEnabledHeader'
   /user/get:
-    x-hidden-from-docs: true
     post:
       tags:
       - plaid
-      summary: Retrieve user identity and information.
+      summary: Retrieve user identity and information
       externalDocs:
         url: /api/users/#userget
       operationId: userGet
@@ -12345,7 +12360,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
-      description: Retrieve user identity and information using a Plaid generated user ID. This endpoint returns user details including the most recent Identity object that was added to the given User.
+      description: Get user details using a `user_id`. This endpoint only supports users that were created on the new user API flow, without a `user_token`. For more details, see [New User APIs](https://plaid.com/docs/api/users/user-apis).
       requestBody:
         required: true
         content:
@@ -12379,7 +12394,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
-      description: This endpoint is used to update user information associated with an existing `user_token`. It can also be used to enable an existing `user_token` for use with Consumer Reports by Plaid Check, by adding a `consumer_report_user_identity` object to the user. Plaid Check Consumer Reports can only be created for US-based users; the user's address country must be `US`.
+      description: "This endpoint updates user information for an existing `user_id` or `user_token`. If an existing `user_id` or `user_token` is missing fields required for a given use case (e.g. creating a Consumer Report) use `/user/update` to add values for those fields. \n\nIdentity updates use merge semantics: provided fields overwrite existing ones; omitted fields remain unchanged."
       requestBody:
         required: true
         content:
@@ -12413,10 +12428,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
-      description: |-
-        `/user/remove` deletes a user token and and associated information, including any Items associated with the token.
-        Any subsequent calls to retrieve information using the same user token will result in an error stating the user does not exist.
-        If a user is created for a given `client_user_id` using `/user/create` and that user is then deleted with `/user/remove`, the `client_user_id` cannot be reused for another `/user/create` request.
+      description: '`/user/remove` deletes a `user_id` or `user_token` and and associated information, including any Items associated with the user.'
       requestBody:
         required: true
         content:
@@ -12521,76 +12533,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
-      description: Returns Items associated with a User along with their corresponding statuses.
+      description: Returns Items associated with a `user_id`, along with their corresponding statuses. Plaid associates an Item with a User when it has been successfully connected within a Link session initialized with that `user_id`.
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/UserItemsGetRequest'
-  /user/items/list:
-    x-hidden-from-docs: true
-    post:
-      tags:
-      - plaid
-      summary: List Items associated with a User
-      externalDocs:
-        url: /api/users/#useritemslist
-      operationId: userItemsList
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserItemsListResponse'
-              examples:
-                example-1:
-                  value:
-                    items:
-                    - available_products:
-                      - balance
-                      - auth
-                      billed_products:
-                      - identity
-                      - transactions
-                      error: null
-                      institution_id: ins_109508
-                      institution_name: First Platypus Bank
-                      item_id: Ed6bjNrDLJfGvZWwnkQlfxwoNz54B5C97ejBr
-                      update_type: background
-                      webhook: https://plaid.com/example/hook
-                      consent_expiration_time: null
-                    - available_products:
-                      - balance
-                      - identity
-                      - payment_initiation
-                      - transactions
-                      billed_products:
-                      - assets
-                      - auth
-                      error: null
-                      institution_id: ins_109508
-                      institution_name: First Platypus Bank
-                      item_id: DWVAAPWq4RHGlEaNyGKRTAnPLaEmo8Cvq7na6
-                      update_type: background
-                      webhook: https://plaid.com/example/hook
-                      consent_expiration_time: null
-                    request_id: m8MDnv9okwxFNBV
-                    next_cursor: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
-        default:
-          description: Error response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PlaidError'
-      description: Returns Items associated with a User along with their corresponding statuses.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserItemsListRequest'
   /user/items/associate:
     x-hidden-from-docs: true
     post:
@@ -14231,6 +14180,7 @@ paths:
                       language: en
                       redirect_uri: null
                       webhook: https://webhook.site/dc9c138f-75de-4db1-883a-a4add4b7eb7e
+                    user_id: usr_123456abcdef
                     request_id: Pxpgzy0Wjvn99mY
         default:
           description: Error response
@@ -21758,13 +21708,15 @@ components:
     PersonalFinanceCategoryVersion:
       title: PersonalFinanceCategoryVersion
       type: string
-      x-hidden-from-docs: true
       description: |
-        Optional parameter that specifies which version of the personal finance category taxonomy to return. The v2 taxonomy is defined [here](https://docs.google.com/spreadsheets/d/e/2PACX-1vRUQR6BdYCwu7libfEUUA0U4TYfkyxpAUOSCj_unpv6OYCJMhIC0_PNrJnnki0At3LAG0PgT3aY7hRz/pubhtml). The legacy v1 taxonomy is defined [here](https://docs.google.com/spreadsheets/d/e/2PACX-1vQb96YxbnLdHbAROh1Dx7BaSpChnAIEKp1zZZFLBBpGbiLtPR3JTtxzvQ8mF4kU0StL8Y16WEpUd5P2/pubhtml).
+        Indicates which version of the personal finance category taxonomy is being used. [View PFCv2 and PFCv1 taxonomies](https://plaid.com/documents/pfc-taxonomy-all.csv).
 
-        If you enabled any Financial Insights products before October 2025 you will receive a default of `v1` taxonomy and may request `v2` by explicitly setting this field to `v2`.
+        If you enabled Transactions or Enrich before December 2025 you will receive the `v1` taxonomy by default and may request `v2` by explicitly setting this field to `v2` in the request.
 
-        If you enabled any Financial Insights products on or after October 2025 you may only receive `v2` taxonomy.
+        If you enabled Transactions or Enrich on or after December 2025, you may only receive the `v2` taxonomy.
+      enum:
+      - v1
+      - v2
     TransactionsGetRequestOptions:
       type: object
       description: An optional object to be used with the request. If specified, `options` must not be `null`.
@@ -22606,7 +22558,6 @@ components:
     TransactionsRecurringGetRequestOptions:
       type: object
       description: An optional object to be used with the request. If specified, `options` must not be `null`.
-      x-hidden-from-docs: true
       properties:
         include_personal_finance_category:
           type: boolean
@@ -22661,7 +22612,7 @@ components:
 
             All implementations are encouraged to use this field instead of `category`, as it provides more meaningful and accurate categorization.
 
-            See the [`taxonomy csv file`](https://plaid.com/documents/transactions-personal-finance-category-taxonomy.csv) for a full list of personal finance categories.
+            See the [taxonomy csv file](https://plaid.com/documents/pfc-taxonomy-all.csv) for a full list of personal finance categories.
         rule_details:
           $ref: '#/components/schemas/TransactionsRuleDetails'
       required:
@@ -23231,13 +23182,20 @@ components:
           description: The ID of the institution the Item will be associated with
         initial_products:
           type: array
-          description: The products to initially pull for the Item. May be any products that the specified `institution_id`  supports. This array may not be empty.
+          description: The products to initially pull for the Item. May be any products that the specified `institution_id` supports. This array may not be empty.
           items:
             $ref: '#/components/schemas/Products'
           minItems: 1
           x-override-enum-values-shown:
           - assets
           - auth
+          - cra_base_report
+          - cra_income_insights
+          - cra_cashflow_insights
+          - cra_lend_score
+          - cra_partner_insights
+          - cra_network_insights
+          - cra_monitoring
           - identity
           - income_verification
           - investments_auth
@@ -23253,6 +23211,8 @@ components:
           $ref: '#/components/schemas/SandboxPublicTokenCreateRequestOptions'
         user_token:
           $ref: '#/components/schemas/UserToken'
+        user_id:
+          $ref: '#/components/schemas/NewUserID'
       required:
       - institution_id
       - initial_products
@@ -24451,8 +24411,8 @@ components:
             $ref: '#/components/schemas/ItemId'
           nullable: true
           description: An array of `item_id`s associated with the User to be reset.  If empty or `null`, this field will default to resetting all Items associated with the User.
-      required:
-      - user_token
+        user_id:
+          $ref: '#/components/schemas/NewUserID'
     SandboxUserResetLoginResponse:
       type: object
       additionalProperties: true
@@ -24532,6 +24492,8 @@ components:
           type: string
           maxLength: 128
           minLength: 1
+        identity:
+          $ref: '#/components/schemas/ClientUserIdentity'
         end_customer:
           x-hidden-from-docs: true
           description: A unique ID representing a CRA reseller's end customer. Maximum of 128 characters.
@@ -24540,12 +24502,9 @@ components:
           minLength: 0
         consumer_report_user_identity:
           $ref: '#/components/schemas/ConsumerReportUserIdentity'
-        identity:
-          $ref: '#/components/schemas/ClientUserIdentity'
         with_upgraded_user:
           x-hidden-from-docs: true
           description: When `true`, a new user will be created and a `user_id` will be returned. Otherwise, a legacy user will be created and a `user_token` will be returned.
-          default: false
           type: boolean
       required:
       - client_user_id
@@ -24557,7 +24516,7 @@ components:
         user_token:
           $ref: '#/components/schemas/UserToken'
         user_id:
-          $ref: '#/components/schemas/UserId'
+          $ref: '#/components/schemas/NewUserID'
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
@@ -24611,14 +24570,14 @@ components:
           $ref: '#/components/schemas/APIClientID'
         secret:
           $ref: '#/components/schemas/APISecret'
-        user_token:
-          $ref: '#/components/schemas/UserToken'
-        consumer_report_user_identity:
-          $ref: '#/components/schemas/ConsumerReportUserIdentity'
         user_id:
           $ref: '#/components/schemas/NewUserID'
         identity:
           $ref: '#/components/schemas/ClientUserIdentity'
+        user_token:
+          $ref: '#/components/schemas/UserToken'
+        consumer_report_user_identity:
+          $ref: '#/components/schemas/ConsumerReportUserIdentity'
     UserUpdateResponse:
       type: object
       additionalProperties: true
@@ -24636,10 +24595,10 @@ components:
           $ref: '#/components/schemas/APIClientID'
         secret:
           $ref: '#/components/schemas/APISecret'
-        user_token:
-          $ref: '#/components/schemas/UserToken'
         user_id:
           $ref: '#/components/schemas/NewUserID'
+        user_token:
+          $ref: '#/components/schemas/UserToken'
     UserRemoveResponse:
       type: object
       additionalProperties: true
@@ -24686,8 +24645,6 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_token:
           $ref: '#/components/schemas/UserToken'
-        user_id:
-          $ref: '#/components/schemas/NewUserID'
         third_party_client_id:
           type: string
           description: The Plaid API `client_id` of the third-party client the token will be shared with. The token will only be valid for the specified client.
@@ -24696,6 +24653,8 @@ components:
           nullable: true
           description: The expiration date and time for the third-party user token in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (`YYYY-MM-DDThh:mm:ssZ`). The expiration is restricted to a maximum of 24 hours from the token's creation time. If not provided, the token will automatically expire after 24 hours.
           format: date-time
+        user_id:
+          $ref: '#/components/schemas/NewUserID'
       required:
       - third_party_client_id
     UserThirdPartyTokenCreateResponse:
@@ -24748,8 +24707,8 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_token:
           $ref: '#/components/schemas/UserToken'
-      required:
-      - user_token
+        user_id:
+          $ref: '#/components/schemas/NewUserID'
     UserItemsGetResponse:
       type: object
       additionalProperties: true
@@ -24764,47 +24723,6 @@ components:
       required:
       - items
       - request_id
-    UserItemsListRequest:
-      type: object
-      description: UserItemsListRequest defines the request schema for `/user/items/list`
-      properties:
-        client_id:
-          $ref: '#/components/schemas/APIClientID'
-        secret:
-          $ref: '#/components/schemas/APISecret'
-        user_id:
-          $ref: '#/components/schemas/NewUserID'
-        cursor:
-          type: string
-          description: An identifier that can be used to retrieve the next set of Items. The `/user/items/list` response will contain a `next_cursor` field if the user has additional Items that were not returned.
-        limit:
-          type: integer
-          minimum: 1
-          default: 100
-          description: The maximum number of Items to return in the response. If not specified, defaults to 100.
-      required:
-      - user_id
-    UserItemsListResponse:
-      type: object
-      additionalProperties: true
-      description: UserItemsListResponse defines the response schema for `/user/items/list`
-      properties:
-        items:
-          type: array
-          description: The Items associated with the user sorted by `created_at`
-          items:
-            $ref: '#/components/schemas/Item'
-        request_id:
-          $ref: '#/components/schemas/RequestID'
-        next_cursor:
-          nullable: true
-          type: string
-          description: An identifier to pass in `/user/items/list` as the optional `cursor` parameter for the next page of Item results. If this is `null` then there are no more Items for the given user.
-          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
-      required:
-      - items
-      - request_id
-      - next_cursor
     UserItemsAssociateRequest:
       type: object
       description: UserItemsAssociateRequest defines the request schema for `/user/items/associate`
@@ -24922,7 +24840,9 @@ components:
       type: object
       nullable: true
       additionalProperties: true
-      description: To create a Plaid Check Consumer Report for a user, this field must be present on the user token. If this field is not provided during user token creation, you can add it to the user later by calling `/user/update`. Once the field has been added to the user, you will be able to call `/link/token/create` with a non-empty `consumer_report_permissible_purpose` (which will automatically create a Plaid Check Consumer Report), or call `/cra/check_report/create` for that user.
+      description: |-
+        This field is only used by integrations created before December 10, 2025. All other integrations must use the `identity` object instead. For more details, see [new user APIs](https://plaid.com/docs/api/users/user-apis).
+        To create a Plaid Check Consumer Report for a user when using a `user_token`, this field must be present. If this field is not provided during user token creation, you can add it to the user later by calling `/user/update`. Once the field has been added to the user, you will be able to call `/link/token/create` with a non-empty `consumer_report_permissible_purpose` (which will automatically create a Plaid Check Consumer Report), or call `/cra/check_report/create` for that user.
       properties:
         first_name:
           type: string
@@ -25045,7 +24965,6 @@ components:
     ClientUserIdentity:
       type: object
       nullable: true
-      x-hidden-from-docs: true
       additionalProperties: true
       description: ClientUserIdentity is the shared user identity construct across /user/* routes.
       properties:
@@ -26176,6 +26095,7 @@ components:
           - cardlytics
           - pinwheel
           - thread_bank
+          - array
           description: The processor you are integrating with.
       required:
       - access_token
@@ -26391,6 +26311,9 @@ components:
           minItems: 1
         user:
           $ref: '#/components/schemas/LinkTokenCreateRequestUser'
+        user_id:
+          type: string
+          description: A `user_id` generated using `/user/create`. Required for integrations that began using Plaid Protect, Multi-Item Link, or Plaid Check Consumer Report after December 10, 2025. For more details, see [new User APIs](https://plaid.com/docs/api/users/user-apis). One of either the `user_id` or the `user` field is required.
         products:
           type: array
           description: |-
@@ -26578,9 +26501,6 @@ components:
           $ref: '#/components/schemas/LinkTokenCreateRequestIdentityVerification'
         statements:
           $ref: '#/components/schemas/LinkTokenCreateRequestStatements'
-        user_token:
-          type: string
-          description: A user token generated using `/user/create`. Any Item created during the Link session will be associated with the user.
         third_party_user_token:
           x-hidden-from-docs: true
           type: string
@@ -26608,10 +26528,9 @@ components:
         enable_multi_item_link:
           type: boolean
           description: If `true`, enable linking multiple items in the same Link session. Defaults to `false`.
-        user_id:
-          description: A unique ID generated by Plaid representing the end user. Typically, this ID will come from the `/user/create` response, when the endpoint is invoked with the `with_upgraded_user` request field set to `true`. **Required** if the `user` object isn't included. If this field is included, then the remaining `user` object fields are ignored.
-          allOf:
-          - $ref: '#/components/schemas/NewUserID'
+        user_token:
+          type: string
+          description: A user token generated using `/user/create`. Any Item created during the Link session will be associated with the user. Integrations that began using Plaid Protect, Multi-Item Link, or Plaid Check Consumer Report before December 10, 2025 use this field instead of the `user_id`.
       required:
       - client_name
       - language
@@ -26728,11 +26647,6 @@ components:
           description: The id of a template defined in Plaid Dashboard
         user:
           $ref: '#/components/schemas/SessionTokenCreateRequestUser'
-        user_id:
-          x-hidden-from-docs: true
-          description: A unique ID generated by Plaid representing the end user. Typically, this ID will come from the `/user/create` response, when the endpoint is invoked with the `with_upgraded_user` request field set to `true`. **Required** if the `user` object isn't included. If this field is included, then the remaining `user` object fields are ignored.
-          allOf:
-          - $ref: '#/components/schemas/NewUserID'
         redirect_uri:
           $ref: '#/components/schemas/LinkTokenCreateRequestRedirectUri'
         android_package_name:
@@ -26742,17 +26656,22 @@ components:
           type: string
           description: The destination URL to which any webhooks should be sent. If you use the same webhook listener for all Sandbox or all Production activity, set this value in the Layer template editor in the Dashboard instead. Only provide a value in this field if you need to use multiple webhook URLs per environment (an uncommon use case). If provided, a value in this field will take priority over webhook values set in the Layer template editor.
           format: url
+        user_id:
+          $ref: '#/components/schemas/NewUserID'
       required:
       - template_id
     SessionTokenCreateRequestUser:
       type: object
-      description: SessionTokenCreateRequestUser defines per-session user-specific data for `/session/token/create`. **Required** if the root-level `user_id` field isn't included.
+      description: Details about the end user. Required if a root-level `user_id` is not provided.
       properties:
         client_user_id:
           type: string
           description: A unique ID representing the end user. Typically this will be a user ID number from your application. Personally identifiable information, such as an email address or phone number, should not be used in the `client_user_id`. It is currently used as a means of searching logs for the given user in the Plaid Dashboard.
         user_id:
-          $ref: '#/components/schemas/UserId'
+          allOf:
+          - $ref: '#/components/schemas/UserId'
+          - type: string
+            description: The `user_id` created by calling `/user/create`. Provide this field only if you are using Plaid Check Report with Layer and have a `user_token`.
       required:
       - client_user_id
     HostedLinkDeliveryMethod:
@@ -27186,6 +27105,8 @@ components:
             $ref: '#/components/schemas/LinkTokenGetSessionsResponse'
         metadata:
           $ref: '#/components/schemas/LinkTokenGetMetadataResponse'
+        user_id:
+          $ref: '#/components/schemas/NewUserID'
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
@@ -27722,6 +27643,16 @@ components:
           type: string
           nullable: true
           description: Suggested steps for resolving the error
+        required_account_subtypes:
+          type: array
+          items:
+            type: string
+          description: "A list of the account subtypes that were requested via the `account_filters` \nparameter in `/link/token/create`. Currently only populated for `NO_ACCOUNTS` errors from\nItems with `investments_auth` as an enabled product.\n"
+        provided_account_subtypes:
+          type: array
+          items:
+            type: string
+          description: "A list of the account subtypes that were extracted but did not match the requested subtypes via the `account_filters` \nparameter in `/link/token/create`. Currently only populated for `NO_ACCOUNTS` errors from\nItems with `investments_auth` as an enabled product.\n"
       required:
       - error_type
       - error_code
@@ -29827,7 +29758,7 @@ components:
       description: |-
         Information describing the intent of the transaction. Most relevant for personal finance use cases, but not limited to such use cases.
 
-        See the [`taxonomy CSV file`](https://plaid.com/documents/transactions-personal-finance-category-taxonomy.csv) for a full list of personal finance categories. If you are migrating to personal finance categories from the legacy categories, also refer to the [`migration guide`](https://plaid.com/docs/transactions/pfc-migration/).
+        See the [taxonomy CSV file](https://plaid.com/documents/pfc-taxonomy-all.csv) for a full list of personal finance categories. If you are migrating to personal finance categories from the legacy categories, also refer to the [migration guide](https://plaid.com/docs/transactions/pfc-migration/).
       properties:
         primary:
           type: string
@@ -29847,9 +29778,7 @@ components:
             `UNKNOWN`: We don’t know the confidence level for this category.
           nullable: true
         version:
-          x-hidden-from-docs: true
-          type: string
-          description: The version of the personal finance category requested. Possible values are “v1” and “v2”
+          $ref: '#/components/schemas/PersonalFinanceCategoryVersion'
       required:
       - primary
       - detailed
@@ -29884,7 +29813,7 @@ components:
     UserToken:
       title: UserToken
       type: string
-      description: The user token associated with the User data is being requested for.
+      description: The user token associated with the User data is being requested for. This field is used only by customers with pre-existing integrations that already use the `user_token` field. All other customers should use the `user_id` instead. For more details, see [New User APIs](https://plaid.com/docs/api/users/user-apis).
     ThirdPartyUserToken:
       x-hidden-from-docs: true
       title: ThirdPartyUserToken
@@ -33158,7 +33087,7 @@ components:
     NewUserID:
       title: NewUserID
       type: string
-      description: A unique `user_id` generated by Plaid for the client-provided `client_user_id`. This field is currently in beta.
+      description: A unique user identifier, created by `/user/create`. Integrations that began using `/user/create` after December 10, 2025 use this field to identify a user instead of the `user_token`. For more details, see [new user APIs](https://plaid.com/docs/api/users/user-apis).
     AuthDefaultUpdateWebhook:
       x-examples:
         example-1:
@@ -36521,7 +36450,7 @@ components:
       type: string
       nullable: true
       x-hidden-from-docs: true
-      description: Indicates whether the transfer is guaranteed by Plaid (Guarantee customers only). This field will contain either `GUARANTEED` or `NOT_GUARANTEED` indicating whether Plaid will guarantee the transfer. If the transfer is not guaranteed, additional information will be provided in the `guarantee_decision_rationale` field. Refer to the `code` field in `guarantee_decision_rationale` for details.
+      description: Indicates whether the transfer is guaranteed by Plaid (Guarantee customers only). This field will contain either `GUARANTEED` or `NOT_GUARANTEED` indicating whether Plaid will guarantee the transfer.
       enum:
       - GUARANTEED
       - NOT_GUARANTEED
@@ -36996,7 +36925,13 @@ components:
           nullable: true
           default: true
           x-hidden-from-docs: true
-          description: If set to `false`, Plaid will not offer a `guarantee_decision` for this request (Guarantee customers only).
+          deprecated: true
+          description: If set to `false`, Plaid will not offer a `guarantee_decision` for this request (Guarantee customers only). This field is deprecated in favor for `guarantee`.
+        request_guarantee:
+          type: boolean
+          nullable: true
+          x-hidden-from-docs: true
+          description: Indicates whether the transfer should be evaluated for guarantee coverage. When set to `true`, Plaid assesses the transfer for guarantee coverage and returns a decision in the authorization response. When omitted or set to `false`, the authorization is evaluated without guarantee coverage.
         beacon_session_id:
           x-hidden-from-docs: true
           type: string
@@ -37444,6 +37379,8 @@ components:
         `declined` – Plaid reviewed the proposed transfer and declined processing. Refer to the `code` field in the `decision_rationale` object for details.
 
         `user_action_required` – An action is required before Plaid can assess the transfer risk and make a decision. The most common scenario is to update authentication for an Item. To complete the required action, initialize Link by setting `transfer.authorization_id` in the request of `/link/token/create`. After Link flow is completed, you may re-attempt the authorization request.
+
+        For `guarantee` requests, `approved` indicates the transfer is eligible for Plaid's guarantee, and `declined` indicates Plaid will not provide guarantee coverage for the transfer.
       enum:
       - approved
       - declined
@@ -46741,17 +46678,14 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_token:
           $ref: '#/components/schemas/UserToken'
-        user_id:
-          x-hidden-from-docs: true
-          description: A unique ID generated by Plaid representing the end user. Typically, this ID will come from the `/user/create` response, when the endpoint is invoked with the `with_upgraded_user` request field set to `true`. If this field is included, then the `user_token` object field is ignored.
-          allOf:
-          - $ref: '#/components/schemas/NewUserID'
         webhook_codes:
           type: array
           description: Webhook codes corresponding to the Cash Flow Updates events to be simulated.
           items:
             $ref: '#/components/schemas/CashFlowUpdatesEventWebhookCodes'
           nullable: true
+        user_id:
+          $ref: '#/components/schemas/NewUserID'
     SandboxCraCashflowUpdatesUpdateResponse:
       title: SandboxCraCashflowUpdatesUpdateResponse
       additionalProperties: true
@@ -49502,8 +49436,9 @@ components:
     CashFlowUpdatesInsightsWebhook:
       title: CashFlowUpdatesInsightsWebhook
       type: object
+      deprecated: true
       additionalProperties: true
-      description: 'For each user''s Item enabled for Cash Flow Updates, this webhook will fire between one and four times a day with information on the status of the update. This webhook will not fire immediately upon enrollment in Cash Flow Updates. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights. At approximately the same time as the `INSIGHTS_UPDATED` webhook, any event-driven `CASH_FLOW_UPDATES` webhooks (e.g. `LOW_BALANCE_DETECTED`, `LARGE_DEPOSIT_DETECTED`) that were triggered by the update will also fire. '
+      description: For each user's Item enabled for Cash Flow Updates, this webhook will fire between one and four times a day with information on the status of the update. This webhook will not fire immediately upon enrollment in Cash Flow Updates. Upon receiving the webhook, call `/cra/monitoring_insights/get` to retrieve the updated insights. At approximately the same time as the `INSIGHTS_UPDATED` webhook, any event-driven `CASH_FLOW_UPDATES` webhooks (e.g. `LOW_BALANCE_DETECTED`, `LARGE_DEPOSIT_DETECTED`) that were triggered by the update will also fire. This webhook has been replaced by the `CASH_FLOW_INSIGHTS_UPDATED` webhook for all customers who began using Plaid Check on or after December 10, 2025.
       properties:
         webhook_type:
           type: string
@@ -49724,7 +49659,6 @@ components:
           user_id: 9eaba3c2fdc916bc197f279185b986607dd21682a5b04eab04a5a03e8b3f3334
           environment: production
     CashFlowUpdatesInsightsV2Webhook:
-      x-hidden-from-docs: true
       title: CashFlowUpdatesInsightsV2Webhook
       type: object
       additionalProperties: true
@@ -49740,7 +49674,7 @@ components:
           $ref: '#/components/schemas/MonitoringInsightsStatus'
         user_id:
           type: string
-          description: A unique ID generated by Plaid representing the end user. Typically, this ID will come from the `/user/create` response, when the endpoint is invoked with the `with_upgraded_user` request field set to `true`.
+          description: The `user_id` associated with the user whose data is being requested. This is received by calling `user/create`.
         insights:
           type: array
           items:
@@ -49765,7 +49699,7 @@ components:
           webhook_type: CASH_FLOW_UPDATES
           webhook_code: CASH_FLOW_INSIGHTS_UPDATED
           status: AVAILABLE
-          user_id: user-sandbox-b0e2c4ee-a763-4df5-bfe9-46a46bce993d
+          user_id: usr_6009db6e
           insights:
           - LARGE_DEPOSIT_DETECTED
           - LOW_BALANCE_DETECTED
@@ -49776,7 +49710,7 @@ components:
           webhook_type: CASH_FLOW_UPDATES
           webhook_code: CASH_FLOW_INSIGHTS_UPDATED
           status: FAILED
-          user_id: user-sandbox-b0e2c4ee-a763-4df5-bfe9-46a46bce993d
+          user_id: usr_6009db6e
           insights: []
           environment: sandbox
     CashFlowInsight:
@@ -50069,7 +50003,6 @@ components:
           environment: production
       x-hidden-from-docs: true
     CraUserCheckReportReadyWebhook:
-      x-hidden-from-docs: true
       type: object
       title: CraUserCheckReportReadyWebhook
       description: Fired when the Check Report are ready to be retrieved. Once this webhook has fired, the report will be available to retrieve for 24 hours.
@@ -50083,7 +50016,7 @@ components:
           description: '`USER_CHECK_REPORT_READY`'
         user_id:
           type: string
-          description: The `user_id` corresponding to the user the webhook has fired for. Typically, this ID will come from the `/user/create` response, when the endpoint is invoked with the `with_upgraded_user` request field set to `true`.
+          description: The `user_id` associated with the user whose data is being requested. This is received by calling `user/create`.
         successful_products:
           type: array
           description: Specifies a list of products that have successfully been generated for the report.
@@ -50132,7 +50065,6 @@ components:
           - cra_base_report
           environment: production
     CraUserCheckReportFailedWebhook:
-      x-hidden-from-docs: true
       type: object
       title: CraUserCheckReportFailedWebhook
       description: Fired when a Check Report has failed to generate
@@ -50146,7 +50078,7 @@ components:
           description: '`USER_CHECK_REPORT_FAILED`'
         user_id:
           type: string
-          description: The `user_id` corresponding to the user the webhook has fired for. Typically, this ID will come from the `/user/create` response, when the endpoint is invoked with the `with_upgraded_user` request field set to `true`.
+          description: The `user_id` associated with the user whose data is being requested. This is received by calling user/create.
         environment:
           $ref: '#/components/schemas/WebhookEnvironmentValues'
       required:
@@ -51078,16 +51010,11 @@ components:
           $ref: '#/components/schemas/APIClientID'
         secret:
           $ref: '#/components/schemas/APISecret'
-        user_token:
-          $ref: '#/components/schemas/UserToken'
+        user_id:
+          $ref: '#/components/schemas/NewUserID'
         item_id:
           type: string
           description: The item ID to subscribe for Cash Flow Updates.
-        user_id:
-          x-hidden-from-docs: true
-          description: A unique ID generated by Plaid representing the end user. Typically, this ID will come from the `/user/create` response, when the endpoint is invoked with the `with_upgraded_user` request field set to `true`. If this field is included, then the `user_token` object field is ignored.
-          allOf:
-          - $ref: '#/components/schemas/NewUserID'
         webhook:
           type: string
           description: URL to which Plaid will send Cash Flow Updates webhooks, for example when the requested Cash Flow Updates report is ready.
@@ -51098,6 +51025,8 @@ components:
           items:
             $ref: '#/components/schemas/CreditBankIncomeCategory'
           nullable: true
+        user_token:
+          $ref: '#/components/schemas/UserToken'
       required:
       - webhook
     CraMonitoringInsightsSubscribeResponse:
@@ -51145,15 +51074,12 @@ components:
           $ref: '#/components/schemas/APIClientID'
         secret:
           $ref: '#/components/schemas/APISecret'
-        user_token:
-          $ref: '#/components/schemas/UserToken'
         user_id:
-          x-hidden-from-docs: true
-          description: A unique ID generated by Plaid representing the end user. Typically, this ID will come from the `/user/create` response, when the endpoint is invoked with the `with_upgraded_user` request field set to `true`. If this field is included, then the `user_token` object field is ignored.
-          allOf:
-          - $ref: '#/components/schemas/NewUserID'
+          $ref: '#/components/schemas/NewUserID'
         consumer_report_permissible_purpose:
           $ref: '#/components/schemas/MonitoringConsumerReportPermissiblePurpose'
+        user_token:
+          $ref: '#/components/schemas/UserToken'
       required:
       - consumer_report_permissible_purpose
     CraMonitoringInsightsGetResponse:
@@ -51446,20 +51372,17 @@ components:
           $ref: '#/components/schemas/APIClientID'
         secret:
           $ref: '#/components/schemas/APISecret'
-        user_token:
-          $ref: '#/components/schemas/UserToken'
+        user_id:
+          $ref: '#/components/schemas/NewUserID'
         third_party_user_token:
           $ref: '#/components/schemas/ThirdPartyUserToken'
-        user_id:
-          x-hidden-from-docs: true
-          description: A unique ID generated by Plaid representing the end user. Typically, this ID will come from the `/user/create` response, when the endpoint is invoked with the `with_upgraded_user` request field set to `true`. If this field is included, then the `user_token` object field is ignored.
-          allOf:
-          - $ref: '#/components/schemas/NewUserID'
         add_ons:
           type: array
           description: Use this field to include other reports in the PDF.
           items:
             $ref: '#/components/schemas/CraPDFAddOns'
+        user_token:
+          $ref: '#/components/schemas/UserToken'
     CraPDFAddOns:
       title: CraPDFAddOns
       enum:
@@ -51484,15 +51407,10 @@ components:
           $ref: '#/components/schemas/APIClientID'
         secret:
           $ref: '#/components/schemas/APISecret'
-        user_token:
-          $ref: '#/components/schemas/UserToken'
+        user_id:
+          $ref: '#/components/schemas/NewUserID'
         third_party_user_token:
           $ref: '#/components/schemas/ThirdPartyUserToken'
-        user_id:
-          x-hidden-from-docs: true
-          description: A unique ID generated by Plaid representing the end user. Typically, this ID will come from the `/user/create` response, when the endpoint is invoked with the `with_upgraded_user` request field set to `true`. If this field is included, then the `user_token` object field is ignored.
-          allOf:
-          - $ref: '#/components/schemas/NewUserID'
         item_ids:
           type: array
           description: The item IDs to include in the Base Report. If not provided, all items associated with the user will be included.
@@ -51500,6 +51418,8 @@ components:
           x-hidden-from-docs: true
           items:
             $ref: '#/components/schemas/ItemId'
+        user_token:
+          $ref: '#/components/schemas/UserToken'
     CraCheckReportBaseReportGetResponse:
       title: CraCheckReportBaseReportGetResponse
       type: object
@@ -55709,27 +55629,6 @@ components:
       - item_ids
       - request_id
       type: object
-    BusinessAddress:
-      type: object
-      description: Physical address of a business. Used for input requests and as base for response schemas.
-      properties:
-        street:
-          $ref: '#/components/schemas/Street'
-        street2:
-          $ref: '#/components/schemas/Street2'
-        city:
-          $ref: '#/components/schemas/City'
-        region:
-          $ref: '#/components/schemas/Region'
-        postal_code:
-          $ref: '#/components/schemas/PostalCode'
-        country:
-          $ref: '#/components/schemas/GenericCountryCode'
-      required:
-      - street
-      - city
-      - country
-      additionalProperties: true
     BusinessEmailAddress:
       type: object
       description: Email address associated with a business
@@ -55737,6 +55636,7 @@ components:
         email_address:
           type: string
           format: email
+          nullable: true
           description: Email address of the business
           example: business@example.com
       required:
@@ -55745,6 +55645,7 @@ components:
     BusinessEntityType:
       description: The legal structure or type of business entity
       type: string
+      nullable: true
       enum:
       - sole_proprietorship
       - general_partnership
@@ -55810,6 +55711,7 @@ components:
       properties:
         name:
           type: string
+          nullable: true
           description: The business name from the data provider
           example: Acme Corporation
         entity_type:
@@ -55851,12 +55753,19 @@ components:
       title: BusinessName
       example: Acme Corporation
       description: The name of the business. Must have at least one character and a maximum length of 500 characters.
+    BusinessNameNullable:
+      type: string
+      title: BusinessName
+      example: Acme Corporation
+      description: The name of the business. Must have at least one character and a maximum length of 500 characters.
+      nullable: true
     BusinessPhoneNumber:
       type: object
       description: Phone number associated with a business
       properties:
         number:
           type: string
+          nullable: true
           description: Phone number in E.164 format
           example: "+12345678909"
       required:
@@ -55882,9 +55791,9 @@ components:
       description: The business information that was used to perform the verification search
       properties:
         name:
-          $ref: '#/components/schemas/BusinessName'
+          $ref: '#/components/schemas/BusinessNameNullable'
         address:
-          $ref: '#/components/schemas/BusinessSearchTermsAddress'
+          $ref: '#/components/schemas/ResponseBusinessAddress'
         website:
           $ref: '#/components/schemas/URLNullable'
         phone_number:
@@ -55898,30 +55807,6 @@ components:
       - phone_number
       - email_address
       additionalProperties: true
-    BusinessSearchTermsAddress:
-      type: object
-      description: Physical address of a business in response
-      additionalProperties: true
-      properties:
-        street:
-          $ref: '#/components/schemas/Street'
-        street2:
-          $ref: '#/components/schemas/Street2'
-        city:
-          $ref: '#/components/schemas/City'
-        region:
-          $ref: '#/components/schemas/Region'
-        postal_code:
-          $ref: '#/components/schemas/PostalCode'
-        country:
-          $ref: '#/components/schemas/GenericCountryCode'
-      required:
-      - street
-      - city
-      - country
-      - street2
-      - region
-      - postal_code
     BusinessVerificationCreateRequest:
       type: object
       description: Request input for creating a business verification
@@ -55944,7 +55829,7 @@ components:
         name:
           $ref: '#/components/schemas/BusinessName'
         address:
-          $ref: '#/components/schemas/BusinessAddress'
+          $ref: '#/components/schemas/RequestBusinessAddress'
         website:
           $ref: '#/components/schemas/URL'
         phone_number:
@@ -56079,6 +55964,7 @@ components:
         url:
           type: string
           format: uri
+          nullable: true
           description: URL of the business website
           example: https://example.com
       required:
@@ -57002,7 +56888,7 @@ components:
       - failed
       - no_data
     IDNumberType:
-      description: A globally unique and human readable ID type, specific to the country and document category. For more context on this field, see [Hybrid Input Validation](https://plaid.com/docs/identity-verification/hybrid-input-validation).
+      description: A globally unique and human readable ID type, specific to the country and document category. For more context on this field, see [Input Validation Rules](https://cognitohq.com/docs/flow/flow-hybrid-input-validation#id-numbers).
       type: string
       enum:
       - ar_dni
@@ -57046,7 +56932,7 @@ components:
       type: string
       example: "123456789"
       title: IDNumberValue
-      description: Value of identity document value typed in by user. Alpha-numeric, with all formatting characters stripped. For specific format requirements by ID type, see [Hybrid Input Validation](https://plaid.com/docs/identity-verification/hybrid-input-validation/).
+      description: Value of identity document value typed in by user. Alpha-numeric, with all formatting characters stripped. For specific format requirements by ID type, see [Input Validation Rules](https://plaid.com/docs/identity-verification/hybrid-input-validation/#id-numbers).
     IDVProtectEvent:
       description: Information about a Protect event including Trust Index score and fraud attributes.
       type: object
@@ -57590,9 +57476,9 @@ components:
         client_user_id:
           $ref: '#/components/schemas/ClientUserID'
         user_id:
+          description: A unique user identifier, created by `/user/create`. All integrations that began using `/user/create` after December 10, 2025 use this field to identify a user instead of the `user_token`. For more details, see [new user APIs](https://plaid.com/docs/api/users/user-apis). If both this field and the `client_user_id` are present in the request, the `user_id` must have been created from the provided `client_user_id`.
           allOf:
           - $ref: '#/components/schemas/PlaidUserID'
-          - description: A unique `user_id` generated by Plaid for the client-provided `client_user_id`. This field is currently in beta. If both `client_user_id` and `user_id` are provided, `client_user_id` must match the value for the returned user.
           nullable: true
         cursor:
           $ref: '#/components/schemas/Cursor'
@@ -58434,12 +58320,12 @@ components:
       type: string
       title: PlaidUserID
       example: usr_dddAs9ewdcDQQQ
-      description: A unique `user_id` generated by Plaid for the client-provided `client_user_id`. This field is currently in beta.
+      description: A unique user identifier, created by `/user/create`. All integrations that began using `/user/create` after December 10, 2025 use this field to identify a user instead of the `user_token`. For more details, see [new user APIs](https://plaid.com/docs/api/user/user-apis).
     PlaidUserIDNullable:
       type: string
       title: PlaidUserID
       example: usr_dddAs9ewdcDQQQ
-      description: A unique `user_id` generated by Plaid for the client-provided `client_user_id`. This field is currently in beta.
+      description: A unique user identifier, created by `/user/create`. All integrations that began using `/user/create` after December 10, 2025 use this field to identify a user instead of the `user_token`. For more details, see [new user APIs](https://plaid.com/docs/api/user/user-apis).
       nullable: true
     PostalCode:
       type: string
@@ -58480,11 +58366,11 @@ components:
       description: Detailed address information for a business from data provider
       properties:
         street:
-          $ref: '#/components/schemas/Street'
+          $ref: '#/components/schemas/StreetNullable'
         street2:
           $ref: '#/components/schemas/Street2'
         city:
-          $ref: '#/components/schemas/City'
+          $ref: '#/components/schemas/CityNullable'
         region:
           $ref: '#/components/schemas/Region'
         postal_code:
@@ -58497,12 +58383,12 @@ components:
           example: true
       required:
       - street
-      - city
-      - country
-      - is_primary
       - street2
+      - city
       - region
       - postal_code
+      - country
+      - is_primary
       type: object
     ProxyType:
       type: string
@@ -58531,6 +58417,51 @@ components:
       title: Region
       description: A subdivision code. "Subdivision" is a generic term for "state", "province", "prefecture", "zone", etc. For the list of valid codes, see [country subdivision codes](https://plaid.com/documents/country_subdivision_codes.json). Country prefixes are omitted, since they are inferred from the `country` field.
       nullable: true
+    RequestBusinessAddress:
+      type: object
+      description: Physical address of a business. Used for input requests.
+      properties:
+        street:
+          $ref: '#/components/schemas/Street'
+        street2:
+          $ref: '#/components/schemas/Street2'
+        city:
+          $ref: '#/components/schemas/City'
+        region:
+          $ref: '#/components/schemas/Region'
+        postal_code:
+          $ref: '#/components/schemas/PostalCode'
+        country:
+          $ref: '#/components/schemas/GenericCountryCode'
+      required:
+      - street
+      - city
+      - country
+      additionalProperties: true
+    ResponseBusinessAddress:
+      type: object
+      description: Physical address of a business. Used for response schemas.
+      properties:
+        street:
+          $ref: '#/components/schemas/StreetNullable'
+        street2:
+          $ref: '#/components/schemas/Street2'
+        city:
+          $ref: '#/components/schemas/CityNullable'
+        region:
+          $ref: '#/components/schemas/Region'
+        postal_code:
+          $ref: '#/components/schemas/PostalCode'
+        country:
+          $ref: '#/components/schemas/GenericCountryCode'
+      required:
+      - street
+      - street2
+      - city
+      - region
+      - postal_code
+      - country
+      additionalProperties: true
     ReviewComment:
       description: A comment submitted by a team member as part of reviewing a watchlist screening.
       type: string
@@ -58622,6 +58553,11 @@ components:
           $ref: '#/components/schemas/RiskCheckIdentityAbuseSignals'
         network:
           $ref: '#/components/schemas/RiskCheckNetwork'
+        facial_duplicates:
+          type: array
+          description: The attributes related to the facial duplicates captured in risk check.
+          items:
+            $ref: '#/components/schemas/RiskCheckFacialDuplicate'
       required:
       - status
       - behavior
@@ -58629,6 +58565,7 @@ components:
       - email
       - phone
       - identity_abuse_signals
+      - facial_duplicates
       nullable: true
       additionalProperties: true
     RiskCheckDevice:
@@ -58743,6 +58680,25 @@ components:
       - "yes"
       - "no"
       - no_data
+    RiskCheckFacialDuplicate:
+      description: Result summary object specifying values for the `facial_duplicate` attributes of risk check.
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/IdentityVerificationID'
+        similarity:
+          description: Similarity score of the match. Ranges from 0 to 100.
+          example: 95
+          type: integer
+        matched_after_completed:
+          description: Whether this match occurred after the session was complete. For example, this would be `true` if a later session ended up matching this one.
+          type: boolean
+          example: true
+      required:
+      - id
+      - similarity
+      - matched_after_completed
+      additionalProperties: true
     RiskCheckFactors:
       x-hidden-from-docs: true
       description: List of factors, when available, that contribute towards the risk level of the given risk check type.
@@ -60596,13 +60552,10 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_token:
           $ref: '#/components/schemas/UserToken'
-        user_id:
-          x-hidden-from-docs: true
-          description: A unique ID generated by Plaid representing the end user. Typically, this ID will come from the `/user/create` response, when the endpoint is invoked with the `with_upgraded_user` request field set to `true`. If this field is included, then the `user_token` object field is ignored.
-          allOf:
-          - $ref: '#/components/schemas/NewUserID'
         third_party_user_token:
           $ref: '#/components/schemas/ThirdPartyUserToken'
+        user_id:
+          $ref: '#/components/schemas/NewUserID'
     CraCheckReportIncomeInsightsGetResponse:
       title: CraCheckReportIncomeInsightsGetResponse
       additionalProperties: true
@@ -61131,13 +61084,10 @@ components:
           $ref: '#/components/schemas/APIClientID'
         secret:
           $ref: '#/components/schemas/APISecret'
+        user_id:
+          $ref: '#/components/schemas/NewUserID'
         user_token:
           $ref: '#/components/schemas/UserToken'
-        user_id:
-          x-hidden-from-docs: true
-          allOf:
-          - $ref: '#/components/schemas/NewUserID'
-          - description: A unique ID generated by Plaid representing the end user. Typically, this ID will come from the `/user/create` response, when the endpoint is invoked with the `with_upgraded_user` request field set to `true`. If this field is included, then the `user_token` object field is ignored.
         webhook:
           type: string
           format: url
@@ -61232,15 +61182,12 @@ components:
           $ref: '#/components/schemas/APIClientID'
         secret:
           $ref: '#/components/schemas/APISecret'
-        user_token:
-          $ref: '#/components/schemas/UserToken'
         user_id:
-          x-hidden-from-docs: true
-          description: A unique ID generated by Plaid representing the end user. Typically, this ID will come from the `/user/create` response, when the endpoint is invoked with the `with_upgraded_user` request field set to `true`. If this field is included, then the `user_token` object field is ignored.
-          allOf:
-          - $ref: '#/components/schemas/NewUserID'
+          $ref: '#/components/schemas/NewUserID'
         third_party_user_token:
           $ref: '#/components/schemas/ThirdPartyUserToken'
+        user_token:
+          $ref: '#/components/schemas/UserToken'
         partner_insights:
           $ref: '#/components/schemas/CraCheckReportPartnerInsightsGetPartnerInsights'
         options:
@@ -61696,15 +61643,12 @@ components:
           $ref: '#/components/schemas/APIClientID'
         secret:
           $ref: '#/components/schemas/APISecret'
-        user_token:
-          $ref: '#/components/schemas/UserToken'
         user_id:
-          x-hidden-from-docs: true
-          description: A unique ID generated by Plaid representing the end user. Typically, this ID will come from the `/user/create` response, when the endpoint is invoked with the `with_upgraded_user` request field set to `true`. If this field is included, then the `user_token` object field is ignored.
-          allOf:
-          - $ref: '#/components/schemas/NewUserID'
+          $ref: '#/components/schemas/NewUserID'
         third_party_user_token:
           $ref: '#/components/schemas/ThirdPartyUserToken'
+        user_token:
+          $ref: '#/components/schemas/UserToken'
         options:
           $ref: '#/components/schemas/CraCheckReportCashflowInsightsGetOptions'
     CraCheckReportLendScoreGetRequest:
@@ -61716,15 +61660,12 @@ components:
           $ref: '#/components/schemas/APIClientID'
         secret:
           $ref: '#/components/schemas/APISecret'
-        user_token:
-          $ref: '#/components/schemas/UserToken'
         user_id:
-          x-hidden-from-docs: true
-          description: A unique ID generated by Plaid representing the end user. Typically, this ID will come from the `/user/create` response, when the endpoint is invoked with the `with_upgraded_user` request field set to `true`. If this field is included, then the `user_token` object field is ignored.
-          allOf:
-          - $ref: '#/components/schemas/NewUserID'
+          $ref: '#/components/schemas/NewUserID'
         third_party_user_token:
           $ref: '#/components/schemas/ThirdPartyUserToken'
+        user_token:
+          $ref: '#/components/schemas/UserToken'
         options:
           $ref: '#/components/schemas/CraCheckReportLendScoreGetOptions'
     CraCheckReportCreateBaseReportOptions:
@@ -61949,17 +61890,14 @@ components:
           $ref: '#/components/schemas/APIClientID'
         secret:
           $ref: '#/components/schemas/APISecret'
-        user_token:
-          $ref: '#/components/schemas/UserToken'
         user_id:
-          x-hidden-from-docs: true
-          description: A unique ID generated by Plaid representing the end user. Typically, this ID will come from the `/user/create` response, when the endpoint is invoked with the `with_upgraded_user` request field set to `true`. If this field is included, then the `user_token` object field is ignored.
-          allOf:
-          - $ref: '#/components/schemas/NewUserID'
+          $ref: '#/components/schemas/NewUserID'
         options:
           $ref: '#/components/schemas/CraCheckReportNetworkInsightsGetOptions'
         third_party_user_token:
           $ref: '#/components/schemas/ThirdPartyUserToken'
+        user_token:
+          $ref: '#/components/schemas/UserToken'
     CraCheckReportNetworkInsightsGetResponse:
       title: CraCheckReportNetworkInsightsGetResponse
       additionalProperties: true
@@ -62032,6 +61970,8 @@ components:
           $ref: '#/components/schemas/APIClientID'
         secret:
           $ref: '#/components/schemas/APISecret'
+        user_id:
+          $ref: '#/components/schemas/NewUserID'
         reports_requested:
           type: array
           description: Specifies which types of verification reports are expected in the response
@@ -62041,11 +61981,6 @@ components:
           $ref: '#/components/schemas/CraCheckReportVerificationGetEmploymentRefreshOptions'
         user_token:
           $ref: '#/components/schemas/UserToken'
-        user_id:
-          x-hidden-from-docs: true
-          description: A unique ID generated by Plaid representing the end user. Typically, this ID will come from the `/user/create` response, when the endpoint is invoked with the `with_upgraded_user` request field set to `true`. If this field is included, then the `user_token` object field is ignored.
-          allOf:
-          - $ref: '#/components/schemas/NewUserID'
       required:
       - reports_requested
     CraCheckReportVerificationGetReportType:
@@ -62101,17 +62036,14 @@ components:
           $ref: '#/components/schemas/APIClientID'
         secret:
           $ref: '#/components/schemas/APISecret'
-        user_token:
-          $ref: '#/components/schemas/UserToken'
+        user_id:
+          $ref: '#/components/schemas/NewUserID'
         third_party_user_token:
           $ref: '#/components/schemas/ThirdPartyUserToken'
-        user_id:
-          x-hidden-from-docs: true
-          description: A unique ID generated by Plaid representing the end user. Typically, this ID will come from the `/user/create` response, when the endpoint is invoked with the `with_upgraded_user` request field set to `true`. If this field is included, then the `user_token` object field is ignored.
-          allOf:
-          - $ref: '#/components/schemas/NewUserID'
         report_type:
           $ref: '#/components/schemas/CraCheckReportVerificationPdfReportType'
+        user_token:
+          $ref: '#/components/schemas/UserToken'
       required:
       - report_type
     CraCheckReportVerificationPdfGetResponse:
@@ -65628,7 +65560,7 @@ components:
           $ref: '#/components/schemas/Ruleset'
         warnings:
           type: array
-          description: If bank information was not available to be used in the Signal Transasction Scores model, this array contains warnings describing why bank data is missing. If you want to receive an API error instead of scores in the case of missing bank data, file a support ticket or contact your Plaid account manager.
+          description: If bank information was not available to be used in the Signal Transaction Scores model, this array contains warnings describing why bank data is missing. If you want to receive an API error instead of scores in the case of missing bank data, file a support ticket or contact your Plaid account manager.
           items:
             $ref: '#/components/schemas/SignalWarning'
       required:
