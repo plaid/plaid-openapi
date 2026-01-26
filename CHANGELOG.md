@@ -1,3 +1,30 @@
+### 2020-09-14_1.680.8
+- Add `cra_plaid_credit_score` value to Products enum. Note that this value is deprecated and is added only to reflect current API behavior, as it is present in the supported products array returned by insititutions endpoints. `cra_plaid_credit_score` should not be used in any requests to `/link/token/create` and is planned to be removed from the API.
+
+### 2020-09-14_1.680.7
+- Add `environment` field to `ProtectUserEventWebhook`
+
+### 2020-09-14_1.680.6
+- Add 'investment_auth' as an available product in the request to `/partner/customer/create`
+
+### 2020-09-14_1.680.6
+- Add `201` response to `/user/create`
+
+### 2020-09-14_1.680.5
+- Add `/user/items/remove` endpoint
+
+### 2020-09-14_1.680.4
+- (hidden) Add `/user/identity/remove` endpoint to allow customers to explicitly purge identity data
+
+### 2020-09-14_1.680.3
+- Mark `is_investments_fallback_item` as an optional rather than required parameter in the response schema for `/processor/investments/holdings/get` endpoint (not yet currently used in Production by any customers), to achieve consistency with `/investments/holdings/get`. 
+
+### 2020-09-14_1.680.2
+- Add `/user_account/session/event/send` endpoint for Layer customer event tracking
+
+### 2020-09-14_1.680.1
+- Update /verification/pdf/get endpoint request attribute from `report_type` to `report_requested`.
+
 ### 2020-09-14_1.680.0
 - Add Facial Duplicate data to IDV APIs.
 
