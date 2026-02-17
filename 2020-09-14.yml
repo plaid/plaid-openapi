@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.680.8
+  version: 2020-09-14_1.681.4
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -3205,7 +3205,7 @@ paths:
               $ref: '#/components/schemas/CraCheckReportNetworkInsightsGetRequest'
   /cra/check_report/verification/get:
     post:
-      summary: Retrieve various verification reports for a user.
+      summary: Retrieve various home lending reports for a user.
       tags:
       - plaid
       responses:
@@ -3394,7 +3394,7 @@ paths:
       externalDocs:
         url: /api/products/check/#cracheck_reportverificationget
       operationId: craCheckReportVerificationGet
-      description: "This endpoint allows you to retrieve verification reports for a user. To obtain a VoA or Employment Refresh report, you need to make sure that `cra_base_report` is included in the `products` parameter when calling `/link/token/create` or `/cra/check_report/create`. \n\nYou should call this endpoint after you've received a `CHECK_REPORT_READY` or a `USER_CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`.\n\nIf the most recent consumer report for the user doesn’t have sufficient data to generate the report, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.\""
+      description: "This endpoint allows you to retrieve home lending reports for a user. To obtain a VoA or Employment Refresh report, you need to make sure that `cra_base_report` is included in the `products` parameter when calling `/link/token/create` or `/cra/check_report/create`. \n\nYou should call this endpoint after you've received a `CHECK_REPORT_READY` or a `USER_CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`.\n\nIf the most recent consumer report for the user doesn’t have sufficient data to generate the report, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.\""
       requestBody:
         required: true
         content:
@@ -7164,6 +7164,7 @@ paths:
                       - id: idv_52xR9LKo77r1Np
                         similarity: 95
                         matched_after_completed: true
+                      trust_index_score: 86
                     verify_sms:
                       status: success
                       verifications:
@@ -7184,7 +7185,7 @@ paths:
                       timestamp: "2020-07-24T03:26:02Z"
                       trust_index:
                         score: 86
-                        model: trust_index.1.0.1
+                        model: trust_index.2.0.0
                         subscores:
                           device_and_connection:
                             score: 87
@@ -7375,6 +7376,7 @@ paths:
                       - id: idv_52xR9LKo77r1Np
                         similarity: 95
                         matched_after_completed: true
+                      trust_index_score: 86
                     verify_sms:
                       status: success
                       verifications:
@@ -7395,7 +7397,7 @@ paths:
                       timestamp: "2020-07-24T03:26:02Z"
                       trust_index:
                         score: 86
-                        model: trust_index.1.0.1
+                        model: trust_index.2.0.0
                         subscores:
                           device_and_connection:
                             score: 87
@@ -7588,6 +7590,7 @@ paths:
                         - id: idv_52xR9LKo77r1Np
                           similarity: 95
                           matched_after_completed: true
+                        trust_index_score: 86
                       verify_sms:
                         status: success
                         verifications:
@@ -7608,7 +7611,7 @@ paths:
                         timestamp: "2020-07-24T03:26:02Z"
                         trust_index:
                           score: 86
-                          model: trust_index.1.0.1
+                          model: trust_index.2.0.0
                           subscores:
                             device_and_connection:
                               score: 87
@@ -7807,6 +7810,7 @@ paths:
                       - id: idv_52xR9LKo77r1Np
                         similarity: 95
                         matched_after_completed: true
+                      trust_index_score: 86
                     verify_sms:
                       status: success
                       verifications:
@@ -7827,7 +7831,7 @@ paths:
                       timestamp: "2020-07-24T03:26:02Z"
                       trust_index:
                         score: 86
-                        model: trust_index.1.0.1
+                        model: trust_index.2.0.0
                         subscores:
                           device_and_connection:
                             score: 87
@@ -9509,7 +9513,7 @@ paths:
                       timestamp: "2020-07-24T03:26:02Z"
                       trust_index:
                         score: 86
-                        model: trust_index.1.0.1
+                        model: trust_index.2.0.0
                         subscores:
                           device_and_connection:
                             score: 87
@@ -9562,6 +9566,51 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ProtectReportCreateRequest'
+  /protect/compute:
+    post:
+      tags:
+      - plaid
+      summary: Compute Protect Trust Index Score
+      externalDocs:
+        url: /api/products/protect/#protectcompute
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProtectComputeResponse'
+              examples:
+                example-1:
+                  value:
+                    trust_index:
+                      score: 86
+                      model: trust_index.2.0.0
+                      subscores:
+                        device_and_connection:
+                          score: 87
+                        bank_account_insights:
+                          score: 85
+                    fraud_attributes:
+                      link_session.linked_bank_accounts.user_pi_matches_owners: true
+                      link_session.linked_bank_accounts.connected_apps.days_since_first_connection: 582
+                      session.challenged_with_mfa: false
+                      user.bank_accounts.num_of_frozen_or_restricted_accounts: 0
+                      user.linked_bank_accounts.num_family_names: 1
+                      user.linked_bank_accounts.num_of_connected_banks: 1
+                      user.link_sessions.days_since_first_link_session: 150
+                      user.pi.email.history_yrs: 7.03
+                      user.pi.email.num_social_networks_linked: 12
+                      user.pi.ssn.user_likely_has_better_ssn: false
+                    request_id: saKrIBuEB9qJZng
+      operationId: protectCompute
+      description: Use this endpoint to compute a Protect Trust Index score and retrieve fraud attributes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProtectComputeRequest'
   /protect/event/send:
     post:
       tags:
@@ -9582,23 +9631,23 @@ paths:
                     event_id: ptevt_cYNnF8xYE1v1om
                     trust_index:
                       score: 86
-                      model: trust_index.1.0.1
+                      model: trust_index.2.0.0
                       subscores:
                         device_and_connection:
                           score: 87
                         bank_account_insights:
                           score: 85
-                      fraud_attributes:
-                        link_session.linked_bank_accounts.user_pi_matches_owners: true
-                        link_session.linked_bank_accounts.connected_apps.days_since_first_connection: 582
-                        session.challenged_with_mfa: false
-                        user.bank_accounts.num_of_frozen_or_restricted_accounts: 0
-                        user.linked_bank_accounts.num_family_names: 1
-                        user.linked_bank_accounts.num_of_connected_banks: 1
-                        user.link_sessions.days_since_first_link_session: 150
-                        user.pi.email.history_yrs: 7.03
-                        user.pi.email.num_social_networks_linked: 12
-                        user.pi.ssn.user_likely_has_better_ssn: false
+                    fraud_attributes:
+                      link_session.linked_bank_accounts.user_pi_matches_owners: true
+                      link_session.linked_bank_accounts.connected_apps.days_since_first_connection: 582
+                      session.challenged_with_mfa: false
+                      user.bank_accounts.num_of_frozen_or_restricted_accounts: 0
+                      user.linked_bank_accounts.num_family_names: 1
+                      user.linked_bank_accounts.num_of_connected_banks: 1
+                      user.link_sessions.days_since_first_link_session: 150
+                      user.pi.email.history_yrs: 7.03
+                      user.pi.email.num_social_networks_linked: 12
+                      user.pi.ssn.user_likely_has_better_ssn: false
                     request_id: saKrIBuEB9qJZng
       operationId: protectEventSend
       description: Send a new event to enrich user data and optionally get a Trust Index score for the event.
@@ -9629,7 +9678,7 @@ paths:
                     timestamp: "2020-07-24T03:26:02Z"
                     trust_index:
                       score: 86
-                      model: trust_index.1.0.1
+                      model: trust_index.2.0.0
                       subscores:
                         device_and_connection:
                           score: 87
@@ -14168,7 +14217,7 @@ paths:
     post:
       tags:
       - plaid
-      summary: Create a Session Token
+      summary: Create a Link token for Layer
       externalDocs:
         url: /api/products/layer/#sessiontokencreate
       operationId: sessionTokenCreate
@@ -21605,6 +21654,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/UserAccountItem'
+        identity_edit_history:
+          $ref: '#/components/schemas/UserAccountIdentityEditHistory'
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
@@ -24849,6 +24900,50 @@ components:
           type: string
           description: The ISO 3166-1 alpha-2 country code
           nullable: true
+    UserAccountIdentityEditCounts:
+      description: Edit counts over various time periods.
+      type: object
+      additionalProperties: true
+      properties:
+        edits_current:
+          type: integer
+          description: Number of edits in the current session
+        edits_1d:
+          type: integer
+          description: Number of edits in the last 1 day
+        edits_30d:
+          type: integer
+          description: Number of edits in the last 30 days
+        edits_365d:
+          type: integer
+          description: Number of edits in the last 365 days
+        edits_all_time:
+          type: integer
+          description: Total number of edits
+    UserAccountIdentityOfficialDocument:
+      description: Official identity document edit statistics.
+      type: object
+      nullable: true
+      additionalProperties: true
+      properties:
+        ssn:
+          $ref: '#/components/schemas/UserAccountIdentityEditCounts'
+    UserAccountIdentityEditHistory:
+      description: Statistics tracking the number of edits made to identity fields over various time periods.
+      type: object
+      nullable: true
+      additionalProperties: true
+      properties:
+        name:
+          $ref: '#/components/schemas/UserAccountIdentityEditCounts'
+        address:
+          $ref: '#/components/schemas/UserAccountIdentityEditCounts'
+        email:
+          $ref: '#/components/schemas/UserAccountIdentityEditCounts'
+        date_of_birth:
+          $ref: '#/components/schemas/UserAccountIdentityEditCounts'
+        official_document:
+          $ref: '#/components/schemas/UserAccountIdentityOfficialDocument'
     UserAccountItem:
       description: An Item created during a Layer authorization session.
       type: object
@@ -26121,6 +26216,7 @@ components:
           - array
           - fiant
           - oatfi
+          - curinos
           description: The processor you are integrating with.
       required:
       - access_token
@@ -30370,6 +30466,8 @@ components:
           description: '`SYNC_UPDATES_AVAILABLE`'
         item_id:
           $ref: '#/components/schemas/ItemId'
+        user_id:
+          $ref: '#/components/schemas/UserId'
         initial_update_complete:
           type: boolean
           description: Indicates if initial pull information (most recent 30 days of transaction history) is available.
@@ -30390,6 +30488,7 @@ components:
           webhook_type: TRANSACTIONS
           webhook_code: SYNC_UPDATES_AVAILABLE
           item_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
+          user_id: usr_9nSp2KuZ2x4JDw
           initial_update_complete: true
           historical_update_complete: false
           environment: production
@@ -33313,6 +33412,8 @@ components:
           description: '`PENDING_EXPIRATION`'
         item_id:
           $ref: '#/components/schemas/ItemId'
+        user_id:
+          $ref: '#/components/schemas/UserId'
         consent_expiration_time:
           type: string
           format: date-time
@@ -33330,6 +33431,7 @@ components:
           webhook_type: ITEM
           webhook_code: PENDING_EXPIRATION
           item_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
+          user_id: usr_9nSp2KuZ2x4JDw
           consent_expiration_time: "2020-01-15T13:25:17.766Z"
           environment: production
     ItemErrorWebhook:
@@ -33346,6 +33448,8 @@ components:
           description: '`ERROR`'
         item_id:
           $ref: '#/components/schemas/ItemId'
+        user_id:
+          $ref: '#/components/schemas/UserId'
         error:
           $ref: '#/components/schemas/PlaidError'
         environment:
@@ -33361,6 +33465,7 @@ components:
           webhook_type: ITEM
           webhook_code: ERROR
           item_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
+          user_id: usr_9nSp2KuZ2x4JDw
           error:
             display_message: The user’s OAuth connection to this institution has been invalidated.
             error_code: ITEM_LOGIN_REQUIRED
@@ -33383,6 +33488,8 @@ components:
           description: '`LOGIN_REPAIRED`'
         item_id:
           $ref: '#/components/schemas/ItemId'
+        user_id:
+          $ref: '#/components/schemas/UserId'
         environment:
           $ref: '#/components/schemas/WebhookEnvironmentValues'
       required:
@@ -33395,6 +33502,7 @@ components:
           webhook_type: ITEM
           webhook_code: LOGIN_REPAIRED
           item_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
+          user_id: usr_9nSp2KuZ2x4JDw
           environment: production
     ItemProductReadyWebhook:
       title: ItemProductReadyWebhook
@@ -33637,6 +33745,7 @@ components:
           webhook_type: PROTECT
           webhook_code: PROTECT_USER_EVENT
           user_id: plaid-user-6009db6e
+          client_user_id: your-client-user-id
           event_id: ptevt_cYNnF8xYE1v1om
           timestamp: "2020-07-24T03:26:02Z"
           event_type: LINK_COMPLETE
@@ -33661,6 +33770,10 @@ components:
         user_id:
           type: string
           description: The Plaid User ID.
+          nullable: true
+        client_user_id:
+          type: string
+          description: The `client_user_id` provided by the client when the user was created via `/user/create` or Link.
           nullable: true
         environment:
           $ref: '#/components/schemas/WebhookEnvironmentValues'
@@ -33780,6 +33893,7 @@ components:
           webhook_type: INVESTMENTS_TRANSACTIONS
           webhook_code: DEFAULT_UPDATE
           item_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
+          user_id: usr_9nSp2KuZ2x4JDw
           error: null
           new_investments_transactions: 16
           canceled_investments_transactions: 0
@@ -33793,6 +33907,8 @@ components:
           description: '`DEFAULT_UPDATE`'
         item_id:
           $ref: '#/components/schemas/ItemId'
+        user_id:
+          $ref: '#/components/schemas/UserId'
         error:
           $ref: '#/components/schemas/PlaidError'
         new_investments_transactions:
@@ -33820,6 +33936,7 @@ components:
           webhook_type: INVESTMENTS_TRANSACTIONS
           webhook_code: HISTORICAL_UPDATE
           item_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
+          user_id: usr_9nSp2KuZ2x4JDw
           error: null
           new_investments_transactions: 16
           canceled_investments_transactions: 0
@@ -33833,6 +33950,8 @@ components:
           description: '`HISTORICAL_UPDATE`'
         item_id:
           $ref: '#/components/schemas/ItemId'
+        user_id:
+          $ref: '#/components/schemas/UserId'
         error:
           $ref: '#/components/schemas/PlaidError'
         new_investments_transactions:
@@ -33860,6 +33979,7 @@ components:
           webhook_type: HOLDINGS
           webhook_code: DEFAULT_UPDATE
           item_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
+          user_id: usr_9nSp2KuZ2x4JDw
           error: null
           new_holdings: 19
           updated_holdings: 0
@@ -33873,6 +33993,8 @@ components:
           description: '`DEFAULT_UPDATE`'
         item_id:
           $ref: '#/components/schemas/ItemId'
+        user_id:
+          $ref: '#/components/schemas/UserId'
         error:
           $ref: '#/components/schemas/PlaidError'
         new_holdings:
@@ -33940,6 +34062,7 @@ components:
           webhook_type: LIABILITIES
           webhook_code: DEFAULT_UPDATE
           item_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
+          user_id: usr_9nSp2KuZ2x4JDw
           error: null
           account_ids_with_new_liabilities:
           - XMBvvyMGQ1UoLbKByoMqH3nXMj84ALSdE5B58
@@ -33957,6 +34080,8 @@ components:
           description: '`DEFAULT_UPDATE`'
         item_id:
           $ref: '#/components/schemas/ItemId'
+        user_id:
+          $ref: '#/components/schemas/UserId'
         error:
           $ref: '#/components/schemas/PlaidError'
         account_ids_with_new_liabilities:
@@ -33999,6 +34124,8 @@ components:
           description: '`PENDING_DISCONNECT`'
         item_id:
           $ref: '#/components/schemas/ItemId'
+        user_id:
+          $ref: '#/components/schemas/UserId'
         reason:
           $ref: '#/components/schemas/PendingDisconnectWebhookReason'
         environment:
@@ -34014,6 +34141,7 @@ components:
           webhook_type: ITEM
           webhook_code: PENDING_DISCONNECT
           item_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
+          user_id: usr_9nSp2KuZ2x4JDw
           reason: INSTITUTION_MIGRATION
           environment: production
     LiabilitiesAccountIdsWithUpdatedLiabilities:
@@ -35540,6 +35668,7 @@ components:
             error_type: ITEM_ERROR
             status: 400
           item_id: gAXlMgVEw5uEGoQnnXZ6tn9E7Mn3LBc4PJVKZ
+          user_id: usr_9nSp2KuZ2x4JDw
           environment: production
       properties:
         webhook_type:
@@ -35550,6 +35679,8 @@ components:
           description: '`USER_PERMISSION_REVOKED`'
         item_id:
           $ref: '#/components/schemas/ItemId'
+        user_id:
+          $ref: '#/components/schemas/UserId'
         error:
           $ref: '#/components/schemas/PlaidError'
         environment:
@@ -40736,6 +40867,49 @@ components:
           $ref: '#/components/schemas/RequestID'
       required:
       - test_clocks
+      - request_id
+    SandboxTransferRfpSimulateRequest:
+      title: SandboxTransferRfpSimulateRequest
+      type: object
+      description: Defines the request schema for `/sandbox/transfer/rfp/simulate`
+      properties:
+        transfer_id:
+          $ref: '#/components/schemas/TransferID'
+        action:
+          $ref: '#/components/schemas/SandboxTransferRfpSimulateAction'
+        amount:
+          type: string
+          description: |
+            The transfer amount provided by the caller for validation purposes, must match the amount on the transfer associated with the provided `transfer_id`.
+        client_name:
+          type: string
+          description: |
+            The client name provided by the caller for validation purposes, must match the sender client name on the transfer associated with the provided `transfer_id`.
+      required:
+      - transfer_id
+      - action
+      - amount
+      - client_name
+    SandboxTransferRfpSimulateAction:
+      title: SandboxTransferRfpSimulateAction
+      description: |
+        The action to simulate. Must be either `approve` or `reject`.
+
+        - `approve`: Simulates bank approval, transitioning the transfer to `settled` status
+        - `reject`: Simulates bank rejection, transitioning the transfer to `failed` status
+      type: string
+      enum:
+      - approve
+      - reject
+    SandboxTransferRfpSimulateResponse:
+      title: SandboxTransferRfpSimulateResponse
+      type: object
+      additionalProperties: true
+      description: Defines the response schema for `/sandbox/transfer/rfp/simulate`
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
       - request_id
     SandboxTransferRepaymentSimulateRequest:
       title: SandboxTransferRepaymentSimulateRequest
@@ -46840,6 +47014,7 @@ components:
           webhook_type: ITEM
           webhook_code: NEW_ACCOUNTS_AVAILABLE
           item_id: gAXlMgVEw5uEGoQnnXZ6tn9E7Mn3LBc4PJVKZ
+          user_id: usr_9nSp2KuZ2x4JDw
           error: null
           environment: production
       properties:
@@ -46851,6 +47026,8 @@ components:
           description: '`NEW_ACCOUNTS_AVAILABLE`'
         item_id:
           $ref: '#/components/schemas/ItemId'
+        user_id:
+          $ref: '#/components/schemas/UserId'
         error:
           $ref: '#/components/schemas/PlaidError'
         environment:
@@ -47233,6 +47410,29 @@ components:
       - CANCELLED
       - INVALID
       - UNKNOWN
+    WalletTransactionPayeeVerificationStatus:
+      type: string
+      nullable: true
+      description: |-
+        Result of payee verification check for EUR payouts. Payee verification checks whether the payee name provided matches the account holder name at the destination institution.
+
+        `FULL_MATCH`: The payee name fully matches the account holder.
+
+        `PARTIAL_MATCH`: The payee name partially matches the account holder.
+
+        `NO_MATCH`: The payee name does not match the account holder.
+
+        `ERROR`: An error occurred during payee verification.
+
+        `CHECK_NOT_POSSIBLE`: Payee verification could not be performed.
+
+        This field is only populated for applicable EUR payout transactions and will be `null` for other transaction types.
+      enum:
+      - FULL_MATCH
+      - PARTIAL_MATCH
+      - NO_MATCH
+      - ERROR
+      - CHECK_NOT_POSSIBLE
     WalletTransactionGetRequest:
       type: object
       description: WalletTransactionGetRequest defines the request schema for `/wallet/transaction/get`
@@ -47405,6 +47605,8 @@ components:
           format: date-time
           type: string
           description: The date and time of the last time the `status` was updated, in IS0 8601 format
+        payee_verification_status:
+          $ref: '#/components/schemas/WalletTransactionPayeeVerificationStatus'
         payment_id:
           type: string
           nullable: true
@@ -47561,10 +47763,10 @@ components:
       properties:
         country:
           type: string
-          description: The country where the transaction occurred.
+          description: The country where the transaction occurred, formatted as an ISO 3166-1 alpha-2 country code ("US" or "CA").
         region:
           type: string
-          description: The region or state where the transaction occurred.
+          description: The region or state where the transaction occurred, formatted as the official two-letter US state or Canadian province postal code, e.g. "CT" or "QC".
         city:
           type: string
           description: The city where the transaction occurred.
@@ -49396,6 +49598,7 @@ components:
           webhook_code: USER_ACCOUNT_REVOKED
           item_id: gAXlMgVEw5uEGoQnnXZ6tn9E7Mn3LBc4PJVKZ
           account_id: BxBXxLj1m4HMXBm9WZJyUg9XLd4rKEhw8Pb1J
+          user_id: usr_9nSp2KuZ2x4JDw
           environment: production
       properties:
         webhook_type:
@@ -49406,6 +49609,8 @@ components:
           description: '`USER_ACCOUNT_REVOKED`'
         item_id:
           $ref: '#/components/schemas/ItemId'
+        user_id:
+          $ref: '#/components/schemas/UserId'
         account_id:
           type: string
           description: The external account ID of the affected account
@@ -50542,6 +50747,8 @@ components:
           description: The public tokens generated by the Link session.
           items:
             type: string
+        user_id:
+          $ref: '#/components/schemas/UserId'
         environment:
           $ref: '#/components/schemas/WebhookEnvironmentValues'
       required:
@@ -58593,6 +58800,11 @@ components:
           description: The attributes related to the facial duplicates captured in risk check.
           items:
             $ref: '#/components/schemas/RiskCheckFacialDuplicate'
+        trust_index_score:
+          description: The trust index score for the `risk_check` step.
+          example: 86
+          type: integer
+          nullable: true
       required:
       - status
       - behavior
@@ -58601,6 +58813,7 @@ components:
       - phone
       - identity_abuse_signals
       - facial_duplicates
+      - trust_index_score
       nullable: true
       additionalProperties: true
     RiskCheckDevice:
@@ -62008,7 +62221,7 @@ components:
           $ref: '#/components/schemas/NewUserID'
         reports_requested:
           type: array
-          description: Specifies which types of verification reports are expected in the response
+          description: Specifies which types of home lending reports are expected in the response
           items:
             $ref: '#/components/schemas/CraCheckReportVerificationGetReportType'
         employment_refresh_options:
@@ -62020,7 +62233,7 @@ components:
     CraCheckReportVerificationGetReportType:
       title: CraCheckReportVerificationGetReportType
       type: string
-      description: Type of verification report.
+      description: Type of home lending report.
       enum:
       - VOA
       - EMPLOYMENT_REFRESH
@@ -62048,7 +62261,7 @@ components:
           $ref: '#/components/schemas/RequestID'
         warnings:
           type: array
-          description: If the verification report generation was successful but a subset of data could not be retrieved, this array will contain information about the errors causing information to be missing.
+          description: If the home lending report generation was successful but a subset of data could not be retrieved, this array will contain information about the errors causing information to be missing.
           items:
             $ref: '#/components/schemas/CheckReportWarning'
       required:
@@ -62087,12 +62300,12 @@ components:
     CraVerificationReport:
       title: CraVerificationReport
       type: object
-      description: Contains data for the CRA Verification Report.
+      description: Contains data for the CRA Home Lending Report.
       additionalProperties: true
       properties:
         report_id:
           type: string
-          description: The unique identifier associated with the Verification Report object. This ID will be the same as the Base Report ID.
+          description: The unique identifier associated with the Home Lending Report object. This ID will be the same as the Base Report ID.
         client_report_id:
           type: string
           nullable: true
@@ -66525,6 +66738,59 @@ components:
           $ref: '#/components/schemas/RequestID'
       required:
       - request_id
+    ProtectComputeRequest:
+      type: object
+      description: Request object for /protect/compute
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        model:
+          type: string
+          maxLength: 128
+          description: The name of the Trust Index model to use for calculating the Trust Index Score, with an optional version suffix. Examples include `ti-link-session-2.0`, `ti-identity-2.0`, `ti-link-session`, and `ti-identity`. If the version suffix is not included, the most recent version of that model will be used. The model specified may require certain fields within `model_inputs`. For example, `ti-link-session-2.0` requires the `link` field to be provided in `model_inputs`.
+        user:
+          $ref: '#/components/schemas/ProtectUser'
+        model_inputs:
+          $ref: '#/components/schemas/ProtectModelInputs'
+      required:
+      - model
+      - user
+    ProtectModelInputs:
+      type: object
+      nullable: true
+      description: Inputs for the Trust Index model. The `link` field is required for any link session model type.
+      properties:
+        link:
+          $ref: '#/components/schemas/ProtectLinkModelInputs'
+    ProtectLinkModelInputs:
+      type: object
+      nullable: true
+      description: Inputs for link session Trust Index models.
+      properties:
+        link_session_id:
+          type: string
+          maxLength: 128
+          description: A unique identifier for the Link session, used to compute a Trust Index score and fraud attributes.
+        require_extracted_data:
+          type: boolean
+          description: Whether to wait for data to be extracted before computing and returning a score. If set to `true` and `/protect/compute` is called before data has been extracted, an error will be returned indicating that data has not yet been extracted. If set to `false`, a score will be computed and returned regardless of whether data has been extracted. If `false` and data has been extracted, extracted data will still be included in the score computation. Defaults to `false`.
+      required:
+      - link_session_id
+    ProtectComputeResponse:
+      type: object
+      additionalProperties: true
+      description: Response object for /protect/compute
+      properties:
+        trust_index:
+          $ref: '#/components/schemas/TrustIndex'
+        fraud_attributes:
+          $ref: '#/components/schemas/FraudAttributes'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
     ProtectAPIToken:
       title: ProtectAPIToken
       type: string
@@ -66582,6 +66848,17 @@ components:
       required:
       - report_id
       - request_id
+    ProtectUser:
+      type: object
+      additionalProperties: true
+      description: Represents an end user for /protect/compute requests.
+      properties:
+        user_id:
+          type: string
+          description: The Plaid User ID returned from a previous call to `/user/create`. This or `client_user_id` can be provided, not both.
+        client_user_id:
+          type: string
+          description: A unique ID representing the end user. Maximum of 128 characters. Typically this will be a user ID number from your application. Personally identifiable information, such as an email address or phone number, should not be used in the `client_user_id`.
     TrustIndex:
       type: object
       nullable: true
