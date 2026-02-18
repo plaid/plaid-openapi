@@ -1,3 +1,6 @@
+### 2020-09-14_1.681.5
+- Add `ELIGIBILITY_FOR_GOVT_BENEFITS` permissible purpose to `ConsumerReportPermissiblePurpose` schema
+
 ### 2020-09-14_1.681.4
 - Add `client_user_id` field to `ProtectUserEventWebhook`
 
