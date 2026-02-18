@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.681.4
+  version: 2020-09-14_1.681.5
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -9779,6 +9779,7 @@ paths:
                     risk_check:
                       status: success
                       score: 92
+                    shareable_url: https://verify.plaid.com/busver_4FrXJvfQU3zGUR?key=e004115db797f7cc3083bff3167cba30644ef630fb46f5b086cde6cc3b86a36f
                     request_id: saKrIBuEB9qJZng
       description: Retrieve the current state of a specific business verification.
       requestBody:
@@ -9854,6 +9855,7 @@ paths:
                     risk_check:
                       status: success
                       score: 92
+                    shareable_url: https://verify.plaid.com/busver_4FrXJvfQU3zGUR?key=e004115db797f7cc3083bff3167cba30644ef630fb46f5b086cde6cc3b86a36f
                     request_id: saKrIBuEB9qJZng
       requestBody:
         content:
@@ -21794,7 +21796,7 @@ components:
           $ref: '#/components/schemas/PersonalFinanceCategoryVersion'
         days_requested:
           description: |-
-            This field only applies to calls for Items where the Transactions product has not already been initialized (i.e. by specifying `transactions` in the `products`, `optional_products`, or `required_if_consented_products` array when calling `/link/token/create` or by making a previous call to `/transactions/sync` or `/transactions/get`). In those cases, the field controls the maximum number of days of transaction history that Plaid will request from the financial institution. The more transaction history is requested, the longer the historical update poll will take. If no value is specified, 90 days of history will be requested by default. If a value under 30 is provided, a minimum of 30 days of history will be requested.
+            This field only applies to calls for Items where the Transactions product has not already been initialized (i.e. by specifying `transactions` in the `products`, `optional_products`, or `required_if_consented_products` array when calling `/link/token/create` or by making a previous call to `/transactions/sync` or `/transactions/get`). In those cases, the field controls the maximum number of days of transaction history that Plaid will request from the financial institution. The more transaction history is requested, the longer the historical update poll will take. If no value is specified, 90 days of history will be requested by default. In Production, if a value under 30 is provided, a minimum of 30 days of history will be requested.
 
             If you are initializing your Items with transactions during the `/link/token/create` call (e.g. by including `transactions` in the `/link/token/create` `products` array), you must use the [`transactions.days_requested`](https://plaid.com/docs/api/link/#link-token-create-request-transactions-days-requested) field in the `/link/token/create` request instead of in the `/transactions/get` request.
 
@@ -22762,7 +22764,7 @@ components:
           $ref: '#/components/schemas/PersonalFinanceCategoryVersion'
         days_requested:
           description: |-
-            This field only applies to calls for Items where the Transactions product has not already been initialized (i.e., by specifying `transactions` in the `products`, `required_if_supported_products`, or `optional_products` array when calling `/link/token/create` or by making a previous call to `/transactions/sync` or `/transactions/get`). In those cases, the field controls the maximum number of days of transaction history that Plaid will request from the financial institution. The more transaction history is requested, the longer the historical update poll will take. If no value is specified, 90 days of history will be requested by default.
+            This field only applies to calls for Items where the Transactions product has not already been initialized (i.e., by specifying `transactions` in the `products`, `required_if_supported_products`, or `optional_products` array when calling `/link/token/create` or by making a previous call to `/transactions/sync` or `/transactions/get`). In those cases, the field controls the maximum number of days of transaction history that Plaid will request from the financial institution. The more transaction history is requested, the longer the historical update poll will take. If no value is specified, 90 days of history will be requested by default. In Production, if a value less than 30 is provided, a minimum of 30 days of transaction history will be requested.
 
             If you are initializing your Items with transactions during the `/link/token/create` call (e.g. by including `transactions` in the `/link/token/create` `products` array), you must use the [`transactions.days_requested`](https://plaid.com/docs/api/link/#link-token-create-request-transactions-days-requested) field in the `/link/token/create` request instead of in the `/transactions/sync` request.
 
@@ -23217,10 +23219,8 @@ components:
           - auth
           - cra_base_report
           - cra_income_insights
-          - cra_cashflow_insights
           - cra_lend_score
           - cra_partner_insights
-          - cra_network_insights
           - cra_monitoring
           - identity
           - income_verification
@@ -26612,6 +26612,8 @@ components:
               `WRITTEN_INSTRUCTION_PREQUALIFICATION`: In accordance with the written instructions of the consumer pursuant to FCRA Section 604(a)(2), to evaluate an application’s profile to make an offer to the consumer.
 
               `WRITTEN_INSTRUCTION_OTHER`: In accordance with the written instructions of the consumer pursuant to FCRA Section 604(a)(2), such as when an individual agrees to act as a guarantor or assumes personal liability for a consumer, business, or commercial loan.
+
+              `ELIGIBILITY_FOR_GOVT_BENEFITS`:  In connection with an eligibility determination for a government benefit where the entity is required to consider an applicant’s financial status pursuant to FCRA Section 604(a)(3)(D).
         auth:
           $ref: '#/components/schemas/LinkTokenCreateRequestAuth'
         transfer:
@@ -26724,7 +26726,7 @@ components:
       properties:
         days_requested:
           description: |-
-            The maximum number of days of transaction history to request for the Transactions product. The more transaction history is requested, the longer the historical update poll will take. The default value is 90 days. If a value under 30 is provided, a minimum of 30 days of history will be requested. Once Transactions has been added to an Item, this value cannot be updated.
+            The maximum number of days of transaction history to request for the Transactions product. The more transaction history is requested, the longer the historical update poll will take. The default value is 90 days. In Production, if a value under 30 is provided, a minimum of 30 days of history will be requested. Once Transactions has been added to an Item, this value cannot be updated.
 
             Customers using [Recurring Transactions](https://plaid.com/docs/api/products/transactions/#transactionsrecurringget) should request at least 180 days of history for optimal results.
           type: integer
@@ -29547,6 +29549,7 @@ components:
       - LEGITIMATE_BUSINESS_NEED_OTHER
       - WRITTEN_INSTRUCTION_PREQUALIFICATION
       - WRITTEN_INSTRUCTION_OTHER
+      - ELIGIBILITY_FOR_GOVT_BENEFITS
       description: |-
         Describes the reason you are generating a Consumer Report for this user.
 
@@ -29563,6 +29566,8 @@ components:
         `WRITTEN_INSTRUCTION_PREQUALIFICATION`: In accordance with the written instructions of the consumer pursuant to FCRA Section 604(a)(2), to evaluate an application’s profile to make an offer to the consumer.
 
         `WRITTEN_INSTRUCTION_OTHER`: In accordance with the written instructions of the consumer pursuant to FCRA Section 604(a)(2), such as when an individual agrees to act as a guarantor or assumes personal liability for a consumer, business, or commercial loan.
+
+        `ELIGIBILITY_FOR_GOVT_BENEFITS`:  In connection with an eligibility determination for a government benefit where the entity is required to consider an applicant’s financial status pursuant to FCRA Section 604(a)(3)(D).
     PaymentMeta:
       title: PaymentMeta
       type: object
@@ -33896,7 +33901,7 @@ components:
           user_id: usr_9nSp2KuZ2x4JDw
           error: null
           new_investments_transactions: 16
-          canceled_investments_transactions: 0
+          cancelled_investments_transactions: 0
           environment: production
       properties:
         webhook_type:
@@ -33914,7 +33919,7 @@ components:
         new_investments_transactions:
           type: number
           description: The number of new transactions reported since the last time this webhook was fired.
-        canceled_investments_transactions:
+        cancelled_investments_transactions:
           type: number
           description: The number of canceled transactions reported since the last time this webhook was fired.
         environment:
@@ -33924,7 +33929,7 @@ components:
       - webhook_code
       - item_id
       - new_investments_transactions
-      - canceled_investments_transactions
+      - cancelled_investments_transactions
       - environment
     InvestmentsHistoricalUpdateWebhook:
       title: InvestmentsHistoricalUpdateWebhook
@@ -33939,7 +33944,7 @@ components:
           user_id: usr_9nSp2KuZ2x4JDw
           error: null
           new_investments_transactions: 16
-          canceled_investments_transactions: 0
+          cancelled_investments_transactions: 0
           environment: production
       properties:
         webhook_type:
@@ -33957,7 +33962,7 @@ components:
         new_investments_transactions:
           type: number
           description: The number of new transactions reported since the last time this webhook was fired.
-        canceled_investments_transactions:
+        cancelled_investments_transactions:
           type: number
           description: The number of canceled transactions reported since the last time this webhook was fired.
         environment:
@@ -33967,7 +33972,7 @@ components:
       - webhook_code
       - item_id
       - new_investments_transactions
-      - canceled_investments_transactions
+      - cancelled_investments_transactions
       - environment
     HoldingsDefaultUpdateWebhook:
       title: HoldingsDefaultUpdateWebhook
@@ -53353,7 +53358,7 @@ components:
           description: The duration of transaction history available within this report for this Item, typically defined as the time since the date of the earliest transaction in that account.
         transactions:
           type: array
-          description: Transaction history associated with the account. Transaction history returned by endpoints such as `/transactions/get` or `/investments/transactions/get` will be returned in the top-level `transactions` field instead. Some transactions may have their details masked in accordance to FCRA.
+          description: Transaction history associated with the account. Transaction history returned by endpoints such as `/transactions/get` or `/investments/transactions/get` will be returned in the top-level `transactions` field instead. Some transactions may have their details masked in accordance to the FCRA. These will appear with a `credit_category` of `MASKED_TRANSACTION_CATEGORY`.
           items:
             $ref: '#/components/schemas/BaseReportTransaction'
         owners:
@@ -56063,9 +56068,9 @@ components:
           $ref: '#/components/schemas/APISecret'
       required:
       - client_user_id
-      - business
     BusinessVerificationCreateRequestBusiness:
       type: object
+      nullable: true
       description: Business information provided in the verification request
       properties:
         name:
@@ -56078,9 +56083,6 @@ components:
           $ref: '#/components/schemas/WatchlistScreeningPhoneNumber'
         email_address:
           $ref: '#/components/schemas/EmailAddress'
-      required:
-      - name
-      - address
       additionalProperties: true
     BusinessVerificationCreateResponse:
       description: A business verification represents a check of a business's identity and risk profile, including information collected about the business and results from third-party data providers.
@@ -56106,6 +56108,8 @@ components:
           $ref: '#/components/schemas/BusinessRiskCheck'
         request_id:
           $ref: '#/components/schemas/RequestID'
+        shareable_url:
+          $ref: '#/components/schemas/ShareableURL'
       required:
       - id
       - client_user_id
@@ -56117,6 +56121,7 @@ components:
       - kyb_check
       - risk_check
       - request_id
+      - shareable_url
       type: object
     BusinessVerificationGetRequest:
       description: Request input for fetching a business verification
@@ -56154,6 +56159,8 @@ components:
           $ref: '#/components/schemas/BusinessRiskCheck'
         request_id:
           $ref: '#/components/schemas/RequestID'
+        shareable_url:
+          $ref: '#/components/schemas/ShareableURL'
       required:
       - id
       - client_user_id
@@ -56165,6 +56172,7 @@ components:
       - kyb_check
       - risk_check
       - request_id
+      - shareable_url
       type: object
     BusinessVerificationID:
       type: string
