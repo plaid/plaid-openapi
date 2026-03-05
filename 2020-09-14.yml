@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.681.5
+  version: 2020-09-14_1.682.2
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -2971,10 +2971,7 @@ paths:
       externalDocs:
         url: /api/products/check/#cracheck_reportcreate
       operationId: craCheckReportCreate
-      description: |-
-        The primary purpose of `/cra/check_report/create` is to refresh data in an existing report. A Consumer Report will last for 24 hours before expiring; you should call any `/get` endpoints on the report before it expires. If a report expires, you can call `/cra/check_report/create` again to re-generate it and refresh the data in the report.
-
-        `/cra/check_report/create` can also be used to create a new report if `consumer_report_permissible_purpose` was omitted during Link token creation. However, using the endpoint in this way is not recommended. Instead, `consumer_report_permissible_purpose` should always be specified when calling `/link/token/create` for Plaid CRA products; this will reduce latency and simplify the integration process. If you provide a `consumer_report_permissible_purpose` during Link token creation, then Plaid Check will automatically begin creating a Consumer Report once the user completes the Link process, and it is not necessary to call `/cra/check_report/create` before retrieving the report.
+      description: Use `/cra/check_report/create` to refresh data in an existing report. A Consumer Report will last for 24 hours before expiring; you should call any `/get` endpoints on the report before it expires. If a report expires, you can call `/cra/check_report/create` again to re-generate it and refresh the data in the report.
       requestBody:
         required: true
         content:
@@ -4378,15 +4375,14 @@ paths:
             examples: {}
         description: ""
   /auth/verify:
-    x-hidden-from-docs: true
     post:
       tags:
       - plaid
       summary: Verify auth data
       externalDocs:
-        url: /auth/coverage/database-auth/
+        url: /api/products/auth/#authverify
       operationId: authVerify
-      description: The `/auth/verify` endpoint verifies bank account numbers against Plaid's database via Database Auth.
+      description: "The `/auth/verify` endpoint verifies bank account and routing numbers and (optionally) account owner names against Plaid's database via [Database Auth](https://plaid.com/docs/auth/coverage/database-auth/). It can be used to verify account numbers that were not collected via the Plaid Link flow. \n\nThis endpoint is currently in Early Availability; contact Sales or your Plaid account manager to request access."
       responses:
         "200":
           description: success
@@ -9583,15 +9579,9 @@ paths:
               examples:
                 example-1:
                   value:
-                    trust_index:
-                      score: 86
-                      model: trust_index.2.0.0
-                      subscores:
-                        device_and_connection:
-                          score: 87
-                        bank_account_insights:
-                          score: 85
-                    fraud_attributes:
+                    score: 86
+                    model: ti-link-session-2.0
+                    attributes:
                       link_session.linked_bank_accounts.user_pi_matches_owners: true
                       link_session.linked_bank_accounts.connected_apps.days_since_first_connection: 582
                       session.challenged_with_mfa: false
@@ -9604,7 +9594,10 @@ paths:
                       user.pi.ssn.user_likely_has_better_ssn: false
                     request_id: saKrIBuEB9qJZng
       operationId: protectCompute
-      description: Use this endpoint to compute a Protect Trust Index score and retrieve fraud attributes
+      description: |-
+        Use this endpoint to compute a Protect Trust Index score and retrieve fraud attributes.
+
+        For link-session models, if the Link session is not yet complete, the endpoint returns HTTP 400 with `error_type` = `INVALID_REQUEST` and `error_code` = `FAILED_PRECONDITION`.
       requestBody:
         required: true
         content:
@@ -9779,6 +9772,31 @@ paths:
                     risk_check:
                       status: success
                       score: 92
+                      industry_prediction:
+                        code: 518210
+                        title: Data Processing, Hosting, and Related Services
+                    digital_presence_check:
+                      status: success
+                      score: 55
+                      address:
+                        summary: match
+                      phone_number:
+                        summary: match
+                      email_address:
+                        summary: match
+                      website:
+                        summary: match
+                      website_analysis:
+                        is_parked: "no"
+                        email_is_deliverable: "yes"
+                        website_build_status: active
+                        whois_record:
+                          domain_created_at: "1995-08-16T00:00:00Z"
+                          domain_updated_at: "2025-07-11T00:00:00Z"
+                          domain_expires_at: "2026-08-15T00:00:00Z"
+                          registrar: GANDI SAS
+                        ssl:
+                          is_valid: "yes"
                     shareable_url: https://verify.plaid.com/busver_4FrXJvfQU3zGUR?key=e004115db797f7cc3083bff3167cba30644ef630fb46f5b086cde6cc3b86a36f
                     request_id: saKrIBuEB9qJZng
       description: Retrieve the current state of a specific business verification.
@@ -9855,6 +9873,31 @@ paths:
                     risk_check:
                       status: success
                       score: 92
+                      industry_prediction:
+                        code: 518210
+                        title: Data Processing, Hosting, and Related Services
+                    digital_presence_check:
+                      status: success
+                      score: 55
+                      address:
+                        summary: match
+                      phone_number:
+                        summary: match
+                      email_address:
+                        summary: match
+                      website:
+                        summary: match
+                      website_analysis:
+                        is_parked: "no"
+                        email_is_deliverable: "yes"
+                        website_build_status: active
+                        whois_record:
+                          domain_created_at: "1995-08-16T00:00:00Z"
+                          domain_updated_at: "2025-07-11T00:00:00Z"
+                          domain_expires_at: "2026-08-15T00:00:00Z"
+                          registrar: GANDI SAS
+                        ssl:
+                          is_valid: "yes"
                     shareable_url: https://verify.plaid.com/busver_4FrXJvfQU3zGUR?key=e004115db797f7cc3083bff3167cba30644ef630fb46f5b086cde6cc3b86a36f
                     request_id: saKrIBuEB9qJZng
       requestBody:
@@ -20071,11 +20114,13 @@ paths:
                   value:
                     rule:
                       id: lPNjeW1nR6CDn5okmGQ6hEpMo4lLNo
-                      item_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
+                      user_id: usr_9nSp2KuZ2x4JDw
                       created_at: "2022-02-28T11:00:00Z"
-                      personal_finance_category: FOOD_AND_DRINK_FAST_FOOD
+                      updated_at: "2022-02-28T11:00:00Z"
+                      pfc_primary_category: FOOD_AND_DRINK
+                      pfc_detailed_category: FOOD_AND_DRINK_FAST_FOOD
                       rule_details:
-                        field: NAME
+                        field: MERCHANT_NAME
                         type: SUBSTRING_MATCH
                         query: Burger Shack
                     request_id: 4zlKapIkTm8p5KM
@@ -20102,10 +20147,11 @@ paths:
                 value:
                   client_id: 7f57eb3d2a9j6480121fx361
                   secret: 79g03eoofwl8240v776r2h667442119
-                  access_token: access-sandbox-71e02f71-0960-4a27-abd2-5631e04f2175
-                  personal_finance_category: FOOD_AND_DRINK_FAST_FOOD
+                  client_user_id: your-client-user-id
+                  pfc_primary_category: FOOD_AND_DRINK
+                  pfc_detailed_category: FOOD_AND_DRINK_FAST_FOOD
                   rule_details:
-                    field: NAME
+                    field: MERCHANT_NAME
                     type: SUBSTRING_MATCH
                     query: Burger Shack
   /beta/transactions/rules/v1/list:
@@ -20126,17 +20172,21 @@ paths:
                   value:
                     rules:
                     - id: lPNjeW1nR6CDn5okmGQ6hEpMo4lLNo
-                      item_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
+                      user_id: usr_9nSp2KuZ2x4JDw
                       created_at: "2022-02-28T11:00:00Z"
-                      personal_finance_category: FOOD_AND_DRINK_FAST_FOOD
+                      updated_at: "2022-02-28T11:00:00Z"
+                      pfc_primary_category: FOOD_AND_DRINK
+                      pfc_detailed_category: FOOD_AND_DRINK_FAST_FOOD
                       rule_details:
-                        field: NAME
+                        field: MERCHANT_NAME
                         type: SUBSTRING_MATCH
                         query: Burger Shack
                     - id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBF
-                      item_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
+                      user_id: usr_9nSp2KuZ2x4JDw
                       created_at: "2022-02-27T14:50:00Z"
-                      personal_finance_category: TRANSFER_IN_ACCOUNT_TRANSFER
+                      updated_at: "2022-02-27T14:50:00Z"
+                      pfc_primary_category: TRANSFER_IN
+                      pfc_detailed_category: TRANSFER_IN_ACCOUNT_TRANSFER
                       rule_details:
                         field: TRANSACTION_ID
                         type: EXACT_MATCH
@@ -20160,7 +20210,7 @@ paths:
                 value:
                   client_id: 7f57eb3d2a9j6480121fx361
                   secret: 79g03eoofwl8240v776r2h667442119
-                  access_token: access-sandbox-71e02f71-0960-4a27-abd2-5631e04f2175
+                  client_user_id: your-client-user-id
   /beta/transactions/rules/v1/remove:
     post:
       tags:
@@ -20196,7 +20246,7 @@ paths:
                 value:
                   client_id: 7f57eb3d2a9j6480121fx361
                   secret: 79g03eoofwl8240v776r2h667442119
-                  access_token: access-sandbox-71e02f71-0960-4a27-abd2-5631e04f2175
+                  client_user_id: your-client-user-id
                   rule_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBF
   /beta/transactions/user_insights/v1/get:
     x-hidden-from-docs: true
@@ -21588,7 +21638,6 @@ components:
       - account
       - routing
     AuthVerifyRequest:
-      x-hidden-from-docs: true
       type: object
       description: AuthVerifyRequest defines the request schema for `/auth/verify`
       properties:
@@ -21605,7 +21654,6 @@ components:
       required:
       - numbers
     AuthVerifyResponse:
-      x-hidden-from-docs: true
       type: object
       additionalProperties: true
       description: AuthVerifyResponse defines the response schema for `/auth/verify`
@@ -22629,23 +22677,21 @@ components:
       properties:
         client_id:
           $ref: '#/components/schemas/APIClientID'
-        access_token:
-          $ref: '#/components/schemas/AccessToken'
         secret:
           $ref: '#/components/schemas/APISecret'
-        personal_finance_category:
+        client_user_id:
           type: string
-          description: |
-            Personal finance detailed category.
-
-            All implementations are encouraged to use this field instead of `category`, as it provides more meaningful and accurate categorization.
-
-            See the [taxonomy csv file](https://plaid.com/documents/pfc-taxonomy-all.csv) for a full list of personal finance categories.
+          description: A unique ID representing the end user. This ID is used to associate rules with a specific user.
+        pfc_primary_category:
+          $ref: '#/components/schemas/PfcPrimaryCategory'
+        pfc_detailed_category:
+          $ref: '#/components/schemas/PfcDetailedCategory'
         rule_details:
           $ref: '#/components/schemas/TransactionsRuleDetails'
       required:
-      - access_token
-      - personal_finance_category
+      - client_user_id
+      - pfc_primary_category
+      - pfc_detailed_category
       - rule_details
     TransactionsRulesCreateResponse:
       type: object
@@ -22665,12 +22711,13 @@ components:
       properties:
         client_id:
           $ref: '#/components/schemas/APIClientID'
-        access_token:
-          $ref: '#/components/schemas/AccessToken'
         secret:
           $ref: '#/components/schemas/APISecret'
+        client_user_id:
+          type: string
+          description: A unique ID representing the end user whose rules should be listed.
       required:
-      - access_token
+      - client_user_id
     TransactionsRulesListResponse:
       type: object
       additionalProperties: true
@@ -22678,7 +22725,7 @@ components:
       properties:
         rules:
           type: array
-          description: A list of the Item's transaction rules
+          description: A list of the user's transaction rules
           items:
             $ref: '#/components/schemas/TransactionsCategoryRule'
         request_id:
@@ -22692,15 +22739,16 @@ components:
       properties:
         client_id:
           $ref: '#/components/schemas/APIClientID'
-        access_token:
-          $ref: '#/components/schemas/AccessToken'
         secret:
           $ref: '#/components/schemas/APISecret'
+        client_user_id:
+          type: string
+          description: A unique ID representing the end user the rule belongs to.
         rule_id:
           type: string
           description: A rule's unique identifier
       required:
-      - access_token
+      - client_user_id
       - rule_id
     TransactionsRulesRemoveResponse:
       type: object
@@ -26426,7 +26474,7 @@ components:
           minLength: 1
         country_codes:
           type: array
-          description: "Specify an array of Plaid-supported country codes using the ISO-3166-1 alpha-2 country code standard. Institutions from all listed countries will be shown. For a complete mapping of supported products by country, see https://plaid.com/global/. By default, access is granted to US and CA. For Production or Limited Production access to other countries, [contact Sales](https://plaid.com/contact/) or your account manager.  \n\nIf using Identity Verification, `country_codes` should be set to the country where your company is based, not the country where your user is located. For all other products, `country_codes` represents the location of your user's financial institution.\n\nIf Link is launched with multiple country codes, only products that you are enabled for in all countries will be used by Link. While all countries are enabled by default in Sandbox, in Production only the countries you have requested access for are shown. To request access to additional countries, [file a product access Support ticket](https://dashboard.plaid.com/support/new/product-and-development/product-troubleshooting/request-product-access) via the Plaid dashboard.\n\nIf using a Link customization, make sure the country codes in the customization match those specified in `country_codes`, or the customization may not be applied.\n\nIf using the Auth features Instant Match, Instant Micro-deposits, Same-day Micro-deposits, Automated Micro-deposits, or Database Auth, `country_codes` must be set to `['US']`."
+          description: "Specify an array of Plaid-supported country codes using the ISO-3166-1 alpha-2 country code standard. Institutions from all listed countries will be shown. For a complete mapping of supported products by country, see https://plaid.com/global/. For access to additional countries beyond what you have been approved for, [contact Sales](https://plaid.com/contact/), your account manager, or support.  \n\nIf using Identity Verification, `country_codes` should be set to the country where your company is based, not the country where your user is located. For all other products, `country_codes` represents the location of your user's financial institution.\n\nIf Link is launched with multiple country codes, only products that you are enabled for in all countries will be used by Link. While all countries are enabled by default in Sandbox, in Production only the countries you have requested access for are shown. To request access to additional countries, [file a product access Support ticket](https://dashboard.plaid.com/support/new/product-and-development/product-troubleshooting/request-product-access) via the Plaid dashboard.\n\nIf using a Link customization, make sure the country codes in the customization match those specified in `country_codes`, or the customization may not be applied.\n\nIf using the Auth features Instant Match, Instant Micro-deposits, Same-day Micro-deposits, Automated Micro-deposits, or Database Auth, `country_codes` must be set to `['US']`."
           items:
             $ref: '#/components/schemas/CountryCode'
           minItems: 1
@@ -26462,6 +26510,7 @@ components:
           - income_verification
           - identity_verification
           - investments
+          - investments_auth
           - liabilities
           - payment_initiation
           - standing_orders
@@ -26593,27 +26642,7 @@ components:
         cra_options:
           $ref: '#/components/schemas/LinkTokenCreateRequestCraOptions'
         consumer_report_permissible_purpose:
-          allOf:
-          - $ref: '#/components/schemas/ConsumerReportPermissiblePurpose'
-          - type: string
-            description: |-
-              Describes the reason you are generating a Consumer Report for this user. This parameter is required when using Plaid Check (CRA) products. If you omit this parameter during Link token creation, you must call the `/cra/check_report/create` endpoint to generate a report. If the Link session is not configured to use any Plaid Check (CRA) products, this parameter cannot be used and will cause an error if included.
-
-              `ACCOUNT_REVIEW_CREDIT`: In connection with a consumer credit transaction for the review or collection of an account pursuant to FCRA Section 604(a)(3)(A).
-
-              `ACCOUNT_REVIEW_NON_CREDIT`: For a legitimate business need of the information to review a non-credit account provided primarily for personal, family, or household purposes to determine whether the consumer continues to meet the terms of the account pursuant to FCRA Section 604(a)(3)(F)(2).
-
-              `EXTENSION_OF_CREDIT`: In connection with a credit transaction initiated by and involving the consumer pursuant to FCRA Section 604(a)(3)(A).
-
-              `LEGITIMATE_BUSINESS_NEED_TENANT_SCREENING`: For a legitimate business need in connection with a business transaction initiated by the consumer primarily for personal, family, or household purposes in connection with a property rental assessment pursuant to FCRA Section 604(a)(3)(F)(i).
-
-              `LEGITIMATE_BUSINESS_NEED_OTHER`: For a legitimate business need in connection with a business transaction made primarily for personal, family, or household initiated by the consumer pursuant to FCRA Section 604(a)(3)(F)(i).
-
-              `WRITTEN_INSTRUCTION_PREQUALIFICATION`: In accordance with the written instructions of the consumer pursuant to FCRA Section 604(a)(2), to evaluate an application’s profile to make an offer to the consumer.
-
-              `WRITTEN_INSTRUCTION_OTHER`: In accordance with the written instructions of the consumer pursuant to FCRA Section 604(a)(2), such as when an individual agrees to act as a guarantor or assumes personal liability for a consumer, business, or commercial loan.
-
-              `ELIGIBILITY_FOR_GOVT_BENEFITS`:  In connection with an eligibility determination for a government benefit where the entity is required to consider an applicant’s financial status pursuant to FCRA Section 604(a)(3)(D).
+          $ref: '#/components/schemas/ConsumerReportPermissiblePurpose'
         auth:
           $ref: '#/components/schemas/LinkTokenCreateRequestAuth'
         transfer:
@@ -28134,7 +28163,7 @@ components:
         name_match_score:
           type: integer
           nullable: true
-          description: Indicates the score of the name match between the given name provided during database verification (available in the [`verification_name`](https://plaid.com/docs/api/products/auth/#auth-get-response-accounts-verification-name) field) and matched Plaid network accounts. If defined, will be a value between 0 and 100. Will be undefined if name matching was not enabled for the database verification session or if there were no eligible Plaid network matches to compare the given name with.
+          description: Indicates the score of the name match between the given name provided during database verification (available in the [`verification_name`](https://plaid.com/docs/api/products/auth/#auth-get-response-accounts-verification-name) field if using standard Database Auth, or provided in the request if using `/auth/verify`) and matched Plaid network accounts. If defined, will be a value between 0 and 100. Will be undefined if name matching was not enabled for the database verification session or if there were no eligible Plaid network matches to compare the given name with.
         network_status:
           $ref: '#/components/schemas/AccountVerificationInsightsNetworkStatus'
         previous_returns:
@@ -28182,7 +28211,7 @@ components:
       properties:
         has_previous_administrative_return:
           type: boolean
-          description: Indicates whether Plaid's data sources include a known administrative ACH return for account and routing number.
+          description: Indicates whether Plaid's data sources include a known administrative ACH return for this account and routing number.
       required:
       - has_previous_administrative_return
     LinkEventName:
@@ -28654,7 +28683,7 @@ components:
       type: string
       enum:
       - TRANSACTION_ID
-      - NAME
+      - MERCHANT_NAME
       description: Transaction field for which the rule is defined.
     TransactionsRuleType:
       title: TransactionsRuleType
@@ -28674,20 +28703,23 @@ components:
         id:
           type: string
           description: A unique identifier of the rule created
-        item_id:
+        user_id:
           type: string
-          description: A unique identifier of the Item the rule was created for.
+          description: The Plaid-generated unique identifier for the end user this rule belongs to.
         created_at:
           type: string
           format: date-time
           description: |
             Date and time when a rule was created in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ( `YYYY-MM-DDTHH:mm:ssZ` ).
-        personal_finance_category:
+        updated_at:
           type: string
+          format: date-time
           description: |
-            Personal finance category unique identifier.
-
-            In the personal finance category taxonomy, this field is represented by the detailed category field.
+            Date and time when a rule was last updated in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format ( `YYYY-MM-DDTHH:mm:ssZ` ).
+        pfc_primary_category:
+          $ref: '#/components/schemas/PfcPrimaryCategory'
+        pfc_detailed_category:
+          $ref: '#/components/schemas/PfcDetailedCategory'
         rule_details:
           $ref: '#/components/schemas/TransactionsRuleDetails'
     TransactionBase:
@@ -29551,7 +29583,7 @@ components:
       - WRITTEN_INSTRUCTION_OTHER
       - ELIGIBILITY_FOR_GOVT_BENEFITS
       description: |-
-        Describes the reason you are generating a Consumer Report for this user.
+        Describes the reason you are generating a Consumer Report for this user. When calling `/link/token/create`, this field is required when using Plaid Check (CRA) products; invalid if not using Plaid Check (CRA) products.
 
         `ACCOUNT_REVIEW_CREDIT`: In connection with a consumer credit transaction for the review or collection of an account pursuant to FCRA Section 604(a)(3)(A).
 
@@ -29879,6 +29911,18 @@ components:
           nullable: true
           minLength: 8
           maxLength: 11
+    PfcPrimaryCategory:
+      title: PfcPrimaryCategory
+      type: string
+      description: |
+        A personal finance primary category.
+        See the [taxonomy csv file](https://plaid.com/documents/pfc-taxonomy-all.csv) for a full list of personal finance categories.
+    PfcDetailedCategory:
+      title: PfcDetailedCategory
+      type: string
+      description: |
+        A personal finance detailed category.
+        See the [taxonomy csv file](https://plaid.com/documents/pfc-taxonomy-all.csv) for a full list of personal finance categories.
     PersonalFinanceCategory:
       title: PersonalFinanceCategory
       nullable: true
@@ -32319,7 +32363,12 @@ components:
         force_available_balance:
           type: number
           format: double
-          description: If provided, the account will always have this amount as its available balance, regardless of current balance or changes in transactions over time.
+          description: |
+            If provided, the account will always have this amount as its available balance, regardless of current balance or changes in transactions over time. Cannot be set together with `has_null_available_balance`.
+        has_null_available_balance:
+          type: boolean
+          description: |
+            If set to `true`, the account will always have null as its available balance, regardless of current balance or changes in transactions over time. Cannot be set together with `force_available_balance`.
         currency:
           type: string
           description: ISO-4217 currency code. If provided, the account will be denominated in the given currency. Transactions will also be in this currency by default.
@@ -32349,6 +32398,7 @@ components:
       - subtype
       - starting_balance
       - force_available_balance
+      - has_null_available_balance
       - currency
       - meta
       - numbers
@@ -37550,7 +37600,7 @@ components:
 
         `user_action_required` – An action is required before Plaid can assess the transfer risk and make a decision. The most common scenario is to update authentication for an Item. To complete the required action, initialize Link by setting `transfer.authorization_id` in the request of `/link/token/create`. After Link flow is completed, you may re-attempt the authorization request.
 
-        For `guarantee` requests, `approved` indicates the transfer is eligible for Plaid's guarantee, and `declined` indicates Plaid will not provide guarantee coverage for the transfer.
+        For `guarantee` requests, `approved` indicates the transfer is eligible for Plaid's guarantee, and `declined` indicates Plaid will not provide guarantee coverage for the transfer. `user_action_required` indicates you should follow the above guidance before re-attempting.
       enum:
       - approved
       - declined
@@ -41742,6 +41792,8 @@ components:
             $ref: '#/components/schemas/PrismProduct'
         prism_versions:
           $ref: '#/components/schemas/PrismVersions'
+        fico:
+          $ref: '#/components/schemas/CraPartnerInsightsFicoInput'
     LinkTokenCreateRequestCraOptionsBaseReport:
       title: LinkTokenCreateRequestCraOptionsBaseReport
       type: object
@@ -53620,6 +53672,10 @@ components:
           type: string
           description: The ID of the category to which this transaction belongs. For a full list of categories, see [`/categories/get`](https://plaid.com/docs/api/products/transactions/#categoriesget).
           nullable: true
+        personal_finance_category:
+          x-hidden-from-docs: true
+          allOf:
+          - $ref: '#/components/schemas/PersonalFinanceCategory'
       required:
       - transaction_id
       - pending
@@ -56028,11 +56084,39 @@ components:
           type: integer
           description: A score from 0 to 100 indicating the risk assessment for the business
           example: 92
+        industry_prediction:
+          $ref: '#/components/schemas/BusinessIndustryPredictionNullable'
       required:
       - status
       - score
+      - industry_prediction
       nullable: true
       additionalProperties: true
+    BusinessIndustryPrediction:
+      type: object
+      description: The predicted industry classification for the business, based on digital presence assessments.
+      properties:
+        code:
+          type: integer
+          description: NAICS code for the predicted business industry.
+          example: 518210
+        title:
+          type: string
+          description: The business industry classification of the predicted NAICS code.
+          example: Data Processing, Hosting, and Related Services
+      required:
+      - code
+      - title
+      additionalProperties: true
+    BusinessIndustryPredictionNullable:
+      type: object
+      additionalProperties: true
+      description: Nullable industry prediction details.
+      nullable: true
+      allOf:
+      - $ref: '#/components/schemas/BusinessIndustryPrediction'
+      - type: object
+        nullable: true
     BusinessSearchTerms:
       type: object
       description: The business information that was used to perform the verification search
@@ -56106,6 +56190,8 @@ components:
           $ref: '#/components/schemas/BusinessKYBCheck'
         risk_check:
           $ref: '#/components/schemas/BusinessRiskCheck'
+        digital_presence_check:
+          $ref: '#/components/schemas/BusinessDigitalPresenceCheck'
         request_id:
           $ref: '#/components/schemas/RequestID'
         shareable_url:
@@ -56120,6 +56206,7 @@ components:
       - search_terms
       - kyb_check
       - risk_check
+      - digital_presence_check
       - request_id
       - shareable_url
       type: object
@@ -56157,6 +56244,8 @@ components:
           $ref: '#/components/schemas/BusinessKYBCheck'
         risk_check:
           $ref: '#/components/schemas/BusinessRiskCheck'
+        digital_presence_check:
+          $ref: '#/components/schemas/BusinessDigitalPresenceCheck'
         request_id:
           $ref: '#/components/schemas/RequestID'
         shareable_url:
@@ -56171,6 +56260,7 @@ components:
       - search_terms
       - kyb_check
       - risk_check
+      - digital_presence_check
       - request_id
       - shareable_url
       type: object
@@ -56207,6 +56297,114 @@ components:
       example: success
       title: BusinessVerificationStatus
       description: Status of the business risk assessment check
+    BusinessVerificationStatus__WebPresenceCheck:
+      type: string
+      enum:
+      - active
+      - success
+      - failed
+      - not_applicable
+      example: success
+      title: BusinessVerificationStatus
+      description: Status of the digital presence check
+    BusinessCheckBooleanStatus:
+      description: Tri-state boolean status, where `no_data` indicates the check could not determine a value.
+      type: string
+      enum:
+      - "yes"
+      - "no"
+      - no_data
+      example: "yes"
+    BusinessDigitalPresenceCheck:
+      type: object
+      description: Results from the digital presence check.
+      properties:
+        status:
+          $ref: '#/components/schemas/BusinessVerificationStatus__WebPresenceCheck'
+        score:
+          type: integer
+          description: A score from 0 to 100 indicating digital presence confidence.
+          example: 55
+        address:
+          $ref: '#/components/schemas/BusinessFieldMatchSummary'
+        phone_number:
+          $ref: '#/components/schemas/BusinessFieldMatchSummary'
+        email_address:
+          $ref: '#/components/schemas/BusinessFieldMatchSummary'
+        website:
+          $ref: '#/components/schemas/BusinessFieldMatchSummary'
+        website_analysis:
+          $ref: '#/components/schemas/BusinessWebsiteAnalysis'
+      required:
+      - status
+      - score
+      - address
+      - phone_number
+      - email_address
+      - website
+      - website_analysis
+      nullable: true
+      additionalProperties: true
+    BusinessWebsiteAnalysis:
+      type: object
+      description: Website analysis details if a website is found for the provided website in the search terms.
+      properties:
+        is_parked:
+          $ref: '#/components/schemas/BusinessCheckBooleanStatus'
+        email_is_deliverable:
+          $ref: '#/components/schemas/BusinessCheckBooleanStatus'
+        website_build_status:
+          $ref: '#/components/schemas/BusinessWebsiteBuildStatus'
+        whois_record:
+          $ref: '#/components/schemas/BusinessWhoisRecord'
+        ssl:
+          $ref: '#/components/schemas/BusinessWebsiteSSL'
+      required:
+      - is_parked
+      - email_is_deliverable
+      - website_build_status
+      - whois_record
+      - ssl
+      nullable: true
+      additionalProperties: true
+    BusinessWebsiteBuildStatus:
+      type: string
+      description: Build status of the business website.
+      enum:
+      - coming_soon
+      - active
+      - inactive
+      example: active
+    BusinessWhoisRecord:
+      type: object
+      description: WHOIS metadata for the business website domain.
+      properties:
+        domain_created_at:
+          $ref: '#/components/schemas/TimestampNullable'
+        domain_updated_at:
+          $ref: '#/components/schemas/TimestampNullable'
+        domain_expires_at:
+          $ref: '#/components/schemas/TimestampNullable'
+        registrar:
+          type: string
+          nullable: true
+          description: Domain registrar.
+          example: GANDI SAS
+      required:
+      - domain_created_at
+      - domain_updated_at
+      - domain_expires_at
+      - registrar
+      additionalProperties: true
+    BusinessWebsiteSSL:
+      type: object
+      description: SSL status for the business website.
+      properties:
+        is_valid:
+          $ref: '#/components/schemas/BusinessCheckBooleanStatus'
+      required:
+      - is_valid
+      additionalProperties: true
     BusinessWebsite:
       type: object
       description: Website associated with a business
@@ -61455,6 +61653,8 @@ components:
       properties:
         prism_versions:
           $ref: '#/components/schemas/PrismVersions'
+        fico:
+          $ref: '#/components/schemas/CraPartnerInsightsFicoInput'
     CraCheckReportPartnerInsightsGetOptions:
       title: CraCheckReportPartnerInsightsGetOptions
       type: object
@@ -61485,6 +61685,8 @@ components:
             $ref: '#/components/schemas/PrismProduct'
         prism_versions:
           $ref: '#/components/schemas/PrismVersions'
+        fico:
+          $ref: '#/components/schemas/CraPartnerInsightsFicoInput'
     PrismVersionsDeprecated:
       title: PrismVersions
       type: object
@@ -61518,6 +61720,176 @@ components:
           $ref: '#/components/schemas/PrismExtendVersion'
         insights:
           $ref: '#/components/schemas/PrismInsightsVersion'
+    CraPartnerInsightsFicoInput:
+      title: CraPartnerInsightsFicoInput
+      type: object
+      nullable: true
+      x-hidden-from-docs: true
+      description: Configurations for FICO products used in the Partner Insights flow.
+      properties:
+        fico_lender_id:
+          type: string
+          description: ID provided by FICO that uniquely identifies the lender. Required for UltraFICO score generation. Sometimes referred to as Lender Org ID.
+        lender_application_id:
+          type: string
+          description: Client-generated identifier that uniquely identifies the FICO Application ID across FICO systems.
+        ultrafico_score_requests:
+          type: array
+          description: A list of UltraFICO scoring requests. Each request contains all configuration required to generate an UltraFICO score.
+          items:
+            $ref: '#/components/schemas/CraPartnerInsightsUltraFicoScoreRequest'
+      required:
+      - fico_lender_id
+      - lender_application_id
+      - ultrafico_score_requests
+    CraPartnerInsightsUltraFicoScoreRequest:
+      title: CraPartnerInsightsUltraFicoScoreRequest
+      type: object
+      x-hidden-from-docs: true
+      description: Configuration required to generate a single UltraFICO score.
+      properties:
+        ultrafico_score_version:
+          $ref: '#/components/schemas/CraPartnerInsightsUltraFicoScoreVersion'
+        fico_scoring_request_id:
+          type: string
+          description: FICO identifier for a particular scoring request. Should only be provided by UltraFICO as part of the FICO-led Flow.
+        request_correlation_id:
+          type: string
+          description: Client-generated identifier that can be used to correlate scoring requests and scoring results.
+        base_fico_score:
+          $ref: '#/components/schemas/CraPartnerInsightsBaseFicoScore'
+      required:
+      - ultrafico_score_version
+      - base_fico_score
+    CraPartnerInsightsUltraFicoScoreVersion:
+      type: string
+      x-hidden-from-docs: true
+      description: The version of the UltraFICO score.
+      enum:
+      - "1.0"
+    CraPartnerInsightsBaseFicoScore:
+      title: CraPartnerInsightsBaseFicoScore
+      type: object
+      x-hidden-from-docs: true
+      description: Details about the base FICO score associated with an UltraFICO scoring request.
+      properties:
+        bureau:
+          $ref: '#/components/schemas/CraPartnerInsightsBureau'
+        score:
+          type: integer
+          description: Numeric value of the base FICO score.
+        reason_code_1:
+          type: string
+          nullable: true
+          description: The first reason code associated with the score.
+        reason_code_2:
+          type: string
+          nullable: true
+          description: The second reason code associated with the score.
+        reason_code_3:
+          type: string
+          nullable: true
+          description: The third reason code associated with the score.
+        reason_code_4:
+          type: string
+          nullable: true
+          description: The fourth reason code associated with the score.
+        did_inquiries_adversely_affect_score:
+          type: boolean
+          nullable: true
+          description: Whether inquiries adversely affected this score but were not represented in one of the four reason codes. Sometimes referred to as the FACTA Flag.
+        base_fico_score_version:
+          $ref: '#/components/schemas/CraPartnerInsightsBaseFicoScoreVersion'
+      required:
+      - bureau
+      - score
+      - base_fico_score_version
+    CraPartnerInsightsBureau:
+      type: string
+      x-hidden-from-docs: true
+      description: The credit bureau that provided the base FICO score.
+      enum:
+      - EQUIFAX
+      - EXPERIAN
+      - TRANSUNION
+    CraPartnerInsightsBaseFicoScoreVersion:
+      type: string
+      x-hidden-from-docs: true
+      description: The version of the base FICO score model.
+      enum:
+      - "8"
+      - "9"
+      - 10T
+    CraPartnerInsightsFicoResults:
+      title: CraPartnerInsightsFicoResults
+      type: object
+      nullable: true
+      x-hidden-from-docs: true
+      description: The calculated UltraFICO scores returned as part of the Partner Insights report.
+      properties:
+        lender_application_id:
+          type: string
+          description: Client-generated identifier that uniquely identifies the FICO Application across FICO systems.
+        ultrafico_score_results:
+          type: array
+          description: UltraFICO scoring results, one per provided base FICO score request.
+          items:
+            $ref: '#/components/schemas/CraPartnerInsightsUltraFicoScoreResult'
+      required:
+      - lender_application_id
+      - ultrafico_score_results
+    CraPartnerInsightsUltraFicoScoreResult:
+      title: CraPartnerInsightsUltraFicoScoreResult
+      type: object
+      x-hidden-from-docs: true
+      description: The result of a single UltraFICO score generation request.
+      properties:
+        request_correlation_id:
+          type: string
+          description: Client-generated identifier that can be used to correlate between scoring requests and scoring results.
+        fico_scoring_request_id:
+          type: string
+          description: FICO-provided identifier that uniquely identifies this score generation request.
+        ultrafico_score:
+          $ref: '#/components/schemas/CraPartnerInsightsUltraFicoScore'
+        error_reason:
+          type: string
+          description: Human-readable description of why the UltraFICO score could not be computed.
+    CraPartnerInsightsUltraFicoScore:
+      title: CraPartnerInsightsUltraFicoScore
+      type: object
+      nullable: true
+      x-hidden-from-docs: true
+      description: The calculated UltraFICO score.
+      properties:
+        ultrafico_score_version:
+          $ref: '#/components/schemas/CraPartnerInsightsUltraFicoScoreVersion'
+        score:
+          type: integer
+          description: Numeric value of the UltraFICO score.
+        reason_code_1:
+          type: string
+          nullable: true
+          description: The first reason code associated with the score.
+        reason_code_2:
+          type: string
+          nullable: true
+          description: The second reason code associated with the score.
+        reason_code_3:
+          type: string
+          nullable: true
+          description: The third reason code associated with the score.
+        reason_code_4:
+          type: string
+          nullable: true
+          description: The fourth reason code associated with the score.
+        did_inquiries_adversely_affect_score:
+          type: boolean
+          nullable: true
+          description: Whether inquiries adversely affected the score but were not represented in one of the four reason codes. Sometimes referred to as the FACTA Flag.
+      required:
+      - ultrafico_score_version
+      - score
     PrismFirstDetectVersion:
       type: string
       description: The version of Prism FirstDetect. If not specified, will default to v3.
@@ -61593,6 +61965,8 @@ components:
           type: string
           nullable: true
           description: Client-generated identifier, which can be used by lenders to track loan applications.
+        fico:
+          $ref: '#/components/schemas/CraPartnerInsightsFicoResults'
         prism:
           $ref: '#/components/schemas/CraPartnerInsightsPrism'
         items:
@@ -66757,7 +67131,7 @@ components:
         model:
           type: string
           maxLength: 128
-          description: The name of the Trust Index model to use for calculating the Trust Index Score, with an optional version suffix. Examples include `ti-link-session-2.0`, `ti-identity-2.0`, `ti-link-session`, and `ti-identity`. If the version suffix is not included, the most recent version of that model will be used. The model specified may require certain fields within `model_inputs`. For example, `ti-link-session-2.0` requires the `link` field to be provided in `model_inputs`.
+          description: The name of the Trust Index model to use for calculating the Trust Index Score, with a major.minor version suffix. Examples include `ti-link-session-2.0` and `ti-identity-2.0`. The model specified may require certain fields within `model_inputs`. For example, `ti-link-session-2.0` requires the `link` field to be provided in `model_inputs`.
         user:
           $ref: '#/components/schemas/ProtectUser'
         model_inputs:
@@ -66772,6 +67146,8 @@ components:
       properties:
         link:
           $ref: '#/components/schemas/ProtectLinkModelInputs'
+        sdk:
+          $ref: '#/components/schemas/ProtectSDKModelInputs'
     ProtectLinkModelInputs:
       type: object
       nullable: true
@@ -66783,17 +67159,33 @@ components:
           description: A unique identifier for the Link session, used to compute a Trust Index score and fraud attributes.
         require_extracted_data:
           type: boolean
-          description: Whether to wait for data to be extracted before computing and returning a score. If set to `true` and `/protect/compute` is called before data has been extracted, an error will be returned indicating that data has not yet been extracted. If set to `false`, a score will be computed and returned regardless of whether data has been extracted. If `false` and data has been extracted, extracted data will still be included in the score computation. Defaults to `false`.
+          description: Controls whether transaction extraction must be complete before scoring. If `false` (default), returns a score whether or not transaction extraction is complete, as long as the link session is finished; if data has been extracted it will still be included in the score computation. If `true`, returns HTTP 400 with `error_type` = `INVALID_REQUEST` and `error_code` = `FAILED_PRECONDITION` if extraction is still in progress; once data is ready a score will be returned normally.
       required:
       - link_session_id
+    ProtectSDKModelInputs:
+      type: object
+      nullable: true
+      description: Inputs for Protect SDK Trust Index models.
+      properties:
+        sdk_session_id:
+          type: string
+          maxLength: 128
+          description: A unique identifier for the Protect SDK session, used to compute a Trust Index score and fraud attributes.
+      required:
+      - sdk_session_id
     ProtectComputeResponse:
       type: object
       additionalProperties: true
       description: Response object for /protect/compute
       properties:
-        trust_index:
-          $ref: '#/components/schemas/TrustIndex'
-        fraud_attributes:
+        score:
+          type: integer
+          nullable: true
+          description: The trust index score.
+        model:
+          type: string
+          description: The versioned name of the Trust Index model used for scoring.
+        attributes:
           $ref: '#/components/schemas/FraudAttributes'
         request_id:
           $ref: '#/components/schemas/RequestID'
