@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.682.2
+  version: 2020-09-14_1.685.3
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -625,7 +625,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
-      description: This endpoint allows you to subscribe to insights for a user's linked CRA items, which are updated between one and four times per day (best-effort).
+      description: This endpoint allows you to subscribe to insights for a user's linked CRA Item, which are updated between one and four times per day (best-effort). In the current Cash Flow Updates beta experience, only one Item per user may be subscribed for monitoring updates.
   /cra/monitoring_insights/unsubscribe:
     post:
       summary: Unsubscribe from Monitoring Insights
@@ -3134,7 +3134,8 @@ paths:
                       lend_score:
                         score: 80
                         reason_codes:
-                        - Bank Balance Volatility
+                        - PS0221
+                        - PS0223
         default:
           description: Error response
           content:
@@ -4586,17 +4587,9 @@ paths:
           description: Error response
       description: |-
         Note: All new implementations are encouraged to use `/transactions/sync` rather than `/transactions/get`. `/transactions/sync` provides the same functionality as `/transactions/get` and improves developer ease-of-use for handling transactions updates.
-
-
         The `/transactions/get` endpoint allows developers to receive user-authorized transaction data for credit, depository, and some loan-type accounts (only those with account subtype `student`; coverage may be limited). For transaction history from investments accounts, use the [Investments endpoint](https://plaid.com/docs/api/products/investments/) instead. Transaction data is standardized across financial institutions, and in many cases transactions are linked to a clean name, entity type, location, and category. Similarly, account data is standardized and returned with a clean name, number, balance, and other meta information where available.
-
-
         Transactions are returned in reverse-chronological order, and the sequence of transaction ordering is stable and will not shift.  Transactions are not immutable and can also be removed altogether by the institution; a removed transaction will no longer appear in `/transactions/get`.  For more details, see [Pending and posted transactions](https://plaid.com/docs/transactions/transactions-data/#pending-and-posted-transactions).
-
-
         Due to the potentially large number of transactions associated with an Item, results are paginated. Manipulate the `count` and `offset` parameters in conjunction with the `total_transactions` response body field to fetch all available transactions.
-
-
         Data returned by `/transactions/get` will be the data available for the Item as of the most recent successful check for new transactions. Plaid typically checks for new data multiple times a day, but these checks may occur less frequently, such as once a day, depending on the institution. To find out when the Item was last updated, use the [Item Debugger](https://plaid.com/docs/account/activity/#troubleshooting-with-item-debugger) or call `/item/get`; the `item.status.transactions.last_successful_update` field will show the timestamp of the most recent successful update. To force Plaid to check for new transactions, you can use the `/transactions/refresh` endpoint.
 
 
@@ -6164,6 +6157,80 @@ paths:
             schema:
               $ref: '#/components/schemas/ItemRemoveRequest'
         description: ""
+  /item/products/terminate:
+    post:
+      tags:
+      - plaid
+      summary: Terminate products for an Item
+      externalDocs:
+        url: /api/items/#itemproductsterminate
+      operationId: itemProductsTerminate
+      description: |-
+        The `/item/products/terminate` endpoint allows you to terminate an Item. Once terminated, the `access_token` associated with the Item is no longer valid, billing for the Item's products is ended, and relevant webhooks are fired.
+
+        `/item/products/terminate` is the recommended way to offboard users or disconnect accounts linked via Plaid.
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemProductsTerminateResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: m8MDnv9okwxFNBV
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemProductsTerminateRequest'
+  /item/handle_fraud_report:
+    post:
+      tags:
+      - plaid
+      summary: Report fraud for an Item
+      externalDocs:
+        url: /api/items/#itemhandlefraudreport
+      operationId: itemHandleFraudReport
+      description: |-
+        Use this endpoint to create a fraud report and terminate the associated Item. The `access_token` associated with the Item will be deactivated and billing for the Item's products will be ended.
+
+        This endpoint allows you to report various types of fraud incidents including account takeovers, identity fraud, unauthorized transactions, and other security events.
+        The reported data helps improve fraud detection models and provides valuable feedback to enhance the overall security of the Plaid network.
+        Reports can be created for confirmed incidents that have been fully investigated, or for suspected incidents that require further review.
+        You can associate reports with specific users, sessions, or transactions to provide comprehensive context about the incident.
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemHandleFraudReportResponse'
+              examples:
+                example-1:
+                  value:
+                    report_id: rpt_1234567890
+                    request_id: m8MDnv9okwxFNBV
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemHandleFraudReportRequest'
   /accounts/get:
     post:
       tags:
@@ -10048,6 +10115,7 @@ paths:
                         current: 110.01
                         iso_currency_code: USD
                         limit: null
+                        margin_loan_amount: null
                         unofficial_currency_code: null
                       mask: "5555"
                       name: Plaid IRA
@@ -10100,6 +10168,7 @@ paths:
                       market_identifier_code: XNAS
                       sector: Technology Services
                       industry: Internet Software or Services
+                      cfi_code: OCASPS
                       option_contract:
                         contract_type: call
                         expiration_date: "2018-02-01"
@@ -10126,6 +10195,7 @@ paths:
                       market_identifier_code: null
                       sector: null
                       industry: null
+                      cfi_code: null
                       option_contract: null
                       fixed_income: null
                     request_id: 24MxmGFZz89Xg2f
@@ -10143,6 +10213,144 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ProcessorInvestmentsHoldingsGetRequest'
+  /processor/investments/auth/get:
+    post:
+      tags:
+      - plaid
+      summary: Get investment account authentication data
+      description: |
+        The `/processor/investments/auth/get` endpoint allows you to retrieve information about the account
+        authorized by a processor token, including account numbers, account owners, holdings, and data provenance information.
+
+        To receive Investments Auth webhooks for a processor token, set its webhook URL via the [`/processor/token/webhook/update`](https://plaid.com/docs/api/processor-partners/#processortokenwebhookupdate) endpoint.
+      externalDocs:
+        url: /api/processor-partners/#processorinvestmentsauthget
+      operationId: processorInvestmentsAuthGet
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessorInvestmentsAuthGetResponse'
+              examples:
+                example-1:
+                  value:
+                    account:
+                      account_id: xlP8npRxwgCj48LQbjxWipkeL3gbyXf64knoy
+                      balances:
+                        available: null
+                        current: 415.57
+                        iso_currency_code: USD
+                        limit: null
+                        margin_loan_amount: null
+                        unofficial_currency_code: null
+                      mask: "5555"
+                      name: Plaid IRA
+                      official_name: null
+                      subtype: ira
+                      type: investment
+                    owners:
+                    - account_id: xlP8npRxwgCj48LQbjxWipkeL3gbyXf64knoy
+                      names:
+                      - Alberta Bobbeth Charleson
+                    numbers:
+                      acats:
+                      - account: TR5555
+                        account_id: xlP8npRxwgCj48LQbjxWipkeL3gbyXf64knoy
+                        dtc_numbers:
+                        - "1111"
+                        - "2222"
+                        - "3333"
+                    holdings:
+                    - account_id: xlP8npRxwgCj48LQbjxWipkeL3gbyXf64knoy
+                      cost_basis: 0.01
+                      institution_price: 0.011
+                      institution_price_as_of: "2021-05-25"
+                      institution_price_datetime: null
+                      institution_value: 110
+                      iso_currency_code: USD
+                      quantity: 10000
+                      security_id: 8E4L9XLl6MudjEpwPAAgivmdZRdBPJuvMPlPb
+                      unofficial_currency_code: null
+                      vested_quantity: null
+                      vested_value: null
+                    - account_id: xlP8npRxwgCj48LQbjxWipkeL3gbyXf64knoy
+                      cost_basis: 40
+                      institution_price: 42.15
+                      institution_price_as_of: "2021-05-25"
+                      institution_price_datetime: null
+                      institution_value: 210.75
+                      iso_currency_code: USD
+                      quantity: 5
+                      security_id: abJamDazkgfvBkVGgnnLUWXoxnomp5up8llg4
+                      unofficial_currency_code: null
+                      vested_quantity: 7
+                      vested_value: 66
+                    securities:
+                    - close_price: 0.011
+                      close_price_as_of: null
+                      cusip: null
+                      cfi_code: OCASPS
+                      industry: null
+                      institution_id: null
+                      institution_security_id: null
+                      is_cash_equivalent: false
+                      isin: null
+                      iso_currency_code: USD
+                      market_identifier_code: null
+                      name: Nflx Feb 01'18 $355 Call
+                      option_contract: null
+                      fixed_income: null
+                      proxy_security_id: null
+                      sector: null
+                      security_id: 8E4L9XLl6MudjEpwPAAgivmdZRdBPJuvMPlPb
+                      sedol: null
+                      ticker_symbol: NFLX180201C00355000
+                      type: derivative
+                      subtype: option
+                      unofficial_currency_code: null
+                      update_datetime: null
+                    - close_price: 42.15
+                      close_price_as_of: null
+                      cusip: null
+                      cfi_code: CEOIES
+                      fixed_income: null
+                      industry: null
+                      institution_id: null
+                      institution_security_id: null
+                      is_cash_equivalent: false
+                      isin: null
+                      iso_currency_code: USD
+                      market_identifier_code: null
+                      name: iShares Inc MSCI Brazil
+                      option_contract: null
+                      proxy_security_id: null
+                      sector: null
+                      security_id: abJamDazkgfvBkVGgnnLUWXoxnomp5up8llg4
+                      sedol: null
+                      ticker_symbol: EWZ
+                      type: etf
+                      subtype: etf
+                      unofficial_currency_code: null
+                      update_datetime: null
+                    data_sources:
+                      numbers: INSTITUTION
+                      owners: INSTITUTION
+                      holdings: INSTITUTION
+                    request_id: m8MDnv9okwxFNBV
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcessorInvestmentsAuthGetRequest'
   /processor/investments/transactions/get:
     post:
       tags:
@@ -10168,6 +10376,7 @@ paths:
                         current: 23631.9805
                         iso_currency_code: USD
                         limit: null
+                        margin_loan_amount: null
                         unofficial_currency_code: null
                       mask: "6666"
                       name: Plaid 401k
@@ -10227,6 +10436,7 @@ paths:
                       market_identifier_code: XNAS
                       sector: Miscellaneous
                       industry: Investment Trusts or Mutual Funds
+                      cfi_code: CIOGES
                       option_contract: null
                       fixed_income: null
                     - close_price: 34.73
@@ -10249,6 +10459,7 @@ paths:
                       market_identifier_code: XNAS
                       sector: Finance
                       industry: Regional Banks
+                      cfi_code: ESVUFR
                       option_contract: null
                       fixed_income: null
                     total_investment_transactions: 2
@@ -10801,7 +11012,7 @@ paths:
       externalDocs:
         url: /api/processor-partners/#processorsignalevaluate
       operationId: processorSignalEvaluate
-      description: "Use `/signal/evaluate` to evaluate a planned ACH transaction to get a return risk assessment and additional risk signals.\n\n`/signal/evaluate` is used with Rulesets that are configured on the end customer Dashboard can can be used with either the Signal Transaction Scores product or the Balance product. Which product is used will be determined by the `ruleset_key` that you provide. For more details, see [Signal Rules](https://plaid.com/docs/signal/signal-rules/).\n\nNote: This request may have higher latency if Signal Transaction Scores is being added to an existing Item for the first time, or when using a Balance-only ruleset. This is because Plaid must communicate directly with the institution to request data. "
+      description: "Use `/processor/signal/evaluate` to evaluate a planned ACH transaction to get a return risk assessment and additional risk signals.\n\n`/processor/signal/evaluate` uses Rulesets that are configured on the end customer's Dashboard and can be used with either the Signal Transaction Scores product or the Balance product. Which product is used will be determined by the `ruleset_key` that you provide. Note that only customer-configured rulesets work with this endpoint; as a processor partner, you cannot create or configure your own rulesets. For more details, see [Signal Rules](https://plaid.com/docs/signal/signal-rules/).\n\nNote: This request may have higher latency if Signal Transaction Scores is being added to an existing Item for the first time, or when using a Balance-only ruleset. This is because Plaid must communicate directly with the institution to request data. "
       responses:
         "200":
           description: OK
@@ -12029,8 +12240,6 @@ paths:
                 $ref: '#/components/schemas/PlaidError'
       description: |-
         `/sandbox/item/reset_login/` forces an Item into an `ITEM_LOGIN_REQUIRED` state in order to simulate an Item whose login is no longer valid. This makes it easy to test Link's [update mode](https://plaid.com/docs/link/update-mode) flow in the Sandbox environment.  After calling `/sandbox/item/reset_login`, You can then use Plaid Link update mode to restore the Item to a good state. An `ITEM_LOGIN_REQUIRED` webhook will also be fired after a call to this endpoint, if one is associated with the Item.
-
-
         In the Sandbox, Items will transition to an `ITEM_LOGIN_REQUIRED` error state automatically after 30 days, even if this endpoint is not called.
       requestBody:
         required: true
@@ -12100,8 +12309,6 @@ paths:
                 $ref: '#/components/schemas/PlaidError'
       description: |-
         `/sandbox/user/reset_login/` functions the same as `/sandbox/item/reset_login`, but will modify Items related to a User. This endpoint forces each Item into an `ITEM_LOGIN_REQUIRED` state in order to simulate an Item whose login is no longer valid. This makes it easy to test Link's [update mode](https://plaid.com/docs/link/update-mode) flow in the Sandbox environment.  After calling `/sandbox/user/reset_login`, You can then use Plaid Link update mode to restore Items associated with the User to a good state. An `ITEM_LOGIN_REQUIRED` webhook will also be fired after a call to this endpoint, if one is associated with the Item.
-
-
         In the Sandbox, Items will transition to an `ITEM_LOGIN_REQUIRED` error state automatically after 30 days, even if this endpoint is not called.
       requestBody:
         required: true
@@ -12228,7 +12435,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
-      description: "For Plaid products and flows that use the user object, `/user/create` provides you a single token to access all data associated with the user. You must call this endpoint before calling `/link/token/create` if you are using any of the following: Plaid Check, Income Verification, Multi-Item Link, or Plaid Protect.\n\n\nFor customers who began using this endpoint on or after December 10, 2025, this endpoint takes a `client_user_id` and an `identity` object and will return a `user_id`. For customers who began using it before that date, the endpoint takes a `client_user_id` and a `consumer_report_user_identity` object and will return a `user_token` and `user_id`. For more details, see [New User APIs](https://plaid.com/docs/api/users/user-apis).\n\n\nIn order to create a Plaid Check Consumer Report for a user, the `identity` (new) or `consumer_report_user_identity` (legacy) object must be present. If it is not provided during the `/user/create` call, it can be added later by calling `/user/update`. \n\n\nIn order to generate a Plaid Check Consumer Report, the following `identity` fields, at minimum, are required and must be non-empty: `name`, `date_of_birth`, `emails`, `phone_numbers`, and `addresses`, (with at least one email, phone number, and address designated as `primary`). Plaid Check Consumer Reports can only be created for US-based users; the user's address country must be `US`. If creating a report for sharing with a GSE such as Fannie or Freddie, the user's full SSN must be provided via the `id_numbers` field. Providing at least a partial SSN is also strongly recommended for all use cases, since it improves the accuracy of matching user records during compliance processes such as file disclosure, dispute, or security freeze requests.\n\n\nWhen using Plaid Protect, it is highly recommended that you provide an `identity` object to better identify and block fraud across your Link sessions. \n\n\nPlaid will normalize identity fields before storing them and utilize the same identity across different user-based products."
+      description: "For Plaid products and flows that use the user object, `/user/create` provides you a single token to access all data associated with the user. You must call this endpoint before calling `/link/token/create` if you are using any of the following: Plaid Check, Income Verification, Multi-Item Link, or Plaid Protect (Identity). If you are using Plaid Protect Link session scoring, you do not need to call `/user/create` first; Plaid will resolve or create the user when `user.client_user_id` is provided in `/link/token/create`.\nFor customers who began using this endpoint on or after December 10, 2025, this endpoint takes a `client_user_id` and an `identity` object and will return a `user_id`. For customers who began using it before that date, the endpoint takes a `client_user_id` and a `consumer_report_user_identity` object and will return a `user_token` and `user_id`. For more details, see [New User APIs](https://plaid.com/docs/api/users/user-apis).\nIn order to create a Plaid Check Consumer Report for a user, the `identity` (new) or `consumer_report_user_identity` (legacy) object must be present. If it is not provided during the `/user/create` call, it can be added later by calling `/user/update`. \n\n\nIn order to generate a Plaid Check Consumer Report, the following `identity` fields, at minimum, are required and must be non-empty: `name`, `date_of_birth`, `emails`, `phone_numbers`, and `addresses`, (with at least one email, phone number, and address designated as `primary`). Plaid Check Consumer Reports can only be created for US-based users; the user's address country must be `US`. If creating a report for sharing with a GSE such as Fannie or Freddie, the user's full SSN must be provided via the `id_numbers` field. Providing at least a partial SSN is also strongly recommended for all use cases, since it improves the accuracy of matching user records during compliance processes such as file disclosure, dispute, or security freeze requests.\n\n\nWhen using Plaid Protect, it is highly recommended that you provide an `identity` object to better identify and block fraud across your Link sessions. \n\n\nPlaid will normalize identity fields before storing them and utilize the same identity across different user-based products."
       requestBody:
         required: true
         content:
@@ -12565,10 +12772,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
-      description: |-
-        This endpoint is used to delete Items for a given User. Either a `user_id` or `user_token` must be provided. If any of the Items are not associated with the provided User, an error will be returned, and no Items will be deleted.
-        This is equivalent to calling `/item/remove` on each Item, but this endpoint supports User-based use cases (CRA) where `/item/remove` is not supported. To obtain a list of Items associated with a User, call `/user/items/get`. After an Item is deleted, it will no longer appear in `/user/items/get`. Item deletion via `/user/items/remove` will permanently and irreversibly delete the Item; to re-create the Item, send the User back through the Link flow.
-        This endpoint is not intended to remove all data for a User, as it will only remove items and no other data for the User. In the case of a user deleting their account with your product, call `/user/products/terminate` to stop billing for unneeded services. For a user initiated data deletion request, see the [Consumer Service Center](https://plaid.com/check/consumer-service-center/) to revoke access to data.
+      description: Removes specific Items associated with a user. It is equivalent to calling `/item/remove` on each Item individually, but supports use cases (such as Plaid Check) where access tokens are not available. All specified Items must belong to the user or the entire operation fails. Similar to `/item/remove`, this deletes Item product data, terminates billing on the Item's products, and fires webhooks to the financial institution. Once removed, Items cannot be reconnected without going through Link again.
       requestBody:
         required: true
         content:
@@ -12827,6 +13031,7 @@ paths:
                         current: 43200
                         iso_currency_code: USD
                         limit: null
+                        margin_loan_amount: null
                         unofficial_currency_code: null
                       mask: "4444"
                       name: Plaid Money Market
@@ -12839,6 +13044,7 @@ paths:
                         current: 110.01
                         iso_currency_code: USD
                         limit: null
+                        margin_loan_amount: null
                         unofficial_currency_code: null
                       mask: "5555"
                       name: Plaid IRA
@@ -12851,6 +13057,7 @@ paths:
                         current: 24580.0605
                         iso_currency_code: USD
                         limit: null
+                        margin_loan_amount: null
                         unofficial_currency_code: null
                       mask: "6666"
                       name: Plaid 401k
@@ -12863,6 +13070,7 @@ paths:
                         current: 48200.03
                         iso_currency_code: USD
                         limit: null
+                        margin_loan_amount: null
                         unofficial_currency_code: null
                       mask: "4092"
                       name: Plaid Crypto Exchange Account
@@ -13018,6 +13226,7 @@ paths:
                       market_identifier_code: XNAS
                       sector: Technology Services
                       industry: Internet Software or Services
+                      cfi_code: OCASPS
                       option_contract:
                         contract_type: call
                         expiration_date: "2018-02-01"
@@ -13044,6 +13253,7 @@ paths:
                       market_identifier_code: XNAS
                       sector: Miscellaneous
                       industry: Investment Trusts or Mutual Funds
+                      cfi_code: CIOGES
                       option_contract: null
                       fixed_income: null
                     - close_price: 2.11
@@ -13066,6 +13276,7 @@ paths:
                       market_identifier_code: XNAS
                       sector: Health Technology
                       industry: Major Pharmaceuticals
+                      cfi_code: ESVUFR
                       option_contract: null
                       fixed_income: null
                     - close_price: 10.42
@@ -13088,6 +13299,7 @@ paths:
                       market_identifier_code: XNAS
                       sector: null
                       industry: null
+                      cfi_code: CIOIBS
                       option_contract: null
                       fixed_income: null
                     - close_price: 1
@@ -13110,6 +13322,7 @@ paths:
                       market_identifier_code: null
                       sector: null
                       industry: null
+                      cfi_code: null
                       option_contract: null
                       fixed_income: null
                     - close_price: 13.73
@@ -13132,6 +13345,7 @@ paths:
                       market_identifier_code: XNAS
                       sector: null
                       industry: null
+                      cfi_code: null
                       option_contract: null
                       fixed_income: null
                     - close_price: 94.808
@@ -13154,6 +13368,7 @@ paths:
                       market_identifier_code: null
                       sector: Government
                       industry: Sovereign Government
+                      cfi_code: DYZTXR
                       option_contract: null
                       fixed_income:
                         face_value: 100
@@ -13182,6 +13397,7 @@ paths:
                       market_identifier_code: XNAS
                       sector: null
                       industry: null
+                      cfi_code: null
                       option_contract: null
                       fixed_income: null
         default:
@@ -13222,6 +13438,7 @@ paths:
                         current: 110
                         iso_currency_code: USD
                         limit: null
+                        margin_loan_amount: null
                         unofficial_currency_code: null
                       mask: "0000"
                       name: Plaid Checking
@@ -13234,6 +13451,7 @@ paths:
                         current: 320.76
                         iso_currency_code: USD
                         limit: null
+                        margin_loan_amount: null
                         unofficial_currency_code: null
                       mask: "5555"
                       name: Plaid IRA
@@ -13246,6 +13464,7 @@ paths:
                         current: 23631.9805
                         iso_currency_code: USD
                         limit: null
+                        margin_loan_amount: null
                         unofficial_currency_code: null
                       mask: "6666"
                       name: Plaid 401k
@@ -13335,6 +13554,7 @@ paths:
                       market_identifier_code: XNAS
                       sector: Miscellaneous
                       industry: Investment Trusts or Mutual Funds
+                      cfi_code: CIOGES
                       option_contract: null
                       fixed_income: null
                     - close_price: 10.42
@@ -13357,6 +13577,7 @@ paths:
                       market_identifier_code: XNAS
                       sector: null
                       industry: null
+                      cfi_code: CIOIBS
                       option_contract: null
                       fixed_income: null
                     - close_price: 34.73
@@ -13379,6 +13600,7 @@ paths:
                       market_identifier_code: XNAS
                       sector: Finance
                       industry: Regional Banks
+                      cfi_code: ESVUFR
                       option_contract: null
                       fixed_income: null
                     total_investment_transactions: 3
@@ -13466,6 +13688,7 @@ paths:
                         current: 43200
                         iso_currency_code: USD
                         limit: null
+                        margin_loan_amount: null
                         unofficial_currency_code: null
                       mask: "4444"
                       name: Plaid Money Market
@@ -13478,6 +13701,7 @@ paths:
                         current: 415.57
                         iso_currency_code: USD
                         limit: null
+                        margin_loan_amount: null
                         unofficial_currency_code: null
                       mask: "5555"
                       name: Plaid IRA
@@ -13580,6 +13804,7 @@ paths:
                     - close_price: 0.011
                       close_price_as_of: null
                       cusip: null
+                      cfi_code: OCASPS
                       industry: null
                       institution_id: null
                       institution_security_id: null
@@ -13602,6 +13827,7 @@ paths:
                     - close_price: 94.808
                       close_price_as_of: "2023-11-02"
                       cusip: 912797HE0
+                      cfi_code: DYZTXR
                       fixed_income:
                         face_value: 100
                         issue_date: "2023-11-02"
@@ -13630,6 +13856,7 @@ paths:
                     - close_price: 9.08
                       close_price_as_of: "2024-09-09"
                       cusip: null
+                      cfi_code: CIOIBS
                       fixed_income: null
                       industry: Investment Trusts or Mutual Funds
                       institution_id: null
@@ -13652,6 +13879,7 @@ paths:
                     - close_price: 42.15
                       close_price_as_of: null
                       cusip: null
+                      cfi_code: CEOIES
                       fixed_income: null
                       industry: null
                       institution_id: null
@@ -13674,6 +13902,7 @@ paths:
                     - close_price: 1
                       close_price_as_of: null
                       cusip: null
+                      cfi_code: null
                       fixed_income: null
                       industry: null
                       institution_id: null
@@ -20779,7 +21008,6 @@ paths:
                   redirect_uris:
                   - http://localhost/oauth.html
                   - https://www.example.com/oauth.html
-                  - https://*.example.com/oauth.html
   /partner/customer/get:
     post:
       tags:
@@ -21045,7 +21273,6 @@ paths:
                   redirect_uris:
                   - http://localhost/oauth.html
                   - https://www.example.com/oauth.html
-                  - https://*.example.com/oauth.html
   /beta/partner/customer/v1/get:
     x-hidden-from-docs: true
     post:
@@ -23682,7 +23909,7 @@ components:
       description: ProcessorInvestmentsHoldingsGetResponse defines the response schema for `/processor/invesments/holdings/get`
       properties:
         account:
-          $ref: '#/components/schemas/AccountBase'
+          $ref: '#/components/schemas/InvestmentAccount'
         holdings:
           type: array
           description: 'The holdings belonging to investment accounts associated with the Item. Details of the securities in the holdings are provided in the `securities` field. '
@@ -23702,6 +23929,63 @@ components:
       - account
       - holdings
       - securities
+    ProcessorInvestmentsAuthGetRequest:
+      type: object
+      description: ProcessorInvestmentsAuthGetRequest defines the request schema for `/processor/investments/auth/get`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        processor_token:
+          $ref: '#/components/schemas/ProcessorToken'
+      required:
+      - processor_token
+    ProcessorInvestmentsAuthGetResponse:
+      type: object
+      description: ProcessorInvestmentsAuthGetResponse defines the response schema for `/processor/investments/auth/get`
+      additionalProperties: true
+      properties:
+        account:
+          $ref: '#/components/schemas/AccountBase'
+        holdings:
+          type: array
+          description: The holdings belonging to the investment account. Details of the securities in the holdings are provided in the `securities` field.
+          items:
+            $ref: '#/components/schemas/Holding'
+        securities:
+          description: Objects describing the securities held in the account.
+          type: array
+          items:
+            $ref: '#/components/schemas/Security'
+        owners:
+          description: Information about the account owners for the account.
+          type: array
+          items:
+            $ref: '#/components/schemas/InvestmentsAuthOwner'
+        numbers:
+          $ref: '#/components/schemas/InvestmentsAuthGetNumbers'
+        data_sources:
+          $ref: '#/components/schemas/InvestmentsAuthDataSources'
+        account_details_401k:
+          type: array
+          x-hidden-from-docs: true
+          description: Additional information for accounts of 401k subtype.
+          items:
+            $ref: '#/components/schemas/InvestmentsAuthAccountDetails401k'
+        is_investments_fallback_item:
+          type: boolean
+          description: When true, this field indicates that the Item's portfolio was manually created with the Investments Fallback flow.
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - account
+      - holdings
+      - securities
+      - numbers
+      - owners
+      - data_sources
+      - request_id
     ProcessorTransactionsGetRequestOptions:
       type: object
       description: An optional object to be used with the request. If specified, `options` must not be `null`.
@@ -24576,8 +24860,7 @@ components:
         consumer_report_user_identity:
           $ref: '#/components/schemas/ConsumerReportUserIdentity'
         with_upgraded_user:
-          x-hidden-from-docs: true
-          description: When `true`, a new user will be created and a `user_id` will be returned. Otherwise, a legacy user will be created and a `user_token` will be returned.
+          description: If your integration with the User API predates December 10, 2025, set this field to `true` to opt into the [new User API](https://plaid.com/docs/api/users/user-apis/). When enabled, you can use the `identity` field instead of `consumer_report_user_identity`.
           type: boolean
       required:
       - client_user_id
@@ -24889,7 +25172,7 @@ components:
           description: |-
             The user's email address.
 
-            Note: email is currently not returned for users, and will be added later in 2026.
+            Note: email is currently not returned.
           type: string
           nullable: true
         date_of_birth:
@@ -25516,7 +25799,7 @@ components:
       - PAYMENT_STATUS_CANCELLED
       - PAYMENT_STATUS_ESTABLISHED
       - PAYMENT_STATUS_REJECTED
-      description: "The status of the payment.\n\nCore lifecycle statuses:\n\n**`PAYMENT_STATUS_INPUT_NEEDED`**: Transitional. The payment is awaiting user input to continue processing. It may re-enter this state if additional input is required.\n\n**`PAYMENT_STATUS_AUTHORISING`:** Transitional. The payment is being authorised by the financial institution. It will automatically move on once authorisation completes.\n\n**`PAYMENT_STATUS_INITIATED`:** Transitional. The payment has been authorised and accepted by the financial institution and is now in transit. A payment should be considered complete once it reaches the `PAYMENT_STATUS_EXECUTED` state or the funds settle in the recipient account.\n\n**`PAYMENT_STATUS_EXECUTED`: Terminal.** The funds have left the payer’s account and the payment is en route to settlement. Support is more common in the UK than in the EU; where unsupported, a successful payment remains in `PAYMENT_STATUS_INITIATED` before settling. When using Plaid Virtual Accounts, `PAYMENT_STATUS_EXECUTED` is not terminal—the payment will continue to `PAYMENT_STATUS_SETTLED` once funds are available.\n\n**`PAYMENT_STATUS_SETTLED`: Terminal.** The funds are available in the recipient’s account. Only available to customers using [Plaid Virtual Accounts](https://plaid.com/docs/payment-initiation/virtual-accounts/).\n\nFailure statuses:\n\n**`PAYMENT_STATUS_INSUFFICIENT_FUNDS`: Terminal.** The payment failed due to insufficient funds. No further retries will succeed until the payer’s balance is replenished.\n\n**`PAYMENT_STATUS_FAILED`: Terminal (retryable).** The payment could not be initiated due to a system error or outage. Retry once the root cause is resolved.\n\n**`PAYMENT_STATUS_BLOCKED`: Terminal (retryable).** The payment was blocked by Plaid (e.g., flagged as risky). Resolve any compliance or risk issues and retry.\n\n**`PAYMENT_STATUS_REJECTED`: Terminal.** The payment was rejected by the financial institution. No automatic retry is possible.\n\n**`PAYMENT_STATUS_CANCELLED`: Terminal.** The end user cancelled the payment during authorisation.\n\nStanding-order statuses:\n\n**`PAYMENT_STATUS_ESTABLISHED`: Terminal.** A recurring/standing order has been successfully created.\n\nDeprecated (to be removed in a future release):\n\n`PAYMENT_STATUS_UNKNOWN`: The payment status is unknown.  \n\n`PAYMENT_STATUS_PROCESSING`: The payment is currently being processed.  \n\n`PAYMENT_STATUS_COMPLETED`: Indicates that the standing order has been successfully established."
+      description: "The status of the payment.\n\nCore lifecycle statuses:\n\n**`PAYMENT_STATUS_INPUT_NEEDED`**: Transitional. The payment is awaiting user input to continue processing. It may re-enter this state if additional input is required.\n\n**`PAYMENT_STATUS_AUTHORISING`:** Transitional. The payment is being authorised by the financial institution. It will automatically move on once authorisation completes.\n\n**`PAYMENT_STATUS_INITIATED`:** The payment has been authorised and accepted by the financial institution. In many EU markets, `PAYMENT_STATUS_EXECUTED` is not supported, and a payment will remain in `PAYMENT_STATUS_INITIATED` until the funds settle, making this a terminal success state in those cases. A payment in `PAYMENT_STATUS_INITIATED` should be treated as a successfully submitted payment; do not gate downstream processing on reaching `PAYMENT_STATUS_EXECUTED`. For a full explanation of payment statuses and how to handle each, see the [Payment Status guide](https://plaid.com/docs/payment-initiation/payment-status/).\n\n**`PAYMENT_STATUS_EXECUTED`: Terminal.** The funds have left the payer’s account and the payment is en route to settlement. Note that this status does not confirm that funds have arrived in the recipient’s account; do not use it as proof of fund receipt. Support is more common in the UK than in the EU; where unsupported, a successful payment remains in `PAYMENT_STATUS_INITIATED` before settling. When using Plaid Virtual Accounts, `PAYMENT_STATUS_EXECUTED` is not terminal—the payment will continue to `PAYMENT_STATUS_SETTLED` once funds are available.\n\n**`PAYMENT_STATUS_SETTLED`: Terminal.** The funds are available in the recipient’s account. Only available to customers using [Plaid Virtual Accounts](https://plaid.com/docs/payment-initiation/virtual-accounts/).\n\nFailure statuses:\n\n**`PAYMENT_STATUS_INSUFFICIENT_FUNDS`: Terminal.** The payment failed due to insufficient funds. No further retries will succeed until the payer’s balance is replenished.\n\n**`PAYMENT_STATUS_FAILED`: Terminal (retryable).** The payment could not be initiated due to a system error or outage. Retry once the root cause is resolved.\n\n**`PAYMENT_STATUS_BLOCKED`: Terminal (retryable).** The payment was blocked by Plaid (e.g., flagged as risky). Resolve any compliance or risk issues and retry.\n\n**`PAYMENT_STATUS_REJECTED`: Terminal.** The payment was rejected by the financial institution. No automatic retry is possible.\n\n**`PAYMENT_STATUS_CANCELLED`: Terminal.** The end user cancelled the payment during authorisation.\n\nStanding-order statuses:\n\n**`PAYMENT_STATUS_ESTABLISHED`: Terminal.** A recurring/standing order has been successfully created.\n\nDeprecated (to be removed in a future release):\n\n`PAYMENT_STATUS_UNKNOWN`: The payment status is unknown.  \n\n`PAYMENT_STATUS_PROCESSING`: The payment is currently being processed.  \n\n`PAYMENT_STATUS_COMPLETED`: Indicates that the standing order has been successfully established."
     PaymentInitiationPayment:
       type: object
       additionalProperties: true
@@ -25921,7 +26204,7 @@ components:
           type: array
           description: The accounts associated with the Item
           items:
-            $ref: '#/components/schemas/AccountBase'
+            $ref: '#/components/schemas/InvestmentAccount'
         holdings:
           type: array
           description: 'The holdings belonging to investment accounts associated with the Item. Details of the securities in the holdings are provided in the `securities` field. '
@@ -25977,7 +26260,7 @@ components:
           type: array
           description: The accounts for which data is being retrieved
           items:
-            $ref: '#/components/schemas/AccountBase'
+            $ref: '#/components/schemas/InvestmentAccount'
         holdings:
           type: array
           description: 'The holdings belonging to investment accounts associated with the Item. Details of the securities in the holdings are provided in the `securities` field. '
@@ -26046,7 +26329,7 @@ components:
       additionalProperties: true
       properties:
         account:
-          $ref: '#/components/schemas/AccountBase'
+          $ref: '#/components/schemas/InvestmentAccount'
         investment_transactions:
           type: array
           description: An array containing investment transactions from the account. Investments transactions are returned in reverse chronological order, with the most recent at the beginning of the array. The maximum number of transactions returned is determined by the `count` parameter.
@@ -26131,7 +26414,7 @@ components:
           type: array
           description: The accounts for which transaction history is being fetched.
           items:
-            $ref: '#/components/schemas/AccountBase'
+            $ref: '#/components/schemas/InvestmentAccount'
         securities:
           type: array
           description: All securities for which there is a corresponding transaction being fetched.
@@ -26513,6 +26796,7 @@ components:
           - investments_auth
           - liabilities
           - payment_initiation
+          - protect_transactions
           - standing_orders
           - signal
           - statements
@@ -26547,6 +26831,7 @@ components:
           - signal
           - statements
           - protect_linked_bank
+          - protect_transactions
           nullable: true
         optional_products:
           type: array
@@ -26566,6 +26851,13 @@ components:
           - signal
           - statements
           - transactions
+          - cra_base_report
+          - cra_income_insights
+          - cra_cashflow_insights
+          - cra_lend_score
+          - cra_partner_insights
+          - cra_network_insights
+          - cra_monitoring
           nullable: true
         additional_consented_products:
           type: array
@@ -27181,7 +27473,7 @@ components:
         investment:
           $ref: '#/components/schemas/LinkTokenCreateInvestmentFilter'
     LinkTokenCreateRequestRedirectUri:
-      description: A URI indicating the destination where a user should be forwarded after completing the Link flow; used to support OAuth authentication flows when launching Link in the browser or another app. The `redirect_uri` should not contain any query parameters. When used in Production, must be an https URI. To specify any subdomain, use `*` as a wildcard character, e.g. `https://*.example.com/oauth.html`. Note that any redirect URI must also be added to the Allowed redirect URIs list in the [developer dashboard](https://dashboard.plaid.com/team/api). If initializing on Android, `android_package_name` must be specified instead and `redirect_uri` should be left blank.
+      description: A URI indicating the destination where a user should be forwarded after completing the Link flow; used to support OAuth authentication flows when launching Link in the browser or another app. The `redirect_uri` should not contain any query parameters. When used in Production, must be an https URI. Note that any redirect URI must also be added to the Allowed redirect URIs list in the [developer dashboard](https://dashboard.plaid.com/team/api). If initializing on Android, `android_package_name` must be specified instead and `redirect_uri` should be left blank.
       type: string
     LinkTokenCreateDepositoryFilter:
       description: A filter to apply to `depository`-type accounts
@@ -27994,6 +28286,36 @@ components:
       - $ref: '#/components/schemas/AccountBase'
       - type: object
         nullable: true
+    InvestmentAccountBalance:
+      title: InvestmentAccountBalance
+      description: A set of fields describing the balance for an account, including margin loan information for investment accounts.
+      allOf:
+      - $ref: '#/components/schemas/AccountBalance'
+      - type: object
+        additionalProperties: true
+        properties:
+          margin_loan_amount:
+            type: number
+            format: double
+            description: |-
+              The total amount of borrowed funds in the account, as determined by the financial institution.
+              For investment-type accounts, the margin balance is the total value of borrowed assets in the account, as presented by the institution.
+              This is commonly referred to as margin or a loan.
+            nullable: true
+        required:
+        - margin_loan_amount
+    InvestmentAccount:
+      title: InvestmentAccount
+      description: A single account at a financial institution, with additional investment-specific balance information.
+      allOf:
+      - $ref: '#/components/schemas/AccountBase'
+      - type: object
+        additionalProperties: true
+        properties:
+          balances:
+            $ref: '#/components/schemas/InvestmentAccountBalance'
+        required:
+        - balances
     AccountBalance:
       title: AccountBalance
       type: object
@@ -28094,6 +28416,7 @@ components:
       - crypto exchange
       - ebt
       - education savings account
+      - fhsa
       - fixed annuity
       - gic
       - health reimbursement arrangement
@@ -28124,12 +28447,18 @@ components:
       - prepaid
       - prif
       - profit sharing plan
+      - qshr
       - rdsp
       - resp
       - retirement
       - rlif
       - roth
       - roth 401k
+      - roth 403B
+      - roth 457b
+      - roth pension
+      - roth profit sharing plan
+      - roth thrift savings plan
       - rrif
       - rrsp
       - sarsep
@@ -32179,6 +32508,7 @@ components:
       - layer
       - pay_by_bank
       - protect_linked_bank
+      - protect_transactions
       description: A list of products that an institution can support. All Items must be initialized with at least one product. The Balance product is always available and does not need to be specified during initialization.
       type: string
     UserBasedProducts:
@@ -32195,6 +32525,7 @@ components:
       - investments
       - liabilities
       - protect_linked_bank
+      - protect_transactions
       - transactions
       description: A list of user-based products. User-based products include Financial Management products, Protect products, CRA products, and subscription products.
       type: string
@@ -33830,6 +34161,10 @@ components:
           type: string
           description: The `client_user_id` provided by the client when the user was created via `/user/create` or Link.
           nullable: true
+        link_session_id:
+          type: string
+          description: An identifier for the Link session this event occurred in
+          nullable: true
         environment:
           $ref: '#/components/schemas/WebhookEnvironmentValues'
       required:
@@ -34618,6 +34953,9 @@ components:
         education savings account:
           type: string
           description: Tax-advantaged Coverdell Education Savings Account (ESA) (US)
+        fhsa:
+          type: string
+          description: First Home Savings Account (FHSA) (Canada)
         fixed annuity:
           type: string
           description: Fixed annuity
@@ -34647,6 +34985,9 @@ components:
         life insurance:
           type: string
           description: Life insurance account
+        line of credit:
+          type: string
+          description: Pre-approved line of credit
         lira:
           type: string
           description: Locked-in Retirement Account (LIRA) (Canada)
@@ -34704,6 +35045,21 @@ components:
         roth 401k:
           type: string
           description: Employer-sponsored Roth 401(k) plan (US)
+        roth 403B:
+          type: string
+          description: Roth 403(b) retirement savings account for non-profits and schools (US)
+        roth 457b:
+          type: string
+          description: Roth 457(b) deferred-compensation retirement plan for governments and non-profits (US)
+        roth pension:
+          type: string
+          description: Roth version of a standard pension account
+        roth profit sharing plan:
+          type: string
+          description: Roth version of a profit sharing plan
+        roth thrift savings plan:
+          type: string
+          description: Roth version of the Thrift Savings Plan (US)
         rrif:
           type: string
           description: Registered Retirement Income Fund (RRIF) (Canada)
@@ -34754,6 +35110,7 @@ components:
       - cash isa
       - crypto exchange
       - education savings account
+      - fhsa
       - fixed annuity
       - gic
       - health reimbursement arrangement
@@ -34763,6 +35120,7 @@ components:
       - keogh
       - lif
       - life insurance
+      - line of credit
       - lira
       - lrif
       - lrsp
@@ -34782,6 +35140,11 @@ components:
       - rlif
       - roth
       - roth 401k
+      - roth 403B
+      - roth 457b
+      - roth pension
+      - roth profit sharing plan
+      - roth thrift savings plan
       - rrif
       - rrsp
       - sarsep
@@ -34809,7 +35172,10 @@ components:
       title: PaymentStatusUpdateWebhook
       type: object
       additionalProperties: true
-      description: Fired when the status of a payment has changed.
+      description: |-
+        Fired when the status of a payment has changed. For a full explanation of payment statuses and how to handle each, see the [Payment Status guide](https://plaid.com/docs/payment-initiation/payment-status/).
+
+        Note: Plaid payment statuses do not constitute proof that funds have arrived in the recipient's account. Do not use `new_payment_status` to confirm fund settlement.
       x-examples:
         example-1:
           webhook_type: PAYMENT_INITIATION
@@ -35178,6 +35544,10 @@ components:
             The industry classification of the security, such as Biotechnology, Airlines, etc.
 
             For a complete list of possible values, please refer to the ["Sectors and Industries" spreadsheet](https://docs.google.com/spreadsheets/d/1L7aXUdqLhxgM8qe7hK67qqKXiUdQqILpwZ0LpxvCVnc).
+        cfi_code:
+          nullable: true
+          type: string
+          description: The ISO-10962 Classification of Financial Instruments Code used to classify the security based on its structure and function.
         option_contract:
           $ref: '#/components/schemas/OptionContract'
         fixed_income:
@@ -35201,6 +35571,7 @@ components:
       - market_identifier_code
       - sector
       - industry
+      - cfi_code
       - option_contract
       - fixed_income
     InvestmentTransactionType:
@@ -41244,6 +41615,7 @@ components:
       - cash isa
       - crypto exchange
       - education savings account
+      - fhsa
       - fixed annuity
       - gic
       - health reimbursement arrangement
@@ -41253,6 +41625,7 @@ components:
       - keogh
       - lif
       - life insurance
+      - line of credit
       - lira
       - lrif
       - lrsp
@@ -41272,6 +41645,11 @@ components:
       - rlif
       - roth
       - roth 401k
+      - roth 403B
+      - roth 457b
+      - roth pension
+      - roth profit sharing plan
+      - roth thrift savings plan
       - rrif
       - rrsp
       - sarsep
@@ -41279,6 +41657,7 @@ components:
       - simple ira
       - sipp
       - stock plan
+      - thrift savings plan
       - tfsa
       - trust
       - ugma
@@ -41784,12 +42163,6 @@ components:
       type: object
       description: Specifies options for initializing Link for use with the Credit Partner Insights product.
       properties:
-        prism_products:
-          type: array
-          deprecated: true
-          description: The specific Prism products to return. If none are passed in, then all products will be returned.
-          items:
-            $ref: '#/components/schemas/PrismProduct'
         prism_versions:
           $ref: '#/components/schemas/PrismVersions'
         fico:
@@ -41827,8 +42200,6 @@ components:
       type: object
       description: Specifies options for initializing Link for use with the Cashflow Insights product.
       properties:
-        plaid_check_score_version:
-          $ref: '#/components/schemas/PlaidCheckScoreVersion'
         attributes_version:
           $ref: '#/components/schemas/CashflowAttributesVersion'
     LinkTokenCreateRequestCraOptionsLendScore:
@@ -41856,21 +42227,6 @@ components:
           description: The maximum integer number of days of history to compute Credit Partner Insights. Defaults to 180 if not specified
           minimum: 1
           maximum: 730
-        prism_products:
-          deprecated: true
-          type: array
-          description: The specific Prism products to return. If none are passed in, then all products will be returned.
-          items:
-            $ref: '#/components/schemas/PrismProduct'
-    PrismProduct:
-      title: PrismProduct
-      deprecated: true
-      x-hidden-from-docs: true
-      enum:
-      - insights
-      - scores
-      description: The Prism products that can be returned by the Plaid API
-      type: string
     LinkTokenCreateRequestEmployment:
       title: LinkTokenCreateRequestEmployment
       type: object
@@ -43375,6 +43731,10 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_token:
           $ref: '#/components/schemas/UserToken'
+        user_id:
+          x-hidden-from-docs: true
+          allOf:
+          - $ref: '#/components/schemas/NewUserID'
         options:
           $ref: '#/components/schemas/CreditBankIncomeGetRequestOptions'
     CreditBankIncomeGetRequestOptions:
@@ -43410,6 +43770,10 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_token:
           $ref: '#/components/schemas/UserToken'
+        user_id:
+          x-hidden-from-docs: true
+          allOf:
+          - $ref: '#/components/schemas/NewUserID'
       required:
       - user_token
     CreditBankIncomePDFGetResponse:
@@ -43784,6 +44148,10 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_token:
           $ref: '#/components/schemas/UserToken'
+        user_id:
+          x-hidden-from-docs: true
+          allOf:
+          - $ref: '#/components/schemas/NewUserID'
         options:
           $ref: '#/components/schemas/CreditBankIncomeRefreshRequestOptions'
       required:
@@ -43816,6 +44184,10 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_token:
           $ref: '#/components/schemas/UserToken'
+        user_id:
+          x-hidden-from-docs: true
+          allOf:
+          - $ref: '#/components/schemas/NewUserID'
         enable_webhooks:
           description: Whether the user should be enabled for proactive webhook notifications when their income changes
           type: boolean
@@ -43868,6 +44240,10 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_token:
           $ref: '#/components/schemas/UserToken'
+        user_id:
+          x-hidden-from-docs: true
+          allOf:
+          - $ref: '#/components/schemas/NewUserID'
         item_id:
           $ref: '#/components/schemas/ItemId'
         parsing_config:
@@ -43915,6 +44291,10 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_token:
           $ref: '#/components/schemas/UserToken'
+        user_id:
+          x-hidden-from-docs: true
+          allOf:
+          - $ref: '#/components/schemas/NewUserID'
     CreditPayrollIncomeRiskSignalsGetResponse:
       title: CreditPayrollIncomeRiskSignalsGetReponse
       type: object
@@ -44151,6 +44531,10 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_token:
           $ref: '#/components/schemas/UserToken'
+        user_id:
+          x-hidden-from-docs: true
+          allOf:
+          - $ref: '#/components/schemas/NewUserID'
         options:
           $ref: '#/components/schemas/CreditPayrollIncomeGetRequestOptions'
     CreditPayrollIncomeGetRequestOptions:
@@ -45693,6 +46077,10 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_token:
           $ref: '#/components/schemas/UserToken'
+        user_id:
+          x-hidden-from-docs: true
+          allOf:
+          - $ref: '#/components/schemas/NewUserID'
         access_tokens:
           type: array
           description: An array of access tokens corresponding to Items belonging to the user whose eligibility is being checked. Note that if the Items specified here are not already initialized with `transactions`, providing them in this field will cause these Items to be initialized with (and billed for) the Transactions product.
@@ -45728,6 +46116,10 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_token:
           $ref: '#/components/schemas/UserToken'
+        user_id:
+          x-hidden-from-docs: true
+          allOf:
+          - $ref: '#/components/schemas/NewUserID'
         options:
           $ref: '#/components/schemas/CreditPayrollIncomeRefreshRequestOptions'
       required:
@@ -48087,8 +48479,6 @@ components:
         personal_finance_category_icon_url:
           type: string
           description: The URL of an icon associated with the primary personal finance category. The icon will always be 100×100 pixel PNG file.
-        recurrence:
-          $ref: '#/components/schemas/Recurrence'
         website:
           type: string
           description: The website associated with this transaction.
@@ -48103,61 +48493,6 @@ components:
       - counterparties
       - merchant_name
       - phone_number
-    Recurrence:
-      deprecated: true
-      x-hidden-from-docs: true
-      title: Recurrence
-      nullable: true
-      type: object
-      description: |-
-        This schema was for beta and is no longer populated.
-
-        Insights relating to expenses and deposits that are predicted to occur on a scheduled basis, such as biweekly, monthly, or annually.
-
-        Common examples include loan payments, bill payments, subscriptions, and payroll income.
-
-        This is a beta field, available to all users.
-      additionalProperties: true
-      properties:
-        is_recurring:
-          type: boolean
-          description: Whether or not the transaction is periodically recurring.
-          nullable: true
-        frequency:
-          $ref: '#/components/schemas/RecurringFrequency'
-    RecurringFrequency:
-      type: string
-      title: RecurringFrequency
-      x-hidden-from-docs: true
-      nullable: true
-      enum:
-      - UNKNOWN
-      - WEEKLY
-      - BIWEEKLY
-      - SEMI_MONTHLY
-      - MONTHLY
-      - ANNUALLY
-      - DAILY
-      - DYNAMIC
-      - null
-      description: |-
-        Describes the frequency of the transaction stream.
-
-        `WEEKLY`: Assigned to a transaction stream that occurs approximately every week.
-
-        `BIWEEKLY`: Assigned to a transaction stream that occurs approximately every 2 weeks.
-
-        `SEMI_MONTHLY`: Assigned to a transaction stream that occurs approximately twice per month. This frequency is typically seen for inflow transaction streams.
-
-        `MONTHLY`: Assigned to a transaction stream that occurs approximately every month.
-
-        `ANNUALLY`: Assigned to a transaction stream that occurs approximately every year.
-
-        `DAILY`: Assigned to a transaction stream that occurs approximately every day.
-
-        `DYNAMIC`: Assigned to a transaction stream that varies in recurrence frequency. This frequency is typically seen for inflow streams in the gig economy.
-
-        `UNKNOWN`: Assigned to a transaction stream that isn't recurring in nature.
     TransactionsUserInsightsGetRequest:
       type: object
       description: TransactionsUserInsightsGetRequest defines the request schema for `/beta/transactions/user_insights/v1/get`.
@@ -48854,7 +49189,7 @@ components:
         assets_under_management:
           $ref: '#/components/schemas/PartnerEndCustomerAssetsUnderManagement'
         redirect_uris:
-          description: A list of URIs indicating the destination(s) where a user can be forwarded after completing the Link flow; used to support OAuth authentication flows when launching Link in the browser or another app. URIs should not contain any query parameters. When used in Production, URIs must use https. To specify any subdomain, use `*` as a wildcard character, e.g. `https://*.example.com/oauth.html`. To modify redirect URIs for an end customer after creating them, go to the end customer's [API page](https://dashboard.plaid.com/team/api) in the Dashboard.
+          description: A list of URIs indicating the destination(s) where a user can be forwarded after completing the Link flow; used to support OAuth authentication flows when launching Link in the browser or another app. URIs should not contain any query parameters. When used in Production, URIs must use https. To modify redirect URIs for an end customer after creating them, go to the end customer's [API page](https://dashboard.plaid.com/team/api) in the Dashboard.
           type: array
           items:
             type: string
@@ -49191,7 +49526,7 @@ components:
         address:
           $ref: '#/components/schemas/PartnerEndCustomerAddress'
         redirect_uris:
-          description: A list of URIs indicating the destination(s) where a user can be forwarded after completing the Link flow; used to support OAuth authentication flows when launching Link in the browser or another app. URIs should not contain any query parameters. When used in Production, URIs must use https. To specify any subdomain, use `*` as a wildcard character, e.g. `https://*.example.com/oauth.html`. To modify redirect URIs for an end customer after creating them, go to the end customer's [API page](https://dashboard.plaid.com/team/api) in the Dashboard.
+          description: A list of URIs indicating the destination(s) where a user can be forwarded after completing the Link flow; used to support OAuth authentication flows when launching Link in the browser or another app. URIs should not contain any query parameters. When used in Production, URIs must use https. To modify redirect URIs for an end customer after creating them, go to the end customer's [API page](https://dashboard.plaid.com/team/api) in the Dashboard.
           type: array
           items:
             type: string
@@ -50215,7 +50550,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ItemId'
-          description: A list of `item_ids` that is included in the Check Report.
+          description: A list of `item_ids` included in the Check Report. Access to this field is in closed beta.
           x-hidden-from-docs: true
           nullable: true
         environment:
@@ -50248,6 +50583,13 @@ components:
         user_id:
           type: string
           description: The `user_id` corresponding to the user the webhook has fired for.
+        item_ids:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemId'
+          description: A list of `item_ids` included in the Check Report. Access to this field is in closed beta.
+          x-hidden-from-docs: true
+          nullable: true
         environment:
           $ref: '#/components/schemas/WebhookEnvironmentValues'
       required:
@@ -50344,8 +50686,9 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ItemId'
-          description: A list of `item_ids` that is included in the Check Report.
+          description: A list of `item_ids` included in the Check Report. Access to this field is in closed beta.
           x-hidden-from-docs: true
+          nullable: true
         environment:
           $ref: '#/components/schemas/WebhookEnvironmentValues'
       required:
@@ -50376,6 +50719,13 @@ components:
         user_id:
           type: string
           description: The `user_id` associated with the user whose data is being requested. This is received by calling user/create.
+        item_ids:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemId'
+          description: A list of `item_ids` included in the Check Report. Access to this field is in closed beta.
+          x-hidden-from-docs: true
+          nullable: true
         environment:
           $ref: '#/components/schemas/WebhookEnvironmentValues'
       required:
@@ -51719,6 +52069,8 @@ components:
             $ref: '#/components/schemas/ItemId'
         user_token:
           $ref: '#/components/schemas/UserToken'
+        user_tier:
+          $ref: '#/components/schemas/CraUserTier'
     CraCheckReportBaseReportGetResponse:
       title: CraCheckReportBaseReportGetResponse
       type: object
@@ -61611,6 +61963,8 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_token:
           $ref: '#/components/schemas/UserToken'
+        user_tier:
+          $ref: '#/components/schemas/CraUserTier'
       required:
       - user_token
     CraPartnerInsightsGetResponse:
@@ -61642,6 +61996,8 @@ components:
           $ref: '#/components/schemas/ThirdPartyUserToken'
         user_token:
           $ref: '#/components/schemas/UserToken'
+        user_tier:
+          $ref: '#/components/schemas/CraUserTier'
         partner_insights:
           $ref: '#/components/schemas/CraCheckReportPartnerInsightsGetPartnerInsights'
         options:
@@ -61663,12 +62019,6 @@ components:
       x-hidden-from-docs: true
       deprecated: true
       properties:
-        prism_products:
-          type: array
-          deprecated: true
-          description: The specific Prism Data products to return. If none are passed in, then all products will be returned.
-          items:
-            $ref: '#/components/schemas/PrismProduct'
         prism_versions:
           $ref: '#/components/schemas/PrismVersionsDeprecated'
     CraCheckReportCreatePartnerInsightsOptions:
@@ -61677,12 +62027,6 @@ components:
       nullable: true
       description: Defines configuration to generate Partner Insights.
       properties:
-        prism_products:
-          type: array
-          deprecated: true
-          description: The specific Prism Data products to return. If none are passed in, then all products will be returned.
-          items:
-            $ref: '#/components/schemas/PrismProduct'
         prism_versions:
           $ref: '#/components/schemas/PrismVersions'
         fico:
@@ -61902,6 +62246,7 @@ components:
       description: The version of Prism Detect
       nullable: true
       enum:
+      - 4.1
       - 4
       - null
     PrismCashScoreVersion:
@@ -61909,10 +62254,12 @@ components:
       description: The version of Prism CashScore. If not specified, will default to v3.
       nullable: true
       x-override-enum-values-shown:
+      - 4.1
       - 4
       - 3
       - null
       enum:
+      - 4.1
       - 4
       - 3_lite
       - 3
@@ -61922,6 +62269,7 @@ components:
       description: The version of Prism Extend
       nullable: true
       enum:
+      - 4.1
       - 4
       - null
     PrismInsightsVersion:
@@ -61929,6 +62277,7 @@ components:
       description: The version of Prism Insights. If not specified, will default to v3.
       nullable: true
       enum:
+      - 4.1
       - 4
       - 3
       - null
@@ -62026,7 +62375,6 @@ components:
         type:
           $ref: '#/components/schemas/CreditBankIncomeAccountType'
         owners:
-          x-hidden-from-docs: true
           type: array
           description: Data returned by the financial institution about the account owner or owners. Identity information is optional, so field may return an empty array.
           items:
@@ -62059,6 +62407,7 @@ components:
       - end_date
     CraPartnerInsightsPrism:
       type: object
+      nullable: true
       additionalProperties: true
       description: The Prism Data insights for the user.
       properties:
@@ -62333,8 +62682,6 @@ components:
       nullable: true
       description: Defines configuration options to generate Cashflow Insights
       properties:
-        plaid_check_score_version:
-          $ref: '#/components/schemas/PlaidCheckScoreVersion'
         attributes_version:
           $ref: '#/components/schemas/CashflowAttributesVersion'
     CraCheckReportLendScoreGetOptions:
@@ -62353,18 +62700,9 @@ components:
       properties:
         network_insights_version:
           $ref: '#/components/schemas/NetworkInsightsVersion'
-    PlaidCheckScoreVersion:
-      type: string
-      description: The version of the Check Score. New integrations should use `/cra/check_report/lend_score/get` and the LendScore instead.
-      deprecated: true
-      x-hidden-from-docs: true
-      nullable: true
-      enum:
-      - v1.0
-      - v2.0
     PlaidLendScoreVersion:
       type: string
-      description: The version of the LendScore
+      description: The version of the LendScore to use. Required if using LendScore.
       nullable: true
       enum:
       - v1.0
@@ -62380,7 +62718,7 @@ components:
       type: string
     CashflowAttributesVersion:
       type: string
-      description: The version of cashflow attributes
+      description: The version of cashflow attributes. Required if using Cash Flow Insights.
       nullable: true
       enum:
       - v1.0
@@ -62390,7 +62728,7 @@ components:
       - CFI1
     NetworkInsightsVersion:
       type: string
-      description: The version of network insights
+      description: The version of Network Insights. Required if using Network Insights.
       nullable: true
       enum:
       - NI1
@@ -62424,34 +62762,11 @@ components:
           type: string
           description: The time when the report was generated.
           format: date-time
-        plaid_check_score:
-          $ref: '#/components/schemas/PlaidCheckScore'
         attributes:
           $ref: '#/components/schemas/CashflowAttributesSchema'
       required:
       - report_id
       - generated_time
-    PlaidCheckScore:
-      type: object
-      additionalProperties: true
-      x-hidden-from-docs: true
-      deprecated: true
-      description: The results of the Plaid Check score. For existing customers only; for new customers, the Plaid Check Score has been replaced by the LendScore, which can be obtained by calling `/cra/check_report/lend_score/get`.
-      nullable: true
-      properties:
-        score:
-          type: integer
-          description: The score returned by the Plaid Check Score model. Will be an integer in the range 1 to 99.
-          nullable: true
-        reason_codes:
-          type: array
-          description: The reasons for an individual having risk according to the Plaid Check score.
-          items:
-            type: string
-        error_reason:
-          type: string
-          nullable: true
-          description: Human-readable description of why the score could not be computed.
     CashflowAttributesSchema:
       type: object
       title: CashflowAttributes
@@ -62503,7 +62818,7 @@ components:
           nullable: true
         reason_codes:
           type: array
-          description: The reasons for an individual having risk according to the LendScore. For a full list of possible reason codes, contact your Plaid Account Manager. Different LendScore versions will use different sets of reason codes.
+          description: The reasons for an individual having risk according to the LendScore. For a full list of possible reason codes and a mapping of reason codes to human-readable reasons, contact your Plaid Account Manager. Different LendScore versions will use different sets of reason codes.
           items:
             type: string
         error_reason:
@@ -62688,6 +63003,9 @@ components:
         report_id:
           type: string
           description: The unique identifier associated with the Home Lending Report object. This ID will be the same as the Base Report ID.
+        gse_reference_id:
+          type: string
+          description: A unique token that can be shared with GSEs in order to provide them access to the report. This is automatically created during report generation when GSE options are specified.
         client_report_id:
           type: string
           nullable: true
@@ -63398,6 +63716,15 @@ components:
       required:
       - status
       - date
+    CraUserTier:
+      type: string
+      description: The tier of the user.
+      x-hidden-from-docs: true
+      nullable: true
+      enum:
+      - free
+      - paid
+      - null
     CraLoanClosedStatus:
       type: object
       description: Contains the status and date information of the loan when unregistering.
@@ -65298,7 +65625,96 @@ components:
         code_sent:
           description: The last webhook code sent.
           type: string
+    ItemProductsTerminateRequest:
+      type: object
+      description: ItemProductsTerminateRequest defines the request schema for `/item/products/terminate`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+        reason_code:
+          $ref: '#/components/schemas/ItemProductsTerminateReasonCode'
+        reason_note:
+          type: string
           nullable: true
+          maxLength: 512
+          description: Additional context or details about the reason for terminating products on the Item. Personally identifiable information, such as an email address or phone number, should not be included in the `reason_note`.
+      required:
+      - access_token
+      - reason_code
+    ItemProductsTerminateReasonCode:
+      type: string
+      description: |
+        The reason for terminating products on the Item.
+
+        `OTHER`: Any other reason for terminating products not covered by the above categories
+      enum:
+      - OTHER
+    ItemProductsTerminateResponse:
+      type: object
+      additionalProperties: true
+      description: ItemProductsTerminateResponse defines the response schema for `/item/products/terminate`
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
+    ItemHandleFraudReportRequest:
+      type: object
+      description: |-
+        Request object for `/item/handle_fraud_report`.
+        Must provide either `user_id` or at least one of the following identifiers in `incident_event`: `link_session_id`, `idv_session_id`, `protect_event_id`, or `signal_client_transaction_id`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+        user_id:
+          type: string
+          nullable: true
+          description: The Plaid User ID associated with the report.
+        incident_event:
+          $ref: '#/components/schemas/ProtectIncidentEvent'
+        report_confidence:
+          $ref: '#/components/schemas/ProtectReportConfidence'
+        report_type:
+          $ref: '#/components/schemas/ProtectReportType'
+        report_source:
+          $ref: '#/components/schemas/ProtectReportSource'
+        bank_account:
+          $ref: '#/components/schemas/ProtectBankAccount'
+        ach_return_code:
+          type: string
+          nullable: true
+          description: Must be a valid ACH return code (e.g. `R01`), required if `report_type` is `ACH_RETURN`.
+        notes:
+          type: string
+          nullable: true
+          maxLength: 1024
+          description: Additional context or details about the report, required if `report_type` is `OTHER`.
+      required:
+      - access_token
+      - report_confidence
+      - report_type
+      - report_source
+    ItemHandleFraudReportResponse:
+      type: object
+      additionalProperties: true
+      description: ItemHandleFraudReportResponse defines the response schema for `/item/handle_fraud_report`
+      properties:
+        report_id:
+          type: string
+          description: A unique identifier representing the submitted report.
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - report_id
+      - request_id
     OauthAPISecret:
       title: APISecret
       type: string
@@ -65614,13 +66030,24 @@ components:
       type: string
       title: Notification Type
       enum:
+      - ACCOUNT_TAKEOVER
+      - ADDRESS_CHANGED
+      - BALANCE
+      - CONSENT_EXPIRED
+      - CONSENT_GRANTED
       - CONSENT_REVOKED
       - CONSENT_UPDATED
       - CUSTOM
-      - SERVICE
-      - BALANCE
+      - MFA_TARGET_CHANGED
+      - PHONE_CHANGED
       - PLANNED_OUTAGE
+      - RISK
+      - SERVICE
+      - SUSPECTED_INCIDENT
+      - TAN_ACTIVATED
+      - TAN_CREATED
       - TAN_REVOKED
+      - TAN_SUSPENDED
       description: Type of Notification
     FDXNotificationSeverity:
       type: string
@@ -65805,6 +66232,9 @@ components:
           description: Id of notification
         type:
           $ref: '#/components/schemas/FDXNotificationType'
+        subtype:
+          type: string
+          description: An optional initiator-defined event subtype code or description if the event type needs to be further categorized or described.
         sentOn:
           $ref: '#/components/schemas/FDXTimestamp'
         category:
@@ -66204,7 +66634,7 @@ components:
           $ref: '#/components/schemas/ProcessorToken'
         client_transaction_id:
           type: string
-          description: Must be the same as the `client_transaction_id` supplied when calling `/signal/evaluate`
+          description: Must be the same as the `client_transaction_id` supplied when calling `/processor/signal/evaluate`
           minLength: 1
           maxLength: 36
         initiated:
