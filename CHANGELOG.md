@@ -1,5 +1,32 @@
+### 2020-09-14_1.688.0
+- Add additional fields to CRA Partner Insights UltraFICO response (hidden from docs)
+
+### 2020-09-14_1.687.1
+- Add `limited purpose checking` to `DepositoryAccountSubtype`, `DepositoryAccount`, and `AccountSubtype` schemas
+- Add `limited_purpose_types` filter field to `DepositoryFilter` and `LinkTokenCreateDepositoryFilter` (hidden from docs)
+- Add `LimitedPurposeTypes` and `LimitedPurposeType` schemas (hidden from docs)
+
+### 2020-09-14_1.687.0
+- Add new field `disconnect_time` to `PendingDisconnectWebhook`
+
+### 2020-09-14_1.686.4
+- Income Insights doc fixes
+
+### 2020-09-14_1.686.3
+- Update `/cra/check_report/income_insights/get` sample response to V2 schema
+
+### 2020-09-14_1.686.2
+- Unhide Income Insights V2 fields and hide Income Insights v1 fields
+
+### 2020-09-14_1.686.1
+- Add `home_lending_report_options` to `CraCheckReportCreateBaseReportOptions` and `LinkTokenCreateRequestCraOptionsBaseReport` for configuring Home Lending Report generation (VOA, Employment Refresh) on base report creation
+
+### 2020-09-14_1.686.0
+- Add Income Insights V2 schemas and fields to client libraries (hidden from docs)
+
 ### 2020-09-14_1.685.3
 - Add `cfi_code` field to the Investments `Security` schema.
+- Add `ewa_attributes` field to `BetaEwaReportV1GetResponse`
 
 ### 2020-09-14_1.685.2
 - Add `protect_transactions` to the public `Products` and `UserBasedProducts` enums and expose it in `/link/token/create` product array docs.
@@ -122,7 +149,7 @@ Update copy for Layer email availability
 - (hidden) Add `/user/identity/remove` endpoint to allow customers to explicitly purge identity data
 
 ### 2020-09-14_1.680.3
-- Mark `is_investments_fallback_item` as an optional rather than required parameter in the response schema for `/processor/investments/holdings/get` endpoint (not yet currently used in Production by any customers), to achieve consistency with `/investments/holdings/get`. 
+- Mark `is_investments_fallback_item` as an optional rather than required parameter in the response schema for `/processor/investments/holdings/get` endpoint (not yet currently used in Production by any customers), to achieve consistency with `/investments/holdings/get`.
 
 ### 2020-09-14_1.680.2
 - Add `/user_account/session/event/send` endpoint for Layer customer event tracking
@@ -265,7 +292,7 @@ Update copy for Layer email availability
 - (beta) new `/protect/report/create` endpoint
 
 ### 2020-09-14_1.667.5
-- Publish `/transfer/platform/originator/create` to docs 
+- Publish `/transfer/platform/originator/create` to docs
 - Publish `/transfer/platform/person/create` to docs
 - Publish `/transfer/platform/requirement/submit` to docs
 
@@ -359,7 +386,7 @@ Update copy for Layer email availability
 - Add `user_id` to `cra/*` endpoints
 
 ### 2020-09-14_1.663.1
-- Add `overdraft` account type to the `LoanAccountSubtype` object, where it was erroneously missing 
+- Add `overdraft` account type to the `LoanAccountSubtype` object, where it was erroneously missing
 - Correct missing and incorrect enum values for `ItemConsentedDataScope` object
 
 ### 2020-09-14_1.663.0
@@ -378,8 +405,8 @@ Update copy for Layer email availability
 - Add `gse_options` to `base_report` options in `/link/token/create` and `cra/check_report/create`
 
 ### 2020-09-14_1.659.0
-- Deprecate the `sedol` field in the Investments `Security` object. 
-- Deprecate the `sedol` field in the Investments `SecurityOverride` object. 
+- Deprecate the `sedol` field in the Investments `Security` object.
+- Deprecate the `sedol` field in the Investments `SecurityOverride` object.
 
 ### 2020-09-14_1.658.0
 - (beta) Add `user_id` field to `/session/token/create` request.
@@ -392,7 +419,7 @@ Update copy for Layer email availability
 - Renamed `protect_sdk_session_id` field in the request of `/protect/event/send` to `protect_session_id` for consistency across endpoints.
 
 ### 2020-09-14_1.656.0
-- Added `aamva_verification` object in the responses of `documentary_verification.documents[].analysis`. This impacts the following endpoints: 
+- Added `aamva_verification` object in the responses of `documentary_verification.documents[].analysis`. This impacts the following endpoints:
     - `identity_verification/create`
     - `identity_verification/get`
     - `identity_verification/list`

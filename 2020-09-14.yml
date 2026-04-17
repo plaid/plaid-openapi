@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.685.3
+  version: 2020-09-14_1.688.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -485,7 +485,7 @@ paths:
                 $ref: '#/components/schemas/PlaidError'
       operationId: assetReportAuditCopyCreate
       description: |-
-        Plaid can provide an Audit Copy of any Asset Report directly to a participating third party on your behalf. For example, Plaid can supply an Audit Copy directly to Fannie Mae on your behalf if you participate in the Day 1 Certainty™ program. An Audit Copy contains the same underlying data as the Asset Report.
+        Plaid can provide an Audit Copy of any Asset Report directly to a participating third party on your behalf. For example, Plaid can supply an Audit Copy directly to the GSEs on your behalf if you participate in Fannie Mae's Day 1 Certainty™ program or utilize Freddie Mac’s Loan Product Advisor® (LPA®) Asset and Income Modeler (AIM). An Audit Copy contains the same underlying data as the Asset Report.
 
         To grant access to an Audit Copy, use the `/asset_report/audit_copy/create` endpoint to create an `audit_copy_token` and then pass that token to the third party who needs access. Each third party has its own `auditor_id`, for example `fannie_mae`. You’ll need to create a separate Audit Copy for each third party to whom you want to grant access to the Report.
       requestBody:
@@ -1755,12 +1755,96 @@ paths:
                       report_id: bbfc5174-5433-4648-8d93-9fec6a0c0966
                       generated_time: "2022-01-31T22:47:53Z"
                       days_requested: 365
+                      user_summary:
+                        income_metrics:
+                        - current:
+                            monthly:
+                              gross_income: 390
+                              net_income: 300
+                            annual:
+                              gross_income: 4680
+                              net_income: 3600
+                          projected:
+                            monthly:
+                              gross_income: 300
+                              net_income: 300
+                            annual:
+                              gross_income: 3600
+                              net_income: 3600
+                          iso_currency_code: USD
+                          unofficial_currency_code: null
+                      income_streams:
+                      - income_stream_id: f17efbdd-caab-4278-8ece-963511cd3d51
+                        start_date: "2021-11-15"
+                        end_date: "2022-01-15"
+                        description: PLAID INC DIRECT DEP PPD
+                        insights:
+                          income_category:
+                            primary: EARNED_INCOME
+                            secondary: SALARY
+                          pay_frequency: MONTHLY
+                          income_provider:
+                            name: Plaid Inc
+                            is_normalized: true
+                          next_payment:
+                            date: "2022-12-15"
+                          status: ACTIVE
+                        income_metrics:
+                          current:
+                            monthly:
+                              gross_income: 390
+                              net_income: 300
+                            annual:
+                              gross_income: 4680
+                              net_income: 3600
+                          projected:
+                            monthly:
+                              gross_income: 300
+                              net_income: 300
+                            annual:
+                              gross_income: 3600
+                              net_income: 3600
+                          iso_currency_code: USD
+                          unofficial_currency_code: null
+                        transactions:
+                        - transaction_id: aH5klwqG3B19OMT7D6F24Syv8pdnJXmtZoKQ5
+                          item_id: AZMP7JrGXgtPd3AQMeg7hwMKgk5E8qU1V5ME7
+                          account_id: 1qKRXQjk8xUWDJojNwPXTj8gEmR48piqRNye8
+                          amount: 100
+                          date: "2021-11-15"
+                          original_description: PLAID_INC_DIRECT_DEP_PPD 123A
+                          outlier:
+                            is_outlier: false
+                          iso_currency_code: USD
+                          unofficial_currency_code: null
+                        - transaction_id: mN3rQ5iH8BC41T6UjKL9oD2vWJpZqXFomGwY1
+                          item_id: AZMP7JrGXgtPd3AQMeg7hwMKgk5E8qU1V5ME7
+                          account_id: 1qKRXQjk8xUWDJojNwPXTj8gEmR48piqRNye8
+                          amount: 100
+                          date: "2021-12-15"
+                          original_description: PLAID_INC_DIRECT_DEP_PPD 123B
+                          outlier:
+                            is_outlier: false
+                          iso_currency_code: USD
+                          unofficial_currency_code: null
+                        - transaction_id: zK9lDoR8uBH51PNQ3W4T6Mjy2VFXpGtJwsL4
+                          item_id: AZMP7JrGXgtPd3AQMeg7hwMKgk5E8qU1V5ME7
+                          account_id: 1qKRXQjk8xUWDJojNwPXTj8gEmR48piqRNye8
+                          amount: 100
+                          date: "2022-01-31"
+                          original_description: PLAID_INC_DIRECT_DEP_PPD 123C
+                          outlier:
+                            is_outlier: false
+                          iso_currency_code: USD
+                          unofficial_currency_code: null
                       items:
                       - item_id: AZMP7JrGXgtPd3AQMeg7hwMKgk5E8qU1V5ME7
-                        last_updated_time: "2022-01-31T22:47:53Z"
-                        institution_id: ins_0
                         institution_name: Plaid Bank
-                        bank_income_accounts:
+                        institution_id: ins_0
+                        last_updated_time: "2022-01-31T22:47:53Z"
+                        bank_income_accounts: []
+                        bank_income_sources: []
+                        accounts:
                         - account_id: 1qKRXQjk8xUWDJojNwPXTj8gEmR48piqRNye8
                           mask: "8888"
                           metadata:
@@ -1768,174 +1852,10 @@ paths:
                             end_date: "2024-07-16"
                           name: Plaid Checking Account
                           official_name: Plaid Checking Account
-                          type: depository
                           subtype: checking
+                          type: depository
                           owners: []
-                        bank_income_sources:
-                        - account_id: 1qKRXQjk8xUWDJojNwPXTj8gEmR48piqRNye8
-                          income_source_id: f17efbdd-caab-4278-8ece-963511cd3d51
-                          income_description: PLAID_INC_DIRECT_DEP_PPD
-                          income_category: SALARY
-                          start_date: "2021-11-15"
-                          end_date: "2022-01-15"
-                          pay_frequency: MONTHLY
-                          total_amount: 300
-                          iso_currency_code: USD
-                          unofficial_currency_code: null
-                          transaction_count: 1
-                          next_payment_date: "2022-12-15"
-                          status: ACTIVE
-                          historical_average_monthly_gross_income: 390
-                          historical_average_monthly_income: 300
-                          forecasted_average_monthly_income: 300
-                          forecasted_average_monthly_income_prediction_intervals:
-                          - lower_bound: 200
-                            upper_bound: 400
-                            probability: 0.8
-                          employer:
-                            name: Plaid Inc
-                          income_provider:
-                            name: Plaid Inc
-                            is_normalized: true
-                          historical_summary:
-                          - start_date: "2021-11-02"
-                            end_date: "2021-11-30"
-                            total_amounts:
-                            - amount: 100
-                              iso_currency_code: USD
-                              unofficial_currency_code: null
-                            transactions:
-                            - transaction_id: aH5klwqG3B19OMT7D6F24Syv8pdnJXmtZoKQ5
-                              amount: 100
-                              bonus_type: null
-                              date: "2021-11-15"
-                              name: PLAID_INC_DIRECT_DEP_PPD
-                              original_description: PLAID_INC_DIRECT_DEP_PPD 123A
-                              pending: false
-                              check_number: null
-                              iso_currency_code: USD
-                              unofficial_currency_code: null
-                          - start_date: "2021-12-01"
-                            end_date: "2021-12-31"
-                            total_amounts:
-                            - amount: 100
-                              iso_currency_code: USD
-                              unofficial_currency_code: null
-                            transactions:
-                            - transaction_id: mN3rQ5iH8BC41T6UjKL9oD2vWJpZqXFomGwY1
-                              amount: 100
-                              bonus_type: null
-                              date: "2021-12-15"
-                              name: PLAID_INC_DIRECT_DEP_PPD
-                              original_description: PLAID_INC_DIRECT_DEP_PPD 123B
-                              pending: false
-                              check_number: null
-                              iso_currency_code: USD
-                              unofficial_currency_code: null
-                          - start_date: "2022-01-01"
-                            end_date: "2022-01-31"
-                            total_amounts:
-                            - amount: 100
-                              iso_currency_code: USD
-                              unofficial_currency_code: null
-                            transactions:
-                            - transaction_id: zK9lDoR8uBH51PNQ3W4T6Mjy2VFXpGtJwsL4
-                              amount: 100
-                              bonus_type: null
-                              date: "2022-01-31"
-                              name: PLAID_INC_DIRECT_DEP_PPD
-                              original_description: PLAID_INC_DIRECT_DEP_PPD 123C
-                              pending: false
-                              check_number: null
-                              iso_currency_code: USD
-                              unofficial_currency_code: null
-                      bank_income_summary:
-                        total_amounts:
-                        - amount: 300
-                          iso_currency_code: USD
-                          unofficial_currency_code: null
-                        start_date: "2021-11-15"
-                        end_date: "2022-01-15"
-                        income_sources_count: 1
-                        income_categories_count: 1
-                        income_transactions_count: 1
-                        historical_average_monthly_gross_income:
-                        - amount: 390
-                          iso_currency_code: USD
-                          unofficial_currency_code: null
-                        historical_average_monthly_income:
-                        - amount: 300
-                          iso_currency_code: USD
-                          unofficial_currency_code: null
-                        forecasted_average_monthly_income:
-                        - amount: 300
-                          iso_currency_code: USD
-                          unofficial_currency_code: null
-                        historical_annual_gross_income:
-                        - amount: 4680
-                          iso_currency_code: USD
-                          unofficial_currency_code: null
-                        historical_annual_income:
-                        - amount: 3600
-                          iso_currency_code: USD
-                          unofficial_currency_code: null
-                        forecasted_annual_income:
-                        - amount: 3600
-                          iso_currency_code: USD
-                          unofficial_currency_code: null
-                        historical_summary:
-                        - start_date: "2021-11-02"
-                          end_date: "2021-11-30"
-                          total_amounts:
-                          - amount: 100
-                            iso_currency_code: USD
-                            unofficial_currency_code: null
-                          transactions:
-                          - transaction_id: aH5klwqG3B19OMT7D6F24Syv8pdnJXmtZoKQ5
-                            amount: 100
-                            bonus_type: null
-                            date: "2021-11-15"
-                            name: PLAID_INC_DIRECT_DEP_PPD
-                            original_description: PLAID_INC_DIRECT_DEP_PPD 123A
-                            pending: false
-                            check_number: null
-                            iso_currency_code: USD
-                            unofficial_currency_code: null
-                        - start_date: "2021-12-01"
-                          end_date: "2021-12-31"
-                          total_amounts:
-                          - amount: 100
-                            iso_currency_code: USD
-                            unofficial_currency_code: null
-                          transactions:
-                          - transaction_id: mN3rQ5iH8BC41T6UjKL9oD2vWJpZqXFomGwY1
-                            amount: 100
-                            bonus_type: null
-                            date: "2021-12-15"
-                            name: PLAID_INC_DIRECT_DEP_PPD
-                            original_description: PLAID_INC_DIRECT_DEP_PPD 123B
-                            pending: false
-                            check_number: null
-                            iso_currency_code: USD
-                            unofficial_currency_code: null
-                        - start_date: "2022-01-01"
-                          end_date: "2022-01-31"
-                          total_amounts:
-                          - amount: 100
-                            iso_currency_code: USD
-                            unofficial_currency_code: null
-                          transactions:
-                          - transaction_id: zK9lDoR8uBH51PNQ3W4T6Mjy2VFXpGtJwsL4
-                            amount: 100
-                            bonus_type: null
-                            date: "2022-01-31"
-                            name: PLAID_INC_DIRECT_DEP_PPD
-                            original_description: PLAID_INC_DIRECT_DEP_PPD 123C
-                            pending: false
-                            check_number: null
-                            iso_currency_code: USD
-                            unofficial_currency_code: null
-                        warnings: []
+                    warnings: []
         default:
           description: Error response
           content:
@@ -1945,7 +1865,10 @@ paths:
       externalDocs:
         url: /api/products/check/#cracheck_reportincome_insightsget
       operationId: craCheckReportIncomeInsightsGet
-      description: This endpoint allows you to retrieve the Income Insights report for your user. You should call this endpoint after you've received a `CHECK_REPORT_READY` or a `USER_CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`. If the most recent consumer report for the user doesn’t have sufficient data to generate the base report, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.
+      description: |-
+        This endpoint allows you to retrieve the Income Insights report for your user. You should call this endpoint after you’ve received a `CHECK_REPORT_READY` or a `USER_CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`. If the most recent consumer report for the user doesn’t have sufficient data to generate the base report, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.
+
+        NOTE: The following schema was updated in April 2026 to reflect the response when the provided version is "II2". Please see [this document](https://docs.google.com/document/d/1kQkQ7FOgFaC4n-sUGUk74hoXZNY_L_nJeCuMe7Keip4/edit?tab=t.0#heading=h.rudamzinus2i) for guidance on migrating to II2 if you are currently using the II1 version, and [this section](https://docs.google.com/document/d/1kQkQ7FOgFaC4n-sUGUk74hoXZNY_L_nJeCuMe7Keip4/edit?tab=t.0#bookmark=id.tdcc2wpk0h60) for an example II1 response along with its [documentation](https://docs.google.com/document/d/1kQkQ7FOgFaC4n-sUGUk74hoXZNY_L_nJeCuMe7Keip4/edit?tab=t.36c85n2ircqk#heading=h.79dwr5c1iszl).
       requestBody:
         required: true
         content:
@@ -3134,8 +3057,8 @@ paths:
                       lend_score:
                         score: 80
                         reason_codes:
-                        - PS0221
-                        - PS0223
+                        - PCS0221
+                        - PCS0223
         default:
           description: Error response
           content:
@@ -3392,7 +3315,12 @@ paths:
       externalDocs:
         url: /api/products/check/#cracheck_reportverificationget
       operationId: craCheckReportVerificationGet
-      description: "This endpoint allows you to retrieve home lending reports for a user. To obtain a VoA or Employment Refresh report, you need to make sure that `cra_base_report` is included in the `products` parameter when calling `/link/token/create` or `/cra/check_report/create`. \n\nYou should call this endpoint after you've received a `CHECK_REPORT_READY` or a `USER_CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`.\n\nIf the most recent consumer report for the user doesn’t have sufficient data to generate the report, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.\""
+      description: |-
+        This endpoint allows you to retrieve home lending reports for a user. To obtain a VoA or Employment Refresh report, you need to make sure that `cra_base_report` is included in the `products` parameter when calling `/link/token/create` or `/cra/check_report/create`.
+
+        You should call this endpoint after you've received a `CHECK_REPORT_READY` or a `USER_CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`.
+
+        If the most recent consumer report for the user doesn’t have sufficient data to generate the report, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`."
       requestBody:
         required: true
         content:
@@ -4259,7 +4187,7 @@ paths:
       operationId: networkStatusGet
       description: |-
         The `/network/status/get` endpoint can be used to check whether Plaid has a matching profile for the user.
-        This is useful for determining if a user is eligible for a streamlined experience, such as Layer.
+        This is useful for determining if a user is eligible for a streamlined experience, such as Layer. To access this endpoint, contact your Plaid Account Manager.
 
         Note: it is strongly recommended to check for Layer eligibility in the frontend. `/network/status/get` should only be used for checking Layer eligibility if a frontend check is not possible for your use case.
         For instructions on performing a frontend eligibility check, see the [Layer documentation](https://plaid.com/docs/layer/#integration-overview).
@@ -4383,7 +4311,10 @@ paths:
       externalDocs:
         url: /api/products/auth/#authverify
       operationId: authVerify
-      description: "The `/auth/verify` endpoint verifies bank account and routing numbers and (optionally) account owner names against Plaid's database via [Database Auth](https://plaid.com/docs/auth/coverage/database-auth/). It can be used to verify account numbers that were not collected via the Plaid Link flow. \n\nThis endpoint is currently in Early Availability; contact Sales or your Plaid account manager to request access."
+      description: |-
+        The `/auth/verify` endpoint verifies bank account and routing numbers and (optionally) account owner names against Plaid's database via [Database Auth](https://plaid.com/docs/auth/coverage/database-auth/). It can be used to verify account numbers that were not collected via the Plaid Link flow.
+
+        This endpoint is currently in Early Availability; contact Sales or your Plaid account manager to request access.
       responses:
         "200":
           description: success
@@ -6126,7 +6057,7 @@ paths:
 
         Calling `/item/remove` is a recommended best practice when offboarding users or if a user chooses to disconnect an account linked via Plaid. For subscription products, such as Transactions, Liabilities, and Investments, calling `/item/remove` is required to end subscription billing for the Item, unless the end user revoked permission (e.g. via [https://my.plaid.com/](https://my.plaid.com/)). For more details, see [Subscription fee model](https://plaid.com/docs/account/billing/#subscription-fee).
 
-        In Limited Production, calling `/item/remove` does not impact the number of remaining Limited Production Items you have available.
+        On a Trial plan, calling `/item/remove` does not impact the number of remaining Trial Items (bank connections) you have available.
 
         Removing an Item does not affect any Asset Reports or Audit Copies you have already created, which will remain accessible until you remove access to them specifically using the `/asset_report/remove` endpoint.
 
@@ -9622,7 +9553,12 @@ paths:
                     report_id: ptrpt_42cF1MNo42r9Xj
                     request_id: saKrIBuEB9qJZng
       operationId: protectReportCreate
-      description: "Use this endpoint to create a Protect report to document fraud incidents, investigation outcomes, or other risk events.\nThis endpoint allows you to report various types of incidents including account takeovers, identity fraud, unauthorized transactions, and other security events. \nThe reported data helps improve fraud detection models and provides valuable feedback to enhance the overall security of the Plaid network.\nReports can be created for confirmed incidents that have been fully investigated, or for suspected incidents that require further review. \nYou can associate reports with specific users, sessions, or transactions to provide comprehensive context about the incident."
+      description: |-
+        Use this endpoint to create a Protect report to document fraud incidents, investigation outcomes, or other risk events.
+        This endpoint allows you to report various types of incidents including account takeovers, identity fraud, unauthorized transactions, and other security events.
+        The reported data helps improve fraud detection models and provides valuable feedback to enhance the overall security of the Plaid network.
+        Reports can be created for confirmed incidents that have been fully investigated, or for suspected incidents that require further review.
+        You can associate reports with specific users, sessions, or transactions to provide comprehensive context about the incident.
       requestBody:
         required: true
         content:
@@ -9799,6 +9735,8 @@ paths:
                     status: success
                     search_terms:
                       name: Acme Corporation
+                      alternative_names:
+                      - Acme Widgets
                       address:
                         street: 123 Main St.
                         street2: Unit 42
@@ -9819,7 +9757,11 @@ paths:
                       website:
                         summary: match
                       match_details:
-                        name: Acme Corporation
+                        names:
+                        - is_primary: true
+                          name: Acme Corporation
+                        - is_primary: false
+                          name: Acme Widgets
                         entity_type: llc
                         addresses:
                         - street: 123 Main St.
@@ -9900,6 +9842,8 @@ paths:
                     status: success
                     search_terms:
                       name: Acme Corporation
+                      alternative_names:
+                      - Acme Widgets
                       address:
                         street: 123 Main St.
                         street2: Unit 42
@@ -9920,7 +9864,11 @@ paths:
                       website:
                         summary: match
                       match_details:
-                        name: Acme Corporation
+                        names:
+                        - is_primary: true
+                          name: Acme Corporation
+                        - is_primary: false
+                          name: Acme Widgets
                         entity_type: llc
                         addresses:
                         - street: 123 Main St.
@@ -11012,7 +10960,12 @@ paths:
       externalDocs:
         url: /api/processor-partners/#processorsignalevaluate
       operationId: processorSignalEvaluate
-      description: "Use `/processor/signal/evaluate` to evaluate a planned ACH transaction to get a return risk assessment and additional risk signals.\n\n`/processor/signal/evaluate` uses Rulesets that are configured on the end customer's Dashboard and can be used with either the Signal Transaction Scores product or the Balance product. Which product is used will be determined by the `ruleset_key` that you provide. Note that only customer-configured rulesets work with this endpoint; as a processor partner, you cannot create or configure your own rulesets. For more details, see [Signal Rules](https://plaid.com/docs/signal/signal-rules/).\n\nNote: This request may have higher latency if Signal Transaction Scores is being added to an existing Item for the first time, or when using a Balance-only ruleset. This is because Plaid must communicate directly with the institution to request data. "
+      description: |-
+        Use `/processor/signal/evaluate` to evaluate a planned ACH transaction to get a return risk assessment and additional risk signals.
+
+        `/processor/signal/evaluate` uses Rulesets that are configured on the end customer's Dashboard and can be used with either the Signal Transaction Scores product or the Balance product. Which product is used will be determined by the `ruleset_key` that you provide. Note that only customer-configured rulesets work with this endpoint; as a processor partner, you cannot create or configure your own rulesets. For more details, see [Signal Rules](https://plaid.com/docs/signal/signal-rules/).
+
+        Note: This request may have higher latency if Signal Transaction Scores is being added to an existing Item for the first time, or when using a Balance-only ruleset. This is because Plaid must communicate directly with the institution to request data.
       responses:
         "200":
           description: OK
@@ -11059,7 +11012,12 @@ paths:
       externalDocs:
         url: /api/processor-partners/#processorsignaldecisionreport
       operationId: processorSignalDecisionReport
-      description: "After you call `/processor/signal/evaluate`, Plaid will normally infer the outcome from your Signal Rules. However, if you are not using Signal Rules, if the Signal Rules outcome was `REVIEW`, or if you take a different action than the one determined by the Signal Rules, you will need to call `/processor/signal/decision/report`. This helps improve Signal Transaction Score accuracy for your account and is necessary for proper functioning of the rule performance and rule tuning capabilities in the Dashboard. If your effective decision changes after calling `/processor/signal/decision/report` (for example, you indicated that you accepted a transaction, but later on, your payment processor rejected it, so it was never initiated), call `/processor/signal/decision/report` again for the transaction to correct Plaid's records.  \n\nIf you are using Plaid Transfer as your payment processor, you also do not need to call `/processor/signal/decision/report`, as Plaid can infer outcomes from your Transfer activity.\n\nIf using a Balance-only ruleset, this endpoint will not impact scores (Balance does not use scores), but is necessary to view accurate transaction outcomes and tune rule logic in the Dashboard.      "
+      description: |-
+        After you call `/processor/signal/evaluate`, Plaid will normally infer the outcome from your Signal Rules. However, if you are not using Signal Rules, if the Signal Rules outcome was `REVIEW`, or if you take a different action than the one determined by the Signal Rules, you will need to call `/processor/signal/decision/report`. This helps improve Signal Transaction Score accuracy for your account and is necessary for proper functioning of the rule performance and rule tuning capabilities in the Dashboard. If your effective decision changes after calling `/processor/signal/decision/report` (for example, you indicated that you accepted a transaction, but later on, your payment processor rejected it, so it was never initiated), call `/processor/signal/decision/report` again for the transaction to correct Plaid's records.
+
+        If you are using Plaid Transfer as your payment processor, you also do not need to call `/processor/signal/decision/report`, as Plaid can infer outcomes from your Transfer activity.
+
+        If using a Balance-only ruleset, this endpoint will not impact scores (Balance does not use scores), but is necessary to view accurate transaction outcomes and tune rule logic in the Dashboard.
       responses:
         "200":
           description: OK
@@ -12011,8 +11969,6 @@ paths:
         After creating a payment recipient, you can use the `/payment_initiation/payment/create` endpoint to create a payment to that recipient.  Payments can be one-time or standing order (recurring) and can be denominated in either EUR, GBP or other chosen [currency](https://plaid.com/docs/api/products/payment-initiation/#payment_initiation-payment-create-request-amount-currency).  If making domestic GBP-denominated payments, your recipient must have been created with BACS numbers. In general, EUR-denominated payments will be sent via SEPA Credit Transfer, GBP-denominated payments will be sent via the Faster Payments network and for non-Eurozone markets typically via the local payment scheme, but the payment network used will be determined by the institution. Payments sent via Faster Payments will typically arrive immediately, while payments sent via SEPA Credit Transfer or other local payment schemes will typically arrive in one business day.
 
         Standing orders (recurring payments) must be denominated in GBP and can only be sent to recipients in the UK. Once created, standing order payments cannot be modified or canceled via the API. An end user can cancel or modify a standing order directly on their banking application or website, or by contacting the bank. Standing orders will follow the payment rules of the underlying rails (Faster Payments in UK). Payments can be sent Monday to Friday, excluding bank holidays. If the pre-arranged date falls on a weekend or bank holiday, the payment is made on the next working day. It is not possible to guarantee the exact time the payment will reach the recipient’s account, although at least 90% of standing order payments are sent by 6am.
-
-        In Limited Production, payments must be below 5 GBP or other chosen [currency](https://plaid.com/docs/api/products/payment-initiation/#payment_initiation-payment-create-request-amount-currency), and standing orders, variable recurring payments, and Virtual Accounts are not supported.
       requestBody:
         required: true
         content:
@@ -12435,7 +12391,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
-      description: "For Plaid products and flows that use the user object, `/user/create` provides you a single token to access all data associated with the user. You must call this endpoint before calling `/link/token/create` if you are using any of the following: Plaid Check, Income Verification, Multi-Item Link, or Plaid Protect (Identity). If you are using Plaid Protect Link session scoring, you do not need to call `/user/create` first; Plaid will resolve or create the user when `user.client_user_id` is provided in `/link/token/create`.\nFor customers who began using this endpoint on or after December 10, 2025, this endpoint takes a `client_user_id` and an `identity` object and will return a `user_id`. For customers who began using it before that date, the endpoint takes a `client_user_id` and a `consumer_report_user_identity` object and will return a `user_token` and `user_id`. For more details, see [New User APIs](https://plaid.com/docs/api/users/user-apis).\nIn order to create a Plaid Check Consumer Report for a user, the `identity` (new) or `consumer_report_user_identity` (legacy) object must be present. If it is not provided during the `/user/create` call, it can be added later by calling `/user/update`. \n\n\nIn order to generate a Plaid Check Consumer Report, the following `identity` fields, at minimum, are required and must be non-empty: `name`, `date_of_birth`, `emails`, `phone_numbers`, and `addresses`, (with at least one email, phone number, and address designated as `primary`). Plaid Check Consumer Reports can only be created for US-based users; the user's address country must be `US`. If creating a report for sharing with a GSE such as Fannie or Freddie, the user's full SSN must be provided via the `id_numbers` field. Providing at least a partial SSN is also strongly recommended for all use cases, since it improves the accuracy of matching user records during compliance processes such as file disclosure, dispute, or security freeze requests.\n\n\nWhen using Plaid Protect, it is highly recommended that you provide an `identity` object to better identify and block fraud across your Link sessions. \n\n\nPlaid will normalize identity fields before storing them and utilize the same identity across different user-based products."
+      description: |-
+        For Plaid products and flows that use the user object, `/user/create` provides you a single token to access all data associated with the user. You must call this endpoint before calling `/link/token/create` if you are using any of the following: Plaid Check, Income Verification, Multi-Item Link, or Plaid Protect (Identity). If you are using Plaid Protect Link session scoring, you do not need to call `/user/create` first; Plaid will resolve or create the user when `user.client_user_id` is provided in `/link/token/create`.
+        For customers who began using this endpoint on or after December 10, 2025, this endpoint takes a `client_user_id` and an `identity` object and will return a `user_id`. For customers who began using it before that date, the endpoint takes a `client_user_id` and a `consumer_report_user_identity` object and will return a `user_token` and `user_id`. For more details, see [New User APIs](https://plaid.com/docs/api/users/user-apis).
+        In order to create a Plaid Check Consumer Report for a user, the `identity` (new) or `consumer_report_user_identity` (legacy) object must be present. If it is not provided during the `/user/create` call, it can be added later by calling `/user/update`.
+
+
+        In order to generate a Plaid Check Consumer Report, the following `identity` fields, at minimum, are required and must be non-empty: `name`, `date_of_birth`, `emails`, `phone_numbers`, and `addresses`, (with at least one email, phone number, and address designated as `primary`). Plaid Check Consumer Reports can only be created for US-based users; the user's address country must be `US`. If creating a report for sharing with a GSE such as Fannie or Freddie, the user's full SSN must be provided via the `id_numbers` field. Providing at least a partial SSN is also strongly recommended for all use cases, since it improves the accuracy of matching user records during compliance processes such as file disclosure, dispute, or security freeze requests.
+
+
+        When using Plaid Protect, it is highly recommended that you provide an `identity` object to better identify and block fraud across your Link sessions.
+
+
+        Plaid will normalize identity fields before storing them and utilize the same identity across different user-based products.
       requestBody:
         required: true
         content:
@@ -12568,7 +12536,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
-      description: "This endpoint updates user information for an existing `user_id` or `user_token`. If an existing `user_id` or `user_token` is missing fields required for a given use case (e.g. creating a Consumer Report) use `/user/update` to add values for those fields. \n\nIdentity updates use merge semantics: provided fields overwrite existing ones; omitted fields remain unchanged."
+      description: |-
+        This endpoint updates user information for an existing `user_id` or `user_token`. If an existing `user_id` or `user_token` is missing fields required for a given use case (e.g. creating a Consumer Report) use `/user/update` to add values for those fields.
+
+        Identity updates use merge semantics: provided fields overwrite existing ones; omitted fields remain unchanged.
       requestBody:
         required: true
         content:
@@ -17851,7 +17822,7 @@ paths:
                 $ref: '#/components/schemas/PlaidError'
       operationId: creditAuditCopyTokenCreate
       description: |-
-        Plaid can create an Audit Copy token of an Asset Report and/or Income Report to share with participating Government Sponsored Entity (GSE). If you participate in the Day 1 Certainty™ program, Plaid can supply an Audit Copy token directly to Fannie Mae on your behalf. An Audit Copy token contains the same underlying data as the Asset Report and/or Income Report (result of `/credit/payroll_income/get`).
+        Plaid can create an Audit Copy token of an Asset Report and/or Income Report to share with a participating Government Sponsored Entity (GSE) if you participate in Fannie Mae's Day 1 Certainty™ program or utilize Freddie Mac's Loan Product Advisor® (LPA®) Asset and Income Modeler (AIM). An Audit Copy token contains the same underlying data as the Asset Report and/or Income Report (result of `/credit/payroll_income/get`).
 
         Use the `/credit/audit_copy_token/create` endpoint to create an `audit_copy_token` and then pass that token to the GSE who needs access.
       requestBody:
@@ -19732,7 +19703,14 @@ paths:
       externalDocs:
         url: /api/products/signal#signalevaluate
       operationId: signalEvaluate
-      description: "Use `/signal/evaluate` to evaluate a planned ACH transaction to get a return risk assessment and additional risk signals.\n\nBefore using `/signal/evaluate`, you must first [create a ruleset](https://plaid.com/docs/signal/signal-rules/) in the Dashboard under [**Signal->Rules**](https://dashboard.plaid.com/signal/risk-profiles). \n\n`/signal/evaluate` can be used with either Signal Transaction Scores or the Balance product. Which product is used will be determined by the `ruleset_key` that you provide. For more details, see [Signal Rules](https://plaid.com/docs/signal/signal-rules/).\n\nNote: This request may have higher latency when using a Balance-only ruleset. This is because Plaid must communicate directly with the institution to request data. Balance-only rulesets may have latency of up to 30 seconds or more; if you encounter errors, you may find it necessary to adjust your timeout period when making requests."
+      description: |-
+        Use `/signal/evaluate` to evaluate a planned ACH transaction to get a return risk assessment and additional risk signals.
+
+        Before using `/signal/evaluate`, you must first [create a ruleset](https://plaid.com/docs/signal/signal-rules/) in the Dashboard under [**Signal->Rules**](https://dashboard.plaid.com/signal/risk-profiles).
+
+        `/signal/evaluate` can be used with either Signal Transaction Scores or the Balance product. Which product is used will be determined by the `ruleset_key` that you provide. For more details, see [Signal Rules](https://plaid.com/docs/signal/signal-rules/).
+
+        Note: This request may have higher latency when using a Balance-only ruleset. This is because Plaid must communicate directly with the institution to request data. Balance-only rulesets may have latency of up to 30 seconds or more; if you encounter errors, you may find it necessary to adjust your timeout period when making requests.
       responses:
         "200":
           description: OK
@@ -19899,7 +19877,12 @@ paths:
       externalDocs:
         url: /api/products/signal#signalprepare
       operationId: signalPrepare
-      description: "When an Item is not initialized with `signal`, call `/signal/prepare` to opt-in that Item to the data collection process used to develop a Signal Transaction Score. This should be done on Items where `signal` was added in the `additional_consented_products` array but not in the `products`, `optional_products`, or `required_if_supported_products` array. If `/signal/prepare` is skipped on an Item that is not initialized with `signal`, the initial call to `/signal/evaluate` on that Item will be less accurate, because Plaid will have access to less data for computing the Signal Transaction Score.\n\nIf your integration is purely Balance-only, this endpoint will have no effect, as Balance-only rulesets do not calculate a Signal Transaction Score. \n\nIf run on an Item that is already initialized with `signal`, this endpoint will return a 200 response and will not modify the Item."
+      description: |-
+        When an Item is not initialized with `signal`, call `/signal/prepare` to opt-in that Item to the data collection process used to develop a Signal Transaction Score. This should be done on Items where `signal` was added in the `additional_consented_products` array but not in the `products`, `optional_products`, or `required_if_supported_products` array. If `/signal/prepare` is skipped on an Item that is not initialized with `signal`, the initial call to `/signal/evaluate` on that Item will be less accurate, because Plaid will have access to less data for computing the Signal Transaction Score.
+
+        If your integration is purely Balance-only, this endpoint will have no effect, as Balance-only rulesets do not calculate a Signal Transaction Score.
+
+        If run on an Item that is already initialized with `signal`, this endpoint will return a 200 response and will not modify the Item.
       responses:
         "200":
           description: OK
@@ -25799,7 +25782,44 @@ components:
       - PAYMENT_STATUS_CANCELLED
       - PAYMENT_STATUS_ESTABLISHED
       - PAYMENT_STATUS_REJECTED
-      description: "The status of the payment.\n\nCore lifecycle statuses:\n\n**`PAYMENT_STATUS_INPUT_NEEDED`**: Transitional. The payment is awaiting user input to continue processing. It may re-enter this state if additional input is required.\n\n**`PAYMENT_STATUS_AUTHORISING`:** Transitional. The payment is being authorised by the financial institution. It will automatically move on once authorisation completes.\n\n**`PAYMENT_STATUS_INITIATED`:** The payment has been authorised and accepted by the financial institution. In many EU markets, `PAYMENT_STATUS_EXECUTED` is not supported, and a payment will remain in `PAYMENT_STATUS_INITIATED` until the funds settle, making this a terminal success state in those cases. A payment in `PAYMENT_STATUS_INITIATED` should be treated as a successfully submitted payment; do not gate downstream processing on reaching `PAYMENT_STATUS_EXECUTED`. For a full explanation of payment statuses and how to handle each, see the [Payment Status guide](https://plaid.com/docs/payment-initiation/payment-status/).\n\n**`PAYMENT_STATUS_EXECUTED`: Terminal.** The funds have left the payer’s account and the payment is en route to settlement. Note that this status does not confirm that funds have arrived in the recipient’s account; do not use it as proof of fund receipt. Support is more common in the UK than in the EU; where unsupported, a successful payment remains in `PAYMENT_STATUS_INITIATED` before settling. When using Plaid Virtual Accounts, `PAYMENT_STATUS_EXECUTED` is not terminal—the payment will continue to `PAYMENT_STATUS_SETTLED` once funds are available.\n\n**`PAYMENT_STATUS_SETTLED`: Terminal.** The funds are available in the recipient’s account. Only available to customers using [Plaid Virtual Accounts](https://plaid.com/docs/payment-initiation/virtual-accounts/).\n\nFailure statuses:\n\n**`PAYMENT_STATUS_INSUFFICIENT_FUNDS`: Terminal.** The payment failed due to insufficient funds. No further retries will succeed until the payer’s balance is replenished.\n\n**`PAYMENT_STATUS_FAILED`: Terminal (retryable).** The payment could not be initiated due to a system error or outage. Retry once the root cause is resolved.\n\n**`PAYMENT_STATUS_BLOCKED`: Terminal (retryable).** The payment was blocked by Plaid (e.g., flagged as risky). Resolve any compliance or risk issues and retry.\n\n**`PAYMENT_STATUS_REJECTED`: Terminal.** The payment was rejected by the financial institution. No automatic retry is possible.\n\n**`PAYMENT_STATUS_CANCELLED`: Terminal.** The end user cancelled the payment during authorisation.\n\nStanding-order statuses:\n\n**`PAYMENT_STATUS_ESTABLISHED`: Terminal.** A recurring/standing order has been successfully created.\n\nDeprecated (to be removed in a future release):\n\n`PAYMENT_STATUS_UNKNOWN`: The payment status is unknown.  \n\n`PAYMENT_STATUS_PROCESSING`: The payment is currently being processed.  \n\n`PAYMENT_STATUS_COMPLETED`: Indicates that the standing order has been successfully established."
+      description: |-
+        The status of the payment.
+
+        Core lifecycle statuses:
+
+        **`PAYMENT_STATUS_INPUT_NEEDED`**: Transitional. The payment is awaiting user input to continue processing. It may re-enter this state if additional input is required.
+
+        **`PAYMENT_STATUS_AUTHORISING`:** Transitional. The payment is being authorised by the financial institution. It will automatically move on once authorisation completes.
+
+        **`PAYMENT_STATUS_INITIATED`:** The payment has been authorised and accepted by the financial institution. In many EU markets, `PAYMENT_STATUS_EXECUTED` is not supported, and a payment will remain in `PAYMENT_STATUS_INITIATED` until the funds settle, making this a terminal success state in those cases. A payment in `PAYMENT_STATUS_INITIATED` should be treated as a successfully submitted payment; do not gate downstream processing on reaching `PAYMENT_STATUS_EXECUTED`. For a full explanation of payment statuses and how to handle each, see the [Payment Status guide](https://plaid.com/docs/payment-initiation/payment-status/).
+
+        **`PAYMENT_STATUS_EXECUTED`: Terminal.** The funds have left the payer’s account and the payment is en route to settlement. Note that this status does not confirm that funds have arrived in the recipient’s account; do not use it as proof of fund receipt. Support is more common in the UK than in the EU; where unsupported, a successful payment remains in `PAYMENT_STATUS_INITIATED` before settling. When using Plaid Virtual Accounts, `PAYMENT_STATUS_EXECUTED` is not terminal—the payment will continue to `PAYMENT_STATUS_SETTLED` once funds are available.
+
+        **`PAYMENT_STATUS_SETTLED`: Terminal.** The funds are available in the recipient’s account. Only available to customers using [Plaid Virtual Accounts](https://plaid.com/docs/payment-initiation/virtual-accounts/).
+
+        Failure statuses:
+
+        **`PAYMENT_STATUS_INSUFFICIENT_FUNDS`: Terminal.** The payment failed due to insufficient funds. No further retries will succeed until the payer’s balance is replenished.
+
+        **`PAYMENT_STATUS_FAILED`: Terminal (retryable).** The payment could not be initiated due to a system error or outage. Retry once the root cause is resolved.
+
+        **`PAYMENT_STATUS_BLOCKED`: Terminal (retryable).** The payment was blocked by Plaid (e.g., flagged as risky). Resolve any compliance or risk issues and retry.
+
+        **`PAYMENT_STATUS_REJECTED`: Terminal.** The payment was rejected by the financial institution. No automatic retry is possible.
+
+        **`PAYMENT_STATUS_CANCELLED`: Terminal.** The end user cancelled the payment during authorisation.
+
+        Standing-order statuses:
+
+        **`PAYMENT_STATUS_ESTABLISHED`: Terminal.** A recurring/standing order has been successfully created.
+
+        Deprecated (to be removed in a future release):
+
+        `PAYMENT_STATUS_UNKNOWN`: The payment status is unknown.
+
+        `PAYMENT_STATUS_PROCESSING`: The payment is currently being processed.
+
+        `PAYMENT_STATUS_COMPLETED`: Indicates that the standing order has been successfully established.
     PaymentInitiationPayment:
       type: object
       additionalProperties: true
@@ -26757,7 +26777,16 @@ components:
           minLength: 1
         country_codes:
           type: array
-          description: "Specify an array of Plaid-supported country codes using the ISO-3166-1 alpha-2 country code standard. Institutions from all listed countries will be shown. For a complete mapping of supported products by country, see https://plaid.com/global/. For access to additional countries beyond what you have been approved for, [contact Sales](https://plaid.com/contact/), your account manager, or support.  \n\nIf using Identity Verification, `country_codes` should be set to the country where your company is based, not the country where your user is located. For all other products, `country_codes` represents the location of your user's financial institution.\n\nIf Link is launched with multiple country codes, only products that you are enabled for in all countries will be used by Link. While all countries are enabled by default in Sandbox, in Production only the countries you have requested access for are shown. To request access to additional countries, [file a product access Support ticket](https://dashboard.plaid.com/support/new/product-and-development/product-troubleshooting/request-product-access) via the Plaid dashboard.\n\nIf using a Link customization, make sure the country codes in the customization match those specified in `country_codes`, or the customization may not be applied.\n\nIf using the Auth features Instant Match, Instant Micro-deposits, Same-day Micro-deposits, Automated Micro-deposits, or Database Auth, `country_codes` must be set to `['US']`."
+          description: |-
+            Specify an array of Plaid-supported country codes using the ISO-3166-1 alpha-2 country code standard. Institutions from all listed countries will be shown. For a complete mapping of supported products by country, see https://plaid.com/global/. For access to additional countries beyond what you have been approved for, [contact Sales](https://plaid.com/contact/), your account manager, or support.
+
+            If using Identity Verification, `country_codes` should be set to the country where your company is based, not the country where your user is located. For all other products, `country_codes` represents the location of your user's financial institution.
+
+            If Link is launched with multiple country codes, only products that you are enabled for in all countries will be used by Link. While all countries are enabled by default in Sandbox, in Production only the countries you have requested access for are shown. To request access to additional countries, [file a product access Support ticket](https://dashboard.plaid.com/support/new/product-and-development/product-troubleshooting/request-product-access) via the Plaid dashboard.
+
+            If using a Link customization, make sure the country codes in the customization match those specified in `country_codes`, or the customization may not be applied.
+
+            If using the Auth features Instant Match, Instant Micro-deposits, Same-day Micro-deposits, Automated Micro-deposits, or Database Auth, `country_codes` must be set to `['US']`.
           items:
             $ref: '#/components/schemas/CountryCode'
           minItems: 1
@@ -27443,7 +27472,10 @@ components:
         reauthorization_enabled:
           x-hidden-from-docs: true
           type: boolean
-          description: "Note: this field is not currently used. Plaid may enable this field in the future if 1033-related expiration begins to be enforced. \n\nBy default, Plaid will enable the reauthorization flow during update mode for an Item enabled for [Data Transparency Messaging](https://plaid.com/docs/link/data-transparency-messaging-migration-guide/) if the Item expires within six months. During a reauthorization flow, an end user will review Plaid's end user privacy policy, use case and data scope consents, and account access consents; they may also be required to log in to their financial institution's OAuth flow. After the end user successfully completes the reauthorization flow, the Item's expiration date will be extended to 12 months from the time that the reauthorization took place. This field allows you to optionally override the default reauthorization scheduling logic to either forcibly enable or disable the reauthorization flow for a given update mode session. This field does not impact the flow for Items at institutions in the EU or UK.\n"
+          description: |
+            Note: this field is not currently used. Plaid may enable this field in the future if 1033-related expiration begins to be enforced.
+
+            By default, Plaid will enable the reauthorization flow during update mode for an Item enabled for [Data Transparency Messaging](https://plaid.com/docs/link/data-transparency-messaging-migration-guide/) if the Item expires within six months. During a reauthorization flow, an end user will review Plaid's end user privacy policy, use case and data scope consents, and account access consents; they may also be required to log in to their financial institution's OAuth flow. After the end user successfully completes the reauthorization flow, the Item's expiration date will be extended to 12 months from the time that the reauthorization took place. This field allows you to optionally override the default reauthorization scheduling logic to either forcibly enable or disable the reauthorization flow for a given update mode session. This field does not impact the flow for Items at institutions in the EU or UK.
         user:
           type: boolean
           description: If `true`, a `user_token` must also be provided, and Link will open in update mode for the given user.
@@ -27481,6 +27513,8 @@ components:
       properties:
         account_subtypes:
           $ref: '#/components/schemas/DepositoryAccountSubtypes'
+        limited_purpose_types:
+          $ref: '#/components/schemas/LimitedPurposeTypes'
     LinkTokenCreateCreditFilter:
       description: A filter to apply to `credit`-type accounts
       type: object
@@ -28427,6 +28461,7 @@ components:
       - keogh
       - lif
       - life insurance
+      - limited purpose checking
       - line of credit
       - lira
       - loan
@@ -29748,7 +29783,7 @@ components:
           nullable: true
         primary_color:
           type: string
-          description: Hexadecimal representation of the primary color used by the institution
+          description: Hexadecimal representation of the primary color used by the institution. If Plaid does not have primary color data for the institution, this field will be a deterministically generated fallback color.
           nullable: true
         logo:
           type: string
@@ -34518,6 +34553,10 @@ components:
           $ref: '#/components/schemas/UserId'
         reason:
           $ref: '#/components/schemas/PendingDisconnectWebhookReason'
+        disconnect_time:
+          type: string
+          format: date-time
+          description: The date and time at which the Item is scheduled to disconnect, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format.
         environment:
           $ref: '#/components/schemas/WebhookEnvironmentValues'
       required:
@@ -34525,6 +34564,7 @@ components:
       - webhook_code
       - item_id
       - reason
+      - disconnect_time
       - environment
       x-examples:
         example-1:
@@ -34533,6 +34573,7 @@ components:
           item_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
           user_id: usr_9nSp2KuZ2x4JDw
           reason: INSTITUTION_MIGRATION
+          disconnect_time: "2020-01-15T13:25:17.766Z"
           environment: production
     LiabilitiesAccountIdsWithUpdatedLiabilities:
       type: object
@@ -34830,6 +34871,9 @@ components:
         hsa:
           type: string
           description: Health Savings Account (US only) that can only hold cash
+        limited purpose checking:
+          type: string
+          description: A checking account that is limited in its purpose or usage
         money market:
           type: string
           description: Money market account
@@ -34852,6 +34896,7 @@ components:
       - prepaid
       - cash management
       - ebt
+      - limited purpose checking
     CreditAccount:
       title: CreditAccount
       type: string
@@ -37641,7 +37686,10 @@ components:
           $ref: '#/components/schemas/TransferAmount'
         description:
           type: string
-          description: "The transfer description, maximum of 15 characters (RTP transactions) or 10 characters (ACH transactions). Should represent why the money is moving, not your company name. For recommendations on setting the `description` field to avoid ACH returns, see [Description field recommendations](https://www.plaid.com/docs/transfer/creating-transfers/#description-field-recommendations). \n\nIf reprocessing a returned transfer, the `description` field must be `\"Retry 1\"` or `\"Retry 2\"`. You may retry a transfer up to 2 times, within 180 days of creating the original transfer. Only transfers that were returned with code `R01` or `R09` may be retried."
+          description: |-
+            The transfer description, maximum of 15 characters (RTP transactions) or 10 characters (ACH transactions). Should represent why the money is moving, not your company name. For recommendations on setting the `description` field to avoid ACH returns, see [Description field recommendations](https://www.plaid.com/docs/transfer/creating-transfers/#description-field-recommendations).
+
+            If reprocessing a returned transfer, the `description` field must be `"Retry 1"` or `"Retry 2"`. You may retry a transfer up to 2 times, within 180 days of creating the original transfer. Only transfers that were returned with code `R01` or `R09` may be retried.
           maxLength: 15
         ach_class:
           x-hidden-from-docs: true
@@ -39981,7 +40029,14 @@ components:
           description: The originator’s monthly expected ACH credit processing amount for the next 6-12 months.
           type: string
         sec_codes:
-          description: "Specifies the expected use cases for the originator’s credit transfers. This should be a list that contains one or more of the following codes:\n\n`\"ccd\"` - Corporate Credit or Debit - fund transfer between two corporate bank accounts\n\n`\"ppd\"` - Prearranged Payment or Deposit. The transfer is part of a pre-existing relationship with a consumer. Authorization was obtained from the consumer in person via writing, or through online authorization, or via an electronic document signing, e.g. Docusign. For example language for online authorization, see the 2025 Nacha Operating Rules — Section 2.3.2, Authorization of Entries via Electronic Means. Can be used for credits or debits. \n\n`\"web\"` - Internet-Initiated Entry. The transfer debits a consumer’s bank account. Authorization from the consumer is obtained over the Internet (e.g. a web or mobile application). Can be used for single debits or recurring debits."
+          description: |-
+            Specifies the expected use cases for the originator’s credit transfers. This should be a list that contains one or more of the following codes:
+
+            `"ccd"` - Corporate Credit or Debit - fund transfer between two corporate bank accounts
+
+            `"ppd"` - Prearranged Payment or Deposit. The transfer is part of a pre-existing relationship with a consumer. Authorization was obtained from the consumer in person via writing, or through online authorization, or via an electronic document signing, e.g. Docusign. For example language for online authorization, see the 2025 Nacha Operating Rules — Section 2.3.2, Authorization of Entries via Electronic Means. Can be used for credits or debits.
+
+            `"web"` - Internet-Initiated Entry. The transfer debits a consumer’s bank account. Authorization from the consumer is obtained over the Internet (e.g. a web or mobile application). Can be used for single debits or recurring debits.
           type: array
           items:
             $ref: '#/components/schemas/CreditACHClass'
@@ -41492,6 +41547,8 @@ components:
       properties:
         account_subtypes:
           $ref: '#/components/schemas/DepositoryAccountSubtypes'
+        limited_purpose_types:
+          $ref: '#/components/schemas/LimitedPurposeTypes'
       required:
       - account_subtypes
     CreditFilter:
@@ -41577,7 +41634,21 @@ components:
       - prepaid
       - cash management
       - ebt
+      - limited purpose checking
       - all
+    LimitedPurposeTypes:
+      title: LimitedPurposeTypes
+      x-hidden-from-docs: true
+      type: array
+      description: An array of limited purpose types. When set, it will restrict which kinds of limited purpose checking accounts may be connected in Link. Only applicable when 'limited purpose checking' is in the subtypes filter.
+      items:
+        $ref: '#/components/schemas/LimitedPurposeType'
+    LimitedPurposeType:
+      x-hidden-from-docs: true
+      type: string
+      description: A limited purpose type identifying the specific use case for limited purpose checking accounts.
+      enum:
+      - RENT_MORTGAGE
     CreditAccountSubtype:
       type: string
       description: Valid account subtypes for credit accounts. For a list containing descriptions of each subtype, see [Account schemas](https://plaid.com/docs/api/accounts/#StandaloneAccountType-credit).
@@ -42156,6 +42227,8 @@ components:
           type: boolean
           nullable: true
           description: Indicates that investment data should be extracted from the linked account(s).
+        income_insights:
+          $ref: '#/components/schemas/LinkTokenCreateRequestCraOptionsIncomeInsights'
       required:
       - days_requested
     LinkTokenCreateRequestCraOptionsPartnerInsights:
@@ -42182,6 +42255,8 @@ components:
           type: boolean
           nullable: true
           description: Indicates that the report must include identity information. If identity information is not available, the report will fail.
+        home_lending_report_options:
+          $ref: '#/components/schemas/CraCheckReportHomeLendingReportOptions'
     LinkTokenCreateRequestCraOptionsBaseReportGSEOptions:
       title: LinkTokenCreateRequestCraOptionsBaseReportGSEOptions
       type: object
@@ -42202,6 +42277,17 @@ components:
       properties:
         attributes_version:
           $ref: '#/components/schemas/CashflowAttributesVersion'
+    LinkTokenCreateRequestCraOptionsIncomeInsights:
+      title: LinkTokenCreateRequestCraOptionsIncomeInsights
+      type: object
+      description: Specifies options for initializing Link for use with the CRA Income Insights product.
+      properties:
+        income_insights_filter:
+          $ref: '#/components/schemas/IncomeInsightsFilter'
+        income_insights_version:
+          $ref: '#/components/schemas/IncomeInsightsVersion'
+      required:
+      - income_insights_version
     LinkTokenCreateRequestCraOptionsLendScore:
       title: LinkTokenCreateRequestCraOptionsLendScore
       type: object
@@ -48826,7 +48912,17 @@ components:
           description: A list of earned wage access (EWA) scoring entries that map potential advance amounts to repayment likelihood scores. The predefined advance amount ranges are `[0, 25]`, `[25, 50]`, `[50, 100]`, `[100, 200]`, `[200, 300]`, `[300, 400]`, and `[400, 500]`.
           items:
             $ref: '#/components/schemas/EwaScore'
+        ewa_attributes:
+          $ref: '#/components/schemas/EwaAttributes'
       additionalProperties: true
+    EwaAttributes:
+      x-hidden-from-docs: true
+      type: object
+      nullable: true
+      additionalProperties:
+        type: number
+        nullable: true
+      description: A set of attributes providing context about the factors that contributed to the EWA scores. Each key is the attribute name and the value is its numeric score, or null if the attribute could not be computed.
     EwaScore:
       x-hidden-from-docs: true
       type: object
@@ -49161,7 +49257,10 @@ components:
           - cra_income_insights
           - cra_partner_insights
         create_link_customization:
-          description: "If `true`, the end customer's default Link customization will be set to match the partner's. You can always change the end customer's Link customization in the Plaid Dashboard. See the [Link Customization docs](https://plaid.com/docs/link/customization/) for more information. If you require the ability to programmatically create end customers using multiple different Link customization profiles, contact your Plaid Account Manager for assistance. \n\nImportant: Data Transparency Messaging (DTM) use cases will not be copied to the end customer's Link customization unless the **Publish changes** button is clicked after the use cases are applied. Link will not work in Production unless the end customer's DTM use cases are configured. For more details, see [Data Transparency Messaging](https://plaid.com/docs/link/data-transparency-messaging-migration-guide/)."
+          description: |-
+            If `true`, the end customer's default Link customization will be set to match the partner's. You can always change the end customer's Link customization in the Plaid Dashboard. See the [Link Customization docs](https://plaid.com/docs/link/customization/) for more information. If you require the ability to programmatically create end customers using multiple different Link customization profiles, contact your Plaid Account Manager for assistance.
+
+            Important: Data Transparency Messaging (DTM) use cases will not be copied to the end customer's Link customization unless the **Publish changes** button is clicked after the use cases are applied. Link will not work in Production unless the end customer's DTM use cases are configured. For more details, see [Data Transparency Messaging](https://plaid.com/docs/link/data-transparency-messaging-migration-guide/).
           type: boolean
         logo:
           description: Base64-encoded representation of the end customer's logo. Must be a PNG of size 1024x1024 under 4MB. The logo will be shared with financial institutions and shown to the end user during Link flows. A logo is required if `create_link_customization` is `true`. If `create_link_customization` is `false` and the logo is omitted, the partner's logo will be used if one exists, otherwise a stock logo will be used.
@@ -49371,7 +49470,7 @@ components:
         status:
           $ref: '#/components/schemas/PartnerEndCustomerStatus'
     PartnerEndCustomerWithSecrets:
-      description: The details for the newly created end customer, including secrets for Sandbox and Limited Production.
+      description: The details for the newly created end customer, including secrets for non-Production environments.
       type: object
       additionalProperties: true
       allOf:
@@ -49396,13 +49495,13 @@ components:
       description: |-
         The status of the given end customer.
 
-        `UNDER_REVIEW`: The end customer has been created and enabled in Sandbox and Limited Production. The end customer must be manually reviewed by the Plaid team before it can be enabled in full production, at which point its status will automatically transition to `PENDING_ENABLEMENT` or `DENIED`.
+        `UNDER_REVIEW`: The end customer has been created and enabled in the Sandbox environment. The end customer must be manually reviewed by the Plaid team before it can be enabled in Production, at which point its status will automatically transition to `PENDING_ENABLEMENT` or `DENIED`.
 
         `PENDING_ENABLEMENT`: The end customer is ready to be fully enabled in the Production environment. Call the `/partner/customer/enable` endpoint to enable the end customer in full Production.
 
         `ACTIVE`: The end customer has been fully enabled in all environments.
 
-        `DENIED`: The end customer has been created and enabled in Sandbox and Limited Production, but it did not pass review by the Plaid team and therefore cannot be enabled for full Production access. Talk to your Account Manager for more information.
+        `DENIED`: The end customer has been created and enabled in the Sandbox environment, but it did not pass review by the Plaid team and therefore cannot be enabled for Production access. Talk to your Account Manager for more information.
     PartnerEndCustomerSecrets:
       description: The secrets for the newly created end customer.
       type: object
@@ -49503,7 +49602,10 @@ components:
           items:
             $ref: '#/components/schemas/Products'
         create_link_customization:
-          description: "If `true`, the end customer's default Link customization will be set to match the partner's. You can always change the end customer's Link customization in the Plaid Dashboard. See the [Link Customization docs](https://plaid.com/docs/link/customization/) for more information. If you require the ability to programmatically create end customers using multiple different Link customization profiles, contact your Plaid Account Manager for assistance. \n\nImportant: Data Transparency Messaging (DTM) use cases will not be copied to the end customer's Link customization unless the **Publish changes** button is clicked after the use cases are applied. Link will not work in Production unless the end customer's DTM use cases are configured. For more details, see [Data Transparency Messaging](https://plaid.com/docs/link/data-transparency-messaging-migration-guide/)."
+          description: |-
+            If `true`, the end customer's default Link customization will be set to match the partner's. You can always change the end customer's Link customization in the Plaid Dashboard. See the [Link Customization docs](https://plaid.com/docs/link/customization/) for more information. If you require the ability to programmatically create end customers using multiple different Link customization profiles, contact your Plaid Account Manager for assistance.
+
+            Important: Data Transparency Messaging (DTM) use cases will not be copied to the end customer's Link customization unless the **Publish changes** button is clicked after the use cases are applied. Link will not work in Production unless the end customer's DTM use cases are configured. For more details, see [Data Transparency Messaging](https://plaid.com/docs/link/data-transparency-messaging-migration-guide/).
           type: boolean
         logo:
           description: Base64-encoded representation of the end customer's logo. Must be a PNG of size 1024x1024 under 4MB. The logo will be shared with financial institutions and shown to the end user during Link flows. A logo is required if `create_link_customization` is `true`. If `create_link_customization` is `false` and the logo is omitted, the partner's logo will be used if one exists, otherwise a stock logo will be used.
@@ -49550,7 +49652,7 @@ components:
         request_id:
           $ref: '#/components/schemas/RequestID'
     BetaPartnerEndCustomerWithSecrets:
-      description: The details for the newly created end customer, including secrets for Sandbox and Limited Production.
+      description: The details for the newly created end customer, including secrets for non-Production environments.
       type: object
       additionalProperties: true
       allOf:
@@ -52109,7 +52211,11 @@ components:
       - cause
     BaseReportWarningCode:
       type: string
-      description: "The warning code identifies a specific kind of warning. \n`IDENTITY_UNAVAILABLE`: Account-owner information is not available. \n`TRANSACTIONS_UNAVAILABLE`: Transactions information associated with Credit and Depository accounts are unavailable. \n`USER_FRAUD_ALERT`: The User has placed a fraud alert on their Plaid Check consumer report due to suspected fraud. Note: when a fraud alert is in place, the recipient of the consumer report has an obligation to verify the consumer’s identity."
+      description: |-
+        The warning code identifies a specific kind of warning.
+        `IDENTITY_UNAVAILABLE`: Account-owner information is not available.
+        `TRANSACTIONS_UNAVAILABLE`: Transactions information associated with Credit and Depository accounts are unavailable.
+        `USER_FRAUD_ALERT`: The User has placed a fraud alert on their Plaid Check consumer report due to suspected fraud. Note: when a fraud alert is in place, the recipient of the consumer report has an obligation to verify the consumer’s identity.
       enum:
       - IDENTITY_UNAVAILABLE
       - TRANSACTIONS_UNAVAILABLE
@@ -53383,7 +53489,12 @@ components:
           type: number
           format: double
           nullable: true
-          description: "If the parent object represents a category of transactions, such as `total_amount`, `transfers_in`, `total_income`, etc. the `amount` represents the sum of all of the transactions in the group. \n\nIf the parent object is `cash_flow`, the `amount` represents the total value of all the inflows minus all the outflows across all the accounts in the report in the given time window. \n\nIf the parent object is `minimum_balance`, the `amount` represents the lowest balance of the account during the given time window."
+          description: |-
+            If the parent object represents a category of transactions, such as `total_amount`, `transfers_in`, `total_income`, etc. the `amount` represents the sum of all of the transactions in the group.
+
+            If the parent object is `cash_flow`, the `amount` represents the total value of all the inflows minus all the outflows across all the accounts in the report in the given time window.
+
+            If the parent object is `minimum_balance`, the `amount` represents the lowest balance of the account during the given time window.
         iso_currency_code:
           type: string
           description: The ISO-4217 currency code of the amount. Always `null` if `unofficial_currency_code` is non-`null`.
@@ -54642,7 +54753,14 @@ components:
       - DORMANT_USER
       - OTHER
       x-hidden-from-docs: true
-      description: "Description of the reason you want to evaluate risk.\n`ONBOARDING`: user links a first bank account as part of the onboarding flow of your platform.\n`NEW_ACCOUNT`: user links another bank account or replaces the currently linked bank account on your platform.\n`INFORMATION_CHANGE`: user changes their information on your platform, e.g., updating their phone number.\n`DORMANT_USER`:  you decide to re-evaluate a user that becomes active after a period of inactivity.  \n`OTHER`: any other reasons not listed here\nPossible values:  `ONBOARDING`, `NEW_ACCOUNT`, `INFORMATION_CHANGE`, `DORMANT_USER`, `OTHER`\n"
+      description: |
+        Description of the reason you want to evaluate risk.
+        `ONBOARDING`: user links a first bank account as part of the onboarding flow of your platform.
+        `NEW_ACCOUNT`: user links another bank account or replaces the currently linked bank account on your platform.
+        `INFORMATION_CHANGE`: user changes their information on your platform, e.g., updating their phone number.
+        `DORMANT_USER`:  you decide to re-evaluate a user that becomes active after a period of inactivity.
+        `OTHER`: any other reasons not listed here
+        Possible values:  `ONBOARDING`, `NEW_ACCOUNT`, `INFORMATION_CHANGE`, `DORMANT_USER`, `OTHER`
     BeaconAccountRiskEvaluateResponse:
       title: BeaconAccountRiskEvaluateResponse
       description: BeaconAccountRiskEvaluateResponse defines the response schema for `/beacon/account_risk/v1/evaluate`
@@ -56364,11 +56482,11 @@ components:
       type: object
       description: Detailed information about the business from data provider results
       properties:
-        name:
-          type: string
-          nullable: true
-          description: The business name from the data provider
-          example: Acme Corporation
+        names:
+          type: array
+          description: Names associated with the business.
+          items:
+            $ref: '#/components/schemas/ProviderBusinessName'
         entity_type:
           $ref: '#/components/schemas/BusinessEntityType'
         addresses:
@@ -56394,7 +56512,7 @@ components:
         formation_date:
           $ref: '#/components/schemas/ISO8601DateNullable'
       required:
-      - name
+      - names
       - entity_type
       - addresses
       - phone_numbers
@@ -56414,6 +56532,31 @@ components:
       example: Acme Corporation
       description: The name of the business. Must have at least one character and a maximum length of 500 characters.
       nullable: true
+    BusinessVerificationPhoneNumber:
+      type: string
+      description: A phone number in E.164 format.
+      example: "+14025671234"
+      title: BusinessVerificationPhoneNumber
+    BusinessVerificationPhoneNumberNullable:
+      type: string
+      description: A phone number in E.164 format.
+      example: "+14025671234"
+      title: BusinessVerificationPhoneNumber
+      nullable: true
+    ProviderBusinessName:
+      type: object
+      description: Name associated with a business
+      properties:
+        is_primary:
+          type: boolean
+          description: Indicates whether this is the primary name for the business.
+          example: true
+        name:
+          $ref: '#/components/schemas/BusinessNameNullable'
+      required:
+      - is_primary
+      - name
+      additionalProperties: true
     BusinessPhoneNumber:
       type: object
       description: Phone number associated with a business
@@ -56475,16 +56618,22 @@ components:
       properties:
         name:
           $ref: '#/components/schemas/BusinessNameNullable'
+        alternative_names:
+          type: array
+          description: Alternative business names that were submitted as search inputs.
+          items:
+            $ref: '#/components/schemas/BusinessName'
         address:
           $ref: '#/components/schemas/ResponseBusinessAddress'
         website:
           $ref: '#/components/schemas/URLNullable'
         phone_number:
-          $ref: '#/components/schemas/WatchlistScreeningPhoneNumberNullable'
+          $ref: '#/components/schemas/BusinessVerificationPhoneNumberNullable'
         email_address:
           $ref: '#/components/schemas/EmailAddressNullable'
       required:
       - name
+      - alternative_names
       - address
       - website
       - phone_number
@@ -56511,12 +56660,14 @@ components:
       properties:
         name:
           $ref: '#/components/schemas/BusinessName'
+        alternative_name:
+          $ref: '#/components/schemas/BusinessNameNullable'
         address:
           $ref: '#/components/schemas/RequestBusinessAddress'
         website:
           $ref: '#/components/schemas/URL'
         phone_number:
-          $ref: '#/components/schemas/WatchlistScreeningPhoneNumber'
+          $ref: '#/components/schemas/BusinessVerificationPhoneNumber'
         email_address:
           $ref: '#/components/schemas/EmailAddress'
       additionalProperties: true
@@ -56547,7 +56698,7 @@ components:
         request_id:
           $ref: '#/components/schemas/RequestID'
         shareable_url:
-          $ref: '#/components/schemas/ShareableURL'
+          $ref: '#/components/schemas/BusinessVerificationShareableURL'
       required:
       - id
       - client_user_id
@@ -56601,7 +56752,7 @@ components:
         request_id:
           $ref: '#/components/schemas/RequestID'
         shareable_url:
-          $ref: '#/components/schemas/ShareableURL'
+          $ref: '#/components/schemas/BusinessVerificationShareableURL'
       required:
       - id
       - client_user_id
@@ -56659,6 +56810,11 @@ components:
       example: success
       title: BusinessVerificationStatus
       description: Status of the digital presence check
+    BusinessVerificationShareableURL:
+      type: string
+      example: https://verify.plaid.com/busver_4FrXJvfQU3zGUR?key=e004115db797f7cc3083bff3167cba30644ef630fb46f5b086cde6cc3b86a36f
+      description: A shareable URL that can be sent directly to the user to complete verification
+      nullable: true
     BusinessCheckBooleanStatus:
       description: Tri-state boolean status, where `no_data` indicates the check could not determine a value.
       type: string
@@ -61362,6 +61518,8 @@ components:
           $ref: '#/components/schemas/ThirdPartyUserToken'
         user_id:
           $ref: '#/components/schemas/NewUserID'
+        options:
+          $ref: '#/components/schemas/CraCheckReportIncomeInsightsGetOptions'
     CraCheckReportIncomeInsightsGetResponse:
       title: CraCheckReportIncomeInsightsGetResponse
       additionalProperties: true
@@ -61398,7 +61556,11 @@ components:
       - cause
     CheckReportWarningCode:
       type: string
-      description: "The warning code identifies a specific kind of warning. \n`IDENTITY_UNAVAILABLE`:  Account-owner information is not available. \n`TRANSACTIONS_UNAVAILABLE`: Transactions information associated with Credit and Depository accounts are unavailable. \n`USER_FRAUD_ALERT`: The user has placed a fraud alert on their Plaid Check consumer report due to suspected fraud. Please note that when a fraud alert is in place, the recipient of the consumer report has an obligation to verify the consumer’s identity."
+      description: |-
+        The warning code identifies a specific kind of warning.
+        `IDENTITY_UNAVAILABLE`:  Account-owner information is not available.
+        `TRANSACTIONS_UNAVAILABLE`: Transactions information associated with Credit and Depository accounts are unavailable.
+        `USER_FRAUD_ALERT`: The user has placed a fraud alert on their Plaid Check consumer report due to suspected fraud. Please note that when a fraud alert is in place, the recipient of the consumer report has an obligation to verify the consumer’s identity.
       enum:
       - IDENTITY_UNAVAILABLE
       - TRANSACTIONS_UNAVAILABLE
@@ -61443,9 +61605,17 @@ components:
           description: The list of Items in the report along with the associated metadata about the Item.
           items:
             $ref: '#/components/schemas/CraBankIncomeItem'
+        user_summary:
+          $ref: '#/components/schemas/CraIncomeInsightsUserSummary'
+        income_streams:
+          type: array
+          description: The list of income streams for this user.
+          items:
+            $ref: '#/components/schemas/CraIncomeStream'
         bank_income_summary:
           $ref: '#/components/schemas/CraBankIncomeSummary'
         warnings:
+          x-hidden-from-docs: true
           type: array
           description: If data from the report was unable to be retrieved, the warnings object will contain information about the error that caused the data to be incomplete.
           items:
@@ -61456,14 +61626,21 @@ components:
       properties:
         item_id:
           $ref: '#/components/schemas/ItemId'
-        bank_income_accounts:
+        accounts:
           type: array
           description: The Item's accounts that have bank income data.
           items:
             $ref: '#/components/schemas/CraBankIncomeAccount'
-        bank_income_sources:
+        bank_income_accounts:
+          x-hidden-from-docs: true
           type: array
-          description: The income sources for this Item. Each entry in the array is a single income source.
+          description: This is a V1 (II1) field. For the V2 (II2) equivalent, use the `accounts` field. The Item's accounts that have bank income data.
+          items:
+            $ref: '#/components/schemas/CraBankIncomeAccount'
+        bank_income_sources:
+          x-hidden-from-docs: true
+          type: array
+          description: This is a V1 (II1) field. For the V2 (II2) equivalent, use the report-level `income_streams` field. The income sources for this Item. Each entry in the array is a single income source.
           items:
             $ref: '#/components/schemas/CraBankIncomeSource'
         last_updated_time:
@@ -61545,6 +61722,7 @@ components:
     CraBankIncomeSource:
       type: object
       additionalProperties: true
+      x-hidden-from-docs: true
       description: Detailed information for the income source.
       properties:
         account_id:
@@ -61623,6 +61801,7 @@ components:
       description: The object containing prediction interval data.
       type: object
       additionalProperties: true
+      x-hidden-from-docs: true
       properties:
         lower_bound:
           type: number
@@ -61642,6 +61821,7 @@ components:
       description: The object containing employer data.
       type: object
       additionalProperties: true
+      x-hidden-from-docs: true
       properties:
         name:
           type: string
@@ -61666,8 +61846,9 @@ components:
       - is_normalized
     CraBankIncomeSummary:
       type: object
-      description: Summary for income across all income sources and items (max history of 730 days).
+      description: This is a V1 (II1) schema. For the V2 (II2) equivalent, use `CraIncomeInsightsUserSummary`. Summary for income across all income sources and items (max history of 730 days).
       additionalProperties: true
+      x-hidden-from-docs: true
       properties:
         total_amounts:
           type: array
@@ -61735,6 +61916,7 @@ components:
       type: object
       description: The end user's monthly summary for the income source(s).
       additionalProperties: true
+      x-hidden-from-docs: true
       properties:
         total_amounts:
           type: array
@@ -61765,6 +61947,7 @@ components:
       type: object
       description: The transactions data for the end user's income source(s).
       additionalProperties: true
+      x-hidden-from-docs: true
       properties:
         transaction_id:
           type: string
@@ -61814,6 +61997,7 @@ components:
       - original_description
     CraBankIncomeBonusType:
       type: string
+      x-hidden-from-docs: true
       description: |-
         The type of bonus that this transaction represents, if it is a bonus.
         `BONUS_INCLUDED`: Bonus is included in this transaction along with the normal pay
@@ -61834,6 +62018,264 @@ components:
       - ACTIVE
       - INACTIVE
       - UNKNOWN
+    CraIncomeInsightsUserSummary:
+      title: CraIncomeInsightsUserSummary
+      type: object
+      additionalProperties: true
+      nullable: true
+      description: Aggregated summary of all income streams for this user.
+      properties:
+        income_metrics:
+          type: array
+          description: List of a user's aggregated income metrics for each currency.
+          items:
+            $ref: '#/components/schemas/CraIncomeMetrics'
+      required:
+      - income_metrics
+    CraIncomeMetrics:
+      title: CraIncomeMetrics
+      type: object
+      additionalProperties: true
+      description: Modeled income metrics for a given income stream or user summary.
+      properties:
+        current:
+          $ref: '#/components/schemas/CraCurrentModeledIncome'
+        projected:
+          $ref: '#/components/schemas/CraProjectedModeledIncome'
+        iso_currency_code:
+          $ref: '#/components/schemas/CreditIsoCurrencyCode'
+        unofficial_currency_code:
+          $ref: '#/components/schemas/CreditUnofficialCurrencyCode'
+      required:
+      - current
+      - projected
+      - iso_currency_code
+      - unofficial_currency_code
+    CraCurrentModeledIncome:
+      title: CraCurrentModeledIncome
+      type: object
+      additionalProperties: true
+      nullable: true
+      description: Modeled estimate of current income based on recently observed income transactions.
+      properties:
+        monthly:
+          $ref: '#/components/schemas/CraMonthlyIncomeValues'
+        annual:
+          $ref: '#/components/schemas/CraAnnualIncomeValues'
+      required:
+      - monthly
+      - annual
+    CraProjectedModeledIncome:
+      title: CraProjectedModeledIncome
+      type: object
+      additionalProperties: true
+      nullable: true
+      description: Forward-looking modeled estimate of income based on recent income transactions and trends in active streams.
+      properties:
+        monthly:
+          $ref: '#/components/schemas/CraMonthlyIncomeValues'
+        annual:
+          $ref: '#/components/schemas/CraAnnualIncomeValues'
+      required:
+      - monthly
+      - annual
+    CraMonthlyIncomeValues:
+      title: CraMonthlyIncomeValues
+      type: object
+      additionalProperties: true
+      description: Modeled estimate of the monthly income.
+      properties:
+        gross_income:
+          type: number
+          description: Gross Income modeled from trends of observed transactions.
+        net_income:
+          type: number
+          description: Net Income estimated from observed transactions.
+      required:
+      - gross_income
+      - net_income
+    CraAnnualIncomeValues:
+      title: CraAnnualIncomeValues
+      type: object
+      additionalProperties: true
+      description: Modeled estimate of the annual income.
+      properties:
+        gross_income:
+          type: number
+          description: Gross Income modeled from trends of observed transactions.
+        net_income:
+          type: number
+          description: Net Income estimated from observed transactions.
+      required:
+      - gross_income
+      - net_income
+    CraIncomeStream:
+      title: CraIncomeStream
+      type: object
+      additionalProperties: true
+      description: An income stream detected for the user.
+      properties:
+        income_stream_id:
+          type: string
+          description: A unique identifier for an income stream. If the report is regenerated and a new `report_id` is created, the new report will have a new set of `income_stream_id`s.
+        start_date:
+          type: string
+          format: date
+          description: Minimum of all dates within the specific income stream for days requested by the client. The date will be returned in an ISO 8601 format (YYYY-MM-DD).
+        end_date:
+          type: string
+          format: date
+          description: Maximum of all dates within the specific income stream for days requested by the client. The date will be returned in an ISO 8601 format (YYYY-MM-DD).
+        description:
+          type: string
+          description: The most common name or original description for the underlying income transactions.
+        insights:
+          $ref: '#/components/schemas/CraIncomeStreamInsights'
+        income_metrics:
+          $ref: '#/components/schemas/CraIncomeMetrics'
+        transactions:
+          type: array
+          description: The transactions data for the income stream ordered by ascending date.
+          items:
+            $ref: '#/components/schemas/CraIncomeTransaction'
+      required:
+      - income_stream_id
+      - start_date
+      - end_date
+      - description
+      - insights
+      - income_metrics
+      - transactions
+    CraIncomeStreamInsights:
+      title: CraIncomeStreamInsights
+      type: object
+      additionalProperties: true
+      description: Modeled insights for a given income stream.
+      properties:
+        income_category:
+          $ref: '#/components/schemas/CraIncomeCategory'
+        pay_frequency:
+          $ref: '#/components/schemas/CreditBankIncomePayFrequency'
+        income_provider:
+          $ref: '#/components/schemas/CraBankIncomeIncomeProvider'
+        status:
+          $ref: '#/components/schemas/CraBankIncomeStatus'
+        next_payment:
+          $ref: '#/components/schemas/CraIncomeNextPayment'
+      required:
+      - income_category
+      - pay_frequency
+      - income_provider
+      - status
+      - next_payment
+    CraIncomeCategory:
+      title: CraIncomeCategory
+      type: object
+      additionalProperties: true
+      description: |-
+        The income category for a given stream. The streams returned in the response will be filtered based on these primary and secondary income categories.
+
+        See the [Income V2 Category Taxonomy](https://plaid.com/documents/income-v2-category-taxonomy.csv) for a full list of income categories.
+      properties:
+        primary:
+          type: string
+          description: A high level category that communicates the broad category of the stream.
+        secondary:
+          type: string
+          description: A granular category conveying the stream's intent.
+      required:
+      - primary
+      - secondary
+    CraIncomeNextPayment:
+      title: CraIncomeNextPayment
+      type: object
+      additionalProperties: true
+      nullable: true
+      description: Metadata of the income stream's next payment.
+      properties:
+        date:
+          type: string
+          format: date
+          description: The expected date of the income stream's next payment. The date will be returned in an ISO 8601 format (YYYY-MM-DD).
+      required:
+      - date
+    CraIncomeTransactionOutlier:
+      title: CraIncomeTransactionOutlier
+      type: object
+      additionalProperties: true
+      description: Metadata on whether this income transaction is an outlier.
+      properties:
+        is_outlier:
+          type: boolean
+          description: Indicates whether an income transaction amount is unusually high compared to the amounts for that stream.
+        amount:
+          type: number
+          nullable: true
+          description: The amount that the transaction differs from the stream average transaction amount.
+      required:
+      - is_outlier
+    CraIncomeTransaction:
+      title: CraIncomeTransaction
+      type: object
+      additionalProperties: true
+      description: The transaction data for an income stream.
+      properties:
+        transaction_id:
+          type: string
+          description: The unique ID of the transaction. Like all Plaid identifiers, the `transaction_id` is case sensitive.
+        item_id:
+          $ref: '#/components/schemas/ItemId'
+        account_id:
+          type: string
+          description: |-
+            Plaid's unique identifier for the account. This value will not change unless Plaid can't reconcile the account with the data returned by the financial institution. This may occur, for example, when the name of the account changes. If this happens a new `account_id` will be assigned to the account.
+
+            If an account with a specific `account_id` disappears instead of changing, the account is likely closed. Closed accounts are not returned by the Plaid API.
+
+            Like all Plaid identifiers, the `account_id` is case sensitive.
+        amount:
+          type: number
+          description: |-
+            The settled value of the transaction, denominated in the transaction's currency as stated in `iso_currency_code` or `unofficial_currency_code`.
+            Positive values when money moves out of the account; negative values when money moves in.
+            For example, credit card purchases are positive; credit card payment, direct deposits, and refunds are negative.
+        date:
+          type: string
+          format: date
+          description: |-
+            For pending transactions, the date that the transaction occurred; for posted transactions, the date that the transaction posted.
+            Both dates are returned in an ISO 8601 format (YYYY-MM-DD).
+        original_description:
+          type: string
+          description: The string returned by the financial institution to describe the transaction.
+        iso_currency_code:
+          $ref: '#/components/schemas/CreditIsoCurrencyCode'
+        unofficial_currency_code:
+          $ref: '#/components/schemas/CreditUnofficialCurrencyCode'
+        outlier:
+          $ref: '#/components/schemas/CraIncomeTransactionOutlier'
+      required:
+      - transaction_id
+      - item_id
+      - account_id
+      - amount
+      - date
+      - original_description
+      - iso_currency_code
+      - unofficial_currency_code
+      - outlier
+    CraCheckReportIncomeInsightsGetOptions:
+      title: CraCheckReportIncomeInsightsGetOptions
+      type: object
+      nullable: true
+      description: Defines configuration options to generate Income Insights.
+      properties:
+        income_insights_filter:
+          $ref: '#/components/schemas/IncomeInsightsFilter'
+        income_insights_version:
+          $ref: '#/components/schemas/IncomeInsightsVersion'
+      required:
+      - income_insights_version
     CraBankIncomeWarning:
       type: object
       additionalProperties: true
@@ -61938,6 +62380,8 @@ components:
           type: boolean
           nullable: true
           description: Indicates that investment data should be extracted from the linked account(s).
+        income_insights:
+          $ref: '#/components/schemas/CraCheckReportIncomeInsightsGetOptions'
         consumer_report_permissible_purpose:
           $ref: '#/components/schemas/ConsumerReportPermissiblePurpose'
       required:
@@ -62163,6 +62607,7 @@ components:
       enum:
       - "8"
       - "9"
+      - "10"
       - 10T
     CraPartnerInsightsFicoResults:
       title: CraPartnerInsightsFicoResults
@@ -62179,9 +62624,107 @@ components:
           description: UltraFICO scoring results, one per provided base FICO score request.
           items:
             $ref: '#/components/schemas/CraPartnerInsightsUltraFicoScoreResult'
+        report_characteristics:
+          $ref: '#/components/schemas/CraPartnerInsightsFicoReportCharacteristics'
       required:
       - lender_application_id
       - ultrafico_score_results
+    CraPartnerInsightsFicoReportCharacteristics:
+      title: CraPartnerInsightsFicoReportCharacteristics
+      type: object
+      nullable: true
+      x-hidden-from-docs: true
+      description: Report characteristics returned by FICO describing the banking data used to generate the UltraFICO score.
+      properties:
+        num_accounts:
+          type: integer
+          nullable: true
+          description: Total number of accounts included in the report. Limited to checking, savings, and money market accounts.
+        avg_daily_balance_over_1_month:
+          type: number
+          format: double
+          nullable: true
+          description: Average daily balance over the past 1 month.
+        avg_daily_balance_over_3_months:
+          type: number
+          format: double
+          nullable: true
+          description: Average daily balance over the past 3 months.
+        avg_daily_balance_over_6_months:
+          type: number
+          format: double
+          nullable: true
+          description: Average daily balance over the past 6 months.
+        avg_daily_balance_over_12_months:
+          type: number
+          format: double
+          nullable: true
+          description: Average daily balance over the past 12 months.
+        days_since_earliest_tx:
+          type: integer
+          nullable: true
+          description: Number of days since the earliest transaction in the report.
+        days_since_most_recent_negative_ending_balance:
+          type: integer
+          nullable: true
+          description: Number of days since the most recent day with a negative ending balance.
+        days_since_most_recent_insufficient_funds_fee_debit_tx:
+          type: integer
+          nullable: true
+          description: Number of days since the most recent insufficient funds fee debit transaction.
+        tot_number_days_with_negative_balance_over_1_month:
+          type: integer
+          nullable: true
+          description: Total number of days with a negative balance over the past 1 month.
+        tot_number_days_with_negative_balance_over_3_months:
+          type: integer
+          nullable: true
+          description: Total number of days with a negative balance over the past 3 months.
+        tot_number_days_with_negative_balance_over_6_months:
+          type: integer
+          nullable: true
+          description: Total number of days with a negative balance over the past 6 months.
+        tot_number_days_with_negative_balance_over_12_months:
+          type: integer
+          nullable: true
+          description: Total number of days with a negative balance over the past 12 months.
+        days_since_most_recent_tx:
+          type: integer
+          nullable: true
+          description: Number of days since the most recent transaction.
+        days_with_tx_over_1_month:
+          type: integer
+          nullable: true
+          description: Number of days with at least one transaction over the past 1 month.
+        days_with_tx_over_3_months:
+          type: integer
+          nullable: true
+          description: Number of days with at least one transaction over the past 3 months.
+        days_with_tx_over_6_months:
+          type: integer
+          nullable: true
+          description: Number of days with at least one transaction over the past 6 months.
+        days_with_tx_over_12_months:
+          type: integer
+          nullable: true
+          description: Number of days with at least one transaction over the past 12 months.
+        tot_current_balances:
+          type: number
+          format: double
+          nullable: true
+          description: Sum of current balances across all accounts in the report.
+        num_checking_accounts:
+          type: integer
+          nullable: true
+          description: Number of checking accounts included in the report.
+        num_money_market_accounts:
+          type: integer
+          nullable: true
+          description: Number of money market accounts included in the report.
+        num_savings_accounts:
+          type: integer
+          nullable: true
+          description: Number of savings accounts included in the report.
     CraPartnerInsightsUltraFicoScoreResult:
       title: CraPartnerInsightsUltraFicoScoreResult
       type: object
@@ -62227,6 +62770,22 @@ components:
           type: string
           nullable: true
           description: The fourth reason code associated with the score.
+        positive_reason_code_1:
+          type: string
+          nullable: true
+          description: The first positive reason code associated with the score.
+        positive_reason_code_2:
+          type: string
+          nullable: true
+          description: The second positive reason code associated with the score.
+        positive_reason_code_3:
+          type: string
+          nullable: true
+          description: The third positive reason code associated with the score.
+        positive_reason_code_4:
+          type: string
+          nullable: true
+          description: The fourth positive reason code associated with the score.
         did_inquiries_adversely_affect_score:
           type: boolean
           nullable: true
@@ -62663,6 +63222,24 @@ components:
           type: boolean
           nullable: true
           description: Indicates that the report must include identity information. If identity information is not available, the report will fail.
+        home_lending_report_options:
+          $ref: '#/components/schemas/CraCheckReportHomeLendingReportOptions'
+    CraCheckReportHomeLendingReportOptions:
+      x-hidden-from-docs: true
+      title: CraCheckReportHomeLendingReportOptions
+      type: object
+      nullable: true
+      description: Options for configuring Home Lending Report (Verification Report) generation.
+      properties:
+        reports_requested:
+          type: array
+          items:
+            $ref: '#/components/schemas/CraCheckReportVerificationGetReportType'
+          description: Specifies which types of home lending reports to generate.
+        employment_refresh_options:
+          $ref: '#/components/schemas/CraCheckReportVerificationGetEmploymentRefreshOptions'
+      required:
+      - reports_requested
     CraCheckReportGSEOptions:
       title: CraCheckReportGSEOptions
       type: object
@@ -62732,6 +63309,44 @@ components:
       nullable: true
       enum:
       - NI1
+    IncomeInsightsFilter:
+      title: IncomeInsightsFilter
+      type: object
+      nullable: true
+      description: |-
+        Filters the returned income streams based on the specified income categories. If no filters are requested, streams from the following default set of categories are returned:
+        - `EARNED_INCOME.*` (`EARNED_INCOME.SALARY`, `EARNED_INCOME.GIG_ECONOMY`, `EARNED_INCOME.SELF_EMPLOYED`)
+        - `BENEFITS.DISABILITY`
+        - `RETIREMENT.*` (`RETIREMENT.GOVERNMENT_DERIVED`, `RETIREMENT.PRIVATE_RETIREMENT`, `RETIREMENT.PLAN_DISTRIBUTION`)
+
+        The final list of income categories is generated by adding the `included_categories`, then removing the `excluded_categories`. Priority is given to `excluded_categories` in the case of collisions.
+
+        Filter patterns supported:
+        - `*`: All categories
+        - `PRIMARY.*`: All categories within the specified primary category
+        - `PRIMARY.SECONDARY`: A specific income category
+
+        For a list of income categories, see the [Income V2 Category Taxonomy](https://plaid.com/documents/income-v2-category-taxonomy.csv).
+      properties:
+        included_categories:
+          type: array
+          description: Includes income streams matching the specified categories.
+          items:
+            type: string
+        excluded_categories:
+          type: array
+          description: Excludes income streams matching the specified categories.
+          items:
+            type: string
+      required:
+      - included_categories
+    IncomeInsightsVersion:
+      title: IncomeInsightsVersion
+      type: string
+      nullable: true
+      description: The version of Income Insights to use.
+      enum:
+      - II2
     CraCheckReportCashflowInsightsGetResponse:
       title: CraCheckReportCashflowInsightsGetResponse
       additionalProperties: true
@@ -65528,7 +66143,10 @@ components:
             format: date-time
           consented_use_cases:
             type: array
-            description: "A list of use cases that the user has consented to for the Item via [Data Transparency Messaging](https://plaid.com/docs/link/data-transparency-messaging-migration-guide). \n\nYou can see the full list of use cases or update the list of use cases to request at any time via the Link Customization section of the [Plaid Dashboard](https://dashboard.plaid.com/link/data-transparency-v5)."
+            description: |-
+              A list of use cases that the user has consented to for the Item via [Data Transparency Messaging](https://plaid.com/docs/link/data-transparency-messaging-migration-guide).
+
+              You can see the full list of use cases or update the list of use cases to request at any time via the Link Customization section of the [Plaid Dashboard](https://dashboard.plaid.com/link/data-transparency-v5).
             items:
               type: string
           consented_data_scopes:
@@ -65767,7 +66385,13 @@ components:
       - refresh_token
       - urn:ietf:params:oauth:grant-type:token-exchange
       - client_credentials
-      description: "The type of OAuth grant being requested:\n  \n`client_credentials` allows exchanging a client id and client secret for a refresh and access token.\n`refresh_token` allows refreshing an access token using a refresh token. When using this grant type, only the `refresh_token` field is required (along with the `client_id` and `client_secret`).\n`urn:ietf:params:oauth:grant-type:token-exchange` allows exchanging a subject token for an OAuth token. When using this grant type, the `audience`, `subject_token` and `subject_token_type` fields are required.\nThese grants are defined in their respective RFCs. `refresh_token` and `client_credentials` are defined in RFC 6749 and `urn:ietf:params:oauth:grant-type:token-exchange` is defined in RFC 8693."
+      description: |-
+        The type of OAuth grant being requested:
+
+        `client_credentials` allows exchanging a client id and client secret for a refresh and access token.
+        `refresh_token` allows refreshing an access token using a refresh token. When using this grant type, only the `refresh_token` field is required (along with the `client_id` and `client_secret`).
+        `urn:ietf:params:oauth:grant-type:token-exchange` allows exchanging a subject token for an OAuth token. When using this grant type, the `audience`, `subject_token` and `subject_token_type` fields are required.
+        These grants are defined in their respective RFCs. `refresh_token` and `client_credentials` are defined in RFC 6749 and `urn:ietf:params:oauth:grant-type:token-exchange` is defined in RFC 8693.
     OAuthSubjectTokenType:
       type: string
       enum:
@@ -66769,7 +67393,17 @@ components:
     CustomerInitiatedRiskTier:
       x-hidden-from-docs: true
       deprecated: true
-      description: "DEPRECATED. Use Signal Rules instead to transform the `score` into a useful action. \n\nA tier corresponding to the projected likelihood that the transaction, if initiated, will be subject to a return.\n\nIn the `customer_initiated_return_risk` object, there are five risk tiers corresponding to the scores:\n  1: Predicted customer-initiated return incidence rate between 0.00% - 0.02%\n  2: Predicted customer-initiated return incidence rate between 0.02% - 0.05%\n  3: Predicted customer-initiated return incidence rate between 0.05% - 0.1%\n  4: Predicted customer-initiated return incidence rate between 0.1% - 0.5%\n  5: Predicted customer-initiated return incidence rate greater than 0.5%\n"
+      description: |
+        DEPRECATED. Use Signal Rules instead to transform the `score` into a useful action.
+
+        A tier corresponding to the projected likelihood that the transaction, if initiated, will be subject to a return.
+
+        In the `customer_initiated_return_risk` object, there are five risk tiers corresponding to the scores:
+          1: Predicted customer-initiated return incidence rate between 0.00% - 0.02%
+          2: Predicted customer-initiated return incidence rate between 0.02% - 0.05%
+          3: Predicted customer-initiated return incidence rate between 0.05% - 0.1%
+          4: Predicted customer-initiated return incidence rate between 0.1% - 0.5%
+          5: Predicted customer-initiated return incidence rate greater than 0.5%
       type: integer
       minimum: 1
       maximum: 5
@@ -66788,7 +67422,18 @@ components:
     BankInitiatedRiskTier:
       x-hidden-from-docs: true
       deprecated: true
-      description: "DEPRECATED. Use Signal Rules instead to transform the `score` into a useful action.  \n\nIn the `bank_initiated_return_risk` object, there are eight risk tiers corresponding to the scores:\n  1: Predicted bank-initiated return incidence rate between 0.0% - 0.5%\n  2: Predicted bank-initiated return incidence rate between 0.5% - 1.5%\n  3: Predicted bank-initiated return incidence rate between 1.5% - 3%\n  4: Predicted bank-initiated return incidence rate between 3% - 5%\n  5: Predicted bank-initiated return incidence rate between 5% - 10%\n  6: Predicted bank-initiated return incidence rate between 10% - 15%\n  7: Predicted bank-initiated return incidence rate between 15% and 50%\n  8: Predicted bank-initiated return incidence rate greater than 50%\n"
+      description: |
+        DEPRECATED. Use Signal Rules instead to transform the `score` into a useful action.
+
+        In the `bank_initiated_return_risk` object, there are eight risk tiers corresponding to the scores:
+          1: Predicted bank-initiated return incidence rate between 0.0% - 0.5%
+          2: Predicted bank-initiated return incidence rate between 0.5% - 1.5%
+          3: Predicted bank-initiated return incidence rate between 1.5% - 3%
+          4: Predicted bank-initiated return incidence rate between 3% - 5%
+          5: Predicted bank-initiated return incidence rate between 5% - 10%
+          6: Predicted bank-initiated return incidence rate between 10% - 15%
+          7: Predicted bank-initiated return incidence rate between 15% and 50%
+          8: Predicted bank-initiated return incidence rate greater than 50%
       type: integer
       minimum: 1
       maximum: 8
@@ -67035,7 +67680,19 @@ components:
     SignalEvaluateCoreAttributes:
       title: SignalEvaluateCoreAttributes
       type: object
-      description: "The core attributes object contains additional data that can be used to assess the ACH return risk. \n\nIf using a Balance-only ruleset, only `available_balance` and `current_balance` will be returned as core attributes. If using a Signal Transaction Scores ruleset, over 80 core attributes will be returned. Examples of attributes include:\n\n`available_balance` and `current_balance`: The balance in the ACH transaction funding account\n`days_since_first_plaid_connection`: The number of days since the first time the Item was connected to an application via Plaid\n`plaid_connections_count_7d`: The number of times the Item has been connected to applications via Plaid over the past 7 days\n`plaid_connections_count_30d`: The number of times the Item has been connected to applications via Plaid over the past 30 days\n`total_plaid_connections_count`: The number of times the Item has been connected to applications via Plaid\n`is_savings_or_money_market_account`: Indicates whether the ACH transaction funding account is a savings/money market account\n\nFor the full list and detailed documentation of core attributes available, or to request that core attributes not be returned, contact Sales or your Plaid account manager."
+      description: |-
+        The core attributes object contains additional data that can be used to assess the ACH return risk.
+
+        If using a Balance-only ruleset, only `available_balance` and `current_balance` will be returned as core attributes. If using a Signal Transaction Scores ruleset, over 80 core attributes will be returned. Examples of attributes include:
+
+        `available_balance` and `current_balance`: The balance in the ACH transaction funding account
+        `days_since_first_plaid_connection`: The number of days since the first time the Item was connected to an application via Plaid
+        `plaid_connections_count_7d`: The number of times the Item has been connected to applications via Plaid over the past 7 days
+        `plaid_connections_count_30d`: The number of times the Item has been connected to applications via Plaid over the past 30 days
+        `total_plaid_connections_count`: The number of times the Item has been connected to applications via Plaid
+        `is_savings_or_money_market_account`: Indicates whether the ACH transaction funding account is a savings/money market account
+
+        For the full list and detailed documentation of core attributes available, or to request that core attributes not be returned, contact Sales or your Plaid account manager.
       properties:
         unauthorized_transactions_count_7d:
           type: integer
@@ -67693,7 +68350,7 @@ components:
       type: object
       nullable: true
       additionalProperties: true
-      description: Represents a calculate Trust Index Score.
+      description: Represents a calculated Trust Index Score.
       properties:
         score:
           type: integer
