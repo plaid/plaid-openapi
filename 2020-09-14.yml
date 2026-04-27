@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.688.0
+  version: 2020-09-14_1.688.6
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -3489,6 +3489,47 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CraLoansUnregisterRequest'
+  /cra/credit_profile/report/get:
+    post:
+      summary: Retrieve the credit profile report for a user
+      tags:
+      - plaid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CraCreditProfileReportGetResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: eYupqX1mZkEuQRx
+                    warnings: []
+                    report:
+                      date_retrieved: "2024-01-15T10:30:00Z"
+                      inquiry_type: SOFT_INQUIRY
+                      client_report_id: loan-app-12345
+                      lend_scores: []
+                      cashflow_insights_attributes: {}
+                      network_insights_attributes: {}
+                      metadata: null
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      operationId: craCreditProfileReportGet
+      externalDocs:
+        url: /none/
+      description: '`/cra/credit_profile/report/get` retrieves a credit profile report for a user.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CraCreditProfileReportGetRequest'
   /consumer_report/pdf/get:
     post:
       tags:
@@ -4092,6 +4133,38 @@ paths:
                       date_of_birth: "1975-01-18"
                       ssn: "987654321"
                       ssn_last_4: "4321"
+                    identity_edit_history:
+                      name:
+                        edits_current: 0
+                        edits_1d: 0
+                        edits_30d: 1
+                        edits_365d: 1
+                        edits_all_time: 1
+                      address:
+                        edits_current: 1
+                        edits_1d: 1
+                        edits_30d: 2
+                        edits_365d: 2
+                        edits_all_time: 2
+                      email:
+                        edits_current: 0
+                        edits_1d: 0
+                        edits_30d: 0
+                        edits_365d: 0
+                        edits_all_time: 0
+                      date_of_birth:
+                        edits_current: 0
+                        edits_1d: 0
+                        edits_30d: 0
+                        edits_365d: 0
+                        edits_all_time: 0
+                      official_document:
+                        ssn:
+                          edits_current: 0
+                          edits_1d: 0
+                          edits_30d: 0
+                          edits_365d: 0
+                          edits_all_time: 0
                     items:
                     - item_id: Ed6bjNrDLJfGvZWwnkQlfxwoNz54B5C97ejBr
                       access_token: access-sandbox-435beced-94e8-4df3-a181-1dde1cfa19f0
@@ -9612,8 +9685,9 @@ paths:
       tags:
       - plaid
       summary: Send a new event to enrich user data
+      deprecated: true
       externalDocs:
-        url: /api/products/protect/#protecteventsend
+        url: none
       responses:
         "200":
           description: OK
@@ -9658,8 +9732,9 @@ paths:
       tags:
       - plaid
       summary: Get information about a user event
+      deprecated: true
       externalDocs:
-        url: /api/products/protect/#protecteventget
+        url: none
       responses:
         "200":
           description: OK
@@ -10983,10 +11058,8 @@ paths:
                     scores:
                       customer_initiated_return_risk:
                         score: 9
-                        risk_tier: 1
                       bank_initiated_return_risk:
                         score: 72
-                        risk_tier: 7
                     core_attributes:
                       available_balance: 2000
                       current_balance: 2200
@@ -12203,6 +12276,40 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SandboxItemResetLoginRequest'
+  /sandbox/item/application/seed:
+    post:
+      tags:
+      - plaid
+      summary: Seed a connected application for a Permissions Manager sandbox item
+      operationId: sandboxItemApplicationSeed
+      description: |-
+        `/sandbox/item/application/seed` creates a test connected application on an existing Permissions Manager Item's login. The seeded application will appear in subsequent calls to `/item/application/list`.
+
+        The `access_token` must belong to a Permissions Manager Item created via `/item/import` in Sandbox. The `application_id` identifies the application to seed as a connected app. To disconnect a seeded application, use `/item/application/unlink`.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SandboxItemApplicationSeedResponse'
+              examples:
+                example-1:
+                  value:
+                    item_id: 9xGbdRaG3gianaxoELGpILQ7drV3RnclMGdKJ
+                    request_id: m8MDnv9okwxFNBV
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SandboxItemApplicationSeedRequest'
   /sandbox/item/set_verification_status:
     post:
       tags:
@@ -15194,7 +15301,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
-      description: Use the `/transfer/metrics/get` endpoint to view your transfer product usage metrics.
+      description: |-
+        Use the `/transfer/metrics/get` endpoint to view your transfer product usage metrics.
+
+        In the Sandbox environment, this endpoint returns static placeholder values rather than metrics computed from your Sandbox transfer activity.
       requestBody:
         required: true
         content:
@@ -18538,7 +18648,8 @@ paths:
       externalDocs:
         url: /api/products/income/#creditbank_incomerefresh
       operationId: creditBankIncomeRefresh
-      description: '`/credit/bank_income/refresh` refreshes the most recent bank income report data for a specific user. If the most recent bank income report is no longer valid (i.e. deleted), the endpoint will refresh the most recent valid report instead.'
+      deprecated: true
+      description: '`/credit/bank_income/refresh` is deprecated. The backend implementation was removed (returns an `Unimplemented` error at runtime), and the endpoint is no longer part of the documented API surface. To refresh Bank Income data for an existing user, send the user through Link Update Mode so they can confirm their income sources. For a fully backend refresh, migrate to CRA Income Insights and call `/cra/check_report/create`.'
       requestBody:
         required: true
         content:
@@ -19724,10 +19835,8 @@ paths:
                     scores:
                       customer_initiated_return_risk:
                         score: 9
-                        risk_tier: 1
                       bank_initiated_return_risk:
                         score: 82
-                        risk_tier: 7
                     core_attributes:
                       available_balance: 2200
                       current_balance: 2000
@@ -24709,6 +24818,34 @@ components:
       required:
       - payment_id
       - status
+      - request_id
+    SandboxItemApplicationSeedRequest:
+      type: object
+      description: SandboxItemApplicationSeedRequest defines the request schema for `/sandbox/item/application/seed`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+        application_id:
+          $ref: '#/components/schemas/ApplicationID'
+      required:
+      - access_token
+      - application_id
+    SandboxItemApplicationSeedResponse:
+      type: object
+      additionalProperties: true
+      description: SandboxItemApplicationSeedResponse defines the response schema for `/sandbox/item/application/seed`
+      properties:
+        item_id:
+          type: string
+          description: The `item_id` of the newly seeded item representing the application connection.
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - item_id
       - request_id
     SandboxItemResetLoginRequest:
       type: object
@@ -50928,7 +51065,7 @@ components:
     BankIncomeRefreshUpdateWebhook:
       type: object
       title: BankIncomeRefreshUpdateWebhook
-      description: Fired when a change to the user's income is detected. You should call `/credit/bank_income/refresh` to get updated income data for the user. To receive this webhook, subscribe in the [Dashboard](https://dashboard.plaid.com/developers/webhooks).
+      description: Fired when a change to the user's income is detected. The `/credit/bank_income/refresh` endpoint that previously served this refresh is deprecated; to get updated income data, send the user through Link Update Mode so they can confirm their income sources, or migrate to CRA Income Insights and call `/cra/check_report/create` for a backend refresh. To receive this webhook, subscribe in the [Dashboard](https://dashboard.plaid.com/developers/webhooks).
       additionalProperties: true
       properties:
         webhook_type:
@@ -50956,7 +51093,7 @@ components:
     BankIncomeRefreshCompleteWebhook:
       type: object
       title: BankIncomeRefreshCompleteWebhook
-      description: Fired when a refreshed bank income report has finished generating or failed to generate, triggered by calling `/credit/bank_income/refresh`. To get this webhook, subscribe via the [Dashboard](https://dashboard.plaid.com/developers/webhooks).
+      description: Fired when a refreshed bank income report has finished generating or failed to generate. The `/credit/bank_income/refresh` endpoint that previously triggered this webhook is deprecated; to refresh Bank Income data, send the user through Link Update Mode, or migrate to CRA Income Insights and call `/cra/check_report/create` for a backend refresh. To get this webhook, subscribe via the [Dashboard](https://dashboard.plaid.com/developers/webhooks).
       additionalProperties: true
       properties:
         webhook_type:
@@ -63386,6 +63523,12 @@ components:
       type: object
       title: CashflowAttributes
       description: A map of cash flow attributes, where the key is a string, and the value is a float, int, or boolean. The specific list of attributes will depend on the cash flow attributes version used. For a full list of attributes, contact your account manager.
+    CraCreditProfileCashflowAttributesSchema:
+      type: object
+      nullable: true
+      title: CraCreditProfileCashflowAttributes
+      description: A map of cash flow attributes, where the key is a string, and the value is a float, int, or boolean. The specific list of attributes will depend on the cash flow attributes version used. For a full list of attributes, contact your account manager.
+      additionalProperties: true
     CraCheckReportLendScoreGetResponse:
       title: CraCheckReportLendScoreGetResponse
       additionalProperties: true
@@ -63440,6 +63583,33 @@ components:
           type: string
           nullable: true
           description: Human-readable description of why the LendScore could not be computed.
+    CraCreditProfileLendScore:
+      type: object
+      additionalProperties: true
+      description: An individual LendScore result within a credit profile report.
+      nullable: true
+      properties:
+        score:
+          type: integer
+          description: The score returned by the LendScore model. Will be an integer in the range 1 to 99. Higher scores indicate lower credit risk.
+          nullable: true
+        reason_codes:
+          type: array
+          description: The reasons for an individual having risk according to the LendScore. For a full list of possible reason codes and a mapping of reason codes to human-readable reasons, contact your Plaid Account Manager. Different LendScore versions will use different sets of reason codes.
+          items:
+            type: string
+        variant:
+          type: string
+          description: The variant identifier for this LendScore result.
+        error_reason:
+          type: string
+          nullable: true
+          description: Human-readable description of why the LendScore could not be computed.
+      required:
+      - score
+      - reason_codes
+      - variant
+      - error_reason
     CraCheckReportNetworkInsightsGetRequest:
       title: CraCheckReportNetworkInsightsGetRequest
       type: object
@@ -63503,6 +63673,12 @@ components:
       type: object
       title: NetworkInsights
       description: A map of network attributes, where the key is a string, and the value is a float, int, or boolean. For a full list of attributes, contact your account manager.
+    CraCreditProfileNetworkInsightsSchema:
+      nullable: true
+      type: object
+      title: CraCreditProfileNetworkInsights
+      description: A map of network attributes, where the key is a string, and the value is a float, int, or boolean. For a full list of attributes, contact your account manager.
+      additionalProperties: true
     CraNetworkInsightsItem:
       type: object
       description: Contains data about the connected Item.
@@ -64352,6 +64528,159 @@ components:
       required:
       - status
       - date
+    CraCreditProfileReportGetRequest:
+      title: CraCreditProfileReportGetRequest
+      type: object
+      description: CraCreditProfileReportGetRequest defines the request schema for `/cra/credit_profile/report/get`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        user_id:
+          $ref: '#/components/schemas/NewUserID'
+        consumer_report_permissible_purpose:
+          $ref: '#/components/schemas/ConsumerReportPermissiblePurpose'
+        client_report_id:
+          type: string
+          description: Client-generated identifier, which can be used by lenders to track loan applications.
+        report_type:
+          $ref: '#/components/schemas/CraCreditProfileReportType'
+        inquiry_type:
+          $ref: '#/components/schemas/CraCreditProfileInquiryType'
+        version:
+          $ref: '#/components/schemas/CraCreditProfileReportVersion'
+      required:
+      - user_id
+      - consumer_report_permissible_purpose
+      - client_report_id
+      - report_type
+      - inquiry_type
+      - version
+    CraCreditProfileReportVersion:
+      type: string
+      description: The version of the credit profile report to retrieve.
+      enum:
+      - v1
+    CraCreditProfileInquiryType:
+      type: string
+      description: The inquiry type of credit profile report.
+      enum:
+      - SOFT_INQUIRY
+      - STANDARD_INQUIRY
+    CraCreditProfileReportType:
+      type: string
+      description: The product type for the credit profile report request.
+      enum:
+      - QUALIFY
+    CraCreditProfileReportGetResponse:
+      title: CraCreditProfileReportGetResponse
+      additionalProperties: true
+      type: object
+      description: CraCreditProfileReportGetResponse defines the response schema for `/cra/credit_profile/report/get`.
+      properties:
+        report:
+          $ref: '#/components/schemas/CraCreditProfileReport'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+        warnings:
+          type: array
+          description: If the report generation was successful but a subset of data could not be retrieved, this array will contain information about the errors causing information to be missing
+          items:
+            $ref: '#/components/schemas/CheckReportWarning'
+      required:
+      - report
+      - request_id
+      - warnings
+    CraCreditProfileReport:
+      type: object
+      description: Contains data for the CRA Credit Profile Report.
+      additionalProperties: true
+      properties:
+        date_retrieved:
+          type: string
+          description: The time when the report was retrieved.
+          format: date-time
+        inquiry_type:
+          $ref: '#/components/schemas/CraCreditProfileInquiryType'
+        client_report_id:
+          type: string
+          description: Client-generated identifier, which can be used by lenders to track loan applications.
+        lend_scores:
+          type: array
+          description: The LendScore results for the credit profile report.
+          items:
+            $ref: '#/components/schemas/CraCreditProfileLendScore'
+        cashflow_insights_attributes:
+          $ref: '#/components/schemas/CraCreditProfileCashflowAttributesSchema'
+        network_insights_attributes:
+          $ref: '#/components/schemas/CraCreditProfileNetworkInsightsSchema'
+        metadata:
+          $ref: '#/components/schemas/CraCreditProfileReportMetadata'
+      required:
+      - date_retrieved
+      - inquiry_type
+      - client_report_id
+      - lend_scores
+      - cashflow_insights_attributes
+      - network_insights_attributes
+      - metadata
+    CraCreditProfileReportMetadata:
+      type: object
+      nullable: true
+      description: Metadata about the CRA Credit Profile Report.
+      additionalProperties: true
+      properties:
+        item_count:
+          type: integer
+          description: The number of items used to calculate the report.
+        institution_ids:
+          type: array
+          description: The institution IDs associated with the report.
+          items:
+            type: string
+        account_count:
+          type: integer
+          description: The total number of accounts in the report.
+        primary_account_count:
+          type: integer
+          description: The number of primary accounts in the report.
+        depository_account_type_count:
+          type: integer
+          description: The number of depository accounts in the report.
+        credit_account_type_count:
+          type: integer
+          description: The number of credit accounts in the report.
+        other_account_type_count:
+          type: integer
+          description: The number of other accounts in the report.
+        multiple_owner_account_count:
+          type: integer
+          description: The number of accounts with multiple owners in the report.
+        generated_at:
+          type: string
+          format: date-time
+          description: The time when the report was generated.
+        oldest_transaction_date:
+          type: string
+          format: date
+          description: The date of the oldest transaction in the report.
+        most_recent_transaction_date:
+          type: string
+          format: date
+          description: The date of the most recent transaction in the report.
+      required:
+      - item_count
+      - institution_ids
+      - account_count
+      - primary_account_count
+      - depository_account_type_count
+      - credit_account_type_count
+      - other_account_type_count
+      - multiple_owner_account_count
+      - generated_at
+      - oldest_transaction_date
+      - most_recent_transaction_date
     AssetReportFreddieGetRequest:
       title: AssetReportFreddieGetRequest
       type: object
