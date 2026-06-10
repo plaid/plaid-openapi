@@ -2,6 +2,17 @@
 
 Plaid uses the `OpenAPI 3.0.0` specification to schematize our [docs](https://plaid.com/docs) and to generate our supported client libraries. This provides for a consistent typing experience across our external interfaces. Below we have listed some examples and issues we have found when iterating on the specification.
 
+## Adding a new `x-*` extension tag
+
+If your edit to the OpenAPI spec introduces a new `x-*` extension, add or update its entry on the Slite [Extension Tags](https://plaid.slite.com/app/docs/O4qPiIyok-7HnF) page in the same PR (or link the follow-up doc PR from this PR's description). The Slite [Editing the OpenAPI file](https://plaid.slite.com/app/docs/6fx_S6U4ai4GdT) workflow carries the canonical step-by-step; in short, the Extension Tags entry should record:
+
+- **granularity** — which scope(s) the tag is valid on (schema, object, field, path, operation, `$ref` target);
+- **survives strip?** — whether the tag passes through `cmd/process.go` into the published `2020-09-14.yml`, or is stripped before consumers see it (all `x-plaid-*` are stripped by the prefix rule at `process.go:348-349`; explicitly-internal non-`x-plaid-*` tags belong in `internalUseFields` at `process.go:20-23`);
+- **primary consumer** — the file(s) that read the tag, with `file.go:NNN` citations;
+- **enforced vs intent-only** — `x-hidden-from-docs` at path/operation scope is the canonical intent-only example, and is the source of most author confusion.
+
+Pure codegen internals with no author-visible decision may be skipped if you record the reason at the definition site. Background: per the 2026-04-23 inventory, half of the spec's 20 `x-*` extensions had no Extension Tags row before that revision; missing this step is how that gap accumulated.
+
 ## Using the OpenAPI generator
 
 You can find examples on the official [OpenApiGenerator docs](https://github.com/OpenAPITools/openapi-generator#3---usage).
