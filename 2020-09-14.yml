@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.697.4
+  version: 2020-09-14_1.698.7
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -2840,7 +2840,7 @@ paths:
       description: This endpoint allows you to retrieve the Base Report for your user, allowing you to receive comprehensive bank account and cash flow data. You should call this endpoint after you've received a `CHECK_REPORT_READY` or a `USER_CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`. If the most recent consumer report for the user doesn't have sufficient data to generate the base report, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.
   /cra/check_report/pdf/get:
     post:
-      summary: Retrieve Consumer Reports as a PDF
+      summary: Retrieve a Consumer Report as a PDF
       tags:
       - plaid
       responses:
@@ -3329,7 +3329,7 @@ paths:
               $ref: '#/components/schemas/CraCheckReportVerificationGetRequest'
   /cra/check_report/verification/pdf/get:
     post:
-      summary: Retrieve Consumer Reports as a Verification PDF
+      summary: Retrieve a Consumer Report as a Verification PDF
       tags:
       - plaid
       responses:
@@ -6213,7 +6213,7 @@ paths:
 
         `/accounts/get` is free to use and retrieves cached information, rather than extracting fresh information from the institution. The balance returned will reflect the balance at the time of the last successful Item update. If the Item is enabled for a regularly updating product, such as Transactions, Investments, or Liabilities, the balance will typically update about once a day, as long as the Item is healthy. If the Item is enabled only for products that do not frequently update, such as Auth or Identity, balance data may be much older.
 
-        For realtime balance information, use the paid endpoints `/accounts/balance/get` or `/signal/evaluate` instead.
+        For real-time balance information, use the paid endpoints `/accounts/balance/get` or `/signal/evaluate` instead.
       responses:
         "200":
           description: success
@@ -7158,6 +7158,11 @@ paths:
                         analysis:
                           document_comparison: match
                           liveness_check: success
+                          age_check:
+                            status: match
+                            reported_age: 36
+                            age_estimate_lower_bound: 32
+                            age_estimate_upper_bound: 38
                     kyc_check:
                       status: success
                       address:
@@ -7189,8 +7194,9 @@ paths:
                         domain_is_custom: "yes"
                         domain_is_disposable: "yes"
                         top_level_domain_is_suspicious: "yes"
-                        is_edu: no_data
-                        includes_date_of_birth: no_data
+                        is_edu: "yes"
+                        includes_date_of_birth: "yes"
+                        name: match
                         linked_services:
                         - apple
                       phone:
@@ -7384,6 +7390,11 @@ paths:
                         analysis:
                           document_comparison: match
                           liveness_check: success
+                          age_check:
+                            status: match
+                            reported_age: 36
+                            age_estimate_lower_bound: 32
+                            age_estimate_upper_bound: 38
                     kyc_check:
                       status: success
                       address:
@@ -7415,8 +7426,9 @@ paths:
                         domain_is_custom: "yes"
                         domain_is_disposable: "yes"
                         top_level_domain_is_suspicious: "yes"
-                        is_edu: no_data
-                        includes_date_of_birth: no_data
+                        is_edu: "yes"
+                        includes_date_of_birth: "yes"
+                        name: match
                         linked_services:
                         - apple
                       phone:
@@ -7612,6 +7624,11 @@ paths:
                           analysis:
                             document_comparison: match
                             liveness_check: success
+                            age_check:
+                              status: match
+                              reported_age: 36
+                              age_estimate_lower_bound: 32
+                              age_estimate_upper_bound: 38
                       kyc_check:
                         status: success
                         address:
@@ -7643,8 +7660,9 @@ paths:
                           domain_is_custom: "yes"
                           domain_is_disposable: "yes"
                           top_level_domain_is_suspicious: "yes"
-                          is_edu: no_data
-                          includes_date_of_birth: no_data
+                          is_edu: "yes"
+                          includes_date_of_birth: "yes"
+                          name: match
                           linked_services:
                           - apple
                         phone:
@@ -7846,6 +7864,11 @@ paths:
                         analysis:
                           document_comparison: match
                           liveness_check: success
+                          age_check:
+                            status: match
+                            reported_age: 36
+                            age_estimate_lower_bound: 32
+                            age_estimate_upper_bound: 38
                     kyc_check:
                       status: success
                       address:
@@ -7877,8 +7900,9 @@ paths:
                         domain_is_custom: "yes"
                         domain_is_disposable: "yes"
                         top_level_domain_is_suspicious: "yes"
-                        is_edu: no_data
-                        includes_date_of_birth: no_data
+                        is_edu: "yes"
+                        includes_date_of_birth: "yes"
+                        name: match
                         linked_services:
                         - apple
                       phone:
@@ -9655,6 +9679,7 @@ paths:
         The reported data helps improve fraud detection models and provides valuable feedback to enhance the overall security of the Plaid network.
         Reports can be created for confirmed incidents that have been fully investigated, or for suspected incidents that require further review.
         You can associate reports with specific users, sessions, or transactions to provide comprehensive context about the incident.
+        Each report must include `user_id`, or an `incident_event` with at least one supported identifier: `link_session_id`, `idv_session_id`, `protect_event_id`, `signal_client_transaction_id`, or `access_token`. Context fields such as `internal_reference`, `time`, `amount`, and `bank_account` do not satisfy this identifier requirement.
       requestBody:
         required: true
         content:
@@ -10129,7 +10154,7 @@ paths:
       description: |
         This endpoint returns the account associated with a given processor token.
 
-        This endpoint retrieves cached information, rather than extracting fresh information from the institution. As a result, the account balance returned may not be up-to-date; for realtime balance information, use `/processor/balance/get` instead. Note that some information is nullable.
+        This endpoint retrieves cached information, rather than extracting fresh information from the institution. As a result, the account balance returned may not be up-to-date; for real-time balance information, use `/processor/balance/get` instead. Note that some information is nullable.
       requestBody:
         required: true
         content:
@@ -11890,7 +11915,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PlaidError'
       description: |
-        Create a payment recipient for payment initiation.  The recipient must be in Europe, within a country that is a member of the Single Euro Payment Area (SEPA) or a non-Eurozone country [supported](https://plaid.com/global) by Plaid. For a standing order (recurring) payment, the recipient must be in the UK.
+        Create a payment recipient for payment initiation.  The recipient must be in Europe, within a country that is a member of the Single Euro Payments Area (SEPA) or a non-Eurozone country [supported](https://support.plaid.com/hc/en-us/articles/27895826947735-What-Plaid-products-are-supported-in-each-country-and-region) by Plaid. For a standing order (recurring) payment, the recipient must be in the UK.
 
         It is recommended to use `bacs` in the UK and `iban` in EU.
 
@@ -12062,7 +12087,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PlaidError'
       description: |-
-        After creating a payment recipient, you can use the `/payment_initiation/payment/create` endpoint to create a payment to that recipient.  Payments can be one-time or standing order (recurring) and can be denominated in either EUR, GBP or other chosen [currency](https://plaid.com/docs/api/products/payment-initiation/#payment_initiation-payment-create-request-amount-currency).  If making domestic GBP-denominated payments, your recipient must have been created with BACS numbers. In general, EUR-denominated payments will be sent via SEPA Credit Transfer, GBP-denominated payments will be sent via the Faster Payments network and for non-Eurozone markets typically via the local payment scheme, but the payment network used will be determined by the institution. Payments sent via Faster Payments will typically arrive immediately, while payments sent via SEPA Credit Transfer or other local payment schemes will typically arrive in one business day.
+        After creating a payment recipient, you can use the `/payment_initiation/payment/create` endpoint to create a payment to that recipient.  Payments can be one-time or standing order (recurring) and can be denominated in either EUR, GBP or other chosen [currency](https://plaid.com/docs/api/products/payment-initiation/#payment_initiation-payment-create-request-amount-currency).  If making domestic GBP-denominated payments, your recipient must have been created with Bacs numbers. In general, EUR-denominated payments will be sent via SEPA Credit Transfer, GBP-denominated payments will be sent via the Faster Payments network and for non-Eurozone markets typically via the local payment scheme, but the payment network used will be determined by the institution. Payments sent via Faster Payments will typically arrive immediately, while payments sent via SEPA Credit Transfer or other local payment schemes will typically arrive in one business day.
 
         Standing orders (recurring payments) must be denominated in GBP and can only be sent to recipients in the UK. Once created, standing order payments cannot be modified or canceled via the API. An end user can cancel or modify a standing order directly on their banking application or website, or by contacting the bank. Standing orders will follow the payment rules of the underlying rails (Faster Payments in UK). Payments can be sent Monday to Friday, excluding bank holidays. If the pre-arranged date falls on a weekend or bank holiday, the payment is made on the next working day. It is not possible to guarantee the exact time the payment will reach the recipient's account, although at least 90% of standing order payments are sent by 6am.
       requestBody:
@@ -14874,6 +14899,7 @@ paths:
                             postal_code: "94053"
                             country: US
                         amount: "12.34"
+                        requested_amount: "12.34"
                         network: ach
                         iso_currency_code: USD
                         origination_account_id: ""
@@ -17957,7 +17983,7 @@ paths:
                 $ref: '#/components/schemas/PlaidError'
       operationId: creditAuditCopyTokenCreate
       description: |-
-        Plaid can create an Audit Copy token of an Asset Report and/or Income Report to share with a participating Government Sponsored Entity (GSE) if you participate in Fannie Mae's Day 1 Certainty™ program or utilize Freddie Mac's Loan Product Advisor® (LPA®) Asset and Income Modeler (AIM). An Audit Copy token contains the same underlying data as the Asset Report and/or Income Report (result of `/credit/payroll_income/get`).
+        Plaid can create an Audit Copy token of an Asset Report and/or Income Report to share with a participating Government-Sponsored Enterprise (GSE) if you participate in Fannie Mae's Day 1 Certainty™ program or utilize Freddie Mac's Loan Product Advisor® (LPA®) Asset and Income Modeler (AIM). An Audit Copy token contains the same underlying data as the Asset Report and/or Income Report (result of `/credit/payroll_income/get`).
 
         Use the `/credit/audit_copy_token/create` endpoint to create an `audit_copy_token` and then pass that token to the GSE who needs access.
       requestBody:
@@ -21677,13 +21703,75 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
+  /fdx/consents/{consentId}/revocation:
+    x-hidden-from-docs: true
+    put:
+      tags:
+      - plaid
+      summary: Revoke FDX Consent Grant
+      operationId: fdxConsentsRevoke
+      description: Appends a REVOKED status record to the named consent grant
+      parameters:
+      - in: path
+        name: consentId
+        description: Consent Grant Identifier. Uniquely identifies the consent grant
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FDXConsentRevocation'
+      responses:
+        "204":
+          description: No Content
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+    get:
+      tags:
+      - plaid
+      summary: Retrieve FDX Consent Grant revocation records
+      operationId: fdxConsentsRevocationGet
+      description: Returns the revocation history of a consent grant
+      parameters:
+      - in: path
+        name: consentId
+        description: Consent Grant Identifier. Uniquely identifies the consent grant
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FDXConsentRevocations'
+              example:
+                revocations:
+                - status: REVOKED
+                  reason: USER_ACTION
+                  initiator: DATA_PROVIDER
+                  updatedTime: "2026-01-03T00:00:00Z"
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
   /fdx/consents/{consentId}:
     x-hidden-from-docs: true
     get:
       tags:
       - plaid
       summary: Get FDX Consent Grant
-      operationId: fdxConsentGet
+      operationId: fdxConsentsGet
       description: Returns a consent grant by its identifier
       parameters:
       - in: path
@@ -21944,7 +22032,7 @@ components:
     AuthGetNumbers:
       type: object
       additionalProperties: true
-      description: An object containing identifying numbers used for making electronic transfers to and from the `accounts`. The identifying number type (ACH, EFT, IBAN, or BACS) used will depend on the country of the account. An account may have more than one number type. If a particular identifying number type is not used by any `accounts` for which data has been requested, the array for that type will be empty.
+      description: An object containing identifying numbers used for making electronic transfers to and from the `accounts`. The identifying number type (ACH, EFT, IBAN, or Bacs) used will depend on the country of the account. An account may have more than one number type. If a particular identifying number type is not used by any `accounts` for which data has been requested, the array for that type will be empty.
       properties:
         ach:
           type: array
@@ -21963,7 +22051,7 @@ components:
             $ref: '#/components/schemas/NumbersInternational'
         bacs:
           type: array
-          description: An array of BACS numbers identifying accounts.
+          description: An array of Bacs numbers identifying accounts.
           items:
             $ref: '#/components/schemas/NumbersBACS'
       required:
@@ -24406,7 +24494,7 @@ components:
     ProcessorNumber:
       type: object
       additionalProperties: true
-      description: An object containing identifying numbers used for making electronic transfers to and from the `account`. The identifying number type (ACH, EFT, IBAN, or BACS) used will depend on the country of the account. An account may have more than one number type. If a particular identifying number type is not used by the `account` for which auth data has been requested, a null value will be returned.
+      description: An object containing identifying numbers used for making electronic transfers to and from the `account`. The identifying number type (ACH, EFT, IBAN, or Bacs) used will depend on the country of the account. An account may have more than one number type. If a particular identifying number type is not used by the `account` for which auth data has been requested, a null value will be returned.
       properties:
         ach:
           $ref: '#/components/schemas/NumbersACHNullable'
@@ -24654,7 +24742,7 @@ components:
           minLength: 1
         iban:
           type: string
-          description: The International Bank Account Number (IBAN) for the recipient. If BACS data is not provided, an IBAN is required.
+          description: The International Bank Account Number (IBAN) for the recipient. If Bacs data is not provided, an IBAN is required.
           nullable: true
           minLength: 15
           maxLength: 34
@@ -25353,11 +25441,11 @@ components:
           type: string
           nullable: true
         ssn:
-          description: The user's social security number.
+          description: The user's Social Security number.
           type: string
           nullable: true
         ssn_last_4:
-          description: The last 4 digits of the user's social security number.
+          description: The last 4 digits of the user's Social Security number.
           type: string
           nullable: true
     UserAccountIdentityName:
@@ -25484,13 +25572,13 @@ components:
             type: string
         ssn_full:
           description: |-
-            The user's full social security number. This field should only be provided by lenders intending to share the resulting consumer report with a Government-Sponsored Enterprise (GSE), such as Fannie Mae or Freddie Mac.
+            The user's full Social Security number. This field should only be provided by lenders intending to share the resulting consumer report with a Government-Sponsored Enterprise (GSE), such as Fannie Mae or Freddie Mac.
 
             Format: "ddd-dd-dddd"
           type: string
           nullable: true
         ssn_last_4:
-          description: The last 4 digits of the user's social security number.
+          description: The last 4 digits of the user's Social Security number.
           type: string
           nullable: true
           maxLength: 4
@@ -26675,6 +26763,9 @@ components:
           - interchecks
           - interchange
           - atomicfi
+          - pay
+          - natural
+          - kanmon
           description: The processor you are integrating with.
       required:
       - access_token
@@ -26776,7 +26867,7 @@ components:
       - request_id
     ProcessorStripeBankAccountTokenCreateRequest:
       type: object
-      description: ProcessorStripeBankAccountTokenCreateRequest defines the request schema for `/processor/stripe/bank_account/create`
+      description: ProcessorStripeBankAccountTokenCreateRequest defines the request schema for `/processor/stripe/bank_account_token/create`
       properties:
         client_id:
           $ref: '#/components/schemas/APIClientID'
@@ -26793,7 +26884,7 @@ components:
     ProcessorStripeBankAccountTokenCreateResponse:
       type: object
       additionalProperties: true
-      description: ProcessorStripeBankAccountTokenCreateResponse defines the response schema for `/processor/stripe/bank_account/create`
+      description: ProcessorStripeBankAccountTokenCreateResponse defines the response schema for `/processor/stripe/bank_account_token/create`
       properties:
         stripe_bank_account_token:
           type: string
@@ -26885,7 +26976,7 @@ components:
         country_codes:
           type: array
           description: |-
-            Specify an array of Plaid-supported country codes using the ISO-3166-1 alpha-2 country code standard. Institutions from all listed countries will be shown. For a complete mapping of supported products by country, see https://plaid.com/global/. For access to additional countries beyond what you have been approved for, [contact sales](https://plaid.com/contact/), your account manager, or support.
+            Specify an array of Plaid-supported country codes using the ISO-3166-1 alpha-2 country code standard. Institutions from all listed countries will be shown. For a complete mapping of supported products by country, see https://support.plaid.com/hc/en-us/articles/27895826947735-What-Plaid-products-are-supported-in-each-country-and-region. For access to additional countries beyond what you have been approved for, [contact sales](https://plaid.com/contact/), your account manager, or support.
 
             If using Identity Verification, `country_codes` should be set to the country where your company is based, not the country where your user is located. For all other products, `country_codes` represents the location of your user's financial institution.
 
@@ -27585,7 +27676,7 @@ components:
             By default, Plaid will enable the reauthorization flow during update mode for an Item enabled for [Data Transparency Messaging](https://plaid.com/docs/link/data-transparency-messaging-migration-guide/) if the Item expires within six months. During a reauthorization flow, an end user will review Plaid's end user privacy policy, use case and data scope consents, and account access consents; they may also be required to log in to their financial institution's OAuth flow. After the end user successfully completes the reauthorization flow, the Item's expiration date will be extended to 12 months from the time that the reauthorization took place. This field allows you to optionally override the default reauthorization scheduling logic to either forcibly enable or disable the reauthorization flow for a given update mode session. This field does not impact the flow for Items at institutions in the EU or UK.
         user:
           type: boolean
-          description: If `true`, a `user_token` must also be provided, and Link will open in update mode for the given user.
+          description: If `true`, a `user_token` or `user_id` must also be provided, and Link will open in update mode for the given user.
           default: false
         item_ids:
           type: array
@@ -28273,6 +28364,7 @@ components:
       - CHECK_REPORT_ERROR
       - CONSUMER_REPORT_ERROR
       - USER_ERROR
+      - IDEMPOTENCY_ERROR
     AccountType:
       type: string
       title: AccountType
@@ -28484,9 +28576,9 @@ components:
 
             Note that not all institutions calculate the `available`  balance. In the event that `available` balance is unavailable, Plaid will return an `available` balance value of `null`.
 
-            Available balance may be cached and is not guaranteed to be up-to-date in realtime unless the value was returned by `/accounts/balance/get`, or by `/signal/evaluate` with a Balance-only ruleset.
+            Available balance may be cached and is not guaranteed to be up-to-date in real-time unless the value was returned by `/accounts/balance/get`, or by `/signal/evaluate` with a Balance-only ruleset.
 
-            If `current` is `null` this field is guaranteed not to be `null`.
+            If `current` is `null` this field is guaranteed not to be `null`, unless you have opted into enabling [limited-purpose checking accounts](https://plaid.com/docs/auth/#enabling-limited-purpose-checking-accounts-for-rent-or-mortgage), which always have `null` values for both `available` and `current` balance.
           nullable: true
         current:
           type: number
@@ -28500,9 +28592,9 @@ components:
 
             For `investment`-type accounts (or `brokerage`-type accounts for API versions 2018-05-22 and earlier), the current balance is the total value of assets as presented by the institution.
 
-            Note that balance information may be cached unless the value was returned by `/accounts/balance/get` or by `/signal/evaluate` with a Balance-only ruleset; if the Item is enabled for Transactions, the balance will be at least as recent as the most recent Transaction update. If you require realtime balance information, use the `available` balance as provided by `/accounts/balance/get` or `/signal/evaluate` called with a Balance-only `ruleset_key`.
+            Note that balance information may be cached unless the value was returned by `/accounts/balance/get` or by `/signal/evaluate` with a Balance-only ruleset; if the Item is enabled for Transactions, the balance will be at least as recent as the most recent Transaction update. If you require real-time balance information, use the `available` balance as provided by `/accounts/balance/get` or `/signal/evaluate` called with a Balance-only `ruleset_key`.
 
-            When returned by `/accounts/balance/get`, this field may be `null`. When this happens, `available` is guaranteed not to be `null`.
+            When returned by `/accounts/balance/get`, this field may be `null`. When this happens, `available` is guaranteed not to be `null`, unless you have opted into enabling [limited-purpose checking accounts](https://plaid.com/docs/auth/#enabling-limited-purpose-checking-accounts-for-rent-or-mortgage), which always have `null` values for both `available` and `current` balance.
           nullable: true
         limit:
           type: number
@@ -28928,7 +29020,7 @@ components:
           description: The International Bank Account Number (IBAN) for the account
         bic:
           type: string
-          description: The Bank Identifier Code (BIC) for the account
+          description: The Business Identifier Code (BIC) for the account
       required:
       - account_id
       - iban
@@ -28944,23 +29036,23 @@ components:
       title: NumbersBACS
       type: object
       additionalProperties: true
-      description: Identifying information for transferring money to or from a UK bank account via BACS.
+      description: Identifying information for transferring money to or from a UK bank account via Bacs.
       properties:
         account_id:
           type: string
           description: The Plaid account ID associated with the account numbers
         account:
           type: string
-          description: The BACS account number for the account
+          description: The Bacs account number for the account
         sort_code:
           type: string
-          description: The BACS sort code for the account
+          description: The Bacs sort code for the account
       required:
       - account_id
       - account
       - sort_code
     NumbersBACSNullable:
-      description: Identifying information for transferring money to or from a UK bank account via BACS.
+      description: Identifying information for transferring money to or from a UK bank account via Bacs.
       nullable: true
       allOf:
       - $ref: '#/components/schemas/NumbersBACS'
@@ -29068,7 +29160,7 @@ components:
       type: object
       additionalProperties: true
       nullable: true
-      description: An object containing a BACS account number and sort code. If an IBAN is not provided or if you need to accept domestic GBP-denominated payments, BACS data is required.
+      description: An object containing a Bacs account number and sort code. If an IBAN is not provided or if you need to accept domestic GBP-denominated payments, Bacs data is required.
       properties:
         account:
           type: string
@@ -29081,7 +29173,7 @@ components:
           minLength: 6
           maxLength: 6
     RecipientBACSNullable:
-      description: An object containing a BACS account number and sort code. If an IBAN is not provided or if this recipient needs to accept domestic GBP-denominated payments, BACS data is required.
+      description: An object containing a Bacs account number and sort code. If an IBAN is not provided or if this recipient needs to accept domestic GBP-denominated payments, Bacs data is required.
       nullable: true
       allOf:
       - $ref: '#/components/schemas/RecipientBACS'
@@ -29089,7 +29181,7 @@ components:
         additionalProperties: true
         description: The account number and sort code of the recipient's account.
     SenderBACSNullable:
-      description: An object containing a BACS account number and sort code. If an IBAN is not provided or if this recipient needs to accept domestic GBP-denominated payments, BACS data is required.
+      description: An object containing a Bacs account number and sort code. If an IBAN is not provided or if this recipient needs to accept domestic GBP-denominated payments, Bacs data is required.
       nullable: true
       allOf:
       - $ref: '#/components/schemas/RecipientBACS'
@@ -30284,7 +30376,7 @@ components:
           nullable: true
         phone_number:
           type: string
-          description: The phone number associated with the counterparty in E. 164 format. If there is a location match (i.e. a street address is returned in the location object), the phone number will be location specific.
+          description: The phone number associated with the counterparty in E.164 format. If there is a location match (i.e. a street address is returned in the location object), the phone number will be location specific.
           nullable: true
         account_numbers:
           $ref: '#/components/schemas/CounterpartyNumbers'
@@ -30370,17 +30462,17 @@ components:
     CounterpartyNumbersBACS:
       type: object
       title: CounterpartyNumbersBACS
-      description: Identifying information for a UK bank account via BACS.
+      description: Identifying information for a UK bank account via Bacs.
       nullable: true
       properties:
         account:
           type: string
           nullable: true
-          description: The BACS account number for the account.
+          description: The Bacs account number for the account.
         sort_code:
           type: string
           nullable: true
-          description: The BACS sort code for the account.
+          description: The Bacs sort code for the account.
     CounterpartyNumbersInternational:
       type: object
       title: CounterpartyNumbersInternational
@@ -30391,7 +30483,7 @@ components:
           $ref: '#/components/schemas/NumbersIBANNullable'
         bic:
           type: string
-          description: Bank identifier code (BIC) for this counterparty.
+          description: Business Identifier Code (BIC) for this counterparty.
           nullable: true
           minLength: 8
           maxLength: 11
@@ -32551,7 +32643,7 @@ components:
     PaymentInitiationConsentPayerNumbers:
       title: PaymentInitiationConsentPayerNumbers
       type: object
-      description: The counterparty's bank account numbers. Exactly one of IBAN or BACS data is required.
+      description: The counterparty's bank account numbers. Exactly one of IBAN or Bacs data is required.
       additionalProperties: true
       properties:
         bacs:
@@ -32660,6 +32752,7 @@ components:
       - cra_monitoring
       - cra_lend_score
       - cra_plaid_credit_score
+      - cra_qualify
       - layer
       - pay_by_bank
       - protect_linked_bank
@@ -32940,13 +33033,13 @@ components:
           description: EFT branch number. Must be specified alongside `eft_institution`.
         international_bic:
           type: string
-          description: Bank identifier code (BIC). Must be specified alongside `international_iban`.
+          description: Business Identifier Code (BIC). Must be specified alongside `international_iban`.
         international_iban:
           type: string
-          description: International bank account number (IBAN). If no account number is specified via `account`, will also be used as the account number by default. Must be specified alongside `international_bic`.
+          description: International Bank Account Number (IBAN). If no account number is specified via `account`, will also be used as the account number by default. Must be specified alongside `international_bic`.
         bacs_sort_code:
           type: string
-          description: BACS sort code
+          description: Bacs sort code
     TransactionOverride:
       title: TransactionOverride
       type: object
@@ -33314,11 +33407,11 @@ components:
           nullable: true
         social_security_wages:
           type: string
-          description: Wages from social security.
+          description: Wages from Social Security.
           nullable: true
         social_security_tax_withheld:
           type: string
-          description: Social security tax withheld for the tax year.
+          description: Social Security tax withheld for the tax year.
           nullable: true
         medicare_wages_and_tips:
           type: string
@@ -33330,7 +33423,7 @@ components:
           nullable: true
         social_security_tips:
           type: string
-          description: Tips from social security.
+          description: Tips from Social Security.
           nullable: true
         allocated_tips:
           type: string
@@ -35193,7 +35286,7 @@ components:
           description: Qualifying share account
         rdsp:
           type: string
-          description: Registered Disability Savings Plan (RSDP) (Canada)
+          description: Registered Disability Savings Plan (RDSP) (Canada)
         resp:
           type: string
           description: Registered Education Savings Plan (Canada)
@@ -36594,9 +36687,13 @@ components:
           deprecated: true
           x-hidden-from-docs: true
         guarantee_decision:
-          $ref: '#/components/schemas/TransferAuthorizationGuaranteeDecision'
+          deprecated: true
+          allOf:
+          - $ref: '#/components/schemas/TransferAuthorizationGuaranteeDecision'
         guarantee_decision_rationale:
           $ref: '#/components/schemas/TransferAuthorizationGuaranteeDecisionRationale'
+        guarantee_details:
+          $ref: '#/components/schemas/TransferGuaranteeDetails'
         iso_currency_code:
           type: string
           description: The currency of the transfer amount, e.g. "USD"
@@ -36890,7 +36987,7 @@ components:
         Specifies the use case of the transfer. Required for transfers on an ACH network. For more details, see [ACH SEC codes](https://plaid.com/docs/transfer/creating-transfers/#ach-sec-codes).
 
         Codes supported for credits: `ccd`, `ppd`
-        Codes supported for debits: `ccd`, `tel`, `web`
+        Codes supported for debits: `ccd`, `ppd`, `tel`, `web`
 
         `"ccd"` - Corporate Credit or Debit - fund transfer between two corporate bank accounts
 
@@ -37264,9 +37361,90 @@ components:
       required:
       - code
       - description
+    TransferGuaranteeOutcome:
+      type: string
+      description: |-
+        The adaptive guarantee outcome for a transfer.
+
+        `FULL_INSTANT`: The full transfer amount is guaranteed and funds are available instantly.
+
+        `PARTIAL_INSTANT_ONLY`: A partial amount is guaranteed and available instantly; the remainder is not guaranteed.
+
+        `PARTIAL_INSTANT_WITH_OBSERVATION_WINDOW`: A partial amount is guaranteed instantly; an additional amount is conditionally guaranteed subject to an observation window.
+
+        `NOT_GUARANTEED`: Plaid did not provide a guarantee for this transfer.
+      enum:
+      - FULL_INSTANT
+      - PARTIAL_INSTANT_ONLY
+      - PARTIAL_INSTANT_WITH_OBSERVATION_WINDOW
+      - NOT_GUARANTEED
+    TransferGuaranteeScheduleItem:
+      title: TransferGuaranteeScheduleItem
+      description: A single entry in the adaptive guarantee settlement schedule, describing one tranche of guaranteed funds. Adds `observation_window_expiration_time`, which is only known once a transfer is created.
+      allOf:
+      - $ref: '#/components/schemas/AuthorizationGuaranteeScheduleItem'
+      - type: object
+        additionalProperties: true
+        properties:
+          observation_window_expiration_time:
+            type: string
+            format: date-time
+            description: The datetime when the observation window for this tranche expires. Present only when the tranche is subject to an observation window. This will be of the form `2006-01-02T15:04:05Z`.
+            nullable: true
+    AuthorizationGuaranteeScheduleItem:
+      title: AuthorizationGuaranteeScheduleItem
+      type: object
+      additionalProperties: true
+      description: A single entry in an authorization's adaptive guarantee settlement schedule, describing one tranche of guaranteed funds.
+      properties:
+        amount:
+          type: string
+          description: The guaranteed amount for this schedule entry (decimal string with two digits of precision e.g. "10.00").
+        observation_window_business_days:
+          type: integer
+          description: The number of business days in the observation window for this tranche. `0` when the tranche is not subject to an observation window.
+      required:
+      - amount
+      - observation_window_business_days
+    AuthorizationGuaranteeDetails:
+      title: AuthorizationGuaranteeDetails
+      type: object
+      additionalProperties: true
+      nullable: true
+      description: Adaptive guarantee details for a transfer authorization, including the guarantee outcome and settlement schedule. Omitted when no guarantee was attempted.
+      properties:
+        outcome:
+          $ref: '#/components/schemas/TransferGuaranteeOutcome'
+        schedule:
+          type: array
+          description: The adaptive guarantee settlement schedule for this authorization.
+          items:
+            $ref: '#/components/schemas/AuthorizationGuaranteeScheduleItem'
+      required:
+      - outcome
+      - schedule
+    TransferGuaranteeDetails:
+      title: TransferGuaranteeDetails
+      type: object
+      additionalProperties: true
+      nullable: true
+      description: Adaptive guarantee details for a transfer, including the guaranteed amount and settlement schedule. Omitted when no guarantee was attempted.
+      properties:
+        guaranteed_amount:
+          type: string
+          description: The amount currently covered by Plaid's guarantee (decimal string with two digits of precision e.g. "10.00"). This may change over time as scheduled tranches reach their observation window expiration and become guaranteed.
+        schedule:
+          type: array
+          description: The adaptive guarantee settlement schedule for this transfer.
+          items:
+            $ref: '#/components/schemas/TransferGuaranteeScheduleItem'
+      required:
+      - guaranteed_amount
+      - schedule
     TransferAuthorizationGuaranteeDecision:
       type: string
       nullable: true
+      deprecated: true
       x-hidden-from-docs: true
       description: Indicates whether the transfer is guaranteed by Plaid (Guarantee customers only). This field will contain either `GUARANTEED` or `NOT_GUARANTEED` indicating whether Plaid will guarantee the transfer.
       enum:
@@ -37298,6 +37476,7 @@ components:
       title: TransferAuthorizationGuaranteeDecisionRationale
       type: object
       nullable: true
+      deprecated: true
       additionalProperties: true
       x-hidden-from-docs: true
       description: The rationale for Plaid's decision to not guarantee a transfer. Will be `null` unless `guarantee_decision` is `NOT_GUARANTEED`.
@@ -37331,6 +37510,9 @@ components:
           $ref: '#/components/schemas/TransferUserInResponse'
         amount:
           $ref: '#/components/schemas/TransferAmount'
+        requested_amount:
+          type: string
+          description: The amount originally requested by the client when creating the authorization (decimal string with two digits of precision e.g. "800.00"). This may differ from `amount`, the amount Plaid proposes to transfer, when only a partial amount is offered as part of an Adaptive Guarantee.
         network:
           type: string
           description: The network or rails used for the transfer.
@@ -37356,6 +37538,7 @@ components:
       - type
       - user
       - amount
+      - requested_amount
       - network
       - origination_account_id
       - iso_currency_code
@@ -37640,7 +37823,7 @@ components:
 
         For transfers submitted as `same-day-ach`, the Same Day ACH cutoff is 3:00 PM Eastern Time.  It is recommended to send the request 15 minutes prior to the cutoff to ensure that it will be processed in time for submission before the cutoff. If the transfer is processed after this cutoff but before the Standard ACH cutoff, it will be sent over Standard ACH rails and will not incur same-day charges; this will apply to both legs of the transfer if applicable. The transaction limit for a Same Day ACH transfer is $1,000,000. Authorization requests sent with an amount greater than $1,000,000 will fail.
 
-        For transfers submitted as `rtp`,  Plaid will automatically route between Real Time Payment rail by TCH or FedNow rails as necessary. If a transfer is submitted as `rtp` and the counterparty account is not eligible for RTP, the `/transfer/authorization/create` request will fail with an `INVALID_FIELD` error code. To pre-check to determine whether a counterparty account can support RTP, call `/transfer/capabilities/get` before calling `/transfer/authorization/create`.
+        For transfers submitted as `rtp`,  Plaid will automatically route between the Real-Time Payments (RTP) rail by TCH or FedNow rails as necessary. If a transfer is submitted as `rtp` and the counterparty account is not eligible for RTP, the `/transfer/authorization/create` request will fail with an `INVALID_FIELD` error code. To pre-check to determine whether a counterparty account can support RTP, call `/transfer/capabilities/get` before calling `/transfer/authorization/create`.
 
         Wire transfers are currently in early availability. To request access to `wire` as a payment network, contact your account manager. For transfers submitted as `wire`, the `type` must be `credit`; wire debits are not supported. The cutoff to submit a wire payment is 6:30 PM Eastern Time on a business day; wires submitted after that time will be processed on the next business day. The transaction limit for a wire is $999,999.99. Authorization requests sent with an amount greater than $999,999.99 will fail.
       enum:
@@ -38243,9 +38426,13 @@ components:
         decision_rationale:
           $ref: '#/components/schemas/TransferAuthorizationDecisionRationale'
         guarantee_decision:
-          $ref: '#/components/schemas/TransferAuthorizationGuaranteeDecision'
+          deprecated: true
+          allOf:
+          - $ref: '#/components/schemas/TransferAuthorizationGuaranteeDecision'
         guarantee_decision_rationale:
           $ref: '#/components/schemas/TransferAuthorizationGuaranteeDecisionRationale'
+        guarantee_details:
+          $ref: '#/components/schemas/AuthorizationGuaranteeDetails'
         payment_risk:
           $ref: '#/components/schemas/TransferAuthorizationPaymentRisk'
         proposed_transfer:
@@ -43623,11 +43810,11 @@ components:
           nullable: true
         social_security_wages:
           type: string
-          description: Wages from social security.
+          description: Wages from Social Security.
           nullable: true
         social_security_tax_withheld:
           type: string
-          description: Social security tax withheld for the tax year.
+          description: Social Security tax withheld for the tax year.
           nullable: true
         medicare_wages_and_tips:
           type: string
@@ -43639,7 +43826,7 @@ components:
           nullable: true
         social_security_tips:
           type: string
-          description: Tips from social security.
+          description: Tips from Social Security.
           nullable: true
         allocated_tips:
           type: string
@@ -45559,7 +45746,7 @@ components:
           nullable: true
         facta_filing_requirement:
           type: string
-          description: Checked if FACTA is a filing requirement.
+          description: Checked if FATCA is a filing requirement.
           nullable: true
           x-override-enum-values-shown:
           - CHECKED
@@ -46263,11 +46450,11 @@ components:
           nullable: true
         social_security_wages:
           type: string
-          description: Wages from social security.
+          description: Wages from Social Security.
           nullable: true
         social_security_tax_withheld:
           type: string
-          description: Social security tax withheld for the tax year.
+          description: Social Security tax withheld for the tax year.
           nullable: true
         medicare_wages_and_tips:
           type: string
@@ -46279,7 +46466,7 @@ components:
           nullable: true
         social_security_tips:
           type: string
-          description: Tips from social security.
+          description: Tips from Social Security.
           nullable: true
         allocated_tips:
           type: string
@@ -48024,7 +48211,7 @@ components:
       title: WalletTransactionCounterpartyNumbers
       additionalProperties: true
       type: object
-      description: The counterparty's bank account numbers. Exactly one of IBAN or BACS data is required.
+      description: The counterparty's bank account numbers. Exactly one of IBAN or Bacs data is required.
       properties:
         bacs:
           $ref: '#/components/schemas/WalletTransactionCounterpartyBACS'
@@ -48788,7 +48975,7 @@ components:
           $ref: '#/components/schemas/PaymentChannel'
         phone_number:
           type: string
-          description: The phone number associated with the counterparty in E. 164 format. If there is a location match (i.e. a street address is returned in the location object), the phone number will be location specific.
+          description: The phone number associated with the counterparty in E.164 format. If there is a location match (i.e. a street address is returned in the location object), the phone number will be location specific.
           nullable: true
         personal_finance_category:
           $ref: '#/components/schemas/PersonalFinanceCategory'
@@ -52900,7 +53087,7 @@ components:
 
             Note that not all institutions calculate the `available`  balance. In the event that `available` balance is unavailable, Plaid will return an `available` balance value of `null`.
 
-            Available balance may be cached and is not guaranteed to be up-to-date in realtime unless the value was returned by `/accounts/balance/get`.
+            Available balance may be cached and is not guaranteed to be up-to-date in real-time unless the value was returned by `/accounts/balance/get`.
 
             If `current` is `null` this field is guaranteed not to be `null`.
           nullable: true
@@ -52916,7 +53103,7 @@ components:
 
             For `investment`-type accounts (or `brokerage`-type accounts for API versions 2018-05-22 and earlier), the current balance is the total value of assets as presented by the institution.
 
-            Note that balance information may be cached unless the value was returned by `/accounts/balance/get`; if the Item is enabled for Transactions, the balance will be at least as recent as the most recent Transaction update. If you require realtime balance information, use the `available` balance as provided by `/accounts/balance/get`.
+            Note that balance information may be cached unless the value was returned by `/accounts/balance/get`; if the Item is enabled for Transactions, the balance will be at least as recent as the most recent Transaction update. If you require real-time balance information, use the `available` balance as provided by `/accounts/balance/get`.
 
             When returned by `/accounts/balance/get`, this field may be `null`. When this happens, `available` is guaranteed not to be `null`.
           nullable: true
@@ -54208,7 +54395,7 @@ components:
 
             Note that not all institutions calculate the `available`  balance. In the event that `available` balance is unavailable, Plaid will return an `available` balance value of `null`.
 
-            Available balance may be cached and is not guaranteed to be up-to-date in realtime unless the value was returned by `/accounts/balance/get`.
+            Available balance may be cached and is not guaranteed to be up-to-date in real-time unless the value was returned by `/accounts/balance/get`.
 
             If `current` is `null` this field is guaranteed not to be `null`.
           nullable: true
@@ -54224,7 +54411,7 @@ components:
 
             For `investment`-type accounts (or `brokerage`-type accounts for API versions 2018-05-22 and earlier), the current balance is the total value of assets as presented by the institution.
 
-            Note that balance information may be cached unless the value was returned by `/accounts/balance/get`; if the Item is enabled for Transactions, the balance will be at least as recent as the most recent Transaction update. If you require realtime balance information, use the `available` balance as provided by `/accounts/balance/get`.
+            Note that balance information may be cached unless the value was returned by `/accounts/balance/get`; if the Item is enabled for Transactions, the balance will be at least as recent as the most recent Transaction update. If you require real-time balance information, use the `available` balance as provided by `/accounts/balance/get`.
 
             When returned by `/accounts/balance/get`, this field may be `null`. When this happens, `available` is guaranteed not to be `null`.
           nullable: true
@@ -57715,7 +57902,7 @@ components:
          `US_UVL`: Bureau of Industry and Security Unverified List
          `US_SAM`: US System for Award Management Exclusion List
          `US_TEL`: US Terrorist Exclusion List
-         `UK_HMC`: UK HM Treasury Consolidated List
+         `UK_HMC`: Foreign, Commonwealth & Development Office UK Sanctions List
       title: EntityWatchlistCode
     EntityWatchlistProgram:
       type: object
@@ -58190,6 +58377,7 @@ components:
       - es_nie
       - hk_hkid
       - in_pan
+      - in_epic
       - it_cf
       - jo_civil_id
       - jp_my_number
@@ -59275,7 +59463,7 @@ components:
          `IZ_PEP`: Politically Exposed Persons List
          `IZ_UNC`: United Nations Consolidated Sanctions
          `IZ_WBK`: World Bank Listing of Ineligible Firms and Individuals
-         `UK_HMC`: UK HM Treasury Consolidated List
+         `UK_HMC`: Foreign, Commonwealth & Development Office UK Sanctions List
          `US_DPL`: Bureau of Industry and Security Denied Persons List
          `US_DTC`: US Department of State AECA Debarred
          `US_FBI`: US Department of Justice FBI Wanted List
@@ -59936,6 +60124,8 @@ components:
           $ref: '#/components/schemas/RiskCheckEmailIsEdu'
         includes_date_of_birth:
           $ref: '#/components/schemas/RiskCheckEmailIncludesDateOfBirth'
+        name:
+          $ref: '#/components/schemas/RiskCheckEmailName'
         linked_services:
           description: A list of online services where this email address has been detected to have accounts or other activity.
           type: array
@@ -59960,6 +60150,7 @@ components:
       - top_level_domain_is_suspicious
       - is_edu
       - includes_date_of_birth
+      - name
       - linked_services
       nullable: true
       additionalProperties: true
@@ -60018,6 +60209,30 @@ components:
       enum:
       - "yes"
       - "no"
+      - no_data
+    RiskCheckEmailName:
+      description: |-
+        Indicates whether the provided name matches the email address according to the KYC name-matches-email inference result if known.
+
+        `match` - "The email's name identifiers match the user's name."
+
+        `partial_match` - "The email's name identifiers partially match the user's name."
+
+        `no_match` - "The email's name identifiers do not match the user's name."
+
+        `indeterminate` - "The email does not contain any name identifiers, and a match could not be determined."
+
+        `no_input` - "The user's profile does not contain the required user inputs to determine a match."
+
+        `no_data` - "Field could not be verified against available sources."
+      example: match
+      type: string
+      enum:
+      - no_input
+      - indeterminate
+      - no_match
+      - partial_match
+      - match
       - no_data
     RiskCheckFacialDuplicate:
       description: Result summary object specifying values for the `facial_duplicates` attributes of risk check.
@@ -60376,6 +60591,8 @@ components:
           $ref: '#/components/schemas/SelfieAnalysisDocumentComparison'
         liveness_check:
           $ref: '#/components/schemas/SelfieAnalysisLivenessCheck'
+        age_check:
+          $ref: '#/components/schemas/SelfieAgeCheck'
         facial_analysis:
           $ref: '#/components/schemas/SelfieAnalysisFacialAnalysis'
       required:
@@ -60389,6 +60606,50 @@ components:
       - no_match
       - no_input
       description: Information about the comparison between the selfie and the document (if documentary verification also ran).
+    SelfieAgeCheck:
+      type: object
+      nullable: true
+      description: Age-estimation results from the selfie capture. This field is `null` when an age range could not be estimated from the selfie capture.
+      properties:
+        status:
+          $ref: '#/components/schemas/SelfieAgeCheckStatus'
+        reported_age:
+          type: integer
+          example: 36
+          nullable: true
+          description: The user's age at the time of the selfie capture, calculated from the date of birth submitted during Identity Verification. If multiple date of birth sources are available, the date of birth submitted in the flow session takes priority over the document date of birth. This field is `null` when the date of birth is unavailable.
+        age_estimate_lower_bound:
+          type: integer
+          example: 32
+          description: Lower bound of the estimated age range from the selfie capture.
+        age_estimate_upper_bound:
+          type: integer
+          example: 38
+          description: Upper bound of the estimated age range from the selfie capture.
+      required:
+      - status
+      - reported_age
+      - age_estimate_lower_bound
+      - age_estimate_upper_bound
+      additionalProperties: true
+    SelfieAgeCheckStatus:
+      type: string
+      enum:
+      - match
+      - warning
+      - no_match
+      - no_data
+      example: match
+      description: |-
+        An enum indicating whether the reported age aligns with the estimated selfie capture age range.
+
+        `match` indicates that the reported age falls within the estimated selfie capture age range.
+
+        `warning` indicates that the reported age falls outside the estimated selfie capture age range, but is close enough that the result should be reviewed.
+
+        `no_match` indicates that the reported age falls far outside the estimated selfie capture age range.
+
+        `no_data` indicates that there was not enough data available at age-estimation time to compare the reported age against the estimated selfie capture age range.
     SelfieAnalysisFacialAnalysis:
       additionalProperties: true
       nullable: true
@@ -62843,7 +63104,7 @@ components:
     CraCheckReportPartnerInsightsGetPartnerInsights:
       title: CraCheckReportPartnerInsightsGetPartnerInsights
       type: object
-      description: Defines configuration to generate Partner Insights
+      description: Defines configuration to generate Partner Insights.
       properties:
         prism_versions:
           $ref: '#/components/schemas/PrismVersions'
@@ -62906,18 +63167,17 @@ components:
       title: CraPartnerInsightsFicoInput
       type: object
       nullable: true
-      x-hidden-from-docs: true
-      description: Configurations for FICO products used in the Partner Insights flow.
+      description: Configuration for the FICO products used in the Partner Insights product.
       properties:
         fico_lender_id:
           type: string
-          description: ID provided by FICO that uniquely identifies the lender. Required for UltraFICO score generation. Sometimes referred to as Lender Org ID.
+          description: ID provided by FICO that uniquely identifies the lender. Required for UltraFICO® score generation. Sometimes referred to as Lender Org ID.
         lender_application_id:
           type: string
-          description: Client-generated identifier that uniquely identifies the FICO Application ID across FICO systems.
+          description: Client-generated identifier that uniquely identifies the FICO Application across FICO systems.
         ultrafico_score_requests:
           type: array
-          description: A list of UltraFICO scoring requests. Each request contains all configuration required to generate an UltraFICO score.
+          description: A list of UltraFICO® scoring requests. Each request contains all configuration required to generate an UltraFICO score.
           items:
             $ref: '#/components/schemas/CraPartnerInsightsUltraFicoScoreRequest'
       required:
@@ -62927,17 +63187,17 @@ components:
     CraPartnerInsightsUltraFicoScoreRequest:
       title: CraPartnerInsightsUltraFicoScoreRequest
       type: object
-      x-hidden-from-docs: true
-      description: Configuration required to generate a single UltraFICO score.
+      description: Configuration required to generate a single UltraFICO® score.
       properties:
         ultrafico_score_version:
           $ref: '#/components/schemas/CraPartnerInsightsUltraFicoScoreVersion'
         fico_scoring_request_id:
           type: string
-          description: FICO identifier for a particular scoring request. Should only be provided by UltraFICO as part of the FICO-led Flow.
+          x-hidden-from-docs: true
+          description: FICO identifier for a particular scoring request. Should only be provided by FICO as part of the FICO-led flow.
         request_correlation_id:
           type: string
-          description: Client-generated identifier that can be used to correlate scoring requests and scoring results.
+          description: Client-generated identifier that can be used to correlate scoring requests with their scoring results.
         base_fico_score:
           $ref: '#/components/schemas/CraPartnerInsightsBaseFicoScore'
       required:
@@ -62945,15 +63205,13 @@ components:
       - base_fico_score
     CraPartnerInsightsUltraFicoScoreVersion:
       type: string
-      x-hidden-from-docs: true
-      description: The version of the UltraFICO score.
+      description: The version of the UltraFICO® score.
       enum:
       - "1.0"
     CraPartnerInsightsBaseFicoScore:
       title: CraPartnerInsightsBaseFicoScore
       type: object
-      x-hidden-from-docs: true
-      description: Details about the base FICO score associated with an UltraFICO scoring request.
+      description: Details about the base FICO score associated with an UltraFICO® scoring request.
       properties:
         bureau:
           $ref: '#/components/schemas/CraPartnerInsightsBureau'
@@ -62970,26 +63228,30 @@ components:
           type: string
           nullable: true
           deprecated: true
+          x-hidden-from-docs: true
           description: Deprecated. Use `reason_codes` instead. The first reason code associated with the score.
         reason_code_2:
           type: string
           nullable: true
           deprecated: true
+          x-hidden-from-docs: true
           description: Deprecated. Use `reason_codes` instead. The second reason code associated with the score.
         reason_code_3:
           type: string
           nullable: true
           deprecated: true
+          x-hidden-from-docs: true
           description: Deprecated. Use `reason_codes` instead. The third reason code associated with the score.
         reason_code_4:
           type: string
           nullable: true
           deprecated: true
+          x-hidden-from-docs: true
           description: Deprecated. Use `reason_codes` instead. The fourth reason code associated with the score.
         did_inquiries_adversely_affect_score:
           type: boolean
           nullable: true
-          description: Whether inquiries adversely affected this score but were not represented in one of the four reason codes. Sometimes referred to as the FACTA Flag.
+          description: Whether inquiries adversely affected the score but were not represented in one of the four reason codes. Sometimes referred to as the FACTA Flag.
         base_fico_score_version:
           $ref: '#/components/schemas/CraPartnerInsightsBaseFicoScoreVersion'
       required:
@@ -62998,7 +63260,6 @@ components:
       - base_fico_score_version
     CraPartnerInsightsBureau:
       type: string
-      x-hidden-from-docs: true
       description: The credit bureau that provided the base FICO score.
       enum:
       - EQUIFAX
@@ -63006,7 +63267,6 @@ components:
       - TRANSUNION
     CraPartnerInsightsBaseFicoScoreVersion:
       type: string
-      x-hidden-from-docs: true
       description: The version of the base FICO score model.
       enum:
       - "8"
@@ -63017,15 +63277,14 @@ components:
       title: CraPartnerInsightsFicoResults
       type: object
       nullable: true
-      x-hidden-from-docs: true
-      description: The calculated UltraFICO scores returned as part of the Partner Insights report.
+      description: The calculated UltraFICO® scores returned as part of the Partner Insights report.
       properties:
         lender_application_id:
           type: string
           description: Client-generated identifier that uniquely identifies the FICO Application across FICO systems.
         ultrafico_score_results:
           type: array
-          description: UltraFICO scoring results, one per provided base FICO score request.
+          description: UltraFICO® scoring results, one per provided UltraFICO scoring request.
           items:
             $ref: '#/components/schemas/CraPartnerInsightsUltraFicoScoreResult'
         report_characteristics:
@@ -63037,8 +63296,7 @@ components:
       title: CraPartnerInsightsFicoReportCharacteristics
       type: object
       nullable: true
-      x-hidden-from-docs: true
-      description: Report characteristics returned by FICO describing the banking data used to generate the UltraFICO score.
+      description: Report characteristics returned by FICO describing the banking data used to generate the UltraFICO® score.
       properties:
         num_accounts:
           type: integer
@@ -63132,12 +63390,11 @@ components:
     CraPartnerInsightsUltraFicoScoreResult:
       title: CraPartnerInsightsUltraFicoScoreResult
       type: object
-      x-hidden-from-docs: true
-      description: The result of a single UltraFICO score generation request.
+      description: The result of a single UltraFICO® score generation request.
       properties:
         request_correlation_id:
           type: string
-          description: Client-generated identifier that can be used to correlate between scoring requests and scoring results.
+          description: Client-generated identifier that can be used to correlate scoring requests with their scoring results.
         fico_scoring_request_id:
           type: string
           description: FICO-provided identifier that uniquely identifies this score generation request.
@@ -63145,19 +63402,18 @@ components:
           $ref: '#/components/schemas/CraPartnerInsightsUltraFicoScore'
         error_reason:
           type: string
-          description: Human-readable description of why the UltraFICO score could not be computed.
+          description: Human-readable description of why the UltraFICO® score could not be computed.
     CraPartnerInsightsUltraFicoScore:
       title: CraPartnerInsightsUltraFicoScore
       type: object
       nullable: true
-      x-hidden-from-docs: true
-      description: The calculated UltraFICO score.
+      description: The calculated UltraFICO® score.
       properties:
         ultrafico_score_version:
           $ref: '#/components/schemas/CraPartnerInsightsUltraFicoScoreVersion'
         score:
           type: integer
-          description: Numeric value of the UltraFICO score.
+          description: Numeric value of the UltraFICO® score.
         negative_reason_codes:
           type: array
           items:
@@ -63174,41 +63430,49 @@ components:
           type: string
           nullable: true
           deprecated: true
+          x-hidden-from-docs: true
           description: Deprecated. Use `negative_reason_codes` instead. The first reason code associated with the score.
         reason_code_2:
           type: string
           nullable: true
           deprecated: true
+          x-hidden-from-docs: true
           description: Deprecated. Use `negative_reason_codes` instead. The second reason code associated with the score.
         reason_code_3:
           type: string
           nullable: true
           deprecated: true
+          x-hidden-from-docs: true
           description: Deprecated. Use `negative_reason_codes` instead. The third reason code associated with the score.
         reason_code_4:
           type: string
           nullable: true
           deprecated: true
+          x-hidden-from-docs: true
           description: Deprecated. Use `negative_reason_codes` instead. The fourth reason code associated with the score.
         positive_reason_code_1:
           type: string
           nullable: true
           deprecated: true
+          x-hidden-from-docs: true
           description: Deprecated. Use `positive_reason_codes` instead. The first positive reason code associated with the score.
         positive_reason_code_2:
           type: string
           nullable: true
           deprecated: true
+          x-hidden-from-docs: true
           description: Deprecated. Use `positive_reason_codes` instead. The second positive reason code associated with the score.
         positive_reason_code_3:
           type: string
           nullable: true
           deprecated: true
+          x-hidden-from-docs: true
           description: Deprecated. Use `positive_reason_codes` instead. The third positive reason code associated with the score.
         positive_reason_code_4:
           type: string
           nullable: true
           deprecated: true
+          x-hidden-from-docs: true
           description: Deprecated. Use `positive_reason_codes` instead. The fourth positive reason code associated with the score.
         did_inquiries_adversely_affect_score:
           type: boolean
@@ -64262,7 +64526,7 @@ components:
 
             Note that not all institutions calculate the `available`  balance. In the event that `available` balance is unavailable, Plaid will return an `available` balance value of `null`.
 
-            Available balance may be cached and is not guaranteed to be up-to-date in realtime unless the value was returned by `/accounts/balance/get`.
+            Available balance may be cached and is not guaranteed to be up-to-date in real-time unless the value was returned by `/accounts/balance/get`.
 
             If `current` is `null` this field is guaranteed not to be `null`.
           nullable: true
@@ -64278,7 +64542,7 @@ components:
 
             For `investment`-type accounts (or `brokerage`-type accounts for API versions 2018-05-22 and earlier), the current balance is the total value of assets as presented by the institution.
 
-            Note that balance information may be cached unless the value was returned by `/accounts/balance/get`; if the Item is enabled for Transactions, the balance will be at least as recent as the most recent Transaction update. If you require realtime balance information, use the `available` balance as provided by `/accounts/balance/get`.
+            Note that balance information may be cached unless the value was returned by `/accounts/balance/get`; if the Item is enabled for Transactions, the balance will be at least as recent as the most recent Transaction update. If you require real-time balance information, use the `available` balance as provided by `/accounts/balance/get`.
 
             When returned by `/accounts/balance/get`, this field may be `null`. When this happens, `available` is guaranteed not to be `null`.
           nullable: true
@@ -67273,6 +67537,7 @@ components:
         `FRAUD_FALSE_IDENTITY`: The end user created the connection using false identity information or stolen credentials
         `FRAUD_ABUSE`: The end user is abusing the client's service or platform through their connected account
         `FRAUD_OTHER`: Other fraud-related reasons involving the end user not covered by the specific fraud categories
+        `FRAUD_TRANSACTION`: Fraud occurred at the transaction level, such as an unauthorized transaction, card testing, chargeback, ACH return, or dispute
         `CONSUMER_LOAN_PAID_OFF`: The end user paid off their loan and no longer needs the product
         `CONSUMER_ACCOUNT_CLOSED`: The end user closed their account with the client and no longer needs the product
         `CONSUMER_CHARGE_OFF`: The end user's account has been charged off
@@ -67286,6 +67551,7 @@ components:
       - FRAUD_FALSE_IDENTITY
       - FRAUD_ABUSE
       - FRAUD_OTHER
+      - FRAUD_TRANSACTION
       - CONSUMER_LOAN_PAID_OFF
       - CONSUMER_ACCOUNT_CLOSED
       - CONSUMER_CHARGE_OFF
@@ -67591,6 +67857,25 @@ components:
       - createdTime
       - updatedTime
       - parties
+    FDXConsentRevocation:
+      type: object
+      additionalProperties: true
+      description: Request body for PUT /fdx/consents/{consentId}/revocation.
+      properties:
+        initiator:
+          $ref: '#/components/schemas/FDXPartyType'
+        reason:
+          $ref: '#/components/schemas/FDXUpdateReason'
+        otherReason:
+          type: string
+          description: Additional information or description of an `OTHER` reason
+        updatedTime:
+          type: string
+          format: date-time
+          description: When the revocation was effected on the initiator's side
+      required:
+      - initiator
+      - reason
     FDXConsentGrantResource:
       type: object
       additionalProperties: true
@@ -67610,6 +67895,38 @@ components:
       - resourceType
       - resourceId
       - dataClusters
+    FDXConsentRevocations:
+      type: object
+      additionalProperties: true
+      description: The revocation history of a consent grant. Response body for GET /fdx/consents/{consentId}/revocation.
+      properties:
+        revocations:
+          type: array
+          description: Revocation records for the consent grant, most recent first. Empty when the grant has never been revoked.
+          items:
+            $ref: '#/components/schemas/FDXConsentRevocationRecord'
+      required:
+      - revocations
+    FDXConsentRevocationRecord:
+      type: object
+      additionalProperties: true
+      description: One revocation record on a consent grant, mirroring the FDX ConsentRevocation entity.
+      properties:
+        status:
+          $ref: '#/components/schemas/FDXConsentGrantStatus'
+        reason:
+          $ref: '#/components/schemas/FDXUpdateReason'
+        initiator:
+          $ref: '#/components/schemas/FDXPartyType'
+        updatedTime:
+          type: string
+          format: date-time
+          description: When the consent grant was revoked
+      required:
+      - status
+      - reason
+      - initiator
+      - updatedTime
     FDXConsentGrantStatus:
       title: FDX Consent Grant Status
       description: Current status of a consent grant. One of `ACTIVE`, `REVOKED`, `EXPIRED`.
@@ -68515,7 +68832,7 @@ components:
       description: |-
         The payment method specified in the `default_payment_method` field directly impacts the timing recommendations provided by the API for submitting the debit entry to your processor or ODFI. If unspecified, defaults to `STANDARD_ACH`.
 
-        `SAME_DAY_ACH`: Same Day ACH (as defined by Nacha). The API assumes the settlement will occur on the same business day if the `/signal/schedule` request is submitted by 6:00 PM UTC. Note: The actual cutoff time can vary depending on your payment processor or ODFI. Nacha has established three processing windows for Same Day ACH (UTC): 2:30 PM, 6:45 PM, and 8:45 PM.
+        `SAME_DAY_ACH`: Same Day ACH (as defined by Nacha). The API assumes the settlement will occur on the same business day if the `/signal/schedule` request is submitted by 6:00 PM UTC. Note: The actual cutoff time can vary depending on your payment processor or ODFI. Nacha has established three processing windows for Same Day ACH (Eastern Time): 10:30 AM, 2:45 PM, and 4:45 PM.
 
         `STANDARD_ACH`: Standard ACH (as defined by Nacha), typically settled one to three business days after submission.
 
@@ -69394,7 +69711,7 @@ components:
       type: object
       description: |-
         Request object for `/protect/report/create`.
-        Must provide either `user_id` or at least one of the following identifiers in `incident_event`: `link_session_id`, `idv_session_id`, `protect_event_id`, or `signal_client_transaction_id`.
+        You must provide either `user_id`, or an `incident_event` with at least one supported identifier: `link_session_id`, `idv_session_id`, `protect_event_id`, `signal_client_transaction_id`, or `access_token`. Context fields such as `internal_reference`, `time`, `amount`, and `bank_account` do not satisfy this identifier requirement.
       properties:
         client_id:
           $ref: '#/components/schemas/APIClientID'
@@ -69420,7 +69737,6 @@ components:
         notes:
           type: string
           nullable: true
-          maxLength: 1024
           description: Additional context or details about the report, required if `report_type` is `OTHER`.
       required:
       - report_confidence
@@ -69741,6 +70057,10 @@ components:
           description: An access token associated with the Item related to this incident.
           allOf:
           - $ref: '#/components/schemas/AccessTokenNullable'
+        item_id:
+          type: string
+          nullable: true
+          description: An `item_id` associated with the Item related to this incident. To identify an Item when creating a report, provide `access_token`.
     ProtectIncidentEventResponse:
       nullable: true
       type: object
