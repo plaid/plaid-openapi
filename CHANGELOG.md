@@ -1,4 +1,13 @@
+### 2020-09-14_1.706.1
+- Make product `metadata` and `attributes` nullable when unavailable in `/cra/report/get` responses.
+
+### 2020-09-14_1.706.0
+- Add the `/transfer/return/recover` endpoint, which lets clients report that they have recovered some or all of the loss on a returned guaranteed transfer.
+- Add the `guarantee_reimbursed`, `client_return_recovered`, and `plaid_return_recovered` transfer event types, and add a nullable signed `event_amount` field to the transfer event object.
+
 ### 2020-09-14_1.705.4
+- Mark superseded products, endpoints, and fields as `deprecated`: the Beacon product (`/beacon/*` endpoints and webhooks, plus the `beacon_user_id` field on Identity Verification responses); Bank Transfer (except the `/bank_transfer/event/*` endpoints, still used for Auth micro-deposits); `/employers/search`; the legacy Cash Flow Updates webhooks superseded by `CASH_FLOW_INSIGHTS_UPDATED`; and the `PaymentInitiationConsentScope`, `TransferCreditFundsSource`, and `RiskReason` schemas.
+- Quote `type: string` certain enum values (Prism version number strings, Freddie Mac "yes/no" API string responses) that YAML parsers were coercing to numbers or booleans.
 - Expose `/cra/report/get` and its request/response schemas in generated client libraries. The endpoint remains hidden from public documentation.
 
 ### 2020-09-14_1.705.3
