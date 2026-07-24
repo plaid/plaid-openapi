@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.706.1
+  version: 2020-09-14_1.708.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -26082,6 +26082,10 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_token:
           $ref: '#/components/schemas/UserToken'
+        user_id:
+          x-hidden-from-docs: true
+          allOf:
+          - $ref: '#/components/schemas/NewUserID'
       required:
       - user_token
     CreditSessionsGetResponse:
@@ -27138,6 +27142,7 @@ components:
           - natural
           - kanmon
           - kick
+          - increase
           description: The processor you are integrating with.
       required:
       - access_token
@@ -37741,11 +37746,15 @@ components:
 
         The following codes indicate that the authorization decision was `declined`:
 
-        `NSF` - Transaction likely to result in a return due to insufficient funds.
+        `NSF` - Transaction has an elevated probability of resulting in a return due to insufficient funds.
 
         `RISK` - Transaction is high-risk.
 
         `TRANSFER_LIMIT_REACHED` - One or several transfer limits are reached, e.g. monthly transfer limit. Check the accompanying `description` field to understand which limit has been reached.
+
+        `ADMIN` - Transaction has an elevated probability of resulting in an administrative return (for example a closed, invalid, or unauthorized account).
+
+        `FRAUD` - Transaction has an elevated probability of being fraudulent.
       enum:
       - NSF
       - RISK
@@ -37755,6 +37764,8 @@ components:
       - PAYMENT_PROFILE_LOGIN_REQUIRED
       - ERROR
       - MIGRATED_ACCOUNT_ITEM
+      - ADMIN
+      - FRAUD
       - null
     TransferAuthorizationDecisionRationale:
       title: TransferAuthorizationDecisionRationale
@@ -45206,6 +45217,10 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_token:
           $ref: '#/components/schemas/UserToken'
+        user_id:
+          x-hidden-from-docs: true
+          allOf:
+          - $ref: '#/components/schemas/NewUserID'
         options:
           $ref: '#/components/schemas/CreditBankStatementsUploadsGetRequestOptions'
       required:
@@ -64882,13 +64897,13 @@ components:
     CashflowAttributesSchema:
       type: object
       title: CashflowAttributes
-      description: A map of cash flow attributes, where the key is a string, and the value is a float, int, or boolean. The specific list of attributes will depend on the cash flow attributes version used. For a full list of attributes, contact your account manager.
+      description: A map of cash flow attributes, where the key is a string, and the value is a string, float, int, or boolean. The specific list of attributes will depend on the cash flow attributes version used. For a full list of attributes, contact your account manager.
     CraCreditProfileCashflowAttributesSchema:
       type: object
       nullable: true
       title: CraCreditProfileCashflowAttributes
-      description: A map of cash flow attributes, where the key is a string, and the value is a float, int, or boolean. The specific list of attributes will depend on the cash flow attributes version used. For a full list of attributes, contact your account manager.
-      additionalProperties: true
+      description: A map of cash flow attributes, where the key is a string, and the value is a string, float, int, or boolean. The specific list of attributes will depend on the cash flow attributes version used. For a full list of attributes, contact your account manager.
+      additionalProperties: {}
     CraCheckReportLendScoreGetResponse:
       title: CraCheckReportLendScoreGetResponse
       additionalProperties: true
@@ -65038,7 +65053,7 @@ components:
       type: object
       title: CraCreditProfileNetworkInsights
       description: A map of network attributes, where the key is a string, and the value is a float, int, or boolean. For a full list of attributes, contact your account manager.
-      additionalProperties: true
+      additionalProperties: {}
     CraNetworkInsightsItem:
       type: object
       description: Contains data about the connected Item.
@@ -66569,14 +66584,14 @@ components:
       type: object
       nullable: true
       description: A map of product report metadata, where the key is a string and the value varies by product. For a full list of metadata fields per product, see the data dictionary. May be `null` if metadata was not available.
-      additionalProperties: true
+      additionalProperties: {}
     CraReportGetProductAttributes:
       title: CraReportGetProductAttributes
       x-hidden-from-docs: true
       type: object
       nullable: true
-      description: A map of product attributes, where the key is a string and the value is a float, int, or boolean. The specific list of attributes depends on the product and version. For a full list, see the data dictionary. May be `null` if attributes were not available.
-      additionalProperties: true
+      description: A map of product attributes, where the key is a string and the value can be any JSON value. The specific list of attributes depends on the product and version. For a full list, see the data dictionary. May be `null` if attributes were not available.
+      additionalProperties: {}
     CraReportGetResponse:
       title: CraReportGetResponse
       x-hidden-from-docs: true
