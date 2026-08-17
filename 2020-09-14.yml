@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.708.0
+  version: 2020-09-14_1.729.1
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -372,6 +372,8 @@ paths:
         An Asset Report is an immutable snapshot of a user's assets. In order to "refresh" an Asset Report you created previously, you can use the `/asset_report/refresh` endpoint to create a new Asset Report based on the old one, but with the most recent data available.
 
         The new Asset Report will contain the same Items as the original Report, as well as the same filters applied by any call to `/asset_report/filter`. By default, the new Asset Report will also use the same parameters you submitted with your original `/asset_report/create` request, but the original `days_requested` value and the values of any parameters in the `options` object can be overridden with new values. To change these arguments, simply supply new values for them in your request to `/asset_report/refresh`. Submit an empty string ("") for any previously-populated fields you would like set as empty.
+
+        Note: Asset Report refresh is not supported in Canada.
       requestBody:
         required: true
         content:
@@ -1745,7 +1747,7 @@ paths:
         secret: []
         plaidVersion: []
       - oauth2:
-        - cra:report:read
+        - cra:read
       responses:
         "200":
           description: OK
@@ -1892,7 +1894,7 @@ paths:
         secret: []
         plaidVersion: []
       - oauth2:
-        - cra:report:read
+        - cra:read
       externalDocs:
         url: /api/products/check/#cracheck_reportbase_reportget
       requestBody:
@@ -2906,7 +2908,10 @@ paths:
       externalDocs:
         url: /api/products/check/#cracheck_reportcreate
       operationId: craCheckReportCreate
-      description: Use `/cra/check_report/create` to refresh data in an existing report. A Consumer Report will last for 24 hours before expiring; you should call any `/get` endpoints on the report before it expires. If a report expires, you can call `/cra/check_report/create` again to re-generate it and refresh the data in the report.
+      description: |-
+        Use `/cra/check_report/create` to refresh data in an existing report. A Consumer Report will last for 24 hours before expiring; you should call any `/get` endpoints on the report before it expires. If a report expires, you can call `/cra/check_report/create` again to re-generate it and refresh the data in the report. The report is generated from all Items associated with the user, excluding [duplicate Items](https://plaid.com/docs/check/add-to-app/#duplicate-items) and Items that cannot supply data.
+
+        Each call to `/cra/check_report/create` creates a new, independent report. `/get` endpoints will retrieve the most recently created report for the requested user.
       requestBody:
         required: true
         content:
@@ -3014,7 +3019,7 @@ paths:
         secret: []
         plaidVersion: []
       - oauth2:
-        - cra:report:read
+        - cra:read
       responses:
         "200":
           description: OK
@@ -3057,7 +3062,7 @@ paths:
         secret: []
         plaidVersion: []
       - oauth2:
-        - cra:report:read
+        - cra:read
       responses:
         "200":
           description: OK
@@ -3103,7 +3108,7 @@ paths:
         secret: []
         plaidVersion: []
       - oauth2:
-        - cra:report:read
+        - cra:read
       responses:
         "200":
           description: OK
@@ -3506,6 +3511,189 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CraLoansUnregisterRequest'
+  /cra/servicing/subscription/create:
+    post:
+      summary: Create a CRA servicing subscription
+      tags:
+      - plaid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CraServicingSubscriptionCreateResponse'
+              examples:
+                example-1:
+                  value:
+                    subscription_id: cra-sub-production-8f2b1c0a-3d4e-5f60-7a8b-9c0d1e2f3a4b
+                    request_id: eYupqX1mZkEuQRx
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      operationId: craServicingSubscriptionCreate
+      externalDocs:
+        url: /none/
+      description: '`/cra/servicing/subscription/create` subscribes a user to CRA report-update webhooks for a given scope.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CraServicingSubscriptionCreateRequest'
+  /cra/servicing/subscription/delete:
+    post:
+      summary: Delete a CRA servicing subscription
+      tags:
+      - plaid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CraServicingSubscriptionDeleteResponse'
+              examples:
+                example-1:
+                  value:
+                    subscription_id: cra-sub-production-8f2b1c0a-3d4e-5f60-7a8b-9c0d1e2f3a4b
+                    request_id: eYupqX1mZkEuQRx
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      operationId: craServicingSubscriptionDelete
+      externalDocs:
+        url: /none/
+      description: '`/cra/servicing/subscription/delete` removes the CRA servicing subscription identified by `subscription_id`.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CraServicingSubscriptionDeleteRequest'
+  /cra/servicing/subscription/get:
+    post:
+      summary: Get a CRA servicing subscription
+      tags:
+      - plaid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CraServicingSubscriptionGetResponse'
+              examples:
+                example-1:
+                  value:
+                    subscription:
+                      subscription_id: cra-sub-production-8f2b1c0a-3d4e-5f60-7a8b-9c0d1e2f3a4b
+                      user_id: usr_123456abcdef
+                      scope: CLIENT_USER
+                      cadence: DAILY
+                      webhook: https://example.com/webhook
+                      products:
+                      - product: cra_base_report
+                        version: V1
+                      - product: cra_income_insights
+                        version: V1
+                    request_id: eYupqX1mZkEuQRx
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      operationId: craServicingSubscriptionGet
+      externalDocs:
+        url: /none/
+      description: '`/cra/servicing/subscription/get` returns the CRA servicing subscription identified by `subscription_id`.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CraServicingSubscriptionGetRequest'
+  /cra/servicing/subscription/list:
+    post:
+      summary: List a user's CRA servicing subscriptions
+      tags:
+      - plaid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CraServicingSubscriptionListResponse'
+              examples:
+                example-1:
+                  value:
+                    subscriptions:
+                    - subscription_id: cra-sub-production-8f2b1c0a-3d4e-5f60-7a8b-9c0d1e2f3a4b
+                      user_id: usr_123456abcdef
+                      scope: CLIENT_USER
+                      cadence: DAILY
+                      webhook: https://example.com/webhook
+                      products:
+                      - product: cra_base_report
+                        version: V1
+                    request_id: eYupqX1mZkEuQRx
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      operationId: craServicingSubscriptionList
+      externalDocs:
+        url: /none/
+      description: '`/cra/servicing/subscription/list` returns all CRA servicing subscriptions for a user, across scopes.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CraServicingSubscriptionListRequest'
+  /cra/servicing/subscription/update:
+    post:
+      summary: Update a CRA servicing subscription
+      tags:
+      - plaid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CraServicingSubscriptionUpdateResponse'
+              examples:
+                example-1:
+                  value:
+                    subscription_id: cra-sub-production-8f2b1c0a-3d4e-5f60-7a8b-9c0d1e2f3a4b
+                    request_id: eYupqX1mZkEuQRx
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      operationId: craServicingSubscriptionUpdate
+      externalDocs:
+        url: /none/
+      description: '`/cra/servicing/subscription/update` modifies an existing CRA servicing subscription. Fields left blank are unchanged; provided fields overwrite the current value. Use `reset_fields` to clear fields.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CraServicingSubscriptionUpdateRequest'
   /cra/report/get:
     x-hidden-from-docs: true
     post:
@@ -3998,6 +4186,36 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ItemApplicationListResponse'
+              examples:
+                example-1:
+                  value:
+                    applications:
+                    - application_id: c048eab9-a70a-42fe-94e9-35980d0a965c
+                      name: Big FinTech App
+                      display_name: Big FinTech
+                      logo_url: https://plaid.com/images/1
+                      application_url: https://bigfintechapp.com
+                      reason_for_access: to display your balances
+                      created_at: "2019-07-16T19:20:00Z"
+                      scopes:
+                        product_access:
+                          account_balance_info: true
+                          account_routing_number: true
+                          transactions: false
+                        accounts:
+                        - unique_id: 4a94ed625e7c
+                          authorized: true
+                        - unique_id: 6068084d3aab
+                          authorized: false
+                        new_accounts: true
+                    disconnected_applications:
+                    - application_id: d348deb9-a70a-67fe-52b9-35980d0a965c
+                      name: Another FinTech App
+                      display_name: Another FinTech
+                      logo_url: https://plaid.com/images/2
+                      application_url: https://anotherfintechapp.com
+                      reason_for_access: to display your balances
+                    request_id: m8MDnv9okwxFNBV
         default:
           description: Error response.
           content:
@@ -4561,6 +4779,7 @@ paths:
                       name: Dd Doordash Burgerkin
                       merchant_name: Burger King
                       merchant_entity_id: mVrw538wamwdm22mK8jqpp7qd5br0eeV9o4a1
+                      merchant_category_code: "5814"
                       logo_url: https://plaid-merchant-logos.plaid.com/burger_king_155.png
                       website: burgerking.com
                       payment_meta:
@@ -4612,6 +4831,7 @@ paths:
                       name: 'PURCHASE WM SUPERCENTER #1700'
                       merchant_name: Walmart
                       merchant_entity_id: O5W5j4dN9OR3E6ypQmjdkWZZRoXEzVMz2ByWM
+                      merchant_category_code: "5411"
                       logo_url: https://plaid-merchant-logos.plaid.com/walmart_1100.png
                       website: walmart.com
                       payment_meta:
@@ -4923,6 +5143,7 @@ paths:
                       name: Dd Doordash Burgerkin
                       merchant_name: Burger King
                       merchant_entity_id: mVrw538wamwdm22mK8jqpp7qd5br0eeV9o4a1
+                      merchant_category_code: "5814"
                       logo_url: https://plaid-merchant-logos.plaid.com/burger_king_155.png
                       website: burgerking.com
                       payment_meta:
@@ -4974,6 +5195,7 @@ paths:
                       name: 'PURCHASE WM SUPERCENTER #1700'
                       merchant_name: Walmart
                       merchant_entity_id: O5W5j4dN9OR3E6ypQmjdkWZZRoXEzVMz2ByWM
+                      merchant_category_code: "5411"
                       logo_url: https://plaid-merchant-logos.plaid.com/walmart_1100.png
                       website: walmart.com
                       payment_meta:
@@ -5143,6 +5365,7 @@ paths:
                       name: Dd Doordash Burgerkin
                       merchant_name: Burger King
                       merchant_entity_id: mVrw538wamwdm22mK8jqpp7qd5br0eeV9o4a1
+                      merchant_category_code: "5814"
                       logo_url: https://plaid-merchant-logos.plaid.com/burger_king_155.png
                       website: burgerking.com
                       payment_meta:
@@ -5194,6 +5417,7 @@ paths:
                       name: 'PURCHASE WM SUPERCENTER #1700'
                       merchant_name: Walmart
                       merchant_entity_id: O5W5j4dN9OR3E6ypQmjdkWZZRoXEzVMz2ByWM
+                      merchant_category_code: "5411"
                       logo_url: https://plaid-merchant-logos.plaid.com/walmart_1100.png
                       website: walmart.com
                       payment_meta:
@@ -5615,6 +5839,7 @@ paths:
                       name: 'PURCHASE WM SUPERCENTER #1700'
                       merchant_name: Walmart
                       merchant_entity_id: O5W5j4dN9OR3E6ypQmjdkWZZRoXEzVMz2ByWM
+                      merchant_category_code: "5411"
                       logo_url: https://plaid-merchant-logos.plaid.com/walmart_1100.png
                       website: walmart.com
                       payment_meta:
@@ -5673,6 +5898,7 @@ paths:
                       name: Dd Doordash Burgerkin
                       merchant_name: Burger King
                       merchant_entity_id: mVrw538wamwdm22mK8jqpp7qd5br0eeV9o4a1
+                      merchant_category_code: "5814"
                       logo_url: https://plaid-merchant-logos.plaid.com/burger_king_155.png
                       website: burgerking.com
                       payment_meta:
@@ -6521,7 +6747,7 @@ paths:
 
         `USER_PERMISSION_REVOKED`: Indicates an end user has revoked the permission that they previously granted to access an Item. May not always fire upon revocation, as some institutions' consent portals do not trigger this webhook. Upon receiving this webhook, it is recommended to delete any stored data from Plaid associated with the account or Item.
 
-        `USER_ACCOUNT_REVOKED`: Fired when an end user has revoked access to their account on the Data Provider's portal. This webhook is currently sent only for PNC Items, but may be sent in the future for other financial institutions. Upon receiving this webhook, it is recommended to delete any stored data from Plaid associated with the account or Item.
+        `USER_ACCOUNT_REVOKED`: Fired when an end user has revoked access to their account on the Data Provider's portal. This webhook is currently sent only for Chase, PNC, and Truist Items, but may be sent in the future for other financial institutions. Upon receiving this webhook, it is recommended to delete any stored data from Plaid associated with the account or Item.
 
         Note that this endpoint is provided for developer ease-of-use and is not required for testing webhooks; webhooks will also fire in Sandbox under the same conditions that they would in Production (except for webhooks of type `TRANSFER`).
       responses:
@@ -6549,6 +6775,49 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SandboxItemFireWebhookRequest'
+  /sandbox/user/fire_webhook:
+    post:
+      tags:
+      - plaid
+      summary: Fire a test user webhook
+      externalDocs:
+        url: /api/sandbox/#sandboxuserfire_webhook
+      operationId: sandboxUserFireWebhook
+      description: |-
+        `/sandbox/user/fire_webhook` functions the same as `/sandbox/item/fire_webhook`, but fires webhooks associated with a user rather than an Item. This endpoint can trigger the following webhooks:
+
+        `USER_CHECK_REPORT_READY`: Fired when a Check Report is ready to be retrieved.
+
+        `USER_CHECK_REPORT_FAILED`: Fired when a Check Report has failed to generate.
+
+        `CHECK_REPORT_READY` / `CHECK_REPORT_FAILED`: The equivalents of the above for integrations that predate the [New User APIs](https://plaid.com/docs/api/users/user-apis).
+
+        Note that this endpoint is provided for developer ease-of-use and is not required for testing webhooks; webhooks will also fire in Sandbox under the same conditions that they would in Production.
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SandboxUserFireWebhookResponse'
+              examples:
+                example-1:
+                  value:
+                    webhook_fired: true
+                    request_id: 1vwmF5TBQwiqfwP
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      requestBody:
+        required: true
+        description: ""
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SandboxUserFireWebhookRequest'
   /accounts/balance/get:
     post:
       tags:
@@ -6951,9 +7220,12 @@ paths:
                       legal_name:
                         score: 30
                         is_first_name_or_last_name_match: false
+                        is_nickname_match: null
+                        is_business_name_detected: null
                       phone_number:
                         score: 100
-                      email_address: null
+                      email_address:
+                        score: null
                       address:
                         score: 100
                         is_postal_code_match: true
@@ -6995,6 +7267,67 @@ paths:
             schema:
               $ref: '#/components/schemas/IdentityMatchRequest'
         description: ""
+  /identity/match/list:
+    x-hidden-from-docs: true
+    post:
+      tags:
+      - plaid
+      summary: List Link Identity Match attempts
+      externalDocs:
+        url: /api/products/identity/#identitymatchlist
+      operationId: identityMatchList
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentityMatchListResponse'
+              examples:
+                example-1:
+                  value:
+                    identity_match_attempts:
+                    - attempt_id: 5f8a4f57c31b4f0012345678
+                      item_id: 6ffb4f57ac2b4f0087654321
+                      created_at: "2026-07-12T14:07:33Z"
+                      link_session_id: 6d0a4f57c31b4f0012345678
+                      link_customization_name: identity_match_customization
+                      ruleset_revision: 4
+                      outcome: PASS
+                      outcome_account_id: 8eaw4f57c31b4f0012345678
+                      scores:
+                      - account_id: 8eaw4f57c31b4f0012345678
+                        legal_name:
+                          score: 90
+                          is_first_name_or_last_name_match: true
+                          is_nickname_match: false
+                          is_business_name_detected: false
+                        phone_number:
+                          score: 100
+                        email_address:
+                          score: 100
+                        address:
+                          score: 80
+                          is_postal_code_match: true
+                    next_cursor: eyJ...
+                    has_more: true
+                    request_id: 45QSn...
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      description: |-
+        Returns a chronological history of Link-originated Identity Match attempts for a client, ordered by creation time with the oldest attempt first.
+
+        Results are retained for up to one year. Attempts for deleted Items are omitted.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentityMatchListRequest'
   /identity/refresh:
     post:
       tags:
@@ -9769,6 +10102,58 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ProtectReportCreateRequest'
+  /protect/cash_advance/decision/create:
+    post:
+      tags:
+      - plaid
+      summary: Record a cash advance decision
+      externalDocs:
+        url: /api/products/protect/#protectcashadvancedecisioncreate
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProtectCashAdvanceDecisionCreateResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: saKrIBuEB9qJZng
+      operationId: protectCashAdvanceDecisionCreate
+      description: Use this endpoint to record a cash-advance decision as feedback. A decision is a determination of whether to approve a user's requested advance and on what terms.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProtectCashAdvanceDecisionCreateRequest'
+  /protect/cash_advance/repayment/create:
+    post:
+      tags:
+      - plaid
+      summary: Record a cash advance repayment
+      externalDocs:
+        url: /api/products/protect/#protectcashadvancerepaymentcreate
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProtectCashAdvanceRepaymentCreateResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: saKrIBuEB9qJZng
+      operationId: protectCashAdvanceRepaymentCreate
+      description: Use this endpoint to record a cash-advance repayment as feedback. A repayment is a record paying back all or some of a previously-taken cash-advance.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProtectCashAdvanceRepaymentCreateRequest'
   /protect/compute:
     post:
       tags:
@@ -10278,7 +10663,7 @@ paths:
                       type: investment
                     holdings:
                     - account_id: JqMLm4rJwpF6gMPJwBqdh9ZjjPvvpDcb7kDK1
-                      cost_basis: 1
+                      cost_basis: 0.01
                       institution_price: 1
                       institution_price_as_of: "2021-04-13"
                       institution_price_datetime: null
@@ -10291,7 +10676,7 @@ paths:
                       vested_value: null
                       tax_lots: []
                     - account_id: JqMLm4rJwpF6gMPJwBqdh9ZjjPvvpDcb7kDK1
-                      cost_basis: 0.01
+                      cost_basis: 100
                       institution_price: 0.011
                       institution_price_as_of: "2021-04-13"
                       institution_price_datetime: null
@@ -10422,7 +10807,7 @@ paths:
                         - "3333"
                     holdings:
                     - account_id: xlP8npRxwgCj48LQbjxWipkeL3gbyXf64knoy
-                      cost_basis: 0.01
+                      cost_basis: 100
                       institution_price: 0.011
                       institution_price_as_of: "2021-05-25"
                       institution_price_datetime: null
@@ -10435,7 +10820,7 @@ paths:
                       vested_value: null
                       tax_lots: []
                     - account_id: xlP8npRxwgCj48LQbjxWipkeL3gbyXf64knoy
-                      cost_basis: 40
+                      cost_basis: 200
                       institution_price: 42.15
                       institution_price_as_of: "2021-05-25"
                       institution_price_datetime: null
@@ -10444,8 +10829,8 @@ paths:
                       quantity: 5
                       security_id: abJamDazkgfvBkVGgnnLUWXoxnomp5up8llg4
                       unofficial_currency_code: null
-                      vested_quantity: 7
-                      vested_value: 66
+                      vested_quantity: null
+                      vested_value: null
                       tax_lots: []
                     securities:
                     - close_price: 0.011
@@ -10719,6 +11104,7 @@ paths:
                       name: Dd Doordash Burgerkin
                       merchant_name: Burger King
                       merchant_entity_id: mVrw538wamwdm22mK8jqpp7qd5br0eeV9o4a1
+                      merchant_category_code: "5814"
                       logo_url: https://plaid-merchant-logos.plaid.com/burger_king_155.png
                       website: burgerking.com
                       payment_meta:
@@ -10770,6 +11156,7 @@ paths:
                       name: 'PURCHASE WM SUPERCENTER #1700'
                       merchant_name: Walmart
                       merchant_entity_id: O5W5j4dN9OR3E6ypQmjdkWZZRoXEzVMz2ByWM
+                      merchant_category_code: "5411"
                       logo_url: https://plaid-merchant-logos.plaid.com/walmart_1100.png
                       website: walmart.com
                       payment_meta:
@@ -10880,6 +11267,7 @@ paths:
                       name: 'PURCHASE WM SUPERCENTER #1700'
                       merchant_name: Walmart
                       merchant_entity_id: O5W5j4dN9OR3E6ypQmjdkWZZRoXEzVMz2ByWM
+                      merchant_category_code: "5411"
                       logo_url: https://plaid-merchant-logos.plaid.com/walmart_1100.png
                       website: walmart.com
                       payment_meta:
@@ -10938,6 +11326,7 @@ paths:
                       name: Dd Doordash Burgerkin
                       merchant_name: Burger King
                       merchant_entity_id: mVrw538wamwdm22mK8jqpp7qd5br0eeV9o4a1
+                      merchant_category_code: "5814"
                       logo_url: https://plaid-merchant-logos.plaid.com/burger_king_155.png
                       website: burgerking.com
                       payment_meta:
@@ -11740,6 +12129,81 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ItemAccessTokenInvalidateRequest'
+  /beta/webhook_events/list:
+    post:
+      tags:
+      - plaid
+      summary: List webhook events
+      externalDocs:
+        url: none
+      operationId: betaWebhookEventsList
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BetaWebhookEventsListResponse'
+              examples:
+                example-1:
+                  value:
+                    webhook_events:
+                    - webhook_message_id: whmsg_4tQ9pNzL2vBxYK
+                      webhook_type: TRANSACTIONS
+                      webhook_code: DEFAULT_UPDATE
+                      item_id: abc123
+                      sent_time: "2026-07-21T14:32:00Z"
+                      payload:
+                        webhook_type: TRANSACTIONS
+                        webhook_code: DEFAULT_UPDATE
+                      destination_url: https://client.example.com/webhook
+                      delivery_status: DELIVERED
+                      last_http_status_code: 200
+                      attempt_count: 1
+                      last_attempt_time: "2026-07-21T14:32:01Z"
+                    has_more: true
+                    next_cursor: eyJzZW50X3RpbWUiOiIyMDI2LTA3LTIxVDE0OjMyOjAwWiIsIndlYmhvb2tfbWVzc2FnZV9pZCI6IndobXNnXzR0UTlwTnpMMnZCeFlLIn0
+                    request_id: 4zlKapIkTm8p5KM
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      description: |-
+        The `/beta/webhook_events/list` endpoint returns webhook events Plaid sent to the calling
+        client within the last 7 days. Results are ordered by `sent_time` ascending and cursor
+        paginated so clients can recover missed webhook deliveries and deduplicate on
+        `webhook_message_id`.
+
+        Filtering is optional. When multiple filter fields are set (`webhook_types`,
+        `webhook_codes`, `item_ids`, `delivery_statuses`), they are combined with AND across fields
+        and OR within each array (for example, `webhook_types: ["TRANSACTIONS", "ITEM"]` matches
+        either type).
+
+        Recommended pagination workflow:
+
+        1. First call: omit `cursor`, and optionally set `start_time` within the last 7 days (or
+           omit `start_time` to begin at the oldest retained event).
+        2. Subsequent calls: pass `next_cursor` as `cursor`. Do not send `start_time` with
+           `cursor` — the two fields are mutually exclusive.
+        3. Persist `next_cursor` even when `has_more` is `false`, then reuse it on the next poll so
+           you only receive events newer than what you have already seen.
+        4. If a stored cursor is older than the 7-day retention window, the API returns
+           `WEBHOOK_EVENTS_CURSOR_EXPIRED`; restart with a `start_time` within the last 7 days.
+           Events older than the retention window are no longer available.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BetaWebhookEventsListRequest'
+            examples:
+              example-1:
+                value:
+                  client_id: 7f57eb3d2a9j6480121fx361
+                  secret: 79g03eoofwl8240v776r2h667442119
+                  count: 100
   /webhook_verification_key/get:
     post:
       tags:
@@ -11853,6 +12317,30 @@ paths:
                       official_name: null
                       subtype: mortgage
                       type: loan
+                    - account_id: c0cTGbrDXN3xiGLGUNI9LGwxrOGjakxtWTgQV
+                      balances:
+                        available: null
+                        current: 18250
+                        iso_currency_code: USD
+                        limit: null
+                        unofficial_currency_code: null
+                      mask: "9999"
+                      name: Plaid Auto Loan
+                      official_name: null
+                      subtype: auto
+                      type: loan
+                    - account_id: ufQuuYHpSjhuk9TKIQTnDWlFVDIR5nWSynuQD
+                      balances:
+                        available: 76000
+                        current: 24000
+                        iso_currency_code: USD
+                        limit: 100000
+                        unofficial_currency_code: null
+                      mask: "1111"
+                      name: Plaid Home Equity Line of Credit
+                      official_name: null
+                      subtype: home equity
+                      type: loan
                     item:
                       available_products:
                       - balance
@@ -11965,6 +12453,49 @@ paths:
                           street: 123 Relaxation Road
                         ytd_interest_paid: 280.55
                         ytd_principal_paid: 271.65
+                      loan:
+                      - account_id: c0cTGbrDXN3xiGLGUNI9LGwxrOGjakxtWTgQV
+                        account_number: "8943210074"
+                        interest_rate:
+                          percentage: 6.49
+                          type: fixed
+                        principal_balance: 18250
+                        origination_principal_amount: 32000
+                        origination_date: "2023-09-01"
+                        loan_term_months: 72
+                        maturity_date: "2029-09-01"
+                        payment_count: 72
+                        payment_frequency: monthly
+                        next_payment_amount: 525.4
+                        next_payment_due_date: "2026-07-01"
+                        last_payment_amount: 525.4
+                        last_payment_date: "2026-06-01"
+                        payoff_amount: 18190.25
+                        ytd_interest_paid: 612.18
+                        compounding_period: monthly
+                      line_of_credit:
+                      - account_id: ufQuuYHpSjhuk9TKIQTnDWlFVDIR5nWSynuQD
+                        interest_rate:
+                          percentage: 8.25
+                          type: variable
+                        credit_limit: 100000
+                        available_credit: 76000
+                        principal_balance: 24000
+                        minimum_payment_amount: 180
+                        next_payment_amount: 180
+                        next_payment_due_date: "2026-07-05"
+                        last_payment_amount: 180
+                        last_payment_date: "2026-06-05"
+                        last_statement_balance: 24000
+                        last_statement_issue_date: "2026-06-01"
+                        past_due_amount: 0
+                        finance_charges: 162.5
+                        draw_period_end_date: "2032-03-10"
+                        aprs:
+                        - apr_percentage: 8.25
+                          apr_type: purchase_apr
+                          balance_subject_to_apr: null
+                          interest_charge_amount: null
                     request_id: dTnnm60WgKGLnKL
         default:
           description: Error response
@@ -11979,7 +12510,7 @@ paths:
             schema:
               $ref: '#/components/schemas/LiabilitiesGetRequest'
       description: |-
-        The `/liabilities/get` endpoint returns various details about an Item with loan or credit accounts. Liabilities data is available primarily for US financial institutions, with some limited coverage of Canadian institutions. Currently supported account types are account type `credit` with account subtype `credit card` or `paypal`, and account type `loan` with account subtype `student` or `mortgage`. To limit accounts listed in Link to types and subtypes supported by Liabilities, you can use the `account_filters` parameter when [creating a Link token](https://plaid.com/docs/api/link/#linktokencreate).
+        The `/liabilities/get` endpoint returns various details about an Item with loan or credit accounts. Liabilities data is available primarily for US financial institutions, with some limited coverage of Canadian institutions. Supported account types are account type `credit` with account subtype `charge card`, `credit card`, or `paypal`; and account type `loan` with account subtype `auto`, `commercial`, `commercial line of credit`, `consumer`, `home equity`, `home equity loan`, `installment`, `line of credit`, `loan`, `mortgage`, or `student`. To limit accounts listed in Link to types and subtypes supported by Liabilities, you can use the `account_filters` parameter when [creating a Link token](https://plaid.com/docs/api/link/#linktokencreate).
 
         The types of information returned by Liabilities can include balances and due dates, loan terms, and account details such as original loan amount and guarantor. Data is refreshed approximately once per day; the latest data can be retrieved by calling `/liabilities/get`.
   /payment_initiation/recipient/create:
@@ -12453,7 +12984,6 @@ paths:
             schema:
               $ref: '#/components/schemas/SandboxItemApplicationSeedRequest'
   /sandbox/fdx/consent/seed:
-    x-hidden-from-docs: true
     post:
       tags:
       - plaid
@@ -12685,7 +13215,10 @@ paths:
       description: |-
         For Plaid products and flows that use the user object, `/user/create` provides you a single token to access all data associated with the user. You must call this endpoint before calling `/link/token/create` if you are using any of the following: Plaid Check, Income Verification, Multi-Item Link, or Plaid Protect (Identity). If you are using Plaid Protect Link session scoring, you do not need to call `/user/create` first; Plaid will resolve or create the user when `user.client_user_id` is provided in `/link/token/create`.
         For customers who began using this endpoint on or after December 10, 2025, this endpoint takes a `client_user_id` and an `identity` object and will return a `user_id`. For customers who began using it before that date, the endpoint takes a `client_user_id` and a `consumer_report_user_identity` object and will return a `user_token` and `user_id`. For more details, see [New User APIs](https://plaid.com/docs/api/users/user-apis).
-        In order to create a Plaid Check Consumer Report for a user, the `identity` (new) or `consumer_report_user_identity` (legacy) object must be present. If it is not provided during the `/user/create` call, it can be added later by calling `/user/update`.
+        In order to create a Plaid Check Consumer Report for a user, or to use Payment Initiation, Variable Recurring Payments, or Virtual Accounts, the `identity` (new) or `consumer_report_user_identity` (legacy) object must be present. If it is not provided during the `/user/create` call, it can be added later by calling `/user/update`.
+
+
+        When using Payment Initiation, Variable Recurring Payments, or Virtual Accounts, the `identity` object must contain a `name` and either an email address or a phone number.
 
 
         In order to generate a Plaid Check Consumer Report, the following `identity` fields, at minimum, are required and must be non-empty: `name`, `date_of_birth`, `emails`, `phone_numbers`, and `addresses` (with at least one email, phone number, and address designated as `primary`). Plaid Check Consumer Reports can only be created for US-based users; the user's address country must be `US`. If creating a report for sharing with a GSE such as Fannie or Freddie, the user's full SSN must be provided via the `id_numbers` field. Providing at least a partial SSN is also strongly recommended for all use cases, since it improves the accuracy of matching user records during compliance processes such as file disclosure, dispute, or security freeze requests.
@@ -12978,7 +13511,6 @@ paths:
             schema:
               $ref: '#/components/schemas/UserItemsGetRequest'
   /user/items/associate:
-    x-hidden-from-docs: true
     post:
       tags:
       - plaid
@@ -13003,7 +13535,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
-      description: Associates Items to the target user. If an Item is already associated to another user, the Item will be disassociated with the existing user and associated to the target user. This operation supports a max of 100 Items.
+      description: Associates Items with a `user_id`. If an Item is already associated with a different `user_id`, calling this endpoint will disassociate it from that User and reassociate it with the target User instead. A single request can associate up to 100 Items.
       requestBody:
         required: true
         content:
@@ -13342,7 +13874,7 @@ paths:
                       type: investment
                     holdings:
                     - account_id: JqMLm4rJwpF6gMPJwBqdh9ZjjPvvpDcb7kDK1
-                      cost_basis: 1
+                      cost_basis: 0.01
                       institution_price: 1
                       institution_price_as_of: "2021-04-13"
                       institution_price_datetime: null
@@ -13364,11 +13896,11 @@ paths:
                       quantity: 1
                       security_id: KDwjlXj1Rqt58dVvmzRguxJybmyQL8FgeWWAy
                       unofficial_currency_code: null
-                      vested_quantity: null
-                      vested_value: null
+                      vested_quantity: 1
+                      vested_value: 2.11
                       tax_lots: []
                     - account_id: k67E4xKvMlhmleEa4pg9hlwGGNnnEeixPolGm
-                      cost_basis: 10
+                      cost_basis: 20
                       institution_price: 10.42
                       institution_price_as_of: "2021-04-13"
                       institution_price_datetime: null
@@ -13383,19 +13915,19 @@ paths:
                       - institution_lot_id: "1"
                         original_purchase_datetime: "2021-01-15T00:00:00Z"
                         quantity: 1
-                        purchase_price: 4.75
-                        cost_basis: 4.75
+                        purchase_price: 9.5
+                        cost_basis: 9.5
                         current_value: 10.42
                         position_type: LONG
                       - institution_lot_id: "2"
                         original_purchase_datetime: "2021-03-22T00:00:00Z"
                         quantity: 1
-                        purchase_price: 5.25
-                        cost_basis: 5.25
+                        purchase_price: 10.5
+                        cost_basis: 10.5
                         current_value: 10.42
                         position_type: LONG
                     - account_id: JqMLm4rJwpF6gMPJwBqdh9ZjjPvvpDcb7kDK1
-                      cost_basis: 0.01
+                      cost_basis: 100
                       institution_price: 0.011
                       institution_price_as_of: "2021-04-13"
                       institution_price_datetime: null
@@ -13408,7 +13940,7 @@ paths:
                       vested_value: null
                       tax_lots: []
                     - account_id: k67E4xKvMlhmleEa4pg9hlwGGNnnEeixPolGm
-                      cost_basis: 23
+                      cost_basis: 542.041
                       institution_price: 27
                       institution_price_as_of: "2021-04-13"
                       institution_price_datetime: null
@@ -13421,7 +13953,7 @@ paths:
                       vested_value: null
                       tax_lots: []
                     - account_id: k67E4xKvMlhmleEa4pg9hlwGGNnnEeixPolGm
-                      cost_basis: 15
+                      cost_basis: 1500.75
                       institution_price: 13.73
                       institution_price_as_of: "2021-04-13"
                       institution_price_datetime: null
@@ -13447,7 +13979,7 @@ paths:
                       vested_value: null
                       tax_lots: []
                     - account_id: k67E4xKvMlhmleEa4pg9hlwGGNnnEeixPolGm
-                      cost_basis: 1
+                      cost_basis: 12345.67
                       institution_price: 1
                       institution_price_as_of: "2021-04-13"
                       institution_price_datetime: null
@@ -14007,7 +14539,7 @@ paths:
                       type: investment
                     holdings:
                     - account_id: xlP8npRxwgCj48LQbjxWipkeL3gbyXf64knoy
-                      cost_basis: 1
+                      cost_basis: 0.01
                       institution_price: 1
                       institution_price_as_of: "2021-05-25"
                       institution_price_datetime: null
@@ -14016,11 +14548,11 @@ paths:
                       quantity: 0.01
                       security_id: d6ePmbPxgWCWmMVv66q9iPV94n91vMtov5Are
                       unofficial_currency_code: null
-                      vested_quantity: 1
-                      vested_value: 1
+                      vested_quantity: null
+                      vested_value: null
                       tax_lots: []
                     - account_id: xlP8npRxwgCj48LQbjxWipkeL3gbyXf64knoy
-                      cost_basis: 0.01
+                      cost_basis: 100
                       institution_price: 0.011
                       institution_price_as_of: "2021-05-25"
                       institution_price_datetime: null
@@ -14046,7 +14578,7 @@ paths:
                       vested_value: null
                       tax_lots: []
                     - account_id: xlP8npRxwgCj48LQbjxWipkeL3gbyXf64knoy
-                      cost_basis: 40
+                      cost_basis: 200
                       institution_price: 42.15
                       institution_price_as_of: "2021-05-25"
                       institution_price_datetime: null
@@ -14055,8 +14587,8 @@ paths:
                       quantity: 5
                       security_id: abJamDazkgfvBkVGgnnLUWXoxnomp5up8llg4
                       unofficial_currency_code: null
-                      vested_quantity: 7
-                      vested_value: 66
+                      vested_quantity: null
+                      vested_value: null
                       tax_lots: []
                     item:
                       available_products:
@@ -14475,9 +15007,11 @@ paths:
                 $ref: '#/components/schemas/PlaidError'
       operationId: itemImport
       description: |-
-        `/item/import` creates an Item via your Plaid Exchange Integration and returns an `access_token`. As part of an `/item/import` request, you will include a User ID (`user_auth.user_id`) and Authentication Token (`user_auth.auth_token`) that enable data aggregation through your Plaid Exchange API endpoints. These authentication principals are to be chosen by you.
+        `/item/import` creates an Item for one of your customers and returns an `access_token`, which the other Permissions Manager endpoints take in place of a customer identifier. You supply your own identifier for the customer as `user_auth.user_id`.
 
-        Upon creating an Item via `/item/import`, Plaid will automatically begin an extraction of that Item through the Plaid Exchange infrastructure you have already integrated.
+        The endpoint is idempotent and the `access_token` it returns is long-lived: repeated calls for the same `user_auth.user_id` return the same token.
+
+        Upon creating an Item via `/item/import`, Plaid will automatically begin an extraction of that Item through the data provider API endpoints you have already integrated.
       requestBody:
         required: true
         content:
@@ -17064,7 +17598,7 @@ paths:
       tags:
       - plaid
       externalDocs:
-        url: /api/products/transfer/#transferreturnrecover
+        url: /api/products/transfer/guaranteed-ach/#transferreturnrecover
       operationId: transferReturnRecover
       responses:
         "200":
@@ -20076,6 +20610,39 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SandboxCraCashflowUpdatesUpdateRequest'
+  /sandbox/cra/servicing/simulate:
+    post:
+      summary: Simulate a CRA Servicing report
+      tags:
+      - plaid
+      externalDocs:
+        url: /none/
+      operationId: sandboxCraServicingSimulate
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SandboxCraServicingSimulateResponse'
+              examples:
+                example-1:
+                  value:
+                    report_id: cra-report-sandbox-5f8e1c2a-2b3c-4d5e-6f70-8a9b0c1d2e3f
+                    request_id: mdqfuVxeoza6mhu
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      description: Use the `/sandbox/cra/servicing/simulate` endpoint to synchronously seed a CRA Servicing report in the Sandbox environment and return a `report_id` that can be fetched via `/cra/check_report/base_report/get` or `/cra/check_report/income_insights/get`. This endpoint also fires a `CRA_REPORT_UPDATED` webhook, mirroring the notification a live subscription would emit.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SandboxCraServicingSimulateRequest'
   /sandbox/oauth/select_accounts:
     post:
       summary: Save the selected accounts when connecting to the Platypus OAuth institution
@@ -21084,6 +21651,240 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlaidError'
+  /beta/issues/v1/get:
+    x-hidden-from-docs: true
+    post:
+      tags:
+      - plaid
+      summary: Get an issue
+      externalDocs:
+        url: /api/products/beta/#betaissuesv1get
+      operationId: betaIssuesV1Get
+      description: Retrieve the latest public details for a specific institution issue.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BetaIssuesV1GetRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BetaIssuesV1GetResponse'
+              examples:
+                example-1:
+                  value:
+                    issue_id: KI-12345
+                    issue_type: ERROR
+                    severity: HIGH
+                    institution_id: ins_109508
+                    institution_name: First Platypus Bank
+                    behaviors:
+                    - NEW_CONNECTIONS_CANNOT_BE_ESTABLISHED
+                    issue_error_type: INSTITUTION_ERROR
+                    issue_error_code: INSTITUTION_NOT_RESPONDING
+                    description: New connections are temporarily unavailable.
+                    attribution: DATA_PARTNER
+                    status: IN_PROGRESS
+                    user_guidance: null
+                    estimated_resolution_time: "2026-07-30T00:00:00Z"
+                    start_time: null
+                    end_time: null
+                    impact:
+                      affected_new_item_count: 12
+                      affected_existing_item_count: 0
+                    affected_products:
+                    - transactions
+                    resolution_log: []
+                    request_id: m8MDnv9okwxFNBV
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+  /beta/issues/v1/list:
+    x-hidden-from-docs: true
+    post:
+      tags:
+      - plaid
+      summary: List institution issues
+      externalDocs:
+        url: /api/products/beta/#betaissuesv1list
+      operationId: betaIssuesV1List
+      description: Retrieve high-severity issues for an institution.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BetaIssuesV1ListRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BetaIssuesV1ListResponse'
+              examples:
+                example-1:
+                  value:
+                    issues:
+                    - issue_id: KI-12345
+                      issue_type: ERROR
+                      severity: HIGH
+                      institution_id: ins_109508
+                      institution_name: First Platypus Bank
+                      behaviors:
+                      - NEW_CONNECTIONS_CANNOT_BE_ESTABLISHED
+                      issue_error_type: INSTITUTION_ERROR
+                      issue_error_code: INSTITUTION_NOT_RESPONDING
+                      description: New connections are temporarily unavailable.
+                      attribution: DATA_PARTNER
+                      status: IN_PROGRESS
+                      user_guidance: null
+                      estimated_resolution_time: "2026-07-30T00:00:00Z"
+                      start_time: null
+                      end_time: null
+                      impact:
+                        affected_new_item_count: 12
+                        affected_existing_item_count: 0
+                      affected_products:
+                      - transactions
+                      resolution_log: []
+                    request_id: m8MDnv9okwxFNBV
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+  /beta/issues/v1/match:
+    x-hidden-from-docs: true
+    post:
+      tags:
+      - plaid
+      summary: Match an Item to issues
+      externalDocs:
+        url: /api/products/beta/#betaissuesv1match
+      operationId: betaIssuesV1Match
+      description: Match a Plaid identifier to institution issues that affect it.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BetaIssuesV1MatchRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BetaIssuesV1MatchResponse'
+              examples:
+                example-1:
+                  value:
+                    item_id: L5RRPmxBvPfrPGEGAD1DuNEl1NqpnduPklge9
+                    issues:
+                    - issue_id: KI-12345
+                      issue_type: ERROR
+                      severity: HIGH
+                      institution_id: ins_109508
+                      institution_name: First Platypus Bank
+                      behaviors:
+                      - NEW_CONNECTIONS_CANNOT_BE_ESTABLISHED
+                      issue_error_type: INSTITUTION_ERROR
+                      issue_error_code: INSTITUTION_NOT_RESPONDING
+                      description: New connections are temporarily unavailable.
+                      attribution: DATA_PARTNER
+                      status: IN_PROGRESS
+                      user_guidance: null
+                      estimated_resolution_time: "2026-07-30T00:00:00Z"
+                      start_time: null
+                      end_time: null
+                      impact:
+                        affected_new_item_count: 12
+                        affected_existing_item_count: 0
+                      affected_products:
+                      - transactions
+                      resolution_log: []
+                    request_id: m8MDnv9okwxFNBV
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+  /beta/issues/v1/subscribe:
+    x-hidden-from-docs: true
+    post:
+      tags:
+      - plaid
+      summary: Subscribe to an issue
+      externalDocs:
+        url: /api/products/beta/#betaissuesv1subscribe
+      operationId: betaIssuesV1Subscribe
+      description: Subscribe a webhook URL to resolution notifications for an institution issue.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BetaIssuesV1SubscribeRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BetaIssuesV1SubscribeResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: m8MDnv9okwxFNBV
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+  /beta/issues/v1/unsubscribe:
+    x-hidden-from-docs: true
+    post:
+      tags:
+      - plaid
+      summary: Unsubscribe from an issue
+      externalDocs:
+        url: /api/products/beta/#betaissuesv1unsubscribe
+      operationId: betaIssuesV1Unsubscribe
+      description: Remove the client's subscription to resolution notifications for an institution issue.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BetaIssuesV1UnsubscribeRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BetaIssuesV1UnsubscribeResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: m8MDnv9okwxFNBV
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
   /issues/search:
     post:
       tags:
@@ -21914,13 +22715,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/PlaidError'
   /fdx/recipients:
-    x-hidden-from-docs: true
     get:
       tags:
       - plaid
       summary: Get Recipients
       operationId: getRecipients
-      description: Returns a list of Recipients
+      description: Returns metadata for every recipient (application) your customers have connected to via Plaid's App Directory.
       responses:
         "200":
           description: OK
@@ -21940,7 +22740,7 @@ paths:
                 - recipient_id: 1a6ad795-2b9a-4a9f-8615-e771816c92db
                   client_name: Another Example Client
                   logo_uri: https://client-logos.plaid.com/logo2.png
-                  joined_date: "2027-04-15"
+                  joined_date: "2023-11-12"
                   category: eCommerce
                   connection_count: 209
                   third_party_legal_name: Another Example Client LLC
@@ -21951,11 +22751,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/PlaidError'
   /fdx/consents:
-    x-hidden-from-docs: true
     get:
       tags:
       - plaid
-      summary: List FDX Consent Grants for a customer
+      summary: List FDX consent grants for a customer
       operationId: fdxConsentsList
       description: Returns zero or more consent grants associated with the given data provider customer, optionally filtered by status.
       parameters:
@@ -22032,19 +22831,18 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PlaidError'
+                $ref: '#/components/schemas/FDXError'
   /fdx/consents/{consentId}/revocation:
-    x-hidden-from-docs: true
     put:
       tags:
       - plaid
-      summary: Revoke FDX Consent Grant
+      summary: Revoke FDX consent grant
       operationId: fdxConsentsRevoke
-      description: Appends a REVOKED status record to the named consent grant
+      description: Revokes a consent grant, ending the data recipient's ongoing access to the customer's data.
       parameters:
       - in: path
         name: consentId
-        description: Consent Grant Identifier. Uniquely identifies the consent grant
+        description: Unique identifier of the consent grant.
         required: true
         schema:
           type: string
@@ -22062,17 +22860,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PlaidError'
+                $ref: '#/components/schemas/FDXError'
     get:
       tags:
       - plaid
-      summary: Retrieve FDX Consent Grant revocation records
+      summary: Retrieve FDX consent grant revocation records
       operationId: fdxConsentsRevocationGet
-      description: Returns the revocation history of a consent grant
+      description: Returns the revocation history of a consent grant.
       parameters:
       - in: path
         name: consentId
-        description: Consent Grant Identifier. Uniquely identifies the consent grant
+        description: Unique identifier of the consent grant.
         required: true
         schema:
           type: string
@@ -22094,19 +22892,18 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PlaidError'
+                $ref: '#/components/schemas/FDXError'
   /fdx/consents/{consentId}:
-    x-hidden-from-docs: true
     get:
       tags:
       - plaid
-      summary: Get FDX Consent Grant
+      summary: Get FDX consent grant
       operationId: fdxConsentsGet
-      description: Returns a consent grant by its identifier
+      description: Returns a consent grant by its identifier.
       parameters:
       - in: path
         name: consentId
-        description: Consent Grant Identifier. Uniquely identifies the consent grant
+        description: Unique identifier of the consent grant.
         required: true
         schema:
           type: string
@@ -22148,25 +22945,24 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PlaidError'
+                $ref: '#/components/schemas/FDXError'
   /fdx/recipient/{recipientId}:
-    x-hidden-from-docs: true
     get:
       tags:
       - plaid
       summary: Get Recipient
       operationId: getRecipient
-      description: Get a specific recipient
+      description: Returns metadata for a single recipient (application), identified by `recipientId`.
       parameters:
       - in: path
         name: recipientId
-        description: Recipient Identifier. Uniquely identifies the recipient
+        description: The recipient's (application's) identifier (a UUID), as returned by `/fdx/recipients`.
         required: true
         schema:
           type: string
       - in: header
         name: OAUTH-STATE-ID
-        description: The value that is passed into the OAuth URI 'state' query parameter.
+        description: Optional. If this lookup happens during an active OAuth flow, pass the value of the OAuth `state` parameter to help Plaid correlate this request in logs.
         schema:
           type: string
         required: false
@@ -22209,7 +23005,7 @@ components:
         clientCredentials:
           tokenUrl: https://api.plaid.com/oauth2/apiv2/token
           scopes:
-            cra:report:read: Read CRA report data.
+            cra:read: Read CRA report data.
             user:write: Write user data.
   parameters:
     PlaidNewUserApiEnabledHeader:
@@ -22974,7 +23770,7 @@ components:
           description: |-
             The total amount of funds in the account, calculated from the `current` balance in the `balance` object by subtracting inflows and adding back outflows according to the posted date of each transaction.
 
-            If the account has any pending transactions, historical balance amounts on or after the date of the earliest pending transaction may differ if retrieved in subsequent Asset Reports as a result of those pending transactions posting.
+            If the account has any pending transactions, historical balance amounts on or before the date of the earliest pending transaction may differ if retrieved in subsequent Asset Reports as a result of those pending transactions posting.
         iso_currency_code:
           type: string
           description: The ISO-4217 currency code of the balance. Always `null` if `unofficial_currency_code` is non-`null`.
@@ -24236,6 +25032,56 @@ components:
       required:
       - webhook_fired
       - request_id
+    SandboxUserFireWebhookRequest:
+      type: object
+      description: SandboxUserFireWebhookRequest defines the request schema for `/sandbox/user/fire_webhook`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        user_id:
+          $ref: '#/components/schemas/NewUserID'
+        user_token:
+          $ref: '#/components/schemas/UserToken'
+        webhook_type:
+          $ref: '#/components/schemas/SandboxUserFireWebhookType'
+        webhook_code:
+          $ref: '#/components/schemas/SandboxUserFireWebhookCode'
+        webhook:
+          type: string
+          description: The destination URL that the test webhook will be sent to.
+          format: url
+      required:
+      - webhook_type
+      - webhook_code
+      - webhook
+    SandboxUserFireWebhookType:
+      type: string
+      enum:
+      - CHECK_REPORT
+      description: The webhook types that can be fired by this test endpoint.
+    SandboxUserFireWebhookCode:
+      type: string
+      enum:
+      - USER_CHECK_REPORT_READY
+      - USER_CHECK_REPORT_FAILED
+      - CHECK_REPORT_READY
+      - CHECK_REPORT_FAILED
+      description: The webhook codes that can be fired by this test endpoint.
+    SandboxUserFireWebhookResponse:
+      type: object
+      additionalProperties: true
+      description: SandboxUserFireWebhookResponse defines the response schema for `/sandbox/user/fire_webhook`
+      properties:
+        webhook_fired:
+          type: boolean
+          description: Value is `true` if the test `webhook_code` was successfully fired.
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - webhook_fired
+      - request_id
     AccountsBalanceGetRequest:
       type: object
       description: AccountsBalanceGetRequest defines the request schema for `/accounts/balance/get`
@@ -24380,6 +25226,132 @@ components:
       - accounts
       - item
       - request_id
+    IdentityMatchListRequest:
+      type: object
+      description: IdentityMatchListRequest defines the request schema for `/identity/match/list`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        start_time:
+          type: string
+          format: date-time
+          description: Inclusive start of the query window in RFC 3339 format.
+        end_time:
+          type: string
+          format: date-time
+          description: Inclusive end of the query window in RFC 3339 format.
+        count:
+          type: integer
+          minimum: 1
+          maximum: 25
+          default: 25
+          description: Maximum number of attempts to return in one page.
+        cursor:
+          type: string
+          description: Opaque pagination cursor. Omit on the first request. For subsequent requests, set this field to the `next_cursor` from the previous response and use the same `start_time` and `end_time`.
+      required:
+      - start_time
+      - end_time
+    IdentityMatchListResponse:
+      type: object
+      additionalProperties: true
+      description: IdentityMatchListResponse defines the response schema for `/identity/match/list`
+      properties:
+        identity_match_attempts:
+          type: array
+          description: Page of Link-originated Identity Match attempts ordered by creation time, oldest first.
+          items:
+            $ref: '#/components/schemas/IdentityMatchListAttempt'
+        next_cursor:
+          type: string
+          nullable: true
+          description: Cursor for the next page. Null when there are no more pages.
+        has_more:
+          type: boolean
+          description: Whether more attempts remain in the query window.
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - identity_match_attempts
+      - next_cursor
+      - has_more
+      - request_id
+    IdentityMatchListAttempt:
+      type: object
+      additionalProperties: true
+      description: A Link-originated Identity Match attempt.
+      properties:
+        attempt_id:
+          type: string
+          description: Identifier for the Identity Match attempt.
+        item_id:
+          $ref: '#/components/schemas/ItemId'
+        created_at:
+          type: string
+          format: date-time
+          description: Time at which the attempt was created.
+        link_session_id:
+          type: string
+          description: Link session that produced the attempt.
+        link_customization_name:
+          type: string
+          description: Link customization that supplied the ruleset.
+        ruleset_revision:
+          type: integer
+          minimum: 0
+          description: Revision of the Identity Match ruleset that was applied.
+        outcome:
+          $ref: '#/components/schemas/IdentityMatchListOutcome'
+        outcome_account_id:
+          type: string
+          nullable: true
+          description: Account ID associated with a `PASS` outcome. Null for `FAIL` or `UNKNOWN` outcomes.
+        scores:
+          type: array
+          description: Per-account match scores. Empty if the attempt data is unavailable.
+          items:
+            $ref: '#/components/schemas/IdentityMatchListAttemptScore'
+      required:
+      - attempt_id
+      - item_id
+      - created_at
+      - link_session_id
+      - link_customization_name
+      - ruleset_revision
+      - outcome
+      - outcome_account_id
+      - scores
+    IdentityMatchListAttemptScore:
+      type: object
+      additionalProperties: true
+      description: Identity Match scores for one account.
+      properties:
+        account_id:
+          type: string
+          description: Plaid account ID for the account that was scored.
+        legal_name:
+          $ref: '#/components/schemas/NameMatchScore'
+        phone_number:
+          $ref: '#/components/schemas/PhoneNumberMatchScore'
+        email_address:
+          $ref: '#/components/schemas/EmailAddressMatchScore'
+        address:
+          $ref: '#/components/schemas/AddressMatchScore'
+      required:
+      - account_id
+      - legal_name
+      - phone_number
+      - email_address
+      - address
+    IdentityMatchListOutcome:
+      type: string
+      description: Link outcome for the Identity Match attempt.
+      enum:
+      - PASS
+      - FAIL
+      - UNKNOWN
     IdentityRefreshRequest:
       type: object
       description: IdentityRefreshRequest defines the request schema for `/identity/refresh`
@@ -24952,6 +25924,151 @@ components:
       required:
       - account
       - request_id
+    BetaWebhookEventsListRequest:
+      type: object
+      description: BetaWebhookEventsListRequest defines the request schema for `/beta/webhook_events/list`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        cursor:
+          type: string
+          maxLength: 512
+          description: |-
+            Opaque cursor from a prior `/beta/webhook_events/list` response `next_cursor`. Use this
+            on subsequent requests to continue forward. Mutually exclusive with `start_time`.
+        start_time:
+          type: string
+          format: date-time
+          nullable: true
+          description: |-
+            ISO-8601 timestamp. Returns webhook events with `sent_time` greater than or equal to
+            this value. Must fall within the last 7 days (the retention window). Mutually exclusive
+            with `cursor`. Omit to begin from the oldest retained event.
+        count:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 100
+          nullable: true
+          description: Page size. Default 100, maximum 100.
+        webhook_types:
+          type: array
+          description: Filter by webhook type. Multiple values are OR'd. Combined with other filters using AND.
+          items:
+            type: string
+        webhook_codes:
+          type: array
+          description: Filter by webhook code. Multiple values are OR'd. Combined with other filters using AND.
+          items:
+            type: string
+        item_ids:
+          type: array
+          description: Filter to specific Items. Multiple values are OR'd. Combined with other filters using AND.
+          items:
+            type: string
+        delivery_statuses:
+          type: array
+          description: |-
+            Filter by delivery status. Returns webhook events whose latest delivery state matches
+            any of the supplied values. Combined with other filters using AND.
+          items:
+            $ref: '#/components/schemas/WebhookEventDeliveryStatus'
+    BetaWebhookEventsListResponse:
+      type: object
+      additionalProperties: true
+      description: BetaWebhookEventsListResponse defines the response schema for `/beta/webhook_events/list`
+      properties:
+        webhook_events:
+          type: array
+          description: Webhook events sent to the calling client.
+          items:
+            $ref: '#/components/schemas/WebhookEvent'
+        has_more:
+          type: boolean
+          description: Indicates whether another page of webhook events is available.
+        next_cursor:
+          type: string
+          description: |-
+            Cursor to pass as `cursor` on a later `/beta/webhook_events/list` request to continue
+            forward. Persist and reuse this value even when `has_more` is `false` so the next poll
+            only returns newer events.
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - webhook_events
+      - has_more
+      - next_cursor
+      - request_id
+    WebhookEvent:
+      type: object
+      additionalProperties: true
+      description: A webhook event Plaid sent to the calling client.
+      properties:
+        webhook_message_id:
+          type: string
+          description: Stable, opaque, per-webhook ID for deduplication and support reference.
+        webhook_type:
+          type: string
+          description: The webhook type.
+        webhook_code:
+          type: string
+          description: The webhook code.
+        item_id:
+          type: string
+          nullable: true
+          description: The Item ID associated with the webhook, if any.
+        sent_time:
+          type: string
+          format: date-time
+          description: The time Plaid sent the webhook.
+        payload:
+          $ref: '#/components/schemas/WebhookEventPayload'
+        destination_url:
+          type: string
+          description: The destination URL Plaid sent the webhook to.
+        delivery_status:
+          $ref: '#/components/schemas/WebhookEventDeliveryStatus'
+        last_http_status_code:
+          type: integer
+          nullable: true
+          description: The most recent HTTP status code returned by the destination, if any.
+        attempt_count:
+          type: integer
+          description: Number of delivery attempts Plaid has made for this webhook.
+        last_attempt_time:
+          type: string
+          format: date-time
+          nullable: true
+          description: The most recent delivery attempt timestamp. Null if Plaid has not yet attempted delivery.
+      required:
+      - webhook_message_id
+      - webhook_type
+      - webhook_code
+      - item_id
+      - sent_time
+      - payload
+      - destination_url
+      - delivery_status
+      - last_http_status_code
+      - attempt_count
+      - last_attempt_time
+    WebhookEventPayload:
+      type: object
+      additionalProperties: {}
+      description: The JSON body Plaid sent to the webhook destination.
+    WebhookEventDeliveryStatus:
+      type: string
+      enum:
+      - PENDING
+      - DELIVERED
+      - FAILED
+      description: |-
+        Latest delivery state for this webhook.
+        `PENDING`: Plaid has not yet received a successful response and may still retry.
+        `DELIVERED`: the destination returned a 2xx response.
+        `FAILED`: all delivery attempts were exhausted without a 2xx response.
     WebhookVerificationKeyGetRequest:
       type: object
       description: WebhookVerificationKeyGetRequest defines the request schema for `/webhook_verification_key/get`
@@ -25218,6 +26335,9 @@ components:
         recipient_id:
           type: string
           description: The ID of the recipient the payment is for.
+        user_id:
+          type: string
+          description: The `user_id` of the end user the payment is initiated for, as returned by [`/user/create`](https://plaid.com/docs/api/users/#usercreate). The user must have a `name` and either an email address or a phone number. Required for new integrations.
         reference:
           type: string
           description: |-
@@ -26083,11 +27203,7 @@ components:
         user_token:
           $ref: '#/components/schemas/UserToken'
         user_id:
-          x-hidden-from-docs: true
-          allOf:
-          - $ref: '#/components/schemas/NewUserID'
-      required:
-      - user_token
+          $ref: '#/components/schemas/NewUserID'
     CreditSessionsGetResponse:
       type: object
       additionalProperties: true
@@ -26506,6 +27622,9 @@ components:
         recipient_id:
           type: string
           description: The ID of the recipient the payment consent is for. The created consent can be used to transfer funds to this recipient only.
+        user_id:
+          type: string
+          description: The `user_id` of the end user the payment consent is for, as returned by [`/user/create`](https://plaid.com/docs/api/users/#usercreate). The user must have a `name` and either an email address or a phone number. Payments created from this consent inherit this `user_id`. Required for new integrations.
         reference:
           type: string
           description: A reference for the payment consent. This must be an alphanumeric string with at most 18 characters and must not contain any special characters.
@@ -27143,6 +28262,10 @@ components:
           - kanmon
           - kick
           - increase
+          - airwallex
+          - cybrid
+          - bizcap
+          - webull
           description: The processor you are integrating with.
       required:
       - access_token
@@ -27369,7 +28492,7 @@ components:
           $ref: '#/components/schemas/LinkTokenCreateRequestUser'
         user_id:
           type: string
-          description: A `user_id` generated using `/user/create`. Required for integrations that began using Plaid Protect, Multi-Item Link, or Plaid Check Consumer Report after December 10, 2025. For more details, see [New User APIs](https://plaid.com/docs/api/users/user-apis). One of either the `user_id` or the `user` field is required.
+          description: A `user_id` generated using `/user/create`. Required for integrations that began using Plaid Protect, Multi-Item Link, or Plaid Check Consumer Report after December 10, 2025. Required for new integrations that use Payment Initiation, Variable Recurring Payments, or Virtual Accounts. For more details, see [New User APIs](https://plaid.com/docs/api/users/user-apis). One of either the `user_id` or the `user` field is required.
         products:
           type: array
           description: |-
@@ -27928,7 +29051,7 @@ components:
         database_insights_enabled:
           type: boolean
           deprecated: true
-          description: 'Database Insights has been deprecated and replaced with Database Auth. Use the [Account Verification Dashboard](https://dashboard.plaid.com/account-verification) to enable Database Auth. In Canada, Database Auth is in early availability and cannot yet be managed via the Dashboard; it must be enabled by passing `database_insights_enabled: true` in `/link/token/create`.'
+          description: Database Insights has been deprecated and replaced with Database Auth. Use the [Account Verification Dashboard](https://dashboard.plaid.com/account-verification) to enable Database Auth.
         flow_type:
           type: string
           x-hidden-from-docs: true
@@ -28378,6 +29501,10 @@ components:
         link_session_id:
           type: string
           description: A unique identifier associated with a user's actions and events through the Link flow. Include this identifier when opening a support ticket for faster turnaround.
+        session_group_id:
+          type: string
+          description: An identifier used to group related Layer sessions.
+          x-hidden-from-docs: true
         transfer_status:
           $ref: '#/components/schemas/LinkSessionSuccessMetadataTransferStatus'
     LinkSessionSuccessMetadataInstitution:
@@ -28886,6 +30013,11 @@ components:
         persistent_account_id:
           type: string
           description: A unique and persistent identifier for accounts that can be used to trace multiple instances of the same account across different Items for depository accounts. This field is currently supported only for Items at institutions that use Tokenized Account Numbers (i.e., Chase, PNC, and US Bank). Because these accounts have a different account number each time they are linked, this field may be used instead of the account number to uniquely identify an account across multiple Items for payments use cases, helping to reduce duplicate Items or attempted fraud. In Sandbox, this field is populated for TAN-based institutions (`ins_56`, `ins_13`, `ins_127990`) as well as the OAuth Sandbox institution (`ins_127287`); in Production, it will only be populated for accounts at applicable institutions.
+        apy:
+          type: number
+          format: double
+          description: The annual percentage yield (APY) on an interest-bearing deposit account, expressed as a percentage (e.g. `4.25` means 4.25%). In the event that the APY is not provided by the financial institution, Plaid will return a value of `null`.
+          nullable: true
         holder_category:
           $ref: '#/components/schemas/AccountHolderCategory'
       required:
@@ -29038,8 +30170,10 @@ components:
       - cash isa
       - cash management
       - cd
+      - charge card
       - checking
       - commercial
+      - commercial line of credit
       - construction
       - consumer
       - credit card
@@ -29051,7 +30185,9 @@ components:
       - gic
       - health reimbursement arrangement
       - home equity
+      - home equity loan
       - hsa
+      - installment
       - isa
       - ira
       - keogh
@@ -29075,6 +30211,7 @@ components:
       - paypal
       - payroll
       - pension
+      - prediction market
       - prepaid
       - prif
       - profit sharing plan
@@ -29109,7 +30246,7 @@ components:
       type: string
       nullable: true
       title: HolderCategory
-      description: Indicates the account's categorization as either a personal or a business account. This field is currently in beta; to request access, contact your account manager.
+      description: Indicates the account's categorization as either a personal or a business account. This field is currently in beta; to request access, contact your account manager. Coverage varies by institution, with approximately 70% of accounts populated overall.
       enum:
       - business
       - personal
@@ -29123,7 +30260,7 @@ components:
         name_match_score:
           type: integer
           nullable: true
-          description: Indicates the score of the name match between the given name provided during database verification (available in the [`verification_name`](https://plaid.com/docs/api/products/auth/#auth-get-response-accounts-verification-name) field if using standard Database Auth, or provided in the request if using `/auth/verify`) and matched Plaid network accounts. If defined, will be a value between 0 and 100. Will be undefined if name matching was not enabled for the database verification session or if there were no eligible Plaid network matches to compare the given name with.
+          description: Indicates the score of the name match between the given name provided during database verification (available in the [`verification_name`](https://plaid.com/docs/api/products/auth/#auth-get-response-accounts-verification-name) field if using standard Database Auth, or provided in the request if using `/auth/verify`) and matched Plaid network accounts. If defined, will be a value between 0 and 100. Will be undefined if name matching was not enabled for the database verification session or if there were no eligible Plaid network matches to compare the given name with. For Items at Canadian institutions, name matching is not currently supported, so this field will always be null.
         network_status:
           $ref: '#/components/schemas/AccountVerificationInsightsNetworkStatus'
         previous_returns:
@@ -29870,6 +31007,10 @@ components:
           merchant_entity_id:
             type: string
             description: A unique, stable, Plaid-generated ID that maps to the merchant. In the case of a merchant with multiple retail locations, this field will map to the broader merchant, not a specific location or store.
+            nullable: true
+          merchant_category_code:
+            type: string
+            description: The merchant category code for the transaction, typically a four-digit [ISO 18245](https://www.iso.org/standard/33365.html) string. Not populated for every transaction.
             nullable: true
           client_customization:
             $ref: '#/components/schemas/ClientCustomization'
@@ -32185,10 +33326,268 @@ components:
           nullable: true
           items:
             $ref: '#/components/schemas/StudentLoan'
+        loan:
+          description: The closed-end loan accounts returned.
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/LoanLiability'
+        line_of_credit:
+          description: The line of credit accounts returned.
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/LineOfCreditLiability'
       required:
       - credit
       - mortgage
       - student
+    LoanLiability:
+      title: LoanLiability
+      type: object
+      additionalProperties: true
+      description: Contains details about a closed-end loan account.
+      properties:
+        account_id:
+          type: string
+          description: The ID of the account that this liability belongs to.
+        account_number:
+          type: string
+          nullable: true
+          description: The account number of the loan. For some institutions, this may be a masked version of the number (e.g., the last 4 digits instead of the entire number).
+        interest_rate:
+          $ref: '#/components/schemas/LoanInterestRate'
+        principal_balance:
+          type: number
+          format: double
+          nullable: true
+          description: The outstanding principal balance of the loan.
+        origination_principal_amount:
+          type: number
+          format: double
+          nullable: true
+          description: The original principal amount of the loan.
+        origination_date:
+          type: string
+          format: date
+          nullable: true
+          description: The date on which the loan was originated, in ISO 8601 format (YYYY-MM-DD).
+        loan_term_months:
+          type: integer
+          format: int32
+          nullable: true
+          description: The length of the loan term in months.
+        maturity_date:
+          type: string
+          format: date
+          nullable: true
+          description: The date on which the loan is scheduled to be fully paid, in ISO 8601 format (YYYY-MM-DD).
+        payment_count:
+          type: integer
+          format: int32
+          nullable: true
+          description: The total number of payments scheduled for the loan.
+        payment_frequency:
+          $ref: '#/components/schemas/LoanPaymentFrequency'
+        next_payment_amount:
+          type: number
+          format: double
+          nullable: true
+          description: The amount of the next scheduled payment.
+        next_payment_due_date:
+          type: string
+          format: date
+          nullable: true
+          description: The due date of the next payment, in ISO 8601 format (YYYY-MM-DD).
+        last_payment_amount:
+          type: number
+          format: double
+          nullable: true
+          description: The amount of the most recent payment.
+        last_payment_date:
+          type: string
+          format: date
+          nullable: true
+          description: The date of the most recent payment, in ISO 8601 format (YYYY-MM-DD).
+        payoff_amount:
+          type: number
+          format: double
+          nullable: true
+          description: The amount required to fully pay off the loan.
+        ytd_interest_paid:
+          type: number
+          format: double
+          nullable: true
+          description: The year-to-date interest paid on the loan.
+        compounding_period:
+          $ref: '#/components/schemas/LoanCompoundingPeriod'
+      required:
+      - account_id
+      - account_number
+      - interest_rate
+      - principal_balance
+      - origination_principal_amount
+      - origination_date
+      - loan_term_months
+      - maturity_date
+      - payment_count
+      - payment_frequency
+      - next_payment_amount
+      - next_payment_due_date
+      - last_payment_amount
+      - last_payment_date
+      - payoff_amount
+      - ytd_interest_paid
+      - compounding_period
+    LineOfCreditLiability:
+      title: LineOfCreditLiability
+      type: object
+      additionalProperties: true
+      description: Contains details about a line of credit account.
+      properties:
+        account_id:
+          type: string
+          description: The ID of the account that this liability belongs to.
+        interest_rate:
+          $ref: '#/components/schemas/LoanInterestRate'
+        credit_limit:
+          type: number
+          format: double
+          nullable: true
+          description: The maximum amount of credit available on the account.
+        available_credit:
+          type: number
+          format: double
+          nullable: true
+          description: The amount of credit currently available on the account.
+        principal_balance:
+          type: number
+          format: double
+          nullable: true
+          description: The outstanding principal balance on the account.
+        minimum_payment_amount:
+          type: number
+          format: double
+          nullable: true
+          description: The minimum payment due for the next billing cycle.
+        next_payment_amount:
+          type: number
+          format: double
+          nullable: true
+          description: The amount of the next scheduled payment.
+        next_payment_due_date:
+          type: string
+          format: date
+          nullable: true
+          description: The due date of the next payment, in ISO 8601 format (YYYY-MM-DD).
+        last_payment_amount:
+          type: number
+          format: double
+          nullable: true
+          description: The amount of the most recent payment.
+        last_payment_date:
+          type: string
+          format: date
+          nullable: true
+          description: The date of the most recent payment, in ISO 8601 format (YYYY-MM-DD).
+        last_statement_balance:
+          type: number
+          format: double
+          nullable: true
+          description: The total amount owed as of the last statement issued.
+        last_statement_issue_date:
+          type: string
+          format: date
+          nullable: true
+          description: The date of the last statement, in ISO 8601 format (YYYY-MM-DD).
+        past_due_amount:
+          type: number
+          format: double
+          nullable: true
+          description: The amount of the payment that is currently past due.
+        finance_charges:
+          type: number
+          format: double
+          nullable: true
+          description: The finance charges assessed on the account.
+        draw_period_end_date:
+          type: string
+          format: date
+          nullable: true
+          description: The date on which the draw period ends, in ISO 8601 format (YYYY-MM-DD).
+        aprs:
+          type: array
+          description: The various interest rates that apply to the account.
+          items:
+            $ref: '#/components/schemas/APR'
+      required:
+      - account_id
+      - interest_rate
+      - credit_limit
+      - available_credit
+      - principal_balance
+      - minimum_payment_amount
+      - next_payment_amount
+      - next_payment_due_date
+      - last_payment_amount
+      - last_payment_date
+      - last_statement_balance
+      - last_statement_issue_date
+      - past_due_amount
+      - finance_charges
+      - draw_period_end_date
+      - aprs
+    LoanInterestRate:
+      title: LoanInterestRate
+      type: object
+      additionalProperties: true
+      nullable: true
+      description: Information about the interest rate on a loan or line of credit.
+      properties:
+        percentage:
+          type: number
+          format: double
+          nullable: true
+          description: The interest rate percentage.
+        type:
+          $ref: '#/components/schemas/LoanInterestRateType'
+      required:
+      - percentage
+      - type
+    LoanInterestRateType:
+      title: LoanInterestRateType
+      type: string
+      nullable: true
+      enum:
+      - fixed
+      - variable
+      description: The type of interest rate.
+    LoanPaymentFrequency:
+      title: LoanPaymentFrequency
+      type: string
+      nullable: true
+      enum:
+      - daily
+      - weekly
+      - biweekly
+      - semimonthly
+      - monthly
+      - semiannually
+      - annually
+      description: The frequency at which payments are scheduled.
+    LoanCompoundingPeriod:
+      title: LoanCompoundingPeriod
+      type: string
+      nullable: true
+      enum:
+      - daily
+      - weekly
+      - biweekly
+      - semimonthly
+      - monthly
+      - semiannually
+      - annually
+      description: The frequency at which interest is compounded.
     StudentLoan:
       title: StudentLoan
       type: object
@@ -32701,6 +34100,7 @@ components:
           enum:
           - balance_transfer_apr
           - cash_apr
+          - penalty_apr
           - purchase_apr
           - special
           description: The type of balance to which the APR applies.
@@ -33161,6 +34561,7 @@ components:
       - cra_lend_score
       - cra_plaid_credit_score
       - cra_qualify
+      - cra_home_lending
       - layer
       - pay_by_bank
       - protect_linked_bank
@@ -33413,6 +34814,10 @@ components:
           type: string
           description: The account's mask. Should be an empty string or a string of 2-4 alphanumeric characters. This allows you to model a mask which does not match the account number (such as with a virtual account number).
           pattern: ^$|^[A-Za-z0-9]{2,4}$
+        apy:
+          type: number
+          format: double
+          description: The annual percentage yield (APY) to report on the account, expressed as a percentage (e.g. `4.25` means 4.25%). Applies to interest-bearing depository accounts; if omitted, the account reports no APY.
       required:
       - name
       - official_name
@@ -34781,7 +36186,7 @@ components:
       title: ProtectUserEventWebhook
       type: object
       additionalProperties: true
-      description: Fired when there has been a new user event. The webhook payload contains limited information about the event. For full event details, call [`/protect/event/get`](https://plaid.com/docs/api/products/protect/#protecteventget).
+      description: Fired when there has been a new user event. The webhook payload contains limited information about the event.
       x-examples:
         example-1:
           webhook_type: PROTECT
@@ -35523,6 +36928,9 @@ components:
       type: string
       description: A credit card type account.
       properties:
+        charge card:
+          type: string
+          description: Bank-issued charge card
         credit card:
           type: string
           description: Bank-issued credit card
@@ -35546,6 +36954,9 @@ components:
         commercial:
           type: string
           description: Commercial loan
+        commercial line of credit:
+          type: string
+          description: Commercial line of credit
         construction:
           type: string
           description: Construction loan
@@ -35555,6 +36966,12 @@ components:
         home equity:
           type: string
           description: Home Equity Line of Credit (HELOC)
+        home equity loan:
+          type: string
+          description: Home equity loan
+        installment:
+          type: string
+          description: Installment loan
         line of credit:
           type: string
           description: Pre-approved line of credit
@@ -35684,6 +37101,9 @@ components:
         pension:
           type: string
           description: Standard pension account
+        prediction market:
+          type: string
+          description: Account used to hold positions in prediction markets
         prif:
           type: string
           description: Prescribed Registered Retirement Income Fund (Canada)
@@ -35797,6 +37217,7 @@ components:
       - other annuity
       - other insurance
       - pension
+      - prediction market
       - prif
       - profit sharing plan
       - qshr
@@ -36504,7 +37925,7 @@ components:
         transaction_datetime:
           type: string
           format: date-time
-          description: Timestamp in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (`YYYY-MM-DDTHH:mm:ssZ`) representing when the order type was initiated. This field is returned for select financial institutions and reflects the value provided by the institution.
+          description: Timestamp in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (`YYYY-MM-DDTHH:mm:ssZ`) representing when the order was initiated. This field is returned for select financial institutions and reflects the value provided by the institution. When the institution only provides a date without time-of-day information, this field will reflect the date that the order was initiated with a time component that defaults to `T00:00:00Z`. This does not indicate that the order was initiated at midnight UTC.
           nullable: true
         name:
           type: string
@@ -37746,15 +39167,15 @@ components:
 
         The following codes indicate that the authorization decision was `declined`:
 
-        `NSF` - Transaction has an elevated probability of resulting in a return due to insufficient funds.
+        `NSF` - Transaction has an elevated risk of resulting in a return due to insufficient funds.
 
         `RISK` - Transaction is high-risk.
 
         `TRANSFER_LIMIT_REACHED` - One or several transfer limits are reached, e.g. monthly transfer limit. Check the accompanying `description` field to understand which limit has been reached.
 
-        `ADMIN` - Transaction has an elevated probability of resulting in an administrative return (for example a closed, invalid, or unauthorized account).
+        `ADMIN` - Transaction has an elevated risk of resulting in an administrative return (for example a closed, invalid, or unauthorized account).
 
-        `FRAUD` - Transaction has an elevated probability of being fraudulent.
+        `FRAUD` - Transaction has an elevated risk of being fraudulent.
       enum:
       - NSF
       - RISK
@@ -42359,7 +43780,7 @@ components:
             type: string
           owners:
             type: array
-            description: Data returned by the financial institution about the account owner or owners. Only returned by Identity or Assets endpoints. For business accounts, the name reported may be either the name of the individual or the name of the business, depending on the institution; detecting whether the linked account is a business account is not currently supported. Multiple owners on a single account will be represented in the same `owner` object, not in multiple owner objects within the array. In API versions 2018-05-22 and earlier, the `owners` object is not returned, and instead identity information is returned in the top level `identity` object. For more details, see [Plaid API versioning](https://plaid.com/docs/api/versioning/#version-2019-05-29)
+            description: Data returned by the financial institution about the account owner or owners. Only returned by Identity or Assets endpoints. For business accounts, the name reported may be either the name of the individual or the name of the business, depending on the institution. To determine whether the linked account is a business account, use the `holder_category` field on the account object. Multiple owners on a single account will be represented in the same `owner` object, not in multiple owner objects within the array. In API versions 2018-05-22 and earlier, the `owners` object is not returned, and instead identity information is returned in the top level `identity` object. For more details, see [Plaid API versioning](https://plaid.com/docs/api/versioning/#version-2019-05-29)
             items:
               $ref: '#/components/schemas/Owner'
         required:
@@ -42390,10 +43811,14 @@ components:
             $ref: '#/components/schemas/EmailAddressMatchScore'
           address:
             $ref: '#/components/schemas/AddressMatchScore'
+        required:
+        - legal_name
+        - phone_number
+        - email_address
+        - address
     NameMatchScore:
       title: NameMatchScore
       type: object
-      nullable: true
       additionalProperties: true
       description: Score found by matching name provided by the API with the name on the account at the financial institution. If the account contains multiple owners, the maximum match score is filled.
       properties:
@@ -42413,10 +43838,14 @@ components:
           type: boolean
           nullable: true
           description: Is `true` if the name on either of the names that was matched for the score contained strings indicative of a business name, such as "CORP", "LLC", "INC", or "LTD". A `true` result generally indicates that an account's name is a business name. However, a `false` result does not mean the account name is not a business name, as some businesses do not use these strings in the names used for their financial institution accounts.
+      required:
+      - score
+      - is_first_name_or_last_name_match
+      - is_nickname_match
+      - is_business_name_detected
     PhoneNumberMatchScore:
       title: PhoneNumberMatchScore
       type: object
-      nullable: true
       additionalProperties: true
       description: Score found by matching phone number provided by the API with the phone number on the account at the financial institution. 100 is a perfect match and 0 is a no match. If the account contains multiple owners, the maximum match score is filled.
       properties:
@@ -42424,10 +43853,11 @@ components:
           type: integer
           nullable: true
           description: Match score for normalized phone number. 100 is a perfect match, 99-70 is a partial match (matching the same phone number with extension against one without extension, etc.), anything below 70 is considered a mismatch. Typically, the match threshold should be set to a score of 70 or higher. If the phone number is missing from either the API or financial institution, this is null.
+      required:
+      - score
     EmailAddressMatchScore:
       title: EmailAddressMatchScore
       type: object
-      nullable: true
       additionalProperties: true
       description: Score found by matching email provided by the API with the email on the account at the financial institution. 100 is a perfect match and 0 is a no match. If the account contains multiple owners, the maximum match score is filled.
       properties:
@@ -42435,10 +43865,11 @@ components:
           type: integer
           nullable: true
           description: Match score for normalized email. 100 is a perfect match, 99-70 is a partial match (matching the same email with different '+' extensions), anything below 70 is considered a mismatch. Typically, the match threshold should be set to a score of 70 or higher. If the email is missing from either the API or financial institution, this is null.
+      required:
+      - score
     AddressMatchScore:
       title: AddressMatchScore
       type: object
-      nullable: true
       additionalProperties: true
       description: Score found by matching address provided by the API with the address on the account at the financial institution. The score can range from 0 to 100 where 100 is a perfect match and 0 is a no match. If the account contains multiple owners, the maximum match score is filled.
       properties:
@@ -42450,6 +43881,9 @@ components:
           type: boolean
           nullable: true
           description: postal code was provided for both and was a match
+      required:
+      - score
+      - is_postal_code_match
     DepositoryFilter:
       title: DepositoryFilter
       description: A filter to apply to `depository`-type accounts
@@ -42562,6 +43996,7 @@ components:
       type: string
       description: Valid account subtypes for credit accounts. For a list containing descriptions of each subtype, see [Account schemas](https://plaid.com/docs/api/accounts/#StandaloneAccountType-credit).
       enum:
+      - charge card
       - credit card
       - paypal
       - all
@@ -42572,9 +44007,12 @@ components:
       - auto
       - business
       - commercial
+      - commercial line of credit
       - construction
       - consumer
       - home equity
+      - home equity loan
+      - installment
       - loan
       - mortgage
       - overdraft
@@ -42616,6 +44054,7 @@ components:
       - other annuity
       - other insurance
       - pension
+      - prediction market
       - prif
       - profit sharing plan
       - qshr
@@ -43051,6 +44490,47 @@ components:
       - item_id
       - verification_status
       - environment
+    UserIncomeVerificationStatusWebhook:
+      title: UserIncomeVerificationStatusWebhook
+      type: object
+      additionalProperties: true
+      description: Fired when the status of an income verification instance has changed. This webhook is fired for both the Document and Payroll Income flows, but not the Bank Income flow. It will typically take several minutes for this webhook to fire after the end user has uploaded their documents in the Document Income flow.
+      x-examples:
+        example-1:
+          webhook_type: INCOME
+          webhook_code: USER_INCOME_VERIFICATION
+          item_id: gAXlMgVEw5uEGoQnnXZ6tn9E7Mn3LBc4PJVKZ
+          user_id: usr_8c3ZbDBYjaqUXZ
+          verification_status: VERIFICATION_STATUS_PROCESSING_COMPLETE
+          environment: production
+      properties:
+        webhook_type:
+          type: string
+          description: '`"INCOME"`'
+        webhook_code:
+          type: string
+          description: '`USER_INCOME_VERIFICATION`'
+        item_id:
+          type: string
+          description: The Item ID associated with the verification.
+        user_id:
+          $ref: '#/components/schemas/NewUserID'
+        verification_status:
+          type: string
+          description: |-
+            `VERIFICATION_STATUS_PROCESSING_COMPLETE`:  The income verification processing has completed. This indicates that the documents have been parsed successfully or that the documents were not parsable. If the user uploaded multiple documents, this webhook will fire when all documents have finished processing. Call the `/credit/payroll_income/get` endpoint and check the document metadata to see which documents were successfully parsed.
+
+            `VERIFICATION_STATUS_PROCESSING_FAILED`: An unexpected internal error occurred when attempting to process the verification documentation.
+
+            `VERIFICATION_STATUS_PENDING_APPROVAL`: (deprecated) The income verification has been sent to the user for review.
+        environment:
+          $ref: '#/components/schemas/WebhookEnvironmentValues'
+      required:
+      - webhook_type
+      - webhook_code
+      - item_id
+      - verification_status
+      - environment
     IncomeVerificationRiskSignalsStatusWebhook:
       title: IncomeVerificationRiskSignalsStatusWebhook
       type: object
@@ -43076,6 +44556,42 @@ components:
           description: The Item ID associated with the verification.
         user_id:
           $ref: '#/components/schemas/UserId'
+        risk_signals_status:
+          type: string
+          description: '`RISK_SIGNALS_PROCESSING_COMPLETE`: The income verification fraud detection processing has completed. If the user uploaded multiple documents, this webhook will fire when all documents have finished processing. Call the `/credit/payroll_income/risk_signals/get` endpoint to get all risk signal data.'
+        environment:
+          $ref: '#/components/schemas/WebhookEnvironmentValues'
+      required:
+      - webhook_type
+      - webhook_code
+      - item_id
+      - risk_signals_status
+      - environment
+    UserIncomeVerificationRiskSignalsStatusWebhook:
+      title: UserIncomeVerificationRiskSignalsStatusWebhook
+      type: object
+      additionalProperties: true
+      description: Fired when risk signals have been processed for documents uploaded via Document Income. It will typically take a minute or two for this webhook to fire after the end user has uploaded their documents in the Document Income flow. Once this webhook has fired, `/credit/payroll_income/risk_signals/get` may then be called to determine whether the documents were successfully processed and to retrieve risk data.
+      x-examples:
+        example-1:
+          webhook_type: INCOME
+          webhook_code: USER_INCOME_VERIFICATION_RISK_SIGNALS
+          item_id: gAXlMgVEw5uEGoQnnXZ6tn9E7Mn3LBc4PJVKZ
+          user_id: usr_8c3ZbDBYjaqUXZ
+          risk_signals_status: RISK_SIGNALS_PROCESSING_COMPLETE
+          environment: production
+      properties:
+        webhook_type:
+          type: string
+          description: '`"INCOME"`'
+        webhook_code:
+          type: string
+          description: '`USER_INCOME_VERIFICATION_RISK_SIGNALS`'
+        item_id:
+          type: string
+          description: The Item ID associated with the verification.
+        user_id:
+          $ref: '#/components/schemas/NewUserID'
         risk_signals_status:
           type: string
           description: '`RISK_SIGNALS_PROCESSING_COMPLETE`: The income verification fraud detection processing has completed. If the user uploaded multiple documents, this webhook will fire when all documents have finished processing. Call the `/credit/payroll_income/risk_signals/get` endpoint to get all risk signal data.'
@@ -44734,9 +46250,7 @@ components:
         user_token:
           $ref: '#/components/schemas/UserToken'
         user_id:
-          x-hidden-from-docs: true
-          allOf:
-          - $ref: '#/components/schemas/NewUserID'
+          $ref: '#/components/schemas/NewUserID'
         options:
           $ref: '#/components/schemas/CreditBankIncomeGetRequestOptions'
     CreditBankIncomeGetRequestOptions:
@@ -44773,11 +46287,7 @@ components:
         user_token:
           $ref: '#/components/schemas/UserToken'
         user_id:
-          x-hidden-from-docs: true
-          allOf:
-          - $ref: '#/components/schemas/NewUserID'
-      required:
-      - user_token
+          $ref: '#/components/schemas/NewUserID'
     CreditBankIncomePDFGetResponse:
       title: CreditBankIncomePDFGetResponse
       format: binary
@@ -45218,20 +46728,16 @@ components:
         user_token:
           $ref: '#/components/schemas/UserToken'
         user_id:
-          x-hidden-from-docs: true
-          allOf:
-          - $ref: '#/components/schemas/NewUserID'
+          $ref: '#/components/schemas/NewUserID'
         options:
           $ref: '#/components/schemas/CreditBankStatementsUploadsGetRequestOptions'
-      required:
-      - user_token
     CreditBankStatementsUploadsGetRequestOptions:
       description: An optional object for `/credit/bank_statements/uploads/get` request options.
       type: object
       properties:
         item_ids:
           type: array
-          description: An array of `item_id`s whose bank statements information is returned. Each `item_id` should uniquely identify a bank statements uploaded item. If this field is not provided, all `item_id`s associated with the `user_token` will be returned in the response.
+          description: An array of `item_id`s whose bank statements information is returned. Each `item_id` should uniquely identify a bank statements uploaded item. If this field is not provided, all `item_id`s associated with the user will be returned in the response.
           items:
             type: string
     CreditPayrollIncomeParsingConfigUpdateRequest:
@@ -45247,9 +46753,7 @@ components:
         user_token:
           $ref: '#/components/schemas/UserToken'
         user_id:
-          x-hidden-from-docs: true
-          allOf:
-          - $ref: '#/components/schemas/NewUserID'
+          $ref: '#/components/schemas/NewUserID'
         item_id:
           $ref: '#/components/schemas/ItemId'
         parsing_config:
@@ -45258,7 +46762,6 @@ components:
           items:
             $ref: '#/components/schemas/IncomeVerificationDocParsingConfig'
       required:
-      - user_token
       - parsing_config
     CreditPayrollIncomeParsingConfigUpdateResponse:
       title: CreditPayrollIncomeParsingConfigUpdateResponse
@@ -45298,9 +46801,7 @@ components:
         user_token:
           $ref: '#/components/schemas/UserToken'
         user_id:
-          x-hidden-from-docs: true
-          allOf:
-          - $ref: '#/components/schemas/NewUserID'
+          $ref: '#/components/schemas/NewUserID'
     CreditPayrollIncomeRiskSignalsGetResponse:
       title: CreditPayrollIncomeRiskSignalsGetResponse
       type: object
@@ -45538,9 +47039,7 @@ components:
         user_token:
           $ref: '#/components/schemas/UserToken'
         user_id:
-          x-hidden-from-docs: true
-          allOf:
-          - $ref: '#/components/schemas/NewUserID'
+          $ref: '#/components/schemas/NewUserID'
         options:
           $ref: '#/components/schemas/CreditPayrollIncomeGetRequestOptions'
     CreditPayrollIncomeGetRequestOptions:
@@ -45549,7 +47048,7 @@ components:
       properties:
         item_ids:
           type: array
-          description: An array of `item_id`s whose payroll information is returned. Each `item_id` should uniquely identify a payroll income item. If this field is not provided, all `item_id`s associated with the `user_token` will be returned in the response.
+          description: An array of `item_id`s whose payroll information is returned. Each `item_id` should uniquely identify a payroll income item. If this field is not provided, all `item_id`s associated with the user will be returned in the response.
           items:
             type: string
     CreditPayrollIncomeGetResponse:
@@ -47233,13 +48732,9 @@ components:
         user_token:
           $ref: '#/components/schemas/UserToken'
         user_id:
-          x-hidden-from-docs: true
-          allOf:
-          - $ref: '#/components/schemas/NewUserID'
+          $ref: '#/components/schemas/NewUserID'
         options:
           $ref: '#/components/schemas/CreditPayrollIncomeRefreshRequestOptions'
-      required:
-      - user_token
     CreditPayrollIncomeRefreshRequestOptions:
       description: An optional object for `/credit/payroll_income/refresh` request options.
       type: object
@@ -47248,7 +48743,7 @@ components:
           type: array
           items:
             type: string
-          description: An array of `item_id`s to be refreshed. Each `item_id` should uniquely identify a payroll income item. If this field is not provided, all `item_id`s associated with the `user_token` will be refreshed.
+          description: An array of `item_id`s to be refreshed. Each `item_id` should uniquely identify a payroll income item. If this field is not provided, all `item_id`s associated with the user will be refreshed.
         webhook:
           type: string
           description: The URL where Plaid will send the payroll income refresh webhook.
@@ -47276,8 +48771,8 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_token:
           $ref: '#/components/schemas/UserToken'
-      required:
-      - user_token
+        user_id:
+          $ref: '#/components/schemas/NewUserID'
     CreditEmploymentGetResponse:
       title: CreditEmploymentGetResponse
       type: object
@@ -47989,6 +49484,11 @@ components:
           description: A list of connected applications.
           items:
             $ref: '#/components/schemas/ConnectedApplication'
+        disconnected_applications:
+          type: array
+          description: A list of applications that the user previously connected and has since disconnected. Disconnected applications carry no `scopes` or `created_at`, since the user has revoked their access.
+          items:
+            $ref: '#/components/schemas/DisconnectedApplication'
       required:
       - applications
     ConnectedApplication:
@@ -48027,6 +49527,34 @@ components:
       - application_id
       - name
       - created_at
+    DisconnectedApplication:
+      description: Describes an application that a particular end user previously connected and has since disconnected.
+      type: object
+      properties:
+        application_id:
+          $ref: '#/components/schemas/ApplicationID'
+        name:
+          type: string
+          description: The name of the application
+        display_name:
+          type: string
+          nullable: true
+          description: A human-readable name of the application for display purposes
+        logo_url:
+          nullable: true
+          type: string
+          description: A URL that links to the application logo image.
+        application_url:
+          nullable: true
+          type: string
+          description: The URL for the application's website
+        reason_for_access:
+          nullable: true
+          type: string
+          description: A string provided by the connected app stating why they use their respective enabled products.
+      required:
+      - application_id
+      - name
     AccountSelectionCardinality:
       type: string
       description: |-
@@ -48117,7 +49645,7 @@ components:
           type: array
           description: An array of objects containing timestamps for the last time each data type was accessed per application.
           items:
-            $ref: '#/components/schemas/LastDataAccessTimes'
+            $ref: '#/components/schemas/ApplicationLastDataAccessTimes'
         cursor:
           type: string
           description: Cursor used for pagination.
@@ -48125,7 +49653,7 @@ components:
       - activities
       - last_data_access_times
       - request_id
-    LastDataAccessTimes:
+    ApplicationLastDataAccessTimes:
       description: Describes the last time each datatype was accessed by an application.
       type: object
       additionalProperties: true
@@ -48145,11 +49673,11 @@ components:
           format: date-time
           description: The last time `account_routing_number` was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
           example: "2023-02-08T10:00:00Z"
-        contact_details:
+        contact_info:
           type: string
           nullable: true
           format: date-time
-          description: The last time `contact_details` was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
+          description: The last time `contact_info` was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
           example: "2023-02-08T10:00:00Z"
         transactions:
           type: string
@@ -48157,11 +49685,11 @@ components:
           format: date-time
           description: The last time `transactions` was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
           example: "2023-02-08T10:00:00Z"
-        credit_and_loans:
+        credit_loan_info:
           type: string
           nullable: true
           format: date-time
-          description: The last time `credit_and_loans` was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
+          description: The last time `credit_loan_info` was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
           example: "2023-02-08T10:00:00Z"
         investments:
           type: string
@@ -48169,28 +49697,14 @@ components:
           format: date-time
           description: The last time `investments` was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
           example: "2023-02-08T10:00:00Z"
-        payroll_info:
-          type: string
-          nullable: true
-          format: date-time
-          description: The last time `payroll_info` was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
-          example: "2023-02-08T10:00:00Z"
-        transaction_risk_info:
-          type: string
-          nullable: true
-          format: date-time
-          description: The last time `transaction_risk_info` was accessed by this application in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format in UTC. null if never accessed.
-          example: "2023-02-08T10:00:00Z"
       required:
       - application_id
       - account_balance_info
       - account_routing_number
-      - contact_details
+      - contact_info
       - transactions
-      - credit_and_loans
+      - credit_loan_info
       - investments
-      - payroll_info
-      - transaction_risk_info
     ConsentEvent:
       description: Describes a consent event.
       additionalProperties: true
@@ -48354,7 +49868,8 @@ components:
           type: string
           description: The Item ID associated with the verification.
         user_id:
-          $ref: '#/components/schemas/UserId'
+          type: string
+          description: The user identifier to include in the test webhook. For `USER_INCOME_VERIFICATION` and `USER_INCOME_VERIFICATION_RISK_SIGNALS`, use the `user_id` returned by `/user/create`, which begins with `usr_`. For `INCOME_VERIFICATION` and `INCOME_VERIFICATION_RISK_SIGNALS`, use the legacy webhook `user_id` associated with the user token.
         webhook:
           type: string
           description: The URL to which the webhook should be sent.
@@ -48381,7 +49896,9 @@ components:
       type: string
       enum:
       - INCOME_VERIFICATION
+      - USER_INCOME_VERIFICATION
       - INCOME_VERIFICATION_RISK_SIGNALS
+      - USER_INCOME_VERIFICATION_RISK_SIGNALS
       description: The webhook codes that can be fired by this test endpoint.
     SandboxIncomeFireWebhookResponse:
       title: SandboxIncomeFireWebhookResponse
@@ -48465,6 +49982,59 @@ components:
       type: object
       description: SandboxCraCashflowUpdatesUpdateResponse defines the response schema for `/sandbox/cra/cashflow_updates/update`
       properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
+    SandboxCraServicingSimulateRequest:
+      title: SandboxCraServicingSimulateRequest
+      type: object
+      description: SandboxCraServicingSimulateRequest defines the request schema for `/sandbox/cra/servicing/simulate`
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        subscription_id:
+          type: string
+          description: The Servicing subscription to simulate an update for. Upon calling this endpoint, Plaid will simulate a report creation for all products referenced by this subscription ID.
+        options:
+          $ref: '#/components/schemas/SandboxCraServicingSimulateRequestOptions'
+      required:
+      - subscription_id
+    SandboxCraServicingSimulateRequestOptions:
+      title: SandboxCraServicingSimulateRequestOptions
+      type: object
+      nullable: true
+      description: Optional parameters controlling the simulated report.
+      properties:
+        transactions_end_date:
+          type: string
+          format: date
+          nullable: true
+          description: The end of the synthesized transaction window ("the present"), as a YYYY-MM-DD date. Accepts past or future dates up to 180 days ahead; defaults to today. A later value appends newer transactions without churning earlier ones.
+        error_webhook_code:
+          $ref: '#/components/schemas/SandboxCraServicingSimulateErrorWebhookCode'
+    SandboxCraServicingSimulateErrorWebhookCode:
+      type: string
+      nullable: true
+      enum:
+      - USER_NOT_FOUND
+      - PRODUCT_GENERATION_FAILED
+      - UNMATCH
+      - DATA_UNAVAILABLE
+      - NO_ELIGIBLE_ITEMS_ON_PROFILE
+      description: If set, skip report generation and instead fire a `CRA_REPORT_UPDATED` error webhook carrying this code.
+    SandboxCraServicingSimulateResponse:
+      title: SandboxCraServicingSimulateResponse
+      additionalProperties: true
+      type: object
+      description: SandboxCraServicingSimulateResponse defines the response schema for `/sandbox/cra/servicing/simulate`
+      properties:
+        report_id:
+          type: string
+          nullable: true
+          description: The `cra-report` token for the seeded snapshot. Pin as `report_id` on `/cra/check_report/base_report/get` or `/cra/check_report/income_insights/get`. Omitted when `error_webhook_code` was used.
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
@@ -48785,6 +50355,9 @@ components:
           $ref: '#/components/schemas/WalletTransactionCounterparty'
         amount:
           $ref: '#/components/schemas/WalletTransactionAmount'
+        user_id:
+          type: string
+          description: The `user_id` of the end user the transaction is for, as returned by [`/user/create`](https://plaid.com/docs/api/users/#usercreate). The user must have a `name` and either an email address or a phone number. Required for new integrations.
         reference:
           type: string
           maxLength: 18
@@ -49146,6 +50719,7 @@ components:
           - RECALL
           - ACCOUNT_FUNDING
           - AUTO_REFUND
+          - TRANSFER_OUT
           description: |-
             The type of the transaction. The supported transaction types that are returned are:
             `BANK_TRANSFER:` a transaction which credits an e-wallet through an external bank transfer.
@@ -49165,6 +50739,8 @@ components:
             `ACCOUNT_FUNDING`: an incoming transfer from an allowlisted account. Not automatically refunded.
 
             `AUTO_REFUND`: an outgoing refund automatically initiated by Plaid in response to an unexpected `BANK_TRANSFER`.
+
+            `TRANSFER_OUT`: a transaction that debits an e-wallet and cannot be classified under another category, typically initiated by a non-Plaid flow due to technical errors, FPS timeouts, or other payment-related issues.
         scheme:
           $ref: '#/components/schemas/WalletPaymentScheme'
         amount:
@@ -49956,6 +51532,348 @@ components:
         ewa_attributes:
           $ref: '#/components/schemas/EwaAttributes'
       additionalProperties: true
+    BetaIssuesV1GetRequest:
+      x-hidden-from-docs: true
+      type: object
+      description: BetaIssuesV1GetRequest defines the request schema for `/beta/issues/v1/get`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        issue_id:
+          type: string
+          description: The KI- or INC-prefixed identifier of the issue to retrieve.
+      required:
+      - issue_id
+    BetaIssuesV1GetResponse:
+      x-hidden-from-docs: true
+      type: object
+      description: BetaIssuesV1GetResponse defines the response schema for `/beta/issues/v1/get`.
+      additionalProperties: true
+      allOf:
+      - $ref: '#/components/schemas/BetaIssuesV1Issue'
+      - type: object
+        properties:
+          request_id:
+            $ref: '#/components/schemas/RequestID'
+      required:
+      - issue_id
+      - issue_type
+      - severity
+      - institution_id
+      - institution_name
+      - behaviors
+      - issue_error_type
+      - issue_error_code
+      - description
+      - attribution
+      - status
+      - user_guidance
+      - estimated_resolution_time
+      - start_time
+      - end_time
+      - impact
+      - affected_products
+      - resolution_log
+      - request_id
+    BetaIssuesV1ListRequest:
+      x-hidden-from-docs: true
+      type: object
+      description: BetaIssuesV1ListRequest defines the request schema for `/beta/issues/v1/list`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        institution_id:
+          type: string
+          description: The identifier of the institution whose issues should be returned.
+      required:
+      - institution_id
+    BetaIssuesV1ListResponse:
+      x-hidden-from-docs: true
+      type: object
+      description: BetaIssuesV1ListResponse defines the response schema for `/beta/issues/v1/list`.
+      additionalProperties: true
+      properties:
+        issues:
+          type: array
+          description: Critical and high-severity issues that are active or were resolved in the past 14 days. An empty list indicates that no matching issues were found.
+          items:
+            $ref: '#/components/schemas/BetaIssuesV1Issue'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - issues
+      - request_id
+    BetaIssuesV1MatchRequest:
+      x-hidden-from-docs: true
+      type: object
+      description: BetaIssuesV1MatchRequest defines the request schema for `/beta/issues/v1/match`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        identifier_type:
+          $ref: '#/components/schemas/BetaIssuesV1MatchIdentifierType'
+        identifier:
+          type: string
+          description: The Item, request, Link session, or Account identifier to match.
+      required:
+      - identifier_type
+      - identifier
+    BetaIssuesV1MatchResponse:
+      x-hidden-from-docs: true
+      type: object
+      description: BetaIssuesV1MatchResponse defines the response schema for `/beta/issues/v1/match`.
+      additionalProperties: true
+      properties:
+        item_id:
+          type: string
+          description: The identifier of the Item used to match issues.
+        issues:
+          type: array
+          description: Issues matched to the Item. An empty list indicates that no matching issues were found.
+          items:
+            $ref: '#/components/schemas/BetaIssuesV1Issue'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - item_id
+      - issues
+      - request_id
+    BetaIssuesV1MatchIdentifierType:
+      x-hidden-from-docs: true
+      type: string
+      description: The type of identifier supplied to `/beta/issues/v1/match`.
+      enum:
+      - ITEM_ID
+      - REQUEST_ID
+      - LINK_SESSION_ID
+      - ACCOUNT_ID
+    BetaIssuesV1SubscribeRequest:
+      x-hidden-from-docs: true
+      type: object
+      description: BetaIssuesV1SubscribeRequest defines the request schema for `/beta/issues/v1/subscribe`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        issue_id:
+          type: string
+          description: The KI- or INC-prefixed identifier of the issue to subscribe to.
+        webhook:
+          type: string
+          format: url
+          description: The URL that will receive issue resolution webhooks.
+      required:
+      - issue_id
+      - webhook
+    BetaIssuesV1SubscribeResponse:
+      x-hidden-from-docs: true
+      type: object
+      description: BetaIssuesV1SubscribeResponse defines the response schema for `/beta/issues/v1/subscribe`.
+      additionalProperties: true
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
+    BetaIssuesV1UnsubscribeRequest:
+      x-hidden-from-docs: true
+      type: object
+      description: BetaIssuesV1UnsubscribeRequest defines the request schema for `/beta/issues/v1/unsubscribe`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        issue_id:
+          type: string
+          description: The customer-visible KI- or INC-prefixed identifier of the issue to unsubscribe from.
+      required:
+      - issue_id
+    BetaIssuesV1UnsubscribeResponse:
+      x-hidden-from-docs: true
+      type: object
+      description: BetaIssuesV1UnsubscribeResponse defines the response schema for `/beta/issues/v1/unsubscribe`.
+      additionalProperties: true
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
+    BetaIssuesV1Issue:
+      x-hidden-from-docs: true
+      type: object
+      description: A customer-facing institution issue.
+      additionalProperties: true
+      properties:
+        issue_id:
+          type: string
+          description: The customer-visible identifier of the issue.
+        issue_type:
+          $ref: '#/components/schemas/BetaIssuesV1IssueType'
+        severity:
+          $ref: '#/components/schemas/BetaIssuesV1IssueSeverity'
+        institution_id:
+          type: string
+          description: The identifier of the institution affected by the issue.
+        institution_name:
+          type: string
+          description: The name of the institution affected by the issue.
+        behaviors:
+          type: array
+          description: The customer-visible effects of the issue.
+          items:
+            $ref: '#/components/schemas/BetaIssuesV1IssueBehavior'
+        issue_error_type:
+          type: string
+          nullable: true
+          description: The API error type associated with the issue if available. Mirrors the `error_type` field on `PlaidError` returned on error responses and is safe for programmatic use. Always null or non-null together with `issue_error_code`.
+          example: INSTITUTION_ERROR
+        issue_error_code:
+          type: string
+          nullable: true
+          description: The API error code associated with the issue if available. Always null or non-null together with `issue_error_type`.
+          example: INSTITUTION_NOT_RESPONDING
+        description:
+          type: string
+          description: A customer-facing explanation of the issue.
+        attribution:
+          $ref: '#/components/schemas/BetaIssuesV1IssueAttribution'
+        status:
+          $ref: '#/components/schemas/BetaIssuesV1IssueStatus'
+        user_guidance:
+          type: string
+          nullable: true
+          description: Guidance for an end user affected by the issue, or null when no guidance is available.
+        estimated_resolution_time:
+          type: string
+          format: date-time
+          nullable: true
+          description: The estimated resolution time, or null when no estimate is available.
+        start_time:
+          type: string
+          format: date-time
+          nullable: true
+          description: The time the issue began, or null when it is unknown. Only populated for incidents.
+        end_time:
+          type: string
+          format: date-time
+          nullable: true
+          description: The time the issue ended, or null while it remains active.
+        impact:
+          $ref: '#/components/schemas/BetaIssuesV1IssueImpact'
+        affected_products:
+          type: array
+          description: The Plaid products affected by the issue.
+          items:
+            $ref: '#/components/schemas/Products'
+        resolution_log:
+          type: array
+          description: Resolution events recorded for the issue.
+          items:
+            $ref: '#/components/schemas/BetaIssuesV1IssueResolutionEvent'
+      required:
+      - issue_id
+      - issue_type
+      - severity
+      - institution_id
+      - institution_name
+      - behaviors
+      - issue_error_type
+      - issue_error_code
+      - description
+      - attribution
+      - status
+      - user_guidance
+      - estimated_resolution_time
+      - start_time
+      - end_time
+      - impact
+      - affected_products
+      - resolution_log
+    BetaIssuesV1IssueType:
+      x-hidden-from-docs: true
+      type: string
+      description: The customer-facing category of an issue.
+      enum:
+      - ERROR
+    BetaIssuesV1IssueSeverity:
+      x-hidden-from-docs: true
+      type: string
+      description: The customer-facing severity of an issue.
+      enum:
+      - CRITICAL
+      - HIGH
+      - MEDIUM
+      - LOW
+    BetaIssuesV1IssueBehavior:
+      x-hidden-from-docs: true
+      type: string
+      description: A customer-visible effect of an issue.
+      enum:
+      - NEW_CONNECTIONS_CANNOT_BE_ESTABLISHED
+      - EXISTING_CONNECTIONS_WILL_NOT_RECEIVE_UPDATES
+      - EXISTING_CONNECTIONS_WILL_BE_DISCONNECTED
+    BetaIssuesV1IssueAttribution:
+      x-hidden-from-docs: true
+      type: string
+      description: The party responsible for resolving an issue.
+      enum:
+      - USER
+      - PLAID
+      - DATA_PARTNER
+    BetaIssuesV1IssueStatus:
+      x-hidden-from-docs: true
+      type: string
+      description: The customer-facing resolution state of an issue.
+      enum:
+      - USER_ACTION_REQUIRED
+      - BACKLOGGED
+      - LIKELY_TO_BE_PRIORITIZED
+      - IN_PROGRESS
+      - RESOLVED
+      - PENDING_NOTIFICATION
+      - DATA_PARTNER_NOTIFIED
+      - DATA_PARTNER_FIX_IN_PROGRESS
+    BetaIssuesV1IssueImpact:
+      x-hidden-from-docs: true
+      type: object
+      nullable: true
+      description: The client-specific impact of an error issue.
+      properties:
+        affected_new_item_count:
+          type: integer
+        affected_existing_item_count:
+          type: integer
+      required:
+      - affected_new_item_count
+      - affected_existing_item_count
+    BetaIssuesV1IssueResolutionEvent:
+      x-hidden-from-docs: true
+      type: object
+      description: A recorded reduction in the impact of an issue.
+      properties:
+        resolution_time:
+          type: string
+          format: date-time
+        type:
+          $ref: '#/components/schemas/BetaIssuesV1IssueResolutionType'
+      required:
+      - resolution_time
+      - type
+    BetaIssuesV1IssueResolutionType:
+      x-hidden-from-docs: true
+      type: string
+      description: How an issue was considered resolved. `MANUAL_RESOLUTION` indicates Plaid's engineering team has reviewed the issue and mitigated its impact. Issues that are manually resolved may still have a small number of occurrences. `AUTOMATED_RESOLUTION` indicates the error has not recently occurred and was automatically closed.
+      enum:
+      - MANUAL_RESOLUTION
+      - AUTOMATED_RESOLUTION
     EwaAttributes:
       x-hidden-from-docs: true
       type: object
@@ -51120,7 +53038,7 @@ components:
       type: object
       additionalProperties: true
       description: |-
-        The `USER_ACCOUNT_REVOKED` webhook is fired when an end user has revoked access to their account on the Data Provider's portal. This webhook is currently sent only for PNC Items, but may be sent in the future for other financial institutions that allow account-level permissions revocation through their portals. Upon receiving this webhook, it is recommended to delete any Plaid-derived data you have stored that is associated with the revoked account.
+        The `USER_ACCOUNT_REVOKED` webhook is fired when an end user has revoked access to their account on the Data Provider's portal. This webhook is currently sent only for Chase, PNC, and Truist Items, but may be sent in the future for other financial institutions that allow account-level permissions revocation through their portals. Upon receiving this webhook, it is recommended to delete any Plaid-derived data you have stored that is associated with the revoked account.
 
         If you are using Auth and receive this webhook, this webhook indicates that the TAN associated with the revoked account is no longer valid and cannot be used to create new transfers. You should not create new ACH transfers for the account that was revoked until access has been re-granted.
 
@@ -52068,6 +53986,33 @@ components:
           webhook_type: INCOME
           webhook_code: INCOME_VERIFICATION_REFRESH_RECONNECT_NEEDED
           user_id: wz666MBjYWTp2PDzzggYhM6oWWmBb
+          environment: production
+    UserIncomeVerificationRefreshReconnectNeededWebhook:
+      type: object
+      title: UserIncomeVerificationRefreshReconnectNeededWebhook
+      description: Fired when the attempt to refresh Payroll Income data for a user via `/credit/payroll_income/refresh` failed because the user must re-connect their payroll account.
+      additionalProperties: true
+      properties:
+        webhook_type:
+          type: string
+          description: '`INCOME`'
+        webhook_code:
+          type: string
+          description: '`USER_INCOME_VERIFICATION_REFRESH_RECONNECT_NEEDED`'
+        user_id:
+          $ref: '#/components/schemas/NewUserID'
+        environment:
+          $ref: '#/components/schemas/WebhookEnvironmentValues'
+      required:
+      - webhook_type
+      - webhook_code
+      - user_id
+      - environment
+      x-examples:
+        example-1:
+          webhook_type: INCOME
+          webhook_code: USER_INCOME_VERIFICATION_REFRESH_RECONNECT_NEEDED
+          user_id: usr_8c3ZbDBYjaqUXZ
           environment: production
     BankIncomeRefreshUpdateWebhook:
       type: object
@@ -53398,7 +55343,7 @@ components:
           description: |-
             The total amount of funds in the account, calculated from the `current` balance in the `balance` object by subtracting inflows and adding back outflows according to the posted date of each transaction.
 
-            If the account has any pending transactions, historical balance amounts on or after the date of the earliest pending transaction may differ if retrieved in subsequent Asset Reports as a result of those pending transactions posting.
+            If the account has any pending transactions, historical balance amounts on or before the date of the earliest pending transaction may differ if retrieved in subsequent Asset Reports as a result of those pending transactions posting.
         iso_currency_code:
           type: string
           description: The ISO-4217 currency code of the balance. Always `null` if `unofficial_currency_code` is non-`null`.
@@ -53431,7 +55376,7 @@ components:
           description: |-
             The total amount of funds in the account, calculated from the `current` balance in the `balance` object by subtracting inflows and adding back outflows according to the posted date of each transaction.
 
-            If the account has any pending transactions, historical balance amounts on or after the date of the earliest pending transaction may differ if retrieved in subsequent Asset Reports as a result of those pending transactions posting.
+            If the account has any pending transactions, historical balance amounts on or before the date of the earliest pending transaction may differ if retrieved in subsequent Asset Reports as a result of those pending transactions posting.
         iso_currency_code:
           type: string
           description: The ISO-4217 currency code of the balance. Always `null` if `unofficial_currency_code` is non-`null`.
@@ -54030,6 +55975,11 @@ components:
 
             See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `unofficial_currency_code`s.
           nullable: true
+        tax_lots:
+          description: Per-lot acquisition data for this holding. This field is absent when lot-level data is not available for the holding — either the institution does not provide it, or the report was generated before lot-level data was supported. Refresh the report if you expect lots.
+          type: array
+          items:
+            $ref: '#/components/schemas/HoldingTaxLot'
       required:
       - account_id
       - security_id
@@ -55816,6 +57766,11 @@ components:
 
             See the [currency code schema](https://plaid.com/docs/api/accounts#currency-code-schema) for a full listing of supported `unofficial_currency_code`s.
           nullable: true
+        tax_lots:
+          description: Per-lot acquisition data for this holding. This field is absent when lot-level data is not available for the holding — either the institution does not provide it, or the report was generated before lot-level data was supported. Refresh the report if you expect lots.
+          type: array
+          items:
+            $ref: '#/components/schemas/HoldingTaxLot'
       required:
       - account_id
       - security_id
@@ -64513,7 +66468,7 @@ components:
     PrismInsightsResult:
       type: object
       title: PrismInsightsResult
-      description: The Insights Result object is a map of cash flow attributes, where the key is a string, and the value is a float or string. For a full list of attributes, contact your account manager. The attributes may vary depending on the Prism version used.
+      description: The Insights Result object is a map of cash flow attributes, where the key is a string, and the value is a float or string. For a full list of all ~2,000 attributes, contact your account manager. The attributes may vary depending on the Prism version used.
     PrismCashScore:
       type: object
       additionalProperties: true
@@ -64897,12 +66852,12 @@ components:
     CashflowAttributesSchema:
       type: object
       title: CashflowAttributes
-      description: A map of cash flow attributes, where the key is a string, and the value is a string, float, int, or boolean. The specific list of attributes will depend on the cash flow attributes version used. For a full list of attributes, contact your account manager.
+      description: A map of cash flow attributes, where the key is a string, and the value is a string, float, int, or boolean. The specific list of attributes will depend on the cash flow attributes version used. For a full list of all ~2,000 attributes, contact your account manager.
     CraCreditProfileCashflowAttributesSchema:
       type: object
       nullable: true
       title: CraCreditProfileCashflowAttributes
-      description: A map of cash flow attributes, where the key is a string, and the value is a string, float, int, or boolean. The specific list of attributes will depend on the cash flow attributes version used. For a full list of attributes, contact your account manager.
+      description: A map of cash flow attributes, where the key is a string, and the value is a string, float, int, or boolean. The specific list of attributes will depend on the cash flow attributes version used. For a full list of all ~2,000 attributes, contact your account manager.
       additionalProperties: {}
     CraCheckReportLendScoreGetResponse:
       title: CraCheckReportLendScoreGetResponse
@@ -66442,28 +68397,126 @@ components:
       - generated_at
       - oldest_transaction_date
       - most_recent_transaction_date
-    CraReportGetRequestProduct:
-      title: CraReportGetRequestProduct
-      x-hidden-from-docs: true
+    CraBaseReportProductConfig:
+      title: CraBaseReportProductConfig
       type: object
-      description: CraReportGetRequestProduct specifies a product and version for a `/cra/report/get` call.
+      additionalProperties: true
+      description: The Base Report product at a given version. Base Report accepts no additional configuration today.
       properties:
         product:
-          allOf:
-          - $ref: '#/components/schemas/Products'
-          x-override-enum-values-shown:
+          type: string
+          enum:
           - cra_base_report
-          - cra_income_insights
-          - cra_cashflow_insights
-          - cra_partner_insights
-          - cra_network_insights
-          - cra_lend_score
-          - cra_qualify
+          description: The Base Report product discriminator.
         version:
           $ref: '#/components/schemas/CraProductVersion'
       required:
       - product
       - version
+    CraIncomeInsightsProductConfig:
+      title: CraIncomeInsightsProductConfig
+      type: object
+      additionalProperties: true
+      description: The Income Insights product at a given version, together with options for additional configuration.
+      properties:
+        product:
+          type: string
+          enum:
+          - cra_income_insights
+          description: The Income Insights product discriminator.
+        version:
+          $ref: '#/components/schemas/CraProductVersion'
+        options:
+          $ref: '#/components/schemas/CraCheckReportCreateIncomeInsightsOptions'
+      required:
+      - product
+      - version
+    CraQualifyProductConfig:
+      title: CraQualifyProductConfig
+      type: object
+      additionalProperties: true
+      description: The Qualify product at a given version. Qualify accepts no additional configuration today.
+      properties:
+        product:
+          type: string
+          enum:
+          - cra_qualify
+          description: The Qualify product discriminator.
+        version:
+          $ref: '#/components/schemas/CraProductVersion'
+      required:
+      - product
+      - version
+    CraIncomeInsightsProduct:
+      title: CraIncomeInsightsProduct
+      x-hidden-from-docs: true
+      type: object
+      additionalProperties: true
+      description: Names the Income Insights product at a given version.
+      properties:
+        product:
+          type: string
+          enum:
+          - cra_income_insights
+          description: The Income Insights product discriminator.
+        version:
+          $ref: '#/components/schemas/CraProductVersion'
+      required:
+      - product
+      - version
+    CraQualifyProduct:
+      title: CraQualifyProduct
+      x-hidden-from-docs: true
+      type: object
+      additionalProperties: true
+      description: Names the Qualify product at a given version.
+      properties:
+        product:
+          type: string
+          enum:
+          - cra_qualify
+          description: The Qualify product discriminator.
+        version:
+          $ref: '#/components/schemas/CraProductVersion'
+      required:
+      - product
+      - version
+    CraHomeLendingProduct:
+      title: CraHomeLendingProduct
+      x-hidden-from-docs: true
+      type: object
+      additionalProperties: true
+      description: Names the Home Lending product at a given version.
+      properties:
+        product:
+          type: string
+          enum:
+          - cra_home_lending
+          description: The Home Lending product discriminator.
+        version:
+          $ref: '#/components/schemas/CraProductVersion'
+      required:
+      - product
+      - version
+    CraReportGetRequestProduct:
+      title: CraReportGetRequestProduct
+      x-hidden-from-docs: true
+      description: CraReportGetRequestProduct specifies one product and version requested from `/cra/report/get`, selected by the `product` discriminator.
+      oneOf:
+      - $ref: '#/components/schemas/CraQualifyProduct'
+      - $ref: '#/components/schemas/CraIncomeInsightsProduct'
+      - $ref: '#/components/schemas/CraHomeLendingProduct'
+      discriminator:
+        propertyName: product
+        mapping:
+          cra_qualify: '#/components/schemas/CraQualifyProduct'
+          cra_income_insights: '#/components/schemas/CraIncomeInsightsProduct'
+          cra_home_lending: '#/components/schemas/CraHomeLendingProduct'
+    CraReportId:
+      title: CraReportId
+      x-hidden-from-docs: true
+      type: string
+      description: A unique ID identifying a CRA report. Like all Plaid identifiers, this ID is case sensitive.
     CraReportGetRequest:
       title: CraReportGetRequest
       x-hidden-from-docs: true
@@ -66488,6 +68541,10 @@ components:
           $ref: '#/components/schemas/CraReportDecisionStage'
         consumer_report_permissible_purpose:
           $ref: '#/components/schemas/ConsumerReportPermissiblePurpose'
+        report_id:
+          allOf:
+          - $ref: '#/components/schemas/CraReportId'
+          - description: A unique ID identifying a CRA report. Like all Plaid identifiers, this ID is case sensitive. When provided, that specific report is returned; when omitted, the most recent report matching the request is returned.
       required:
       - user_id
       - products
@@ -66529,6 +68586,238 @@ components:
       - PLAID_NETWORK
       - CLIENT_USER
       description: Determines whose items are used. `PLAID_NETWORK` (default) uses the Plaid Network view of the user's profile. `CLIENT_USER` uses only the items linked by this client.
+    CraSubscriptionID:
+      title: CraSubscriptionID
+      type: string
+      description: A CRA servicing subscription identifier, in the format `cra-sub-<environment>-<uuid>`.
+    CraSubscriptionCadence:
+      title: CraSubscriptionCadence
+      type: string
+      enum:
+      - DAILY
+      - null
+      nullable: true
+      description: The cadence at which products are generated and webhooks are fired. If the Qualify product is requested, cadence must be null or omitted, because Qualify's generation cadence is controlled by Plaid.
+    CraSubscriptionProductConfig:
+      title: CraSubscriptionProductConfig
+      description: A product and its configuration, for use with CRA servicing subscription endpoints.
+      oneOf:
+      - $ref: '#/components/schemas/CraQualifyProductConfig'
+      - $ref: '#/components/schemas/CraBaseReportProductConfig'
+      - $ref: '#/components/schemas/CraIncomeInsightsProductConfig'
+      discriminator:
+        propertyName: product
+        mapping:
+          cra_qualify: '#/components/schemas/CraQualifyProductConfig'
+          cra_base_report: '#/components/schemas/CraBaseReportProductConfig'
+          cra_income_insights: '#/components/schemas/CraIncomeInsightsProductConfig'
+    CraServicingSubscriptionCreateRequest:
+      title: CraServicingSubscriptionCreateRequest
+      type: object
+      description: CraServicingSubscriptionCreateRequest defines the request schema for `/cra/servicing/subscription/create`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        user_id:
+          $ref: '#/components/schemas/NewUserID'
+        scope:
+          allOf:
+          - $ref: '#/components/schemas/CraReportScope'
+          x-override-enum-values-shown:
+          - CLIENT_USER
+        cadence:
+          $ref: '#/components/schemas/CraSubscriptionCadence'
+        webhook:
+          type: string
+          format: url
+          description: The URL to which the webhook should be sent. If provided, this will override the URL set in the dashboard.
+        products:
+          type: array
+          minItems: 1
+          description: The products included in this subscription.
+          items:
+            $ref: '#/components/schemas/CraSubscriptionProductConfig'
+      required:
+      - user_id
+      - scope
+      - products
+    CraServicingSubscriptionCreateResponse:
+      title: CraServicingSubscriptionCreateResponse
+      type: object
+      additionalProperties: true
+      description: CraServicingSubscriptionCreateResponse defines the response schema for `/cra/servicing/subscription/create`.
+      properties:
+        subscription_id:
+          $ref: '#/components/schemas/CraSubscriptionID'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - subscription_id
+      - request_id
+    CraServicingSubscriptionDeleteRequest:
+      title: CraServicingSubscriptionDeleteRequest
+      type: object
+      description: CraServicingSubscriptionDeleteRequest defines the request schema for `/cra/servicing/subscription/delete`. Removes the subscription identified by `subscription_id`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        subscription_id:
+          $ref: '#/components/schemas/CraSubscriptionID'
+      required:
+      - subscription_id
+    CraServicingSubscriptionDeleteResponse:
+      title: CraServicingSubscriptionDeleteResponse
+      type: object
+      additionalProperties: true
+      description: CraServicingSubscriptionDeleteResponse defines the response schema for `/cra/servicing/subscription/delete`.
+      properties:
+        subscription_id:
+          $ref: '#/components/schemas/CraSubscriptionID'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - subscription_id
+      - request_id
+    CraServicingSubscriptionGetRequest:
+      title: CraServicingSubscriptionGetRequest
+      type: object
+      description: CraServicingSubscriptionGetRequest defines the request schema for `/cra/servicing/subscription/get`. Returns the subscription identified by `subscription_id`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        subscription_id:
+          $ref: '#/components/schemas/CraSubscriptionID'
+      required:
+      - subscription_id
+    CraServicingSubscriptionGetResponse:
+      title: CraServicingSubscriptionGetResponse
+      type: object
+      additionalProperties: true
+      description: CraServicingSubscriptionGetResponse defines the response schema for `/cra/servicing/subscription/get`.
+      properties:
+        subscription:
+          $ref: '#/components/schemas/CraServicingSubscription'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - subscription
+      - request_id
+    CraServicingSubscription:
+      title: CraServicingSubscription
+      type: object
+      additionalProperties: true
+      description: A single CRA servicing subscription.
+      properties:
+        subscription_id:
+          $ref: '#/components/schemas/CraSubscriptionID'
+        user_id:
+          $ref: '#/components/schemas/NewUserID'
+        scope:
+          allOf:
+          - $ref: '#/components/schemas/CraReportScope'
+          x-override-enum-values-shown:
+          - CLIENT_USER
+        cadence:
+          $ref: '#/components/schemas/CraSubscriptionCadence'
+        webhook:
+          type: string
+          nullable: true
+          description: The webhook URL Plaid sends report-update notifications to for this subscription, or null if none is set.
+        products:
+          type: array
+          description: The products this subscription covers, each with the options it is configured with.
+          items:
+            $ref: '#/components/schemas/CraSubscriptionProductConfig'
+      required:
+      - subscription_id
+      - user_id
+      - scope
+      - products
+    CraServicingSubscriptionListRequest:
+      title: CraServicingSubscriptionListRequest
+      type: object
+      description: CraServicingSubscriptionListRequest defines the request schema for `/cra/servicing/subscription/list`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        user_id:
+          $ref: '#/components/schemas/NewUserID'
+      required:
+      - user_id
+    CraServicingSubscriptionListResponse:
+      title: CraServicingSubscriptionListResponse
+      type: object
+      additionalProperties: true
+      description: CraServicingSubscriptionListResponse defines the response schema for `/cra/servicing/subscription/list`.
+      properties:
+        subscriptions:
+          type: array
+          description: All CRA servicing subscriptions for the user, across scopes.
+          items:
+            $ref: '#/components/schemas/CraServicingSubscription'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - subscriptions
+      - request_id
+    CraServicingSubscriptionUpdateRequest:
+      title: CraServicingSubscriptionUpdateRequest
+      type: object
+      description: 'CraServicingSubscriptionUpdateRequest defines the request schema for `/cra/servicing/subscription/update`. It follows field-mask semantics: omitted fields are left unchanged, while provided fields overwrite the current value. To clear a field, include its name in `reset_fields`.'
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        subscription_id:
+          $ref: '#/components/schemas/CraSubscriptionID'
+        webhook:
+          type: string
+          format: url
+          description: The URL to which the webhook should be sent. If provided, this will override the URL set in the dashboard.
+        products:
+          type: array
+          description: The products included in this subscription. If provided, this replaces the subscription's entire product list.
+          items:
+            $ref: '#/components/schemas/CraSubscriptionProductConfig'
+        reset_fields:
+          $ref: '#/components/schemas/CraServicingSubscriptionUpdateRequestResettableFieldList'
+      required:
+      - subscription_id
+    CraServicingSubscriptionUpdateRequestResettableField:
+      title: CraServicingSubscriptionUpdateRequestResettableField
+      type: string
+      enum:
+      - webhook
+      description: The name of a field that can be reset back to its default value.
+    CraServicingSubscriptionUpdateRequestResettableFieldList:
+      title: CraServicingSubscriptionUpdateRequestResettableFieldList
+      type: array
+      nullable: true
+      description: A list of fields to reset back to their default value. Fields named here take precedence over any value provided for the same field elsewhere in the request.
+      items:
+        $ref: '#/components/schemas/CraServicingSubscriptionUpdateRequestResettableField'
+    CraServicingSubscriptionUpdateResponse:
+      title: CraServicingSubscriptionUpdateResponse
+      type: object
+      additionalProperties: true
+      description: CraServicingSubscriptionUpdateResponse defines the response schema for `/cra/servicing/subscription/update`.
+      properties:
+        subscription_id:
+          $ref: '#/components/schemas/CraSubscriptionID'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - subscription_id
+      - request_id
     CraReportDecisionStage:
       title: CraReportDecisionStage
       x-hidden-from-docs: true
@@ -66540,27 +68829,34 @@ components:
       description: The stage in the lending lifecycle for which the report is being retrieved.
     CraProductVersion:
       title: CraProductVersion
-      x-hidden-from-docs: true
       type: string
-      description: The version of the product that was generated.
+      description: A string that specifies a particular version of a CRA product.
     CraReportGetResponseProduct:
       title: CraReportGetResponseProduct
       x-hidden-from-docs: true
+      description: Per-product report data, selected by the `product` discriminator.
+      oneOf:
+      - $ref: '#/components/schemas/CraReportGetQualifyResponseProduct'
+      - $ref: '#/components/schemas/CraReportGetIncomeInsightsResponseProduct'
+      - $ref: '#/components/schemas/CraReportGetHomeLendingResponseProduct'
+      discriminator:
+        propertyName: product
+        mapping:
+          cra_qualify: '#/components/schemas/CraReportGetQualifyResponseProduct'
+          cra_income_insights: '#/components/schemas/CraReportGetIncomeInsightsResponseProduct'
+          cra_home_lending: '#/components/schemas/CraReportGetHomeLendingResponseProduct'
+    CraReportGetQualifyResponseProduct:
+      title: CraReportGetQualifyResponseProduct
+      x-hidden-from-docs: true
       type: object
       additionalProperties: true
-      description: Per-product report data. `attributes` is an opaque map of key-value pairs; for a full list of attributes per product and version, see the data dictionary.
+      description: Qualify data returned by `/cra/report/get`.
       properties:
         product:
-          allOf:
-          - $ref: '#/components/schemas/Products'
-          x-override-enum-values-shown:
-          - cra_base_report
-          - cra_income_insights
-          - cra_cashflow_insights
-          - cra_partner_insights
-          - cra_network_insights
-          - cra_lend_score
+          type: string
+          enum:
           - cra_qualify
+          description: The Qualify product.
         version:
           $ref: '#/components/schemas/CraProductVersion'
         metadata:
@@ -66578,6 +68874,300 @@ components:
       - metadata
       - attributes
       - errors
+    CraReportGetIncomeInsightsResponseProduct:
+      title: CraReportGetIncomeInsightsResponseProduct
+      x-hidden-from-docs: true
+      type: object
+      additionalProperties: true
+      description: Income Insights data returned by `/cra/report/get`.
+      properties:
+        product:
+          type: string
+          enum:
+          - cra_income_insights
+          description: The Income Insights product.
+        version:
+          $ref: '#/components/schemas/CraProductVersion'
+        metadata:
+          $ref: '#/components/schemas/CraReportGetIncomeInsightsMetadata'
+        attributes:
+          $ref: '#/components/schemas/CraReportGetIncomeInsightsAttributes'
+        errors:
+          type: array
+          description: Product-level errors. Non-empty when this product failed to generate; empty on success.
+          items:
+            $ref: '#/components/schemas/PlaidError'
+      required:
+      - product
+      - version
+      - metadata
+      - attributes
+      - errors
+    CraReportGetIncomeInsightsAttributes:
+      title: CraReportGetIncomeInsightsAttributes
+      x-hidden-from-docs: true
+      type: object
+      nullable: true
+      additionalProperties: true
+      description: Income Insights attribute data returned by `/cra/report/get`.
+      properties:
+        income_streams:
+          type: array
+          description: The income streams detected for the user.
+          items:
+            $ref: '#/components/schemas/CraReportGetIncomeInsightsStream'
+        user_summary:
+          $ref: '#/components/schemas/CraIncomeInsightsUserSummary'
+      required:
+      - income_streams
+      - user_summary
+    CraReportGetIncomeInsightsStream:
+      title: CraReportGetIncomeInsightsStream
+      x-hidden-from-docs: true
+      type: object
+      additionalProperties: true
+      description: An income stream detected for the user.
+      properties:
+        income_stream_id:
+          type: string
+          description: A unique identifier for an income stream. If the report is regenerated and a new `report_id` is created, the new report will have a new set of `income_stream_id`s.
+        start_date:
+          type: string
+          format: date
+          nullable: true
+          description: Minimum of all dates within the specific income stream. The date will be returned in an ISO 8601 format (YYYY-MM-DD). May be `null` if the producer could not compute a date range.
+        end_date:
+          type: string
+          format: date
+          nullable: true
+          description: Maximum of all dates within the specific income stream. The date will be returned in an ISO 8601 format (YYYY-MM-DD). May be `null` if the producer could not compute a date range.
+        insights:
+          $ref: '#/components/schemas/CraIncomeStreamInsights'
+        income_metrics:
+          $ref: '#/components/schemas/CraIncomeMetrics'
+      required:
+      - income_stream_id
+      - start_date
+      - end_date
+      - insights
+      - income_metrics
+    CraReportGetProductBaseMetadata:
+      title: CraReportGetProductBaseMetadata
+      x-hidden-from-docs: true
+      type: object
+      nullable: true
+      additionalProperties: true
+      description: Fields common to every /cra/report/get product's metadata.
+      properties:
+        generated_time:
+          type: string
+          format: date-time
+          nullable: true
+          description: The time the report was generated. May be `null` if unavailable.
+        item_count:
+          type: integer
+          description: The number of Items used to generate the report.
+        account_count:
+          type: integer
+          description: The number of accounts used to generate the report.
+        institution_ids:
+          type: array
+          description: The institution IDs of the Items used to generate the report.
+          items:
+            type: string
+      required:
+      - generated_time
+      - item_count
+      - account_count
+      - institution_ids
+    CraReportGetIncomeInsightsMetadata:
+      title: CraReportGetIncomeInsightsMetadata
+      x-hidden-from-docs: true
+      type: object
+      nullable: true
+      additionalProperties: true
+      description: Income Insights report metadata returned by `/cra/report/get`.
+      allOf:
+      - $ref: '#/components/schemas/CraReportGetProductBaseMetadata'
+      - type: object
+        properties:
+          primary_account_count:
+            type: integer
+            description: The number of accounts carrying Plaid's primary account indicator.
+          depository_account_type_count:
+            type: integer
+            description: The number of depository accounts used to generate the report.
+          credit_account_type_count:
+            type: integer
+            description: The number of credit accounts used to generate the report.
+          other_account_type_count:
+            type: integer
+            description: The number of accounts that are neither depository nor credit.
+          multiple_owner_account_count:
+            type: integer
+            description: The number of accounts with multiple owners.
+          oldest_transaction_date:
+            type: string
+            format: date
+            nullable: true
+            description: The earliest transaction date across the accounts the report was generated from. May be `null` if the producer could not compute a transaction range.
+          most_recent_transaction_date:
+            type: string
+            format: date
+            nullable: true
+            description: The latest transaction date across the accounts the report was generated from. May be `null` if the producer could not compute a transaction range.
+        required:
+        - primary_account_count
+        - depository_account_type_count
+        - credit_account_type_count
+        - other_account_type_count
+        - multiple_owner_account_count
+        - oldest_transaction_date
+        - most_recent_transaction_date
+    CraReportGetHomeLendingResponseProduct:
+      title: CraReportGetHomeLendingResponseProduct
+      x-hidden-from-docs: true
+      type: object
+      additionalProperties: true
+      description: Home Lending data returned by `/cra/report/get`.
+      properties:
+        product:
+          type: string
+          enum:
+          - cra_home_lending
+          description: The Home Lending product.
+        version:
+          $ref: '#/components/schemas/CraProductVersion'
+        metadata:
+          $ref: '#/components/schemas/CraReportGetHomeLendingMetadata'
+        attributes:
+          $ref: '#/components/schemas/CraReportGetHomeLendingAttributes'
+        errors:
+          type: array
+          description: Product-level errors. Non-empty when this product failed to generate; empty on success.
+          items:
+            $ref: '#/components/schemas/PlaidError'
+      required:
+      - product
+      - version
+      - metadata
+      - attributes
+      - errors
+    CraReportGetHomeLendingAttributes:
+      title: CraReportGetHomeLendingAttributes
+      x-hidden-from-docs: true
+      type: object
+      nullable: true
+      additionalProperties: true
+      description: Home Lending attribute data returned by `/cra/report/get`.
+      properties:
+        income_metrics:
+          type: array
+          description: Modeled income metrics, one entry per currency observed across the user's income streams.
+          items:
+            $ref: '#/components/schemas/CraReportGetHomeLendingIncomeMetrics'
+        income_by_categories:
+          type: array
+          description: Modeled income broken down by income category, one entry per currency observed across the user's income streams.
+          items:
+            $ref: '#/components/schemas/CraReportGetHomeLendingIncomeByCategories'
+        income_sources:
+          $ref: '#/components/schemas/CraReportGetHomeLendingIncomeSources'
+        loan_payments_cash_advance_count_90d:
+          type: integer
+          description: The number of cash advance loan payments observed in the trailing 90 days.
+        loan_payments_bnpl_count_90d:
+          type: integer
+          description: The number of buy-now-pay-later loan payments observed in the trailing 90 days.
+        payment_behavior_nsf_late_fees_flag_90d:
+          type: integer
+          description: A flag indicating whether non-sufficient-funds or late fees were observed in the trailing 90 days.
+      required:
+      - income_metrics
+      - income_by_categories
+      - income_sources
+      - loan_payments_cash_advance_count_90d
+      - loan_payments_bnpl_count_90d
+      - payment_behavior_nsf_late_fees_flag_90d
+    CraReportGetHomeLendingIncomeMetrics:
+      title: CraReportGetHomeLendingIncomeMetrics
+      x-hidden-from-docs: true
+      type: object
+      additionalProperties: true
+      description: Modeled current income for a given currency. Home Lending reports current income only; there is no projected income figure.
+      properties:
+        current:
+          $ref: '#/components/schemas/CraCurrentModeledIncome'
+        iso_currency_code:
+          $ref: '#/components/schemas/CreditIsoCurrencyCode'
+        unofficial_currency_code:
+          $ref: '#/components/schemas/CreditUnofficialCurrencyCode'
+      required:
+      - current
+      - iso_currency_code
+      - unofficial_currency_code
+    CraReportGetHomeLendingIncomeByCategories:
+      title: CraReportGetHomeLendingIncomeByCategories
+      x-hidden-from-docs: true
+      type: object
+      additionalProperties: true
+      description: Modeled income for one currency, broken down by income category.
+      properties:
+        iso_currency_code:
+          $ref: '#/components/schemas/CreditIsoCurrencyCode'
+        unofficial_currency_code:
+          $ref: '#/components/schemas/CreditUnofficialCurrencyCode'
+        categories:
+          type: array
+          description: The income categories observed for this currency, ordered by primary and then secondary category.
+          items:
+            $ref: '#/components/schemas/CraReportGetHomeLendingCategoryIncome'
+      required:
+      - iso_currency_code
+      - unofficial_currency_code
+      - categories
+    CraReportGetHomeLendingCategoryIncome:
+      title: CraReportGetHomeLendingCategoryIncome
+      x-hidden-from-docs: true
+      type: object
+      additionalProperties: true
+      description: Modeled current income for a single income category.
+      properties:
+        income_category:
+          $ref: '#/components/schemas/CraIncomeCategory'
+        current:
+          $ref: '#/components/schemas/CraCurrentModeledIncome'
+      required:
+      - income_category
+      - current
+    CraReportGetHomeLendingIncomeSources:
+      title: CraReportGetHomeLendingIncomeSources
+      x-hidden-from-docs: true
+      type: object
+      nullable: true
+      additionalProperties: true
+      description: Summary of the income sources backing the Home Lending report.
+      properties:
+        income_stream_count:
+          type: integer
+          description: The number of income streams detected for the user.
+        income_providers:
+          type: array
+          description: The income providers observed across the user's income streams, ordered by provider name.
+          items:
+            $ref: '#/components/schemas/CraBankIncomeIncomeProvider'
+      required:
+      - income_stream_count
+      - income_providers
+    CraReportGetHomeLendingMetadata:
+      title: CraReportGetHomeLendingMetadata
+      x-hidden-from-docs: true
+      type: object
+      nullable: true
+      additionalProperties: true
+      description: Home Lending report metadata returned by `/cra/report/get`.
+      allOf:
+      - $ref: '#/components/schemas/CraReportGetProductBaseMetadata'
     CraReportGetProductMetadata:
       title: CraReportGetProductMetadata
       x-hidden-from-docs: true
@@ -67875,7 +70465,7 @@ components:
         properties:
           owners:
             type: array
-            description: Data returned by the financial institution about the account owner or owners. Only returned by Identity or Assets endpoints. For business accounts, the name reported may be either the name of the individual or the name of the business, depending on the institution; detecting whether the linked account is a business account is not currently supported. Multiple owners on a single account will be represented in the same `owner` object, not in multiple owner objects within the array. In API versions 2018-05-22 and earlier, the `owners` object is not returned, and instead identity information is returned in the top level `identity` object. For more details, see [Plaid API versioning](https://plaid.com/docs/api/versioning/#version-2019-05-29)
+            description: Data returned by the financial institution about the account owner or owners. Only returned by Identity or Assets endpoints. For business accounts, the name reported may be either the name of the individual or the name of the business, depending on the institution. To determine whether the linked account is a business account, use the `holder_category` field on the account object. Multiple owners on a single account will be represented in the same `owner` object, not in multiple owner objects within the array. In API versions 2018-05-22 and earlier, the `owners` object is not returned, and instead identity information is returned in the top level `identity` object. For more details, see [Plaid API versioning](https://plaid.com/docs/api/versioning/#version-2019-05-29)
             items:
               $ref: '#/components/schemas/Owner'
           documents:
@@ -68198,7 +70788,8 @@ components:
           $ref: '#/components/schemas/ItemImportRequestInstitutionID'
         products:
           type: array
-          description: Array of product strings
+          description: Array of product strings. Sent only by a Plaid-internal caller, the Data Partner Dashboard validation tool; external callers never need it. Not required for Permissions Manager callers, who authenticate with `user_auth.user_id`.
+          x-hidden-from-docs: true
           items:
             $ref: '#/components/schemas/Products'
           minItems: 1
@@ -68220,11 +70811,10 @@ components:
         options:
           $ref: '#/components/schemas/ItemImportRequestOptions'
       required:
-      - products
       - user_auth
     ItemImportRequestInstitutionID:
       type: string
-      description: The Plaid Institution ID associated with the Item.
+      description: The Plaid Institution ID associated with the Item. Most callers omit this field; Plaid resolves your institution automatically. If your organization has multiple institutions, contact Plaid to determine whether you should send it.
     ItemAuthMethod:
       description: |-
         The method used to populate Auth data for the Item. This field is only populated for Items that have had Auth numbers data set on at least one of their accounts, and will be `null` otherwise. For info about the various flows, see our [Auth coverage documentation](https://plaid.com/docs/auth/coverage/).
@@ -68261,26 +70851,30 @@ components:
       - null
     ItemImportRequestOptions:
       type: object
-      description: An optional object to configure `/item/import` request.
+      deprecated: true
+      x-hidden-from-docs: true
+      description: An optional object to configure `/item/import` request. Retained for the legacy Plaid Exchange integration; not required for Permissions Manager callers.
       properties:
         webhook:
           type: string
           format: url
+          deprecated: true
           description: |
             Specifies a webhook URL to associate with an Item. Plaid fires a webhook if credentials fail.
     ItemImportRequestUserAuth:
       type: object
       required:
       - user_id
-      - auth_token
       description: Object of user ID and auth token pair, permitting Plaid to aggregate a user's accounts
       properties:
         user_id:
           type: string
-          description: Opaque user identifier
+          description: Your persistent, unique identifier for the customer.
         auth_token:
           type: string
-          description: Authorization token Plaid will use to aggregate this user's accounts
+          deprecated: true
+          description: Authorization token used by the legacy Plaid Exchange integration; not required for Permissions Manager callers.
+          x-hidden-from-docs: true
     ItemImportResponse:
       type: object
       additionalProperties: true
@@ -68825,6 +71419,24 @@ components:
       additionalProperties: true
       allOf:
       - $ref: '#/components/schemas/FDXRecipientMetadata'
+    FDXError:
+      type: object
+      additionalProperties: true
+      description: Error response for the FDX Consent API. These endpoints use the FDX error format rather than Plaid's standard error object.
+      properties:
+        error_type:
+          type: string
+          description: Broad categorization of the error. Stable, and safe for programmatic use. Common values are `BAD_REQUEST`, `NOT_FOUND`, `CONFLICT`, and `INTERNAL_SERVER_ERROR`.
+        error_code:
+          type: string
+          description: The particular error code. Stable, and safe for programmatic use. For example `32` for a malformed request, `1107` when the consent grant is not found, `409` when the grant is already in a terminal state, and `01` for an internal error.
+        error_message:
+          type: string
+          description: A developer-friendly description of the error code. Subject to change, so it is not safe for programmatic use.
+      required:
+      - error_type
+      - error_code
+      - error_message
     FDXConsentGrant:
       type: object
       additionalProperties: true
@@ -68979,22 +71591,22 @@ components:
           title: Recipient ID
           type: string
           maxLength: 256
-          description: The recipient identifier
+          description: The recipient's (application's) identifier
         client_name:
           title: Client Name
           type: string
           maxLength: 256
-          description: The recipient name displayed by the Data Provider during the consent flow
+          description: The recipient's (application's) name, as displayed to your customers during the consent flow
         logo_uri:
           title: Logo URI
           type: string
           nullable: true
-          description: Data Recipient Logo URL location
+          description: URL for the recipient's (application's) logo
         third_party_legal_name:
           title: Third Party Legal Name
           type: string
           maxLength: 256
-          description: The legal name of the recipient
+          description: The recipient's (application's) legal entity name
       required:
       - recipient_id
       - client_name
@@ -69008,17 +71620,17 @@ components:
         properties:
           category:
             title: Category
-            description: The category that the recipient falls under
+            description: The category the recipient (application) falls under
             type: string
           joined_date:
             title: Joined Date
-            description: The date at which the recipient gained production access to Plaid
+            description: The date the recipient (application) gained production access to Plaid
             type: string
             format: date
             example: "2021-07-15"
           connection_count:
             title: Connection Count
-            description: The number of consumers connected to the recipient through this Data Partner
+            description: The number of your customers connected to this recipient (application)
             type: integer
         required:
         - category
@@ -70748,7 +73360,7 @@ components:
         notes:
           type: string
           nullable: true
-          description: Additional context or details about the report, required if `report_type` is `OTHER`.
+          description: Additional context or details about the report.
       required:
       - report_confidence
       - report_type
@@ -70765,6 +73377,137 @@ components:
           $ref: '#/components/schemas/RequestID'
       required:
       - report_id
+      - request_id
+    ProtectCashAdvanceDecisionCreateRequest:
+      type: object
+      description: Request object for `/protect/cash_advance/decision/create`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        user:
+          $ref: '#/components/schemas/ProtectUser'
+        client_advance_id:
+          type: string
+          nullable: true
+          description: Your unique identifier for a cash-advance. Provide when available. This should be the same id provided when recording a repayment.
+        decision_time:
+          type: string
+          format: date-time
+          description: The time the decision was made, in ISO 8601 / RFC 3339 format (`YYYY-MM-DDTHH:mm:ssZ`).
+        decision:
+          $ref: '#/components/schemas/CashAdvanceDecisionOutcome'
+        cash_advance:
+          $ref: '#/components/schemas/CashAdvanceDetails'
+      required:
+      - user
+      - decision_time
+      - decision
+    CashAdvanceDetails:
+      type: object
+      additionalProperties: true
+      description: The details of a cash-advance associated with an approved cash-advance decision. Required when a cash-advance has been approved.
+      nullable: true
+      properties:
+        amount_approved:
+          description: The amount a user was approved for in a cash-advance.
+          allOf:
+          - $ref: '#/components/schemas/Amount'
+        amount_due:
+          description: The amount a user is required to pay, including any fees or additional amounts. Required if `is_taken` is `true`.
+          allOf:
+          - $ref: '#/components/schemas/Amount'
+        due_date:
+          type: string
+          format: date
+          description: The date the cash-advance is due, in ISO 8601 format (`YYYY-MM-DD`). Required if `is_taken` is `true`.
+        is_taken:
+          type: boolean
+          description: Whether the end user took the approved cash-advance. `True` if taken, `False` if not.
+      required:
+      - amount_approved
+      - is_taken
+    Amount:
+      type: object
+      additionalProperties: true
+      description: A monetary amount and its currency.
+      properties:
+        iso_currency_code:
+          type: string
+          description: The ISO-4217 currency code of the amount. Defaults to USD if not specified.
+          default: USD
+        value:
+          type: number
+          format: double
+          description: The amount value.
+      required:
+      - value
+    ProtectCashAdvanceDecisionCreateResponse:
+      type: object
+      additionalProperties: true
+      description: Response object for `/protect/cash_advance/decision/create`.
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - request_id
+    ProtectCashAdvanceRepaymentCreateRequest:
+      type: object
+      description: Request object for `/protect/cash_advance/repayment/create`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        user:
+          $ref: '#/components/schemas/ProtectUser'
+        client_advance_id:
+          type: string
+          description: The client's unique identifier for the cash-advance.
+        status:
+          $ref: '#/components/schemas/CashAdvanceRepaymentStatus'
+        repayment_time:
+          type: string
+          format: date-time
+          nullable: true
+          description: The time the repayment occurred, in ISO 8601 / RFC 3339 format (`YYYY-MM-DDTHH:mm:ssZ`).
+        repayment:
+          $ref: '#/components/schemas/CashAdvanceRepayment'
+      required:
+      - user
+      - client_advance_id
+      - status
+      - repayment
+    CashAdvanceRepayment:
+      type: object
+      additionalProperties: true
+      description: The repayment details for a cash-advance.
+      properties:
+        amount_paid:
+          description: The amount a user paid.
+          allOf:
+          - $ref: '#/components/schemas/Amount'
+        amount_due:
+          description: The amount a user is required to pay, including any fees or additional amounts.
+          allOf:
+          - $ref: '#/components/schemas/Amount'
+        due_date:
+          type: string
+          format: date
+          description: The date the cash-advance is due, in ISO 8601 format (`YYYY-MM-DD`).
+      required:
+      - amount_paid
+      - amount_due
+      - due_date
+    ProtectCashAdvanceRepaymentCreateResponse:
+      type: object
+      additionalProperties: true
+      description: Response object for `/protect/cash_advance/repayment/create`.
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
       - request_id
     ProtectUser:
       type: object
@@ -71126,6 +73869,30 @@ components:
           description: The monetary value of the incident amount.
       required:
       - value
+    CashAdvanceDecisionOutcome:
+      type: string
+      enum:
+      - APPROVED
+      - DECLINED
+      description: |-
+        The outcome of a cash-advance decision.
+
+        `APPROVED` - The cash-advance was approved.
+        `DECLINED` - The cash-advance was declined.
+    CashAdvanceRepaymentStatus:
+      type: string
+      enum:
+      - REPAID
+      - DELIVERED
+      - UNPAID
+      description: |-
+        The repayment status of a cash-advance.
+
+        `REPAID` - The cash-advance has been fully repaid.
+
+        `DELIVERED` - The cash-advance has been disbursed to the user and is still outstanding, but its due date has not yet passed.
+
+        `UNPAID` - The cash-advance is past its due date and has not been repaid; the user is delinquent.
     ProtectReportConfidence:
       type: string
       enum:
@@ -71197,7 +73964,7 @@ components:
 
         `NO_FRAUD` - Indicates that an investigation determined no fraudulent activity occurred on user/event (positive label).
 
-        `OTHER` - Indicates that the case involves fraud or financial risk not covered by other report types. Requires notes describing the report.
+        `OTHER` - Indicates that the case involves fraud or financial risk not covered by other report types.
     ProtectReportSource:
       type: string
       enum:
