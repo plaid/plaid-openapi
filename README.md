@@ -6,6 +6,20 @@ Plaid uses the `OpenAPI 3.0.0` specification to schematize our [docs](https://pl
 
 Names under `components.schemas` must match `^[A-Za-z_][A-Za-z0-9_]*$` because the internal Go generators use each component name as a source identifier. Use the existing PascalCase convention (for example, `TransactionsGetRequest`); do not use hyphens, periods, spaces, or a leading digit. Internal generation fails capability validation and reports the offending component path when this requirement is violated.
 
+## Internal generation pipeline
+
+The canonical per-product files remain authored as OpenAPI 3.0. Internal Go generation uses this pipeline:
+
+`canonical source → merge → internal 3.1 projection → libopenapi → internal generators`
+
+libopenapi can parse more OpenAPI and JSON Schema constructs than the internal generators implement. The generator-capability validator therefore rejects known generator-visible constructs that are not implemented, with the affected path or component and keyword. It is a guardrail rather than an exhaustive raw-keyword allowlist: parsing successfully is not evidence that a newly introduced construct affects generation. Adopt a new construct by adding focused behavior coverage and removing its capability rejection when one exists.
+
+Public SDK generation, including Fern, is a separate downstream concern and does not sit in this internal generator path.
+
+Kin is no longer part of this pipeline. The repository-level Kin dependency remains for the unrelated Data Partner Dashboard FDX validator under `services/data_partner_dashboard/server/unittestvalidator`.
+
+Internal request validators intentionally preserve Plaid's existing unknown-field policy. Schema-valued `additionalProperties` permits arbitrary nested keys, while boolean `additionalProperties: true` does not change the generated path allowlist; request-schema-level `x-plaid-allow-unknown-fields` controls that behavior. Aligning this with standard JSON Schema semantics is a separate compatibility change because it would alter production request validation.
+
 ## Adding a new `x-*` extension tag
 
 If your edit to the OpenAPI spec introduces a new `x-*` extension, add or update its entry on the Slite [Extension Tags](https://plaid.slite.com/app/docs/O4qPiIyok-7HnF) page in the same PR (or link the follow-up doc PR from this PR's description). The Slite [Editing the OpenAPI file](https://plaid.slite.com/app/docs/6fx_S6U4ai4GdT) workflow carries the canonical step-by-step; in short, the Extension Tags entry should record:
