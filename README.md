@@ -1,5 +1,9 @@
 # plaid-OpenAPI
 
+> **Help shape Plaid’s next-generation SDKs**
+>
+> We’re modernizing Plaid’s SDKs and looking for developers to try early releases and share feedback. [Register your interest](https://docs.google.com/forms/d/e/1FAIpQLScuhIBKCGcxrDQXLZA0nyTdJEW83J-VEr8E08KMKkT0EjmxBQ/viewform) and we’ll follow up when an early release is available for your language. No migration is required today.
+
 Plaid uses the `OpenAPI 3.0.0` specification to schematize our [docs](https://plaid.com/docs) and to generate our supported client libraries. This provides for a consistent typing experience across our external interfaces. Below we have listed some examples and issues we have found when iterating on the specification.
 
 ## Naming component schemas

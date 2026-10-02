@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.740.1
+  version: 2020-09-14_1.762.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -603,7 +603,7 @@ paths:
       - plaid
       operationId: craMonitoringInsightsSubscribe
       externalDocs:
-        url: /api/products/check/#cramonitoring_insightssubscribe
+        url: /api/products/check-legacy/#cramonitoring_insightssubscribe
       requestBody:
         required: true
         content:
@@ -637,7 +637,7 @@ paths:
       - plaid
       operationId: craMonitoringInsightsUnsubscribe
       externalDocs:
-        url: /api/products/check/#cramonitoring_insightsunsubscribe
+        url: /api/products/check-legacy/#cramonitoring_insightsunsubscribe
       requestBody:
         required: true
         content:
@@ -670,7 +670,7 @@ paths:
       - plaid
       operationId: craMonitoringInsightsGet
       externalDocs:
-        url: /api/products/check/#cramonitoring_insightsget
+        url: /api/products/check-legacy/#cramonitoring_insightsget
       requestBody:
         required: true
         content:
@@ -1874,7 +1874,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PlaidError'
       externalDocs:
-        url: /api/products/check/#cracheck_reportincome_insightsget
+        url: /api/products/check-legacy/#cracheck_reportincome_insightsget
       operationId: craCheckReportIncomeInsightsGet
       description: |-
         This endpoint allows you to retrieve the Income Insights report for your user. You should call this endpoint after you've received a `CHECK_REPORT_READY` or a `USER_CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`. If the most recent consumer report for the user doesn't have sufficient data to generate the report, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.
@@ -1899,7 +1899,7 @@ paths:
       - oauth2:
         - cra:read
       externalDocs:
-        url: /api/products/check/#cracheck_reportbase_reportget
+        url: /api/products/check-legacy/#cracheck_reportbase_reportget
       requestBody:
         required: true
         content:
@@ -2877,9 +2877,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/PlaidError'
       externalDocs:
-        url: /api/products/check/#cracheck_reportpdfget
+        url: /api/products/check-legacy/#cracheck_reportpdfget
       operationId: craCheckReportPdfGet
-      description: '`/cra/check_report/pdf/get` retrieves the most recent Consumer Report in PDF format. By default, the most recent Base Report (if it exists) for the user will be returned. To request that the most recent Partner Insights or Income Insights report be included in the PDF as well, use the `add-ons` field.'
+      description: '`/cra/check_report/pdf/get` retrieves the most recent Consumer Report in PDF format. The most recent Base Report for the user is always included. Use the `add_ons` field to also include the most recent Income Insights, Partner Insights or LendScore report in the PDF.'
       requestBody:
         required: true
         content:
@@ -2909,7 +2909,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PlaidError'
       externalDocs:
-        url: /api/products/check/#cracheck_reportcreate
+        url: /api/products/check-legacy/#cracheck_reportcreate
       operationId: craCheckReportCreate
       description: |-
         Use `/cra/check_report/create` to refresh data in an existing report. A Consumer Report will last for 24 hours before expiring; you should call any `/get` endpoints on the report before it expires. If a report expires, you can call `/cra/check_report/create` again to re-generate it and refresh the data in the report. The report is generated from all Items associated with the user, excluding [duplicate Items](https://plaid.com/docs/check/add-to-app/#duplicate-items) and Items that cannot supply data.
@@ -3003,7 +3003,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PlaidError'
       externalDocs:
-        url: /api/products/check/#cracheck_reportpartner_insightsget
+        url: /api/products/check-legacy/#cracheck_reportpartner_insightsget
       operationId: craCheckReportPartnerInsightsGet
       description: This endpoint allows you to retrieve the Partner Insights report for your user. You should call this endpoint after you've received a `CHECK_REPORT_READY` or a `USER_CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`. If the most recent consumer report for the user doesn't have sufficient data to generate the report, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.
       requestBody:
@@ -3046,7 +3046,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PlaidError'
       externalDocs:
-        url: /api/products/check/#cracheck_reportcashflow_insightsget
+        url: /api/products/check-legacy/#cracheck_reportcashflow_insightsget
       operationId: craCheckReportCashflowInsightsGet
       description: This endpoint allows you to retrieve the Cashflow Insights report for your user. You should call this endpoint after you've received a `CHECK_REPORT_READY` or a `USER_CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`. If the most recent consumer report for the user doesn't have sufficient data to generate the report, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.
       requestBody:
@@ -3092,7 +3092,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PlaidError'
       externalDocs:
-        url: /api/products/check/#cracheck_reportlend_scoreget
+        url: /api/products/check-legacy/#cracheck_reportlend_scoreget
       operationId: craCheckReportLendScoreGet
       description: This endpoint allows you to retrieve the LendScore report for your user. You should call this endpoint after you've received a `CHECK_REPORT_READY` or a `USER_CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`. If the most recent consumer report for the user doesn't have sufficient data to generate the report, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.
       requestBody:
@@ -3141,7 +3141,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PlaidError'
       externalDocs:
-        url: /api/products/check/#cracheck_reportnetwork_insightsget
+        url: /api/products/check-legacy/#cracheck_reportnetwork_insightsget
       operationId: craCheckReportNetworkInsightsGet
       description: This endpoint allows you to retrieve the Network Insights report for your user. You should call this endpoint after you've received a `CHECK_REPORT_READY` or a `USER_CHECK_REPORT_READY` webhook, either after the Link session for the user or after calling `/cra/check_report/create`. If the most recent consumer report for the user doesn't have sufficient data to generate the report, or the consumer report has expired, you will receive an error indicating that you should create a new consumer report by calling `/cra/check_report/create`.
       requestBody:
@@ -3155,6 +3155,12 @@ paths:
       summary: Retrieve various home lending reports for a user
       tags:
       - plaid
+      security:
+      - clientId: []
+        secret: []
+        plaidVersion: []
+      - oauth2:
+        - cra:read
       responses:
         "200":
           description: OK
@@ -3338,7 +3344,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PlaidError'
       externalDocs:
-        url: /api/products/check/#cracheck_reportverificationget
+        url: /api/products/check-legacy/#cracheck_reportverificationget
       operationId: craCheckReportVerificationGet
       description: |-
         This endpoint allows you to retrieve home lending reports for a user. To obtain a VoA or Employment Refresh report, you need to make sure that `cra_base_report` is included in the `products` parameter when calling `/link/token/create` or `/cra/check_report/create`.
@@ -3357,6 +3363,12 @@ paths:
       summary: Retrieve a Consumer Report as a Verification PDF
       tags:
       - plaid
+      security:
+      - clientId: []
+        secret: []
+        plaidVersion: []
+      - oauth2:
+        - cra:read
       responses:
         "200":
           description: OK
@@ -3374,7 +3386,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PlaidError'
       externalDocs:
-        url: /api/products/check/#cracheck_reportverificationpdfget
+        url: /api/products/check-legacy/#cracheck_reportverificationpdfget
       operationId: craCheckReportVerificationPdfGet
       description: |-
         The `/cra/check_report/verification/pdf/get` endpoint retrieves the most recent Consumer Report in PDF format, specifically formatted for Home Lending verification use cases. Before calling this endpoint, ensure that you've created a VOA report through Link or the `/cra/check_report/create` endpoint, and have received a `CHECK_REPORT_READY` or a `USER_CHECK_REPORT_READY` webhook.
@@ -3539,7 +3551,7 @@ paths:
                 $ref: '#/components/schemas/PlaidError'
       operationId: craServicingSubscriptionCreate
       externalDocs:
-        url: /api/products/check/#craservicingsubscriptioncreate
+        url: /api/products/check-legacy/#craservicingsubscriptioncreate
       description: '`/cra/servicing/subscription/create` subscribes a user to CRA report-update webhooks for a given scope.'
       requestBody:
         required: true
@@ -3572,7 +3584,7 @@ paths:
                 $ref: '#/components/schemas/PlaidError'
       operationId: craServicingSubscriptionDelete
       externalDocs:
-        url: /api/products/check/#craservicingsubscriptiondelete
+        url: /api/products/check-legacy/#craservicingsubscriptiondelete
       description: '`/cra/servicing/subscription/delete` removes the CRA servicing subscription identified by `subscription_id`.'
       requestBody:
         required: true
@@ -3615,7 +3627,7 @@ paths:
                 $ref: '#/components/schemas/PlaidError'
       operationId: craServicingSubscriptionGet
       externalDocs:
-        url: /api/products/check/#craservicingsubscriptionget
+        url: /api/products/check-legacy/#craservicingsubscriptionget
       description: '`/cra/servicing/subscription/get` returns the CRA servicing subscription identified by `subscription_id`.'
       requestBody:
         required: true
@@ -3656,7 +3668,7 @@ paths:
                 $ref: '#/components/schemas/PlaidError'
       operationId: craServicingSubscriptionList
       externalDocs:
-        url: /api/products/check/#craservicingsubscriptionlist
+        url: /api/products/check-legacy/#craservicingsubscriptionlist
       description: '`/cra/servicing/subscription/list` returns all CRA servicing subscriptions for a user, across scopes.'
       requestBody:
         required: true
@@ -3689,7 +3701,7 @@ paths:
                 $ref: '#/components/schemas/PlaidError'
       operationId: craServicingSubscriptionUpdate
       externalDocs:
-        url: /api/products/check/#craservicingsubscriptionupdate
+        url: /api/products/check-legacy/#craservicingsubscriptionupdate
       description: '`/cra/servicing/subscription/update` modifies an existing CRA servicing subscription. Fields left blank are unchanged; provided fields overwrite the current value. Use `reset_fields` to clear fields.'
       requestBody:
         required: true
@@ -3697,12 +3709,53 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CraServicingSubscriptionUpdateRequest'
+  /cra/report/create:
+    post:
+      summary: Create a CRA Report for provided user
+      tags:
+      - plaid
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CraReportCreateResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: eYupqX1mZkEuQRx
+                    report_id: cra-report-production-6f8b1e0c-4d2a-4c7e-9a3b-2f1d8e5a7c90
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      operationId: craReportCreate
+      externalDocs:
+        url: /api/products/check/#crareportcreate
+      description: |-
+        `/cra/report/create` generates a CRA Report for a user from the Items associated with that user.
+
+        Each requested product is generated asynchronously. Use the returned `report_id` to retrieve the report once its products are ready.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CraReportCreateRequest'
   /cra/report/get:
-    x-hidden-from-docs: true
     post:
       summary: Retrieve a CRA Report for provided user
       tags:
       - plaid
+      security:
+      - clientId: []
+        secret: []
+        plaidVersion: []
+      - oauth2:
+        - cra:read
       responses:
         "200":
           description: OK
@@ -3723,7 +3776,7 @@ paths:
                       decision_stage: DECISIONING
                       consumer_report_permissible_purpose: WRITTEN_INSTRUCTION_PREQUALIFICATION
                       products:
-                      - product: cra_qualify
+                      - product: cra_income_insights
                         version: V1
                         metadata:
                           generated_time: "2024-01-15T10:30:00Z"
@@ -3731,9 +3784,16 @@ paths:
                           account_count: 5
                           institution_ids:
                           - ins_56
+                          primary_account_count: 1
+                          depository_account_type_count: 3
+                          credit_account_type_count: 2
+                          other_account_type_count: 0
+                          multiple_owner_account_count: 0
+                          oldest_transaction_date: "2023-01-15"
+                          most_recent_transaction_date: "2024-01-14"
                         attributes:
-                          plaid_conn_user_active_auto_loan_count_90d: 0
-                          accounts_count: 3
+                          income_streams: []
+                          user_summary: null
                         errors: []
         default:
           description: Error response
@@ -3743,7 +3803,7 @@ paths:
                 $ref: '#/components/schemas/PlaidError'
       operationId: craReportGet
       externalDocs:
-        url: /none/
+        url: /api/products/check/#crareportget
       description: '`/cra/report/get` retrieves a CRA Report for a user.'
       requestBody:
         required: true
@@ -4330,6 +4390,12 @@ paths:
       externalDocs:
         url: /api/items/#itemget
       operationId: itemGet
+      security:
+      - clientId: []
+        secret: []
+        plaidVersion: []
+      - oauth2:
+        - item:read
       description: Returns information about the status of an Item.
       responses:
         "200":
@@ -4461,6 +4527,8 @@ paths:
                     items:
                     - item_id: Ed6bjNrDLJfGvZWwnkQlfxwoNz54B5C97ejBr
                       access_token: access-sandbox-435beced-94e8-4df3-a181-1dde1cfa19f0
+                    idv_session_status: success
+                    link_session_id: 00010203-0405-0607-0809-0a0b0c0d0e0f
                     request_id: m8MDnv9okwxFNBV
         default:
           description: Error response.
@@ -4590,6 +4658,12 @@ paths:
       externalDocs:
         url: /api/products/auth/#authget
       operationId: authGet
+      security:
+      - clientId: []
+        secret: []
+        plaidVersion: []
+      - oauth2:
+        - auth:read
       description: |-
         The `/auth/get` endpoint returns the bank account and bank identification numbers (such as routing numbers, for US accounts) associated with an Item's checking, savings, and cash management accounts, along with high-level account data and balances when available.
 
@@ -4606,6 +4680,7 @@ paths:
                   value:
                     accounts:
                     - account_id: vzeNDwK7KQIm4yEog683uElbp9GRLEFXGK98D
+                      apy: 0
                       balances:
                         available: 100
                         current: 110
@@ -4736,6 +4811,7 @@ paths:
                   value:
                     accounts:
                     - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
+                      apy: 0
                       balances:
                         available: 110.94
                         current: 110.94
@@ -4980,8 +5056,16 @@ paths:
                   value:
                     error_type: INVALID_REQUEST
                     error_code: INVALID_FIELD
-                    error_message: Transaction and posted dates must be within the last 14 days. The posted date cannot be before the transaction date.
-                    display_message: Transaction and posted dates must be within the last 14 days. The posted date cannot be before the transaction date.
+                    error_message: date_posted must be within the last 730 days
+                    display_message: null
+                    status: 400
+                    request_id: m8MDnv9okwxFNBV
+                invalid_account_id:
+                  value:
+                    error_type: INVALID_INPUT
+                    error_code: INVALID_ACCOUNT_ID
+                    error_message: could not find matching account. Verify that you are using a valid account_id
+                    display_message: null
                     status: 400
                     request_id: m8MDnv9okwxFNBV
         default:
@@ -4993,9 +5077,9 @@ paths:
       description: |-
         Use the `/sandbox/transactions/create` endpoint to create new transactions for an existing Item. This endpoint can be used to add up to 10 transactions to any Item at a time.
 
-        This endpoint can only be used with Items that were created in the Sandbox environment using the `user_transactions_dynamic` test user. You can use this to add transactions to test the `/transactions/get` and `/transactions/sync` endpoints.
+        This endpoint can be used with any Item created in the Sandbox environment. Added transactions persist across subsequent calls to `/transactions/get` and `/transactions/sync`.
 
-        Custom transactions are only applied to the depository account. Support for per-account targeting may be added in the future.
+        Each transaction is added to the account named by its `account_id`. When `account_id` is omitted, the transaction is added to the Item's checking account, or, for a custom Sandbox user, to the first depository account listed in its `override_accounts`, or its first account if it has no depository account.
       requestBody:
         required: true
         content:
@@ -5063,6 +5147,7 @@ paths:
                   value:
                     accounts:
                     - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
+                      apy: 0
                       balances:
                         available: 110.94
                         current: 110.94
@@ -5285,6 +5370,7 @@ paths:
                   value:
                     accounts:
                     - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
+                      apy: 0
                       balances:
                         available: 110.94
                         current: 110.94
@@ -5523,6 +5609,7 @@ paths:
                       auth_method: INSTANT_AUTH
                     accounts:
                     - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
+                      apy: 0
                       balances:
                         available: 110.94
                         current: 110.94
@@ -5791,6 +5878,12 @@ paths:
       externalDocs:
         url: /api/products/transactions/#transactionssync
       operationId: transactionsSync
+      security:
+      - clientId: []
+        secret: []
+        plaidVersion: []
+      - oauth2:
+        - transactions:read
       responses:
         "200":
           description: OK
@@ -5803,6 +5896,7 @@ paths:
                   value:
                     accounts:
                     - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
+                      apy: 0
                       balances:
                         available: 110.94
                         current: 110.94
@@ -6226,6 +6320,7 @@ paths:
                       - "0955"
                       - "1367"
                       oauth: false
+                      connection_availability: SUPPORTED
                     request_id: tbFyCEqkU774ZGG
                     total: 11384
         default:
@@ -6269,6 +6364,7 @@ paths:
                       institution_id: ins_109513
                       name: Theoretical Bank
                       oauth: true
+                      connection_availability: SUPPORTED
                       products:
                       - assets
                       - auth
@@ -6295,7 +6391,7 @@ paths:
                 $ref: '#/components/schemas/PlaidError'
           description: Error response
       description: |
-        Returns a JSON response containing details for institutions that match the query parameters, up to a maximum of ten institutions per query.
+        Returns a JSON response containing details for institutions that match the query parameters, up to a maximum of ten institutions per query. Institutions that Plaid does not support for new connections are not included in search results, but can still be retrieved by ID with `/institutions/get_by_id`.
 
         Versioning note: API versions 2019-05-29 and earlier allow use of the `public_key` parameter instead of the `client_id` and `secret` parameters to authenticate to this endpoint. The `public_key` parameter has since been deprecated; all customers are encouraged to use `client_id` and `secret` instead.
       requestBody:
@@ -6341,6 +6437,7 @@ paths:
                       - "0955"
                       - "1367"
                       oauth: false
+                      connection_availability: SUPPORTED
                       status:
                         item_logins:
                           status: HEALTHY
@@ -6412,7 +6509,9 @@ paths:
                 $ref: '#/components/schemas/PlaidError'
           description: Error response
       description: |
-        Returns a JSON response containing details on a specified financial institution currently supported by Plaid.
+        Returns a JSON response containing details on a specified financial institution.
+
+        Institutions that Plaid does not support for new connections are still returned by this endpoint, so that an `institution_id` stored on an existing Item can still be looked up. These institutions are not returned by `/institutions/get` or `/institutions/search`, and attempting to create a new Item for one of them returns an `INSTITUTION_NO_LONGER_SUPPORTED` error. Use `connection_availability` to tell the two cases apart.
 
         Versioning note: API versions 2019-05-29 and earlier allow use of the `public_key` parameter instead of the `client_id` and `secret` to authenticate to this endpoint. The `public_key` has been deprecated; all customers are encouraged to use `client_id` and `secret` instead.
       requestBody:
@@ -6528,6 +6627,7 @@ paths:
                   value:
                     accounts:
                     - account_id: blgvvBlXw3cq5GMPwqB6s6q4dLKB9WcVqGDGo
+                      apy: 0
                       balances:
                         available: 100
                         current: 110
@@ -6541,6 +6641,7 @@ paths:
                       subtype: checking
                       type: depository
                     - account_id: 6PdjjRP6LmugpBy5NgQvUqpRXMWxzktg3rwrk
+                      apy: null
                       balances:
                         available: null
                         current: 23631.9805
@@ -6553,6 +6654,7 @@ paths:
                       subtype: 401k
                       type: investment
                     - account_id: XMBvvyMGQ1UoLbKByoMqH3nXMj84ALSdE5B58
+                      apy: null
                       balances:
                         available: null
                         current: 65262
@@ -6832,6 +6934,12 @@ paths:
       externalDocs:
         url: /api/products/signal/#accountsbalanceget
       operationId: accountsBalanceGet
+      security:
+      - clientId: []
+        secret: []
+        plaidVersion: []
+      - oauth2:
+        - accounts:read
       responses:
         "200":
           description: OK
@@ -6844,6 +6952,7 @@ paths:
                   value:
                     accounts:
                     - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
+                      apy: 0
                       balances:
                         available: 100
                         current: 110
@@ -6857,6 +6966,7 @@ paths:
                       subtype: checking
                       type: depository
                     - account_id: dVzbVMLjrxTnLjX4G66XUp5GLklm4oiZy88yK
+                      apy: null
                       balances:
                         available: null
                         current: 410
@@ -6869,6 +6979,7 @@ paths:
                       subtype: credit card
                       type: credit
                     - account_id: Pp1Vpkl9w8sajvK6oEEKtr7vZxBnGpf7LxxLE
+                      apy: null
                       balances:
                         available: null
                         current: 65262
@@ -6932,6 +7043,12 @@ paths:
       externalDocs:
         url: /api/products/identity/#identityget
       operationId: identityGet
+      security:
+      - clientId: []
+        secret: []
+        plaidVersion: []
+      - oauth2:
+        - identity:read
       responses:
         "200":
           description: OK
@@ -6944,6 +7061,7 @@ paths:
                   value:
                     accounts:
                     - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
+                      apy: 0
                       balances:
                         available: 100
                         current: 110
@@ -6994,6 +7112,7 @@ paths:
                       subtype: checking
                       type: depository
                     - account_id: 3gE5gnRzNyfXpBK5wEEKcymJ5albGVUqg77gr
+                      apy: 0.1
                       balances:
                         available: 200
                         current: 210
@@ -7100,6 +7219,7 @@ paths:
                   value:
                     accounts:
                     - account_id: ZXEbW7Rkr9iv1qj8abebU1KDMlkexgSgrLAod
+                      apy: null
                       balances:
                         available: null
                         current: null
@@ -7190,6 +7310,7 @@ paths:
                   value:
                     accounts:
                     - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
+                      apy: 0
                       balances:
                         available: null
                         current: null
@@ -7214,6 +7335,7 @@ paths:
                       subtype: checking
                       type: depository
                     - account_id: 3gE5gnRzNyfXpBK5wEEKcymJ5albGVUqg77gr
+                      apy: 0.1
                       balances:
                         available: null
                         current: null
@@ -10047,6 +10169,7 @@ paths:
                     latest_scored_event:
                       event_id: ptevt_cYNnF8xYE1v1om
                       timestamp: "2020-07-24T03:26:02Z"
+                      event_type: PROTECT_COMPUTE
                       trust_index:
                         score: 86
                         model: trust_index.2.0.0
@@ -10157,6 +10280,33 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ProtectCashAdvanceRepaymentCreateRequest'
+  /protect/cash_advance/feedback/upload:
+    post:
+      tags:
+      - plaid
+      summary: Upload a file of cash advance feedback
+      externalDocs:
+        url: /api/products/protect/#protectcashadvancefeedbackupload
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProtectCashAdvanceFeedbackUploadResponse'
+              examples:
+                example-1:
+                  value:
+                    request_id: saKrIBuEB9qJZng
+                    upload_id: caifb_7Kx9mQ2vXpLw9R
+      operationId: protectCashAdvanceFeedbackUpload
+      description: Upload a CSV file of cash advance decision or repayment feedback. Each row is equivalent to one call to `/protect/cash_advance/decision/create` or `/protect/cash_advance/repayment/create`. Send the request as `multipart/form-data` with `client_id` and `secret` in the `PLAID-CLIENT-ID` and `PLAID-SECRET` headers. The file is accepted for asynchronous processing; the response contains a `request_id` and an `upload_id` that identifies the upload.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProtectCashAdvanceFeedbackUploadRequest'
   /protect/compute:
     post:
       tags:
@@ -10266,6 +10416,7 @@ paths:
                   value:
                     event_id: ptevt_cYNnF8xYE1v1om
                     timestamp: "2020-07-24T03:26:02Z"
+                    event_type: PROTECT_COMPUTE
                     trust_index:
                       score: 86
                       model: trust_index.2.0.0
@@ -10536,6 +10687,7 @@ paths:
                   value:
                     account:
                       account_id: vzeNDwK7KQIm4yEog683uElbp9GRLEFXGK98D
+                      apy: 0
                       balances:
                         available: 100
                         current: 110
@@ -10603,6 +10755,7 @@ paths:
                   value:
                     account:
                       account_id: QKKzevvp33HxPWpoqn6rI13BxW4awNSjnw4xv
+                      apy: 0
                       balances:
                         available: 100
                         current: 110
@@ -10652,6 +10805,7 @@ paths:
                   value:
                     account:
                       account_id: JqMLm4rJwpF6gMPJwBqdh9ZjjPvvpDcb7kDK1
+                      apy: null
                       balances:
                         available: null
                         current: 110.01
@@ -10784,6 +10938,7 @@ paths:
                   value:
                     account:
                       account_id: xlP8npRxwgCj48LQbjxWipkeL3gbyXf64knoy
+                      apy: null
                       balances:
                         available: null
                         current: 415.57
@@ -10921,6 +11076,7 @@ paths:
                   value:
                     account:
                       account_id: rz99ex9ZQotvnjXdgQLEsR81e3ArPgulVWjGj
+                      apy: null
                       balances:
                         available: null
                         current: 23631.9805
@@ -11060,6 +11216,7 @@ paths:
                   value:
                     account:
                       account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
+                      apy: 0
                       balances:
                         available: 110.94
                         current: 110.94
@@ -11230,6 +11387,7 @@ paths:
                   value:
                     account:
                       account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
+                      apy: 0
                       balances:
                         available: 110.94
                         current: 110.94
@@ -11795,6 +11953,7 @@ paths:
                   value:
                     account:
                       account_id: dVzbVMLjrxTnLjX4G66XUp5GLklm4oiZy88yK
+                      apy: null
                       balances:
                         available: null
                         current: 410
@@ -11833,6 +11992,7 @@ paths:
                         last_statement_balance: 1708.77
                         minimum_payment_amount: 20
                         next_payment_due_date: "2020-05-28"
+                        cash_advance_limit: 500
                       mortgage: []
                       student: []
                     request_id: dTnnm60WgKGLnKL
@@ -11874,6 +12034,7 @@ paths:
                   value:
                     account:
                       account_id: XMGPJy4q1gsQoKd5z9R3tK8kJ9EWL8SdkgKMq
+                      apy: 0
                       balances:
                         available: 100
                         current: 110
@@ -11957,6 +12118,7 @@ paths:
                   value:
                     account:
                       account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
+                      apy: 0
                       balances:
                         available: null
                         current: null
@@ -12018,6 +12180,7 @@ paths:
                   value:
                     account:
                       account_id: QKKzevvp33HxPWpoqn6rI13BxW4awNSjnw4xv
+                      apy: 0
                       balances:
                         available: 100
                         current: 110
@@ -12139,9 +12302,8 @@ paths:
       tags:
       - plaid
       summary: List webhook events
-      x-hidden-from-docs: true
       externalDocs:
-        url: none
+        url: /api/webhooks/webhook-events/#betawebhook_eventslist
       operationId: betaWebhookEventsList
       responses:
         "200":
@@ -12204,41 +12366,53 @@ paths:
                     display_message: null
                     status: 400
                     request_id: 4zlKapIkTm8p5KM
+                start_time_out_of_range:
+                  value:
+                    error_type: INVALID_INPUT
+                    error_code: WEBHOOK_EVENTS_START_TIME_OUT_OF_RANGE
+                    error_message: start_time is earlier than the 7-day webhook events retention window. Retry with a start_time within the last 7 days, or omit start_time to begin from the oldest retained event.
+                    display_message: null
+                    status: 400
+                    request_id: 4zlKapIkTm8p5KM
+                invalid_field:
+                  value:
+                    error_type: INVALID_REQUEST
+                    error_code: INVALID_FIELD
+                    error_message: cursor must be a properly formatted string
+                    display_message: null
+                    status: 400
+                    request_id: 4zlKapIkTm8p5KM
       description: |-
-        The `/beta/webhook_events/list` endpoint returns webhook events Plaid sent to the calling
-        client within the last 7 days. Results are ordered by `sent_time` ascending and cursor
-        paginated so clients can recover missed webhook deliveries and deduplicate on
-        `webhook_message_id`.
+        `/beta/webhook_events/list` returns webhook events for your account from the last 7
+        days, regardless of delivery outcome. Results are ordered by `sent_time`, oldest
+        first, and paginated with a cursor so you can recover deliveries your endpoint
+        missed. Each event includes a `webhook_message_id` that stays the same if that
+        event shows up again on a later poll, so you can skip events you have already
+        handled.
 
-        Filtering is optional. When multiple filter fields are set (`webhook_types`,
-        `webhook_codes`, `item_ids`, `delivery_statuses`), they are combined with AND across fields
-        and OR within each array (for example, `webhook_types: ["ITEM", "AUTH"]` matches
-        either type).
+        `TRANSACTIONS` webhooks are not returned. Use
+        [`/transactions/sync`](https://plaid.com/docs/api/products/transactions/#transactionssync)
+        to recover transaction updates.
 
-        Recommended pagination workflow:
+        Filtering is optional. For `webhook_types`, `webhook_codes`, `item_ids`, and
+        `delivery_statuses`, values within a field match with OR; different fields combine
+        with AND. For example, `webhook_types: ["ITEM", "AUTH"]` matches events of either
+        type.
 
-        1. First call: omit `cursor`, and optionally set `start_time` within the last 7 days (or
-           omit `start_time` to begin at the oldest retained event).
-        2. Subsequent calls: pass `next_cursor` as `cursor`. Do not send `start_time` with
-           `cursor` — the two fields are mutually exclusive. Sending both returns `INVALID_FIELD`.
-        3. Persist `next_cursor` even when `has_more` is `false`, then reuse it on the next poll so
-           you only receive events newer than what you have already seen.
-        4. If a stored cursor is older than the 7-day retention window, the API returns
-           `WEBHOOK_EVENTS_CURSOR_EXPIRED`; restart with a `start_time` within the last 7 days.
-           Events older than the retention window are no longer available.
+        To page through events:
 
-        Errors:
+        - On the first request, omit `cursor`. You can set `start_time` to a time within the last 7 days, or omit `start_time` to start at the oldest retained event.
+        - On later requests, send the previous response's `next_cursor` as `cursor`. If you also send `start_time`, it is ignored; `cursor` takes precedence, even when `start_time` has changed.
+        - Save `next_cursor` even when `has_more` is `false`, and send that cursor on the next poll so you only receive events newer than the ones you have already seen.
 
-        `WEBHOOK_EVENTS_START_TIME_OUT_OF_RANGE` (400) is returned when `start_time` is earlier
-        than the 7-day retention window. Retry with a `start_time` within the last 7 days, or omit
-        it.
+        A request fails with 400 in these cases:
 
-        `WEBHOOK_EVENTS_CURSOR_EXPIRED` (400) is returned when the cursor's position is older than
-        the 7-day retention window and can no longer be resolved. Restart pagination with a
-        `start_time` within the last 7 days.
+        - `WEBHOOK_EVENTS_START_TIME_OUT_OF_RANGE` (`INVALID_INPUT`) is returned when `cursor` is omitted and `start_time` is earlier than the 7-day retention window. Retry with a `start_time` within the last 7 days, or omit `start_time`.
+        - `WEBHOOK_EVENTS_CURSOR_EXPIRED` (`INVALID_INPUT`) is returned when the cursor is older than the 7-day retention window and can no longer be resolved. Start again with a `start_time` within the last 7 days. Events older than that window are no longer available.
+        - `INVALID_FIELD` (`INVALID_REQUEST`) is returned when `cursor` is not a properly formatted string, or when the request is otherwise invalid.
 
-        `INVALID_FIELD` (400) is returned when `cursor` is not a properly formatted string, when
-        both `cursor` and `start_time` are provided, or when the request is otherwise invalid.
+        This endpoint is in beta and may change in backwards-incompatible ways before it
+        is generally available. Send feedback or bug reports to building@plaid.com.
       requestBody:
         required: true
         content:
@@ -12332,6 +12506,7 @@ paths:
                   value:
                     accounts:
                     - account_id: BxBXxLj1m4HMXBm9WZZmCWVbPjX16EHwv99vp
+                      apy: 0
                       balances:
                         available: 100
                         current: 110
@@ -12344,6 +12519,7 @@ paths:
                       subtype: checking
                       type: depository
                     - account_id: dVzbVMLjrxTnLjX4G66XUp5GLklm4oiZy88yK
+                      apy: null
                       balances:
                         available: null
                         current: 410
@@ -12356,6 +12532,7 @@ paths:
                       subtype: credit card
                       type: credit
                     - account_id: Pp1Vpkl9w8sajvK6oEEKtr7vZxBnGpf7LxxLE
+                      apy: null
                       balances:
                         available: null
                         current: 65262
@@ -12368,6 +12545,7 @@ paths:
                       subtype: student
                       type: loan
                     - account_id: BxBXxLj1m4HMXBm9WZJyUg9XLd4rKEhw8Pb1J
+                      apy: null
                       balances:
                         available: null
                         current: 56302.06
@@ -12380,6 +12558,7 @@ paths:
                       subtype: mortgage
                       type: loan
                     - account_id: c0cTGbrDXN3xiGLGUNI9LGwxrOGjakxtWTgQV
+                      apy: null
                       balances:
                         available: null
                         current: 18250
@@ -12392,6 +12571,7 @@ paths:
                       subtype: auto
                       type: loan
                     - account_id: ufQuuYHpSjhuk9TKIQTnDWlFVDIR5nWSynuQD
+                      apy: null
                       balances:
                         available: 76000
                         current: 24000
@@ -12448,6 +12628,7 @@ paths:
                         last_statement_balance: 1708.77
                         minimum_payment_amount: 20
                         next_payment_due_date: "2020-05-28"
+                        cash_advance_limit: 500
                       mortgage:
                       - account_id: BxBXxLj1m4HMXBm9WZJyUg9XLd4rKEhw8Pb1J
                         account_number: "3120194154"
@@ -13113,6 +13294,12 @@ paths:
       externalDocs:
         url: /api/items/#itempublic_tokenexchange
       operationId: itemPublicTokenExchange
+      security:
+      - clientId: []
+        secret: []
+        plaidVersion: []
+      - oauth2:
+        - item:write
       responses:
         "200":
           description: OK
@@ -13840,6 +14027,7 @@ paths:
                   value:
                     accounts:
                     - account_id: 5Bvpj4QknlhVWk7GygpwfVKdd133GoCxB814g
+                      apy: 1.85
                       balances:
                         available: 43200
                         current: 43200
@@ -13853,6 +14041,7 @@ paths:
                       subtype: money market
                       type: depository
                     - account_id: JqMLm4rJwpF6gMPJwBqdh9ZjjPvvpDcb7kDK1
+                      apy: null
                       balances:
                         available: null
                         current: 110.01
@@ -13866,6 +14055,7 @@ paths:
                       subtype: ira
                       type: investment
                     - account_id: k67E4xKvMlhmleEa4pg9hlwGGNnnEeixPolGm
+                      apy: null
                       balances:
                         available: null
                         current: 24580.0605
@@ -13879,6 +14069,7 @@ paths:
                       subtype: 401k
                       type: investment
                     - account_id: ax0xgOBYRAIqOOjeLZr0iZBb8r6K88HZXpvmq
+                      apy: null
                       balances:
                         available: 48200.03
                         current: 48200.03
@@ -14278,6 +14469,7 @@ paths:
                   value:
                     accounts:
                     - account_id: 5e66Dl6jNatx3nXPGwZ7UkJed4z6KBcZA4Rbe
+                      apy: 0
                       balances:
                         available: 100
                         current: 110
@@ -14291,6 +14483,7 @@ paths:
                       subtype: checking
                       type: depository
                     - account_id: KqZZMoZmBWHJlz7yKaZjHZb78VNpaxfVa7e5z
+                      apy: null
                       balances:
                         available: null
                         current: 320.76
@@ -14304,6 +14497,7 @@ paths:
                       subtype: ira
                       type: investment
                     - account_id: rz99ex9ZQotvnjXdgQLEsR81e3ArPgulVWjGj
+                      apy: null
                       balances:
                         available: null
                         current: 23631.9805
@@ -14531,6 +14725,7 @@ paths:
                   value:
                     accounts:
                     - account_id: 31qEA6LPwGumkA4Z5mGbfyGwr4mL6nSZlQqpZ
+                      apy: 1.85
                       balances:
                         available: 43200
                         current: 43200
@@ -14544,6 +14739,7 @@ paths:
                       subtype: money market
                       type: depository
                     - account_id: xlP8npRxwgCj48LQbjxWipkeL3gbyXf64knoy
+                      apy: null
                       balances:
                         available: null
                         current: 415.57
@@ -15045,6 +15241,12 @@ paths:
       externalDocs:
         url: /api/link/#linktokencreate
       operationId: linkTokenCreate
+      security:
+      - clientId: []
+        secret: []
+        plaidVersion: []
+      - oauth2:
+        - link:write
       responses:
         "200":
           description: OK
@@ -22635,79 +22837,6 @@ paths:
                   end_customer_client_id: 634758733ebb4f00134b85ea
                   products:
                   - auth
-  /link_delivery/create:
-    post:
-      deprecated: true
-      tags:
-      - plaid
-      summary: Create Hosted Link session
-      externalDocs:
-        url: /none/
-      operationId: linkDeliveryCreate
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LinkDeliveryCreateResponse'
-              examples:
-                example-1:
-                  value:
-                    link_delivery_url: https://secure.plaid.com/99ace160-3cf7-4e51-a083-403633425815
-                    link_delivery_session_id: 99ace160-3cf7-4e51-a083-403633425815
-                    request_id: 4ciYmmesdqSiUAB
-        default:
-          description: Error response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PlaidError'
-      description: Use the `/link_delivery/create` endpoint to create a Hosted Link session.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/LinkDeliveryCreateRequest'
-  /link_delivery/get:
-    post:
-      deprecated: true
-      tags:
-      - plaid
-      summary: Get Hosted Link session
-      externalDocs:
-        url: /none/
-      operationId: linkDeliveryGet
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LinkDeliveryGetResponse'
-              examples:
-                example-1:
-                  value:
-                    status: COMPLETED
-                    created_at: "2019-10-12T07:20:50.52Z"
-                    public_tokens:
-                    - public-sandbox-b0e2c4ee-a763-4df5-bfe9-46a46bce993d
-                    completed_at: "2019-10-12T07:21:50.52Z"
-                    request_id: 4ciYmmesdqSiUAB
-        default:
-          description: Error response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PlaidError'
-      description: Use the `/link_delivery/get` endpoint to get the status of a Hosted Link session.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/LinkDeliveryGetRequest'
   /fdx/notifications:
     post:
       tags:
@@ -23026,6 +23155,13 @@ components:
           scopes:
             cra:read: Read CRA report data.
             user:write: Write user data.
+            item:read: Read Item data.
+            link:write: Create Link tokens.
+            item:write: Exchange a public token for an access token.
+            auth:read: Read Auth data.
+            accounts:read: Read account data.
+            identity:read: Read Identity data.
+            transactions:read: Read Transactions data.
   parameters:
     PlaidNewUserApiEnabledHeader:
       name: Plaid-New-User-API-Enabled
@@ -23295,6 +23431,16 @@ components:
       additionalProperties: true
       description: UserAccountSessionGetResponse defines the response schema for `/user_account/session/get`
       properties:
+        idv_session_status:
+          description: Overall IDV status for the session. Omitted when IDV status retrieval is disabled, no verification exists, or its status is unavailable. Use the IDV endpoints for detailed results.
+          x-hidden-from-docs: true
+          allOf:
+          - $ref: '#/components/schemas/IdentityVerificationStatus'
+        link_session_id:
+          type: string
+          nullable: true
+          description: The Link session identifier associated with this session. Null for sessions without a valid Link session identifier.
+          x-hidden-from-docs: true
         identity:
           $ref: '#/components/schemas/UserAccountIdentity'
         items:
@@ -23306,6 +23452,7 @@ components:
         request_id:
           $ref: '#/components/schemas/RequestID'
       required:
+      - link_session_id
       - identity
       - items
       - request_id
@@ -25027,9 +25174,19 @@ components:
           - PRODUCT_READY
           - ERROR
           description: The webhook codes that can be fired by this test endpoint.
+        options:
+          $ref: '#/components/schemas/SandboxItemFireWebhookRequestOptions'
       required:
       - access_token
       - webhook_code
+    SandboxItemFireWebhookRequestOptions:
+      type: object
+      description: Values to set on the fired webhook's payload. Each field is named after the webhook field it sets. If specified, must not be `null`.
+      properties:
+        new_transactions:
+          type: integer
+          minimum: 0
+          description: The value to send as `new_transactions` in a `TRANSACTIONS` `DEFAULT_UPDATE` webhook. Defaults to 0. Only valid when `webhook_type` is `TRANSACTIONS` and `webhook_code` is `DEFAULT_UPDATE`.
     WebhookType:
       type: string
       enum:
@@ -25959,17 +26116,18 @@ components:
           maxLength: 512
           description: |-
             Opaque cursor from a prior `/beta/webhook_events/list` response `next_cursor`. Use this
-            on subsequent requests to continue forward. Mutually exclusive with `start_time`: sending
-            both returns `INVALID_FIELD`. Callers should send only one.
+            on subsequent requests to continue forward. If `start_time` is also provided,
+            it is ignored; `cursor` takes precedence.
         start_time:
           type: string
           format: date-time
           nullable: true
           description: |-
             ISO-8601 timestamp. Returns webhook events with `sent_time` greater than or equal to
-            this value. Must not be earlier than the 7-day retention window. Mutually exclusive with
-            `cursor`: sending both returns `INVALID_FIELD`. Omit to begin from the oldest retained
-            event. Callers should send only one of `cursor` or `start_time`.
+            this value. When `cursor` is provided, this value is ignored, even if it has changed
+            or falls outside the 7-day retention window. Otherwise, it must not be earlier than
+            the 7-day retention window. Omit both `cursor` and `start_time` to begin from the
+            oldest retained event.
         count:
           type: integer
           minimum: 1
@@ -26021,7 +26179,7 @@ components:
       properties:
         webhook_events:
           type: array
-          description: Webhook events sent to the calling client.
+          description: Webhook events for your account.
           items:
             $ref: '#/components/schemas/WebhookEvent'
         has_more:
@@ -26043,11 +26201,11 @@ components:
     WebhookEvent:
       type: object
       additionalProperties: true
-      description: A webhook event Plaid sent to the calling client.
+      description: A webhook event for your account.
       properties:
         webhook_message_id:
           type: string
-          description: Stable, opaque, per-webhook ID for deduplication and support reference.
+          description: Stable, opaque ID for this webhook event. The same value is returned if the event appears again on a later poll. Quote it when contacting support.
         webhook_type:
           type: string
           description: The webhook type.
@@ -26106,7 +26264,9 @@ components:
       description: |-
         Latest delivery state for this webhook.
 
-        `PENDING`: Plaid has not yet received a successful response and may still retry.
+        `PENDING`: Plaid has not recorded a successful response and may still retry.
+        Treat `PENDING` as unknown rather than undelivered: a delivery may have
+        succeeded without the outcome being recorded.
 
         `DELIVERED`: the destination returned a 2xx response.
 
@@ -28309,6 +28469,8 @@ components:
           - bizcap
           - webull
           - kikoff_enterprise
+          - adyen_ca
+          - bitgo
           description: The processor you are integrating with.
       required:
       - access_token
@@ -28502,6 +28664,7 @@ components:
             - Estonian (`'et'`)
             - French (`'fr'`)
             - German (`'de'`)
+            - Haitian Creole (`'ht'`)
             - Hindi (`'hi'`)
             - Italian (`'it'`)
             - Latvian (`'lv'`)
@@ -28703,6 +28866,8 @@ components:
           $ref: '#/components/schemas/LinkTokenCreateRequestCreditPartnerInsights'
         cra_options:
           $ref: '#/components/schemas/LinkTokenCreateRequestCraOptions'
+        cra_report_parameter:
+          $ref: '#/components/schemas/LinkTokenCreateRequestCraReportParameter'
         consumer_report_permissible_purpose:
           $ref: '#/components/schemas/ConsumerReportPermissiblePurpose'
         auth:
@@ -30216,7 +30381,6 @@ components:
       - cash isa
       - cash management
       - cd
-      - charge card
       - checking
       - commercial
       - commercial line of credit
@@ -30233,7 +30397,6 @@ components:
       - home equity
       - home equity loan
       - hsa
-      - installment
       - isa
       - ira
       - keogh
@@ -31596,6 +31759,8 @@ components:
         oauth:
           type: boolean
           description: Indicates that the institution has an OAuth login flow. This will be `true` if OAuth is supported for any Items associated with the institution, even if the institution also supports non-OAuth connections.
+        connection_availability:
+          $ref: '#/components/schemas/InstitutionConnectionAvailability'
         status:
           $ref: '#/components/schemas/InstitutionStatus'
         payment_initiation_metadata:
@@ -31609,6 +31774,19 @@ components:
       - country_codes
       - routing_numbers
       - oauth
+      - connection_availability
+    InstitutionConnectionAvailability:
+      type: string
+      title: InstitutionConnectionAvailability
+      description: |
+        Whether Plaid supports creating new Items for the institution.
+
+        `SUPPORTED`: Plaid supports new connections to the institution. Whether a given connection succeeds can still depend on your integration and account: some institutions require completing [OAuth registration](https://plaid.com/docs/link/oauth/#complete-the-registration-requirements) before they can be used, the institution may not support every product requested in `/link/token/create`, and your Plaid account must be in good standing.
+
+        `NOT_SUPPORTED`: Plaid does not support new connections to the institution. Existing Items may continue to work. Attempting to create a new Item for the institution returns an `INSTITUTION_NO_LONGER_SUPPORTED` error. Institutions with this value are returned only by `/institutions/get_by_id`.
+      enum:
+      - SUPPORTED
+      - NOT_SUPPORTED
     InstitutionStatus:
       title: InstitutionStatus
       type: object
@@ -33268,6 +33446,7 @@ components:
           description: |-
             The full street address
             Example: `"564 Main Street, APT 15"`
+          nullable: true
         postal_code:
           type: string
           description: The postal code. In API versions 2018-05-22 and earlier, this field is called `zip`.
@@ -33303,6 +33482,7 @@ components:
           description: |-
             The full street address
             Example: `"564 Main Street, APT 15"`
+          nullable: true
         postal_code:
           type: string
           description: The postal code. In API versions 2018-05-22 and earlier, this field is called `zip`.
@@ -33865,6 +34045,12 @@ components:
           format: date
           description: The due date for the next payment. The due date is `null` if a payment is not expected. Dates are returned in an [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (YYYY-MM-DD).
           nullable: true
+        cash_advance_limit:
+          description: The credit limit for cash advances on the account.
+          type: number
+          format: double
+          nullable: true
+          x-hidden-from-docs: true
       required:
       - account_id
       - aprs
@@ -34263,6 +34449,9 @@ components:
         supports_payment_consents:
           type: boolean
           description: Indicates whether the institution supports payment consents.
+        supports_commercial_payment_consents:
+          type: boolean
+          description: Indicates whether the institution supports commercial variable recurring payment (cVRP) consents.
       required:
       - supports_international_payments
       - supports_sepa_instant
@@ -34270,6 +34459,7 @@ components:
       - supports_refund_details
       - standing_order_metadata
       - supports_payment_consents
+      - supports_commercial_payment_consents
     PaymentInitiationMaximumPaymentAmount:
       type: object
       description: |
@@ -34752,6 +34942,13 @@ components:
             A seed, in the form of a string, that will be used to randomly generate account and transaction data, if this data is not specified using the `override_accounts` argument. If no seed is specified, the randomly generated data will be different each time.
 
             Note that transactions data is generated relative to the Item's creation date. Different Items created on different dates with the same seed for transactions data will have different dates for the transactions. The number of days between each transaction and the Item creation will remain constant. For example, an Item created on December 15 might show a transaction on December 14. An Item created on December 20, using the same seed, would show that same transaction occurring on December 19.
+        roll_dates_forward:
+          type: boolean
+          default: false
+          description: |-
+            When `true`, every date in this configuration is shifted at Item creation so that the most recent activity date falls on the day the Item is created, keeping the spacing between dates. Activity dates are transaction and investment transaction dates, pay period end dates and pay days, holding `institution_price_as_of` dates, and a loan's `last_payment_date` or `last_statement_issue_date`. Scheduled loan dates such as `origination_date`, `maturity_date`, and `next_payment_due_date` move by the same amount but are never the anchor. This lets a saved configuration keep producing recent data without being edited.
+
+            A `date_posted` later than its `date_transacted` stays later, so the most recent transaction can still be pending. Dates are UTC calendar dates. The shift happens once, when the Item is created; the Item keeps the shifted dates afterwards. Defaults to `false`.
         override_accounts:
           type: array
           description: An array of account overrides to configure the accounts for the Item. By default, if no override is specified, transactions and account data will be randomly generated based on the account type and subtype, and other products will have fixed or empty data.
@@ -34950,7 +35147,7 @@ components:
         date_transacted:
           type: string
           format: date
-          description: The date of the transaction, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) (YYYY-MM-DD) format. Transactions in Sandbox will move from pending to posted once their transaction date has been reached. If a `date_transacted` is not provided by the institution, a transaction date may be available in the [`authorized_date`](https://plaid.com/docs/api/products/transactions/#transactions-get-response-transactions-authorized-date) field.
+          description: The date of the transaction, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) (YYYY-MM-DD) format. This field does not affect pending status; see `date_posted`.
         date_posted:
           type: string
           format: date
@@ -34979,11 +35176,11 @@ components:
         date_transacted:
           type: string
           format: date
-          description: The date of the transaction, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) (YYYY-MM-DD) format. Transaction date must be the present date or a date up to 14 days in the past. Future dates are not allowed.
+          description: The date of the transaction, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) (YYYY-MM-DD) format. Transaction date must be the present date or a date up to 730 days in the past. Future dates are not allowed.
         date_posted:
           type: string
           format: date
-          description: The date the transaction posted, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) (YYYY-MM-DD) format. Posted date must be the present date or a date up to 14 days in the past. Future dates are not allowed.
+          description: The date the transaction posted, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) (YYYY-MM-DD) format. Posted date must be the present date or a date up to 730 days in the past. Future dates are not allowed.
         amount:
           type: number
           format: double
@@ -34994,6 +35191,9 @@ components:
         iso_currency_code:
           type: string
           description: The ISO-4217 format currency code for the transaction. Defaults to USD.
+        account_id:
+          type: string
+          description: The `account_id` of the account to add the transaction to, as returned by `/accounts/get`. If omitted, the transaction is added to the Item's checking account, or, for a custom Sandbox user, to the first depository account listed in its `override_accounts`, or its first account if it has no depository account. Student loan accounts don't accept custom transactions and return an `INVALID_ACCOUNT_ID` error.
       required:
       - date_transacted
       - date_posted
@@ -37023,10 +37223,6 @@ components:
       type: string
       description: A credit card type account.
       properties:
-        charge card:
-          x-hidden-from-docs: true
-          type: string
-          description: Bank-issued charge card
         credit card:
           type: string
           description: Bank-issued credit card
@@ -37051,7 +37247,6 @@ components:
           type: string
           description: Commercial loan
         commercial line of credit:
-          x-hidden-from-docs: true
           type: string
           description: Commercial line of credit
         construction:
@@ -37064,13 +37259,8 @@ components:
           type: string
           description: Home Equity Line of Credit (HELOC)
         home equity loan:
-          x-hidden-from-docs: true
           type: string
           description: Home equity loan
-        installment:
-          x-hidden-from-docs: true
-          type: string
-          description: Installment loan
         line of credit:
           type: string
           description: Pre-approved line of credit
@@ -37093,9 +37283,11 @@ components:
       - auto
       - business
       - commercial
+      - commercial line of credit
       - construction
       - consumer
       - home equity
+      - home equity loan
       - loan
       - mortgage
       - overdraft
@@ -37853,6 +38045,51 @@ components:
     InvestmentTransactionSubtype:
       type: string
       description: For descriptions of possible transaction types and subtypes, see the [Investment transaction types schema](https://plaid.com/docs/api/accounts/#investment-transaction-types-schema).
+      x-override-enum-values-shown:
+      - account fee
+      - adjustment
+      - assignment
+      - buy
+      - buy to cover
+      - contribution
+      - deposit
+      - distribution
+      - dividend
+      - dividend reinvestment
+      - exercise
+      - expire
+      - interest
+      - interest receivable
+      - interest reinvestment
+      - legal fee
+      - long-term capital gain
+      - long-term capital gain reinvestment
+      - management fee
+      - margin expense
+      - merger
+      - miscellaneous fee
+      - non-qualified dividend
+      - non-resident tax
+      - pending credit
+      - pending debit
+      - qualified dividend
+      - return of principal
+      - request
+      - sell
+      - sell short
+      - send
+      - short-term capital gain
+      - short-term capital gain reinvestment
+      - spin off
+      - split
+      - tax
+      - tax withheld
+      - trade
+      - transfer
+      - transfer fee
+      - trust fee
+      - unqualified gain
+      - withdrawal
       enum:
       - account fee
       - adjustment
@@ -37866,12 +38103,10 @@ components:
       - dividend reinvestment
       - exercise
       - expire
-      - fund fee
       - interest
       - interest receivable
       - interest reinvestment
       - legal fee
-      - loan payment
       - long-term capital gain
       - long-term capital gain reinvestment
       - management fee
@@ -37883,7 +38118,6 @@ components:
       - pending credit
       - pending debit
       - qualified dividend
-      - rebalance
       - return of principal
       - request
       - sell
@@ -38153,9 +38387,6 @@ components:
         dividend:
           type: string
           description: Inflow of cash from a dividend
-        stock distribution:
-          type: string
-          description: Inflow of stock from a distribution
         interest:
           type: string
           description: Inflow of cash from interest
@@ -38254,9 +38485,6 @@ components:
         short-term capital gain:
           type: string
           description: Short-term capital gain received as cash
-        stock distribution:
-          type: string
-          description: Inflow of stock from a distribution
         tax:
           type: string
           description: Taxes paid on behalf of the investor
@@ -39618,6 +39846,25 @@ components:
         Maximum value length of 500 characters
 
         Do not include personally identifiable information or other sensitive data.
+    TransferAuthorizationUserAttributes:
+      x-hidden-from-docs: true
+      type: object
+      title: TransferAuthorizationUserAttributes
+      nullable: true
+      properties:
+        account_created_time:
+          type: string
+          format: date-time
+          nullable: true
+          description: The date and time the end user created their account on your platform, in ISO 8601 format (`YYYY-MM-DDTHH:mm:ssZ`). This is the user's account with you, not a Plaid `account_id`.
+        successful_payment_count:
+          type: integer
+          format: int64
+          minimum: 0
+          nullable: true
+          description: The total number of payments the end user has successfully completed on your platform since their account was created, across all payment methods. Excludes the payment being authorized, and excludes payments that were returned, charged back, or subsequently failed.
+      description: |
+        Typed attributes of the end user that Plaid models directly in transfer authorization decisioning. Use `custom_attributes` for any other risk-relevant context.
     TransferType:
       type: string
       title: TransferType
@@ -39829,7 +40076,7 @@ components:
       type: object
       additionalProperties: true
       nullable: true
-      description: The failure reason if the event type for a transfer is `"failed"` or `"returned"`. Null value otherwise.
+      description: The failure reason if the event type for a transfer is `"failed"` or `"returned"`, or the adjustment reason if the event type is `"adjustment"`. Null value otherwise.
       properties:
         failure_code:
           type: string
@@ -39842,7 +40089,7 @@ components:
           description: The ACH return code, e.g. `R01`.  A return code will be provided if and only if the transfer status is `returned`. For a full listing of ACH return codes, see [Transfer errors](https://plaid.com/docs/errors/transfer/#ach-return-codes).
         description:
           type: string
-          description: A human-readable description of the reason for the failure or reversal.
+          description: A human-readable description of the reason for the failure, reversal, or adjustment.
     BankTransferFailure:
       title: BankTransferFailure
       type: object
@@ -39942,6 +40189,10 @@ components:
           nullable: true
         custom_attributes:
           $ref: '#/components/schemas/TransferAuthorizationCustomAttributes'
+        user_attributes:
+          x-hidden-from-docs: true
+          allOf:
+          - $ref: '#/components/schemas/TransferAuthorizationUserAttributes'
       required:
       - type
       - network
@@ -41037,6 +41288,8 @@ components:
 
         `returned`: A posted transfer was returned.
 
+        `adjustment`: An adjustment was made to the transfer due to rare activity, such as a dishonor. Refer to `event_amount` for the amount adjusted: a positive amount means funds are credited to the ledger, and a negative amount means funds are debited from the ledger. `failure_reason.description` describes the reason for the adjustment.
+
         `guarantee_reimbursed`: Plaid reimbursed the client for the loss on a returned guaranteed transfer. The `event_amount` is the reimbursed amount.
 
         `client_return_recovered`: The client reported recovering the loss on a returned transfer via `/transfer/return/recover`, and Plaid debited the recovered amount from the client's ledger. The `event_amount` is the recovered amount.
@@ -41085,6 +41338,7 @@ components:
       - funds_available
       - guaranteed
       - returned
+      - adjustment
       - guarantee_reimbursed
       - client_return_recovered
       - plaid_return_recovered
@@ -44132,7 +44386,6 @@ components:
       type: string
       description: Valid account subtypes for credit accounts. For a list containing descriptions of each subtype, see [Account schemas](https://plaid.com/docs/api/accounts/#StandaloneAccountType-credit).
       enum:
-      - charge card
       - credit card
       - paypal
       - all
@@ -44148,7 +44401,6 @@ components:
       - consumer
       - home equity
       - home equity loan
-      - installment
       - loan
       - mortgage
       - overdraft
@@ -44863,6 +45115,40 @@ components:
       properties:
         network_insights_version:
           $ref: '#/components/schemas/NetworkInsightsVersion'
+    LinkTokenCreateRequestCraReportParameter:
+      title: LinkTokenCreateRequestCraReportParameter
+      type: object
+      description: Specifies the report parameters for Plaid Check products, mirroring the parameters accepted on `/cra/report/create`.
+      properties:
+        scope:
+          $ref: '#/components/schemas/CraReportScope'
+        decision_stage:
+          $ref: '#/components/schemas/CraReportDecisionStage'
+        client_report_id:
+          type: string
+          nullable: true
+          description: Client-generated identifier, which can be used by lenders to track loan applications.
+        days_requested:
+          type: integer
+          nullable: true
+          description: The number of days of history to include in Plaid Check products. Maximum is 731; minimum is 180. If a value lower than 180 is provided, a minimum of 180 days of history will be requested.
+          minimum: 0
+          maximum: 731
+        days_required:
+          type: integer
+          nullable: true
+          description: The minimum number of days of data required for the report to be successfully generated.
+          minimum: 0
+          maximum: 184
+        include_investments:
+          type: boolean
+          nullable: true
+          description: Indicates that investment data should be extracted from the linked account(s).
+        products:
+          type: array
+          description: The Plaid Check products, versions, and options to generate for the report.
+          items:
+            $ref: '#/components/schemas/CraReportProduct'
     LinkTokenCreateRequestCreditPartnerInsights:
       title: LinkTokenCreateRequestCreditPartnerInsights
       type: object
@@ -53024,143 +53310,6 @@ components:
           type: string
         request_id:
           $ref: '#/components/schemas/RequestID'
-    LinkDeliverySessionStatus:
-      type: string
-      enum:
-      - CREATED
-      - OPENED
-      - EXITED
-      - COMPLETED
-      - EXPIRED
-      description: |-
-        The status of the given Hosted Link session.
-
-        `CREATED`: The session is created but not yet accessed by the user
-
-        `OPENED`: The session is opened by the user but not yet completed
-
-        `EXITED`: The session has been exited by the user
-
-        `COMPLETED`: The session has been completed by the user
-
-        `EXPIRED`: The session has expired
-    LinkDeliveryDeliveryMethod:
-      type: string
-      enum:
-      - SMS
-      - EMAIL
-      description: |-
-        The delivery method to be used to deliver the Hosted Link session URL.
-
-        `SMS`: The URL will be delivered through SMS
-
-        `EMAIL`: The URL will be delivered through email
-    LinkDeliveryCommunicationMethod:
-      type: object
-      description: The communication method containing both the type and address to send the URL.
-      properties:
-        method:
-          $ref: '#/components/schemas/LinkDeliveryDeliveryMethod'
-        address:
-          type: string
-          description: The phone number / email address that Hosted Link sessions are delivered to. Phone numbers must be in E.164 format.
-    LinkDeliveryRecipient:
-      type: object
-      description: Metadata related to the recipient. If the information required to populate this field is not available, leave it blank.
-      properties:
-        communication_methods:
-          type: array
-          items:
-            $ref: '#/components/schemas/LinkDeliveryCommunicationMethod'
-          description: The list of communication methods to send the Hosted Link session URL to. If delivery is not required, leave this field blank.
-        first_name:
-          type: string
-          description: First name of the recipient. Will be used in the body of the email / text (if configured). If this information is not available, leave this field blank.
-    LinkDeliveryOptions:
-      type: object
-      description: Optional metadata related to the Hosted Link session
-      properties:
-        recipient:
-          $ref: '#/components/schemas/LinkDeliveryRecipient'
-    LinkDeliveryCreateRequest:
-      type: object
-      description: LinkDeliveryCreateRequest defines the request schema for `/link_delivery/create`
-      properties:
-        client_id:
-          $ref: '#/components/schemas/APIClientID'
-        secret:
-          $ref: '#/components/schemas/APISecret'
-        link_token:
-          type: string
-          description: A `link_token` from a previous invocation of `/link/token/create`.
-        options:
-          $ref: '#/components/schemas/LinkDeliveryOptions'
-      required:
-      - link_token
-    LinkDeliveryCreateResponse:
-      type: object
-      additionalProperties: true
-      description: LinkDeliveryCreateResponse defines the response schema for `/link_delivery/create`
-      properties:
-        link_delivery_url:
-          type: string
-          description: The URL to the Hosted Link session, which will be delivered by the specified delivery method.
-        link_delivery_session_id:
-          type: string
-          description: The ID for the Hosted Link session. Same as the `link_token` string excluding the "link-{env}-" prefix.
-        request_id:
-          $ref: '#/components/schemas/RequestID'
-      required:
-      - link_delivery_url
-      - link_delivery_session_id
-      - request_id
-    LinkDeliveryGetRequest:
-      type: object
-      description: LinkDeliveryGetRequest defines the request schema for `/link_delivery/get`
-      properties:
-        client_id:
-          $ref: '#/components/schemas/APIClientID'
-        secret:
-          $ref: '#/components/schemas/APISecret'
-        link_delivery_session_id:
-          type: string
-          description: The ID for the Hosted Link session from a previous invocation of `/link_delivery/create`.
-      required:
-      - link_delivery_session_id
-    LinkDeliveryGetResponse:
-      type: object
-      additionalProperties: true
-      description: LinkDeliveryGetResponse defines the response schema for `/link_delivery/get`
-      properties:
-        status:
-          $ref: '#/components/schemas/LinkDeliverySessionStatus'
-        created_at:
-          type: string
-          format: date-time
-          description: Timestamp in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (`YYYY-MM-DDTHH:mm:ssZ`) indicating the time the given Hosted Link session was created at.
-        completed_at:
-          type: string
-          format: date-time
-          nullable: true
-          description: Timestamp in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format (`YYYY-MM-DDTHH:mm:ssZ`) indicating the time the given Hosted Link session was completed at.
-        request_id:
-          $ref: '#/components/schemas/RequestID'
-        access_tokens:
-          type: array
-          items:
-            $ref: '#/components/schemas/AccessToken'
-          nullable: true
-          description: An array of access tokens associated with the Hosted Link session.
-        item_ids:
-          type: array
-          items:
-            $ref: '#/components/schemas/ItemId'
-          nullable: true
-          description: An array of `item_id`s associated with the Hosted Link session.
-      required:
-      - status
-      - created_at
-      - request_id
     LinkUserDeliveryStatusWebhook:
       title: LinkUserDeliveryStatusWebhook
       x-hidden-from-docs: true
@@ -53887,7 +54036,6 @@ components:
           type: string
           description: The `user_id` corresponding to the user the webhook has fired for.
         error:
-          nullable: true
           description: Details on why the Check Report failed and how to resolve it.
           allOf:
           - $ref: '#/components/schemas/PlaidError'
@@ -53922,6 +54070,9 @@ components:
       - webhook_type
       - webhook_code
       - user_id
+      - error
+      - repairable_items
+      - failed_products
       - environment
       x-examples:
         example-1:
@@ -54058,7 +54209,6 @@ components:
           type: string
           description: The `user_id` associated with the user whose data is being requested. This is received by calling `/user/create`.
         error:
-          nullable: true
           description: Details on why the Check Report failed and how to resolve it.
           allOf:
           - $ref: '#/components/schemas/PlaidError'
@@ -54093,6 +54243,9 @@ components:
       - webhook_type
       - webhook_code
       - user_id
+      - error
+      - repairable_items
+      - failed_products
       - environment
       x-examples:
         example-1:
@@ -54127,6 +54280,10 @@ components:
         user_id:
           type: string
           description: The `user_id` associated with the user whose data is being requested. This is received by calling `/user/create`.
+        client_user_id:
+          type: string
+          minLength: 1
+          description: The `client_user_id` you supplied for this user when calling `/user/create`.
         report_id:
           type: string
           description: The identifier of the CRA report that was updated. Pass this value to the relevant product `/get` endpoint to retrieve the updated report.
@@ -54158,6 +54315,7 @@ components:
       - webhook_type
       - webhook_code
       - user_id
+      - client_user_id
       - scope
       - successful_products
       - failed_products
@@ -54167,6 +54325,7 @@ components:
           webhook_type: CRA_REPORT
           webhook_code: CRA_REPORT_UPDATED
           user_id: usr_8c3ZbDBYjaqUXZ
+          client_user_id: uid_12345
           report_id: cra-report-production-6f8b1e0c-4d2a-4c7e-9a3b-2f1d8e5a7c90
           scope: CLIENT_USER
           successful_products:
@@ -54181,6 +54340,7 @@ components:
           webhook_type: CRA_REPORT
           webhook_code: CRA_REPORT_UPDATED
           user_id: usr_8c3ZbDBYjaqUXZ
+          client_user_id: uid_12345
           report_id: cra-report-production-6f8b1e0c-4d2a-4c7e-9a3b-2f1d8e5a7c90
           scope: PLAID_NETWORK
           successful_products: []
@@ -54190,6 +54350,103 @@ components:
           - product: cra_income_insights
             version: V1
           error_code: NO_ELIGIBLE_ITEMS
+          environment: production
+    CraReportReadyWebhook:
+      type: object
+      title: CraReportReadyWebhook
+      description: Fired when generation finishes for a CRA report requested via `/cra/report/create` or a Link session configured with `cra_report_parameter`, whether every requested product was generated, only some were, or none were. `successful_products` and `failed_products` indicate which products were generated, and `error_code` is populated when every product failed. Call `/cra/report/get` for the generated products and for error details on failed products.
+      additionalProperties: true
+      properties:
+        webhook_type:
+          type: string
+          description: '`CRA_REPORT`'
+        webhook_code:
+          type: string
+          description: '`CRA_REPORT_READY`'
+        user_id:
+          type: string
+          description: The `user_id` associated with the user whose data is being requested. This is received by calling `/user/create`.
+        client_user_id:
+          type: string
+          nullable: true
+          description: The `client_user_id` you supplied for this user when calling `/user/create`. `null` if no `client_user_id` is associated with the user.
+        report_id:
+          allOf:
+          - $ref: '#/components/schemas/CraReportId'
+          - description: The identifier of the CRA report. Pass this value to `/cra/report/get` to retrieve the report.
+          nullable: true
+        client_report_id:
+          type: string
+          description: The `client_report_id` you supplied when requesting the report, if any.
+          nullable: true
+        scope:
+          $ref: '#/components/schemas/CraReportScope'
+        successful_products:
+          type: array
+          description: Specifies a list of products that have successfully been generated for the report.
+          items:
+            $ref: '#/components/schemas/CreditProduct'
+        failed_products:
+          type: array
+          description: Specifies a list of products that have failed to generate for the report. Additional detail on what caused the failure can be found in the product's `errors` when calling `/cra/report/get`.
+          items:
+            $ref: '#/components/schemas/CreditProduct'
+        generated_time:
+          type: string
+          format: date-time
+          description: The timestamp when the products were generated, in ISO 8601 format. Null if there are no successful products.
+          nullable: true
+        error_code:
+          $ref: '#/components/schemas/CraReportErrorCode'
+        environment:
+          $ref: '#/components/schemas/WebhookEnvironmentValues'
+      required:
+      - webhook_type
+      - webhook_code
+      - user_id
+      - client_user_id
+      - report_id
+      - client_report_id
+      - scope
+      - successful_products
+      - failed_products
+      - generated_time
+      - error_code
+      - environment
+      x-examples:
+        example-1:
+          webhook_type: CRA_REPORT
+          webhook_code: CRA_REPORT_READY
+          user_id: usr_8c3ZbDBYjaqUXZ
+          client_user_id: uid_12345
+          report_id: cra-report-production-6f8b1e0c-4d2a-4c7e-9a3b-2f1d8e5a7c90
+          client_report_id: 908en3djkk342
+          scope: CLIENT_USER
+          successful_products:
+          - product: cra_base_report
+            version: V1
+          failed_products:
+          - product: cra_income_insights
+            version: V2
+          generated_time: "2026-01-12T20:23:59Z"
+          error_code: null
+          environment: production
+        example-2:
+          webhook_type: CRA_REPORT
+          webhook_code: CRA_REPORT_READY
+          user_id: usr_8c3ZbDBYjaqUXZ
+          client_user_id: uid_12345
+          report_id: cra-report-production-6f8b1e0c-4d2a-4c7e-9a3b-2f1d8e5a7c90
+          client_report_id: 908en3djkk342
+          scope: CLIENT_USER
+          successful_products: []
+          failed_products:
+          - product: cra_base_report
+            version: V1
+          - product: cra_income_insights
+            version: V2
+          generated_time: null
+          error_code: DATA_UNAVAILABLE
           environment: production
     CraPartnerInsightsCompleteWebhook:
       type: object
@@ -55516,7 +55773,7 @@ components:
           $ref: '#/components/schemas/ThirdPartyUserToken'
         add_ons:
           type: array
-          description: Use this field to include other reports in the PDF.
+          description: Use this field to include the most recent Income Insights, Partner Insights, or LendScore report in the PDF.
           items:
             $ref: '#/components/schemas/CraPDFAddOns'
         user_token:
@@ -55526,12 +55783,15 @@ components:
       enum:
       - cra_income_insights
       - cra_partner_insights
+      - cra_lend_score
       description: |-
         A list of add-ons that can be included in the PDF.
 
         `cra_income_insights`: Include Income Insights report in the PDF.
 
         `cra_partner_insights`: Include Partner Insights report in the PDF.
+
+        `cra_lend_score`: Include LendScore report in the PDF.
       type: string
     CraCheckReportPDFGetResponse:
       format: binary
@@ -61672,6 +61932,8 @@ components:
           description: A flag specifying whether you would like Plaid to expose a shareable URL for the verification being created.
         template_id:
           $ref: '#/components/schemas/IdentityVerificationTemplateID'
+        language:
+          $ref: '#/components/schemas/IdentityVerificationLanguage'
         gave_consent:
           $ref: '#/components/schemas/IdentityVerificationConsent'
         user:
@@ -61974,6 +62236,23 @@ components:
       example: idv_52xR9LKo77r1Np
       title: IdentityVerificationID
       description: ID of the associated Identity Verification attempt.
+    IdentityVerificationLanguage:
+      type: string
+      nullable: true
+      description: |-
+        The language shown when the user starts this identity verification. If omitted or null, the language is detected from the user's browser settings, with English as the fallback. The user can select a different language during the session. An idempotent request that returns an existing identity verification does not change its language.
+
+        Use a supported BCP 47 language tag, such as `fr-CA`. Unlike `/link/token/create`, this field requires a region-specific value rather than a two-letter language code such as `fr`.
+      example: fr-CA
+      enum:
+      - en-US
+      - es-ES
+      - es-US
+      - fr-CA
+      - ja-JP
+      - pt-BR
+      - pt-PT
+      - null
     IdentityVerificationListRequest:
       description: Request input for listing Identity Verifications
       type: object
@@ -68825,7 +69104,6 @@ components:
       - version
     CraIncomeInsightsProduct:
       title: CraIncomeInsightsProduct
-      x-hidden-from-docs: true
       type: object
       additionalProperties: true
       description: Names the Income Insights product at a given version.
@@ -68859,7 +69137,6 @@ components:
       - version
     CraHomeLendingProduct:
       title: CraHomeLendingProduct
-      x-hidden-from-docs: true
       type: object
       additionalProperties: true
       description: Names the Home Lending product at a given version.
@@ -68874,28 +69151,356 @@ components:
       required:
       - product
       - version
+    CraBaseReportProduct:
+      title: CraBaseReportProduct
+      type: object
+      additionalProperties: true
+      description: Names the Base Report product at a given version.
+      properties:
+        product:
+          type: string
+          enum:
+          - cra_base_report
+          description: The Base Report product discriminator.
+        version:
+          $ref: '#/components/schemas/CraProductVersion'
+      required:
+      - product
+      - version
+    CraLendScoreProduct:
+      title: CraLendScoreProduct
+      type: object
+      additionalProperties: true
+      description: Names the LendScore product at a given version.
+      properties:
+        product:
+          type: string
+          enum:
+          - cra_lend_score
+          description: The LendScore product discriminator.
+        version:
+          $ref: '#/components/schemas/CraProductVersion'
+      required:
+      - product
+      - version
+    CraCashflowInsightsProduct:
+      title: CraCashflowInsightsProduct
+      type: object
+      additionalProperties: true
+      description: Names the Cashflow Insights product at a given version.
+      properties:
+        product:
+          type: string
+          enum:
+          - cra_cashflow_insights
+          description: The Cashflow Insights product discriminator.
+        version:
+          $ref: '#/components/schemas/CraProductVersion'
+      required:
+      - product
+      - version
+    CraNetworkInsightsProduct:
+      title: CraNetworkInsightsProduct
+      type: object
+      additionalProperties: true
+      description: Names the Network Insights product at a given version.
+      properties:
+        product:
+          type: string
+          enum:
+          - cra_network_insights
+          description: The Network Insights product discriminator.
+        version:
+          $ref: '#/components/schemas/CraProductVersion'
+      required:
+      - product
+      - version
     CraReportGetRequestProduct:
       title: CraReportGetRequestProduct
-      x-hidden-from-docs: true
       description: CraReportGetRequestProduct specifies one product and version requested from `/cra/report/get`, selected by the `product` discriminator.
       oneOf:
       - $ref: '#/components/schemas/CraQualifyProduct'
       - $ref: '#/components/schemas/CraIncomeInsightsProduct'
       - $ref: '#/components/schemas/CraHomeLendingProduct'
+      - $ref: '#/components/schemas/CraBaseReportProduct'
+      - $ref: '#/components/schemas/CraLendScoreProduct'
+      - $ref: '#/components/schemas/CraCashflowInsightsProduct'
+      - $ref: '#/components/schemas/CraNetworkInsightsProduct'
       discriminator:
         propertyName: product
         mapping:
           cra_qualify: '#/components/schemas/CraQualifyProduct'
           cra_income_insights: '#/components/schemas/CraIncomeInsightsProduct'
           cra_home_lending: '#/components/schemas/CraHomeLendingProduct'
+          cra_base_report: '#/components/schemas/CraBaseReportProduct'
+          cra_lend_score: '#/components/schemas/CraLendScoreProduct'
+          cra_cashflow_insights: '#/components/schemas/CraCashflowInsightsProduct'
+          cra_network_insights: '#/components/schemas/CraNetworkInsightsProduct'
+    CraReportCreateEmploymentRefreshOptions:
+      title: CraReportCreateEmploymentRefreshOptions
+      type: object
+      nullable: true
+      description: Configures the Employment Refresh report.
+      properties:
+        days_requested:
+          type: integer
+          description: The number of days of data to request for the Employment Refresh report. Maximum is 731.
+          minimum: 0
+          maximum: 731
+      required:
+      - days_requested
+    CraReportCreateHomeLendingReportType:
+      title: CraReportCreateHomeLendingReportType
+      type: string
+      description: A type of home lending report.
+      enum:
+      - VOA
+      - EMPLOYMENT_REFRESH
+      - INCOME
+    CraReportCreateBaseReportOptions:
+      title: CraReportCreateBaseReportOptions
+      type: object
+      nullable: true
+      description: Configures how the Base Report product is generated.
+      properties:
+        require_identity:
+          type: boolean
+          nullable: true
+          description: Require the report to include identity information. If identity information is not available, report generation fails.
+    CraReportCreateHomeLendingOptions:
+      title: CraReportCreateHomeLendingOptions
+      type: object
+      nullable: true
+      description: Configures how the Home Lending product is generated.
+      properties:
+        reports_requested:
+          type: array
+          description: The home lending reports to generate.
+          items:
+            $ref: '#/components/schemas/CraReportCreateHomeLendingReportType'
+        employment_refresh_options:
+          $ref: '#/components/schemas/CraReportCreateEmploymentRefreshOptions'
+      required:
+      - reports_requested
+    CraReportCreateIncomeInsightsOptions:
+      title: CraReportCreateIncomeInsightsOptions
+      type: object
+      nullable: true
+      description: Configures how the Income Insights product is generated.
+      properties:
+        income_insights_filter:
+          $ref: '#/components/schemas/IncomeInsightsFilter'
+    CraReportCreateBaseReportProductConfig:
+      title: CraReportCreateBaseReportProductConfig
+      type: object
+      additionalProperties: true
+      description: Requests the given version of the Base Report product, optionally configuring how it is generated.
+      properties:
+        product:
+          type: string
+          enum:
+          - cra_base_report
+          description: Set to `cra_base_report` to request the Base Report product.
+        version:
+          $ref: '#/components/schemas/CraProductVersion'
+        options:
+          $ref: '#/components/schemas/CraReportCreateBaseReportOptions'
+      required:
+      - product
+      - version
+    CraReportCreateCashflowInsightsProductConfig:
+      title: CraReportCreateCashflowInsightsProductConfig
+      type: object
+      additionalProperties: true
+      description: Requests the given version of the Cashflow Insights product. Cashflow Insights accepts no additional configuration today.
+      properties:
+        product:
+          type: string
+          enum:
+          - cra_cashflow_insights
+          description: Set to `cra_cashflow_insights` to request the Cashflow Insights product.
+        version:
+          $ref: '#/components/schemas/CraProductVersion'
+      required:
+      - product
+      - version
+    CraReportCreateHomeLendingProductConfig:
+      title: CraReportCreateHomeLendingProductConfig
+      type: object
+      additionalProperties: true
+      description: Requests the given version of the Home Lending product, optionally configuring how it is generated.
+      properties:
+        product:
+          type: string
+          enum:
+          - cra_home_lending
+          description: Set to `cra_home_lending` to request the Home Lending product.
+        version:
+          $ref: '#/components/schemas/CraProductVersion'
+        options:
+          $ref: '#/components/schemas/CraReportCreateHomeLendingOptions'
+      required:
+      - product
+      - version
+    CraReportCreateIncomeInsightsProductConfig:
+      title: CraReportCreateIncomeInsightsProductConfig
+      type: object
+      additionalProperties: true
+      description: Requests the given version of the Income Insights product, optionally configuring how it is generated.
+      properties:
+        product:
+          type: string
+          enum:
+          - cra_income_insights
+          description: Set to `cra_income_insights` to request the Income Insights product.
+        version:
+          $ref: '#/components/schemas/CraProductVersion'
+        options:
+          $ref: '#/components/schemas/CraReportCreateIncomeInsightsOptions'
+      required:
+      - product
+      - version
+    CraReportCreateLendScoreProductConfig:
+      title: CraReportCreateLendScoreProductConfig
+      type: object
+      additionalProperties: true
+      description: Requests the given version of the LendScore product. LendScore accepts no additional configuration today.
+      properties:
+        product:
+          type: string
+          enum:
+          - cra_lend_score
+          description: Set to `cra_lend_score` to request the LendScore product.
+        version:
+          $ref: '#/components/schemas/CraProductVersion'
+      required:
+      - product
+      - version
+    CraReportCreateNetworkInsightsProductConfig:
+      title: CraReportCreateNetworkInsightsProductConfig
+      type: object
+      additionalProperties: true
+      description: Requests the given version of the Network Insights product. Network Insights accepts no additional configuration today.
+      properties:
+        product:
+          type: string
+          enum:
+          - cra_network_insights
+          description: Set to `cra_network_insights` to request the Network Insights product.
+        version:
+          $ref: '#/components/schemas/CraProductVersion'
+      required:
+      - product
+      - version
+    CraReportCreateQualifyProductConfig:
+      title: CraReportCreateQualifyProductConfig
+      type: object
+      additionalProperties: true
+      description: Requests the given version of the Qualify product. Qualify accepts no additional configuration today.
+      properties:
+        product:
+          type: string
+          enum:
+          - cra_qualify
+          description: Set to `cra_qualify` to request the Qualify product.
+        version:
+          $ref: '#/components/schemas/CraProductVersion'
+      required:
+      - product
+      - version
+    CraReportProduct:
+      title: CraReportProduct
+      description: A Plaid Check product and version to generate for the report, with the options that apply to that product, selected by the `product` field.
+      oneOf:
+      - $ref: '#/components/schemas/CraReportCreateBaseReportProductConfig'
+      - $ref: '#/components/schemas/CraReportCreateCashflowInsightsProductConfig'
+      - $ref: '#/components/schemas/CraReportCreateHomeLendingProductConfig'
+      - $ref: '#/components/schemas/CraReportCreateIncomeInsightsProductConfig'
+      - $ref: '#/components/schemas/CraReportCreateLendScoreProductConfig'
+      - $ref: '#/components/schemas/CraReportCreateNetworkInsightsProductConfig'
+      - $ref: '#/components/schemas/CraReportCreateQualifyProductConfig'
+      discriminator:
+        propertyName: product
+        mapping:
+          cra_base_report: '#/components/schemas/CraReportCreateBaseReportProductConfig'
+          cra_cashflow_insights: '#/components/schemas/CraReportCreateCashflowInsightsProductConfig'
+          cra_home_lending: '#/components/schemas/CraReportCreateHomeLendingProductConfig'
+          cra_income_insights: '#/components/schemas/CraReportCreateIncomeInsightsProductConfig'
+          cra_lend_score: '#/components/schemas/CraReportCreateLendScoreProductConfig'
+          cra_network_insights: '#/components/schemas/CraReportCreateNetworkInsightsProductConfig'
+          cra_qualify: '#/components/schemas/CraReportCreateQualifyProductConfig'
     CraReportId:
       title: CraReportId
-      x-hidden-from-docs: true
       type: string
       description: A unique ID identifying a CRA report. Like all Plaid identifiers, this ID is case sensitive.
+    CraReportCreateRequest:
+      title: CraReportCreateRequest
+      type: object
+      description: CraReportCreateRequest defines the request schema for `/cra/report/create`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        user_id:
+          $ref: '#/components/schemas/NewUserID'
+        products:
+          type: array
+          description: The Plaid Check products, versions, and options to generate for the report.
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/CraReportProduct'
+        scope:
+          $ref: '#/components/schemas/CraReportScope'
+        decision_stage:
+          $ref: '#/components/schemas/CraReportDecisionStage'
+        consumer_report_permissible_purpose:
+          $ref: '#/components/schemas/ConsumerReportPermissiblePurpose'
+        client_report_id:
+          type: string
+          nullable: true
+          description: Client-generated identifier, which can be used by lenders to track loan applications.
+        days_requested:
+          type: integer
+          nullable: true
+          description: The number of days of history to include in Plaid Check products. Maximum is 731; minimum is 180. If a value lower than 180 is provided, a minimum of 180 days of history will be requested.
+          maximum: 731
+        days_required:
+          type: integer
+          nullable: true
+          description: The minimum number of days of data required for the report to be successfully generated.
+          minimum: 0
+          maximum: 184
+        include_investments:
+          type: boolean
+          nullable: true
+          description: Indicates that investment data should be extracted from the linked account(s).
+        webhook:
+          type: string
+          format: url
+          description: The destination URL to which the report's webhooks will be sent.
+      required:
+      - user_id
+      - products
+      - decision_stage
+      - consumer_report_permissible_purpose
+    CraReportCreateResponse:
+      title: CraReportCreateResponse
+      additionalProperties: true
+      type: object
+      description: CraReportCreateResponse defines the response schema for `/cra/report/create`.
+      properties:
+        report_id:
+          allOf:
+          - $ref: '#/components/schemas/CraReportId'
+          - description: The identifier of the report being generated. Use it to retrieve the report once its products are ready.
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - report_id
+      - request_id
     CraReportGetRequest:
       title: CraReportGetRequest
-      x-hidden-from-docs: true
       type: object
       description: CraReportGetRequest defines the request schema for `/cra/report/get`.
       properties:
@@ -68907,7 +69512,7 @@ components:
           $ref: '#/components/schemas/NewUserID'
         products:
           type: array
-          description: The requested products and their versions, e.g. `[{"product":"cra_qualify","version":"V1"}]`.
+          description: The requested products and their versions, e.g. `[{"product":"cra_base_report","version":"V1"}]`.
           minItems: 1
           items:
             $ref: '#/components/schemas/CraReportGetRequestProduct'
@@ -68928,7 +69533,6 @@ components:
       - consumer_report_permissible_purpose
     CraReportGetReport:
       title: CraReportGetReport
-      x-hidden-from-docs: true
       type: object
       additionalProperties: true
       description: The CRA report returned by `/cra/report/get`.
@@ -68954,6 +69558,20 @@ components:
       - decision_stage
       - consumer_report_permissible_purpose
       - products
+    CraReportErrorCode:
+      title: CraReportErrorCode
+      type: string
+      nullable: true
+      description: |-
+        The reason every product in a CRA report failed to generate. `null` when at least one product succeeded.
+
+        `DATA_UNAVAILABLE`: Plaid could not retrieve enough data from the user's Items to generate any of the requested products. Sending the user through Link to add or repair Items may resolve this.
+
+        `INTERNAL_SERVER_ERROR`: Plaid encountered an unexpected error while generating the report.
+      enum:
+      - DATA_UNAVAILABLE
+      - INTERNAL_SERVER_ERROR
+      - null
     CraReportScope:
       title: CraReportScope
       type: string
@@ -68972,6 +69590,9 @@ components:
           x-override-enum-values-shown:
           - cra_base_report
           - cra_income_insights
+          - cra_cashflow_insights
+          - cra_lend_score
+          - cra_network_insights
         version:
           type: string
           description: The version of the product that was generated.
@@ -69212,20 +69833,18 @@ components:
       - request_id
     CraReportDecisionStage:
       title: CraReportDecisionStage
-      x-hidden-from-docs: true
       type: string
       enum:
       - PREQUALIFICATION
       - DECISIONING
       - SERVICING
-      description: The stage in the lending lifecycle for which the report is being retrieved.
+      description: The stage in the lending lifecycle that the report is for.
     CraProductVersion:
       title: CraProductVersion
       type: string
       description: A string that specifies a particular version of a CRA product.
     CraReportGetResponseProduct:
       title: CraReportGetResponseProduct
-      x-hidden-from-docs: true
       description: Per-product report data, selected by the `product` discriminator.
       oneOf:
       - $ref: '#/components/schemas/CraReportGetQualifyResponseProduct'
@@ -69268,7 +69887,6 @@ components:
       - errors
     CraReportGetIncomeInsightsResponseProduct:
       title: CraReportGetIncomeInsightsResponseProduct
-      x-hidden-from-docs: true
       type: object
       additionalProperties: true
       description: Income Insights data returned by `/cra/report/get`.
@@ -69297,7 +69915,6 @@ components:
       - errors
     CraReportGetIncomeInsightsAttributes:
       title: CraReportGetIncomeInsightsAttributes
-      x-hidden-from-docs: true
       type: object
       nullable: true
       additionalProperties: true
@@ -69315,7 +69932,6 @@ components:
       - user_summary
     CraReportGetIncomeInsightsStream:
       title: CraReportGetIncomeInsightsStream
-      x-hidden-from-docs: true
       type: object
       additionalProperties: true
       description: An income stream detected for the user.
@@ -69345,7 +69961,6 @@ components:
       - income_metrics
     CraReportGetProductBaseMetadata:
       title: CraReportGetProductBaseMetadata
-      x-hidden-from-docs: true
       type: object
       nullable: true
       additionalProperties: true
@@ -69374,7 +69989,6 @@ components:
       - institution_ids
     CraReportGetIncomeInsightsMetadata:
       title: CraReportGetIncomeInsightsMetadata
-      x-hidden-from-docs: true
       type: object
       nullable: true
       additionalProperties: true
@@ -69418,7 +70032,6 @@ components:
         - most_recent_transaction_date
     CraReportGetHomeLendingResponseProduct:
       title: CraReportGetHomeLendingResponseProduct
-      x-hidden-from-docs: true
       type: object
       additionalProperties: true
       description: Home Lending data returned by `/cra/report/get`.
@@ -69447,7 +70060,6 @@ components:
       - errors
     CraReportGetHomeLendingAttributes:
       title: CraReportGetHomeLendingAttributes
-      x-hidden-from-docs: true
       type: object
       nullable: true
       additionalProperties: true
@@ -69483,7 +70095,6 @@ components:
       - payment_behavior_nsf_late_fees_flag_90d
     CraReportGetHomeLendingIncomeMetrics:
       title: CraReportGetHomeLendingIncomeMetrics
-      x-hidden-from-docs: true
       type: object
       additionalProperties: true
       description: Modeled current income for a given currency. Home Lending reports current income only; there is no projected income figure.
@@ -69500,7 +70111,6 @@ components:
       - unofficial_currency_code
     CraReportGetHomeLendingIncomeByCategories:
       title: CraReportGetHomeLendingIncomeByCategories
-      x-hidden-from-docs: true
       type: object
       additionalProperties: true
       description: Modeled income for one currency, broken down by income category.
@@ -69520,7 +70130,6 @@ components:
       - categories
     CraReportGetHomeLendingCategoryIncome:
       title: CraReportGetHomeLendingCategoryIncome
-      x-hidden-from-docs: true
       type: object
       additionalProperties: true
       description: Modeled current income for a single income category.
@@ -69534,7 +70143,6 @@ components:
       - current
     CraReportGetHomeLendingIncomeSources:
       title: CraReportGetHomeLendingIncomeSources
-      x-hidden-from-docs: true
       type: object
       nullable: true
       additionalProperties: true
@@ -69553,7 +70161,6 @@ components:
       - income_providers
     CraReportGetHomeLendingMetadata:
       title: CraReportGetHomeLendingMetadata
-      x-hidden-from-docs: true
       type: object
       nullable: true
       additionalProperties: true
@@ -69562,21 +70169,18 @@ components:
       - $ref: '#/components/schemas/CraReportGetProductBaseMetadata'
     CraReportGetProductMetadata:
       title: CraReportGetProductMetadata
-      x-hidden-from-docs: true
       type: object
       nullable: true
       description: A map of product report metadata, where the key is a string and the value varies by product. For a full list of metadata fields per product, see the data dictionary. May be `null` if metadata was not available.
       additionalProperties: {}
     CraReportGetProductAttributes:
       title: CraReportGetProductAttributes
-      x-hidden-from-docs: true
       type: object
       nullable: true
       description: A map of product attributes, where the key is a string and the value can be any JSON value. The specific list of attributes depends on the product and version. For a full list, see the data dictionary. May be `null` if attributes were not available.
       additionalProperties: {}
     CraReportGetResponse:
       title: CraReportGetResponse
-      x-hidden-from-docs: true
       additionalProperties: true
       type: object
       description: CraReportGetResponse defines the response schema for `/cra/report/get`.
@@ -71379,6 +71983,11 @@ components:
           enum:
           - background
           - user_present_required
+        paired_item_id:
+          description: The `item_id` of the Item that was created alongside this one in a single Link session. Only present for Items created in a hybrid Link flow that produces separate Plaid Inc and Plaid Check items; `null` for every other Item.
+          type: string
+          nullable: true
+          x-hidden-from-docs: true
       required:
       - item_id
       - webhook
@@ -74144,6 +74753,9 @@ components:
           type: string
           format: date-time
           description: The timestamp of the event, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format, e.g. `"2017-09-14T14:42:19.350Z"`
+        event_type:
+          type: string
+          description: The external event type, when one is available.
         trust_index:
           $ref: '#/components/schemas/TrustIndex'
         fraud_attributes:
@@ -74169,7 +74781,7 @@ components:
           description: The timestamp of the event, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format, e.g. `"2017-09-14T14:42:19.350Z"`
         event_type:
           type: string
-          description: The type of event.
+          description: The external event type, when one is available.
         trust_index:
           $ref: '#/components/schemas/TrustIndex'
         fraud_attributes:
@@ -74468,3 +75080,38 @@ components:
           type: string
           nullable: true
           description: Routing number of the bank account. Must be present if `account_number` is present.
+    CashAdvanceFeedbackType:
+      type: string
+      title: CashAdvanceFeedbackType
+      description: The kind of feedback rows the file contains.
+      enum:
+      - DECISION
+      - REPAYMENT
+    ProtectCashAdvanceFeedbackUploadRequest:
+      title: ProtectCashAdvanceFeedbackUploadRequest
+      type: object
+      description: Defines the request schema for `/protect/cash_advance/feedback/upload`
+      properties:
+        feedback_type:
+          $ref: '#/components/schemas/CashAdvanceFeedbackType'
+        file:
+          type: string
+          format: binary
+          description: A CSV file of feedback rows. Maximum 20 MB.
+      required:
+      - feedback_type
+      - file
+    ProtectCashAdvanceFeedbackUploadResponse:
+      title: ProtectCashAdvanceFeedbackUploadResponse
+      type: object
+      additionalProperties: true
+      description: Defines the response schema for `/protect/cash_advance/feedback/upload`
+      properties:
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+        upload_id:
+          type: string
+          description: 'A unique identifier for the upload. Retain it: it is the identifier Plaid Support uses to look up this upload.'
+      required:
+      - request_id
+      - upload_id
