@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.762.0
+  version: 2020-09-14_1.764.2
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -3771,6 +3771,8 @@ paths:
                     client_user_id: your-db-id-3b24110
                     warnings: []
                     report:
+                      report_id: cra-report-production-6f8b1e0c-4d2a-4c7e-9a3b-2f1d8e5a7c90
+                      client_report_id: 908en3djkk342
                       retrieved_time: "2024-01-15T10:30:00Z"
                       scope: PLAID_NETWORK
                       decision_stage: DECISIONING
@@ -12696,6 +12698,49 @@ paths:
                           street: 123 Relaxation Road
                         ytd_interest_paid: 280.55
                         ytd_principal_paid: 271.65
+                      loan:
+                      - account_id: c0cTGbrDXN3xiGLGUNI9LGwxrOGjakxtWTgQV
+                        account_number: "8943210074"
+                        interest_rate:
+                          percentage: 6.49
+                          type: fixed
+                        principal_balance: 18250
+                        origination_principal_amount: 32000
+                        origination_date: "2023-09-01"
+                        loan_term_months: 72
+                        maturity_date: "2029-09-01"
+                        payment_count: 72
+                        payment_frequency: monthly
+                        next_payment_amount: 525.4
+                        next_payment_due_date: "2026-07-01"
+                        last_payment_amount: 525.4
+                        last_payment_date: "2026-06-01"
+                        payoff_amount: 18190.25
+                        ytd_interest_paid: 612.18
+                        compounding_period: monthly
+                      line_of_credit:
+                      - account_id: ufQuuYHpSjhuk9TKIQTnDWlFVDIR5nWSynuQD
+                        interest_rate:
+                          percentage: 8.25
+                          type: variable
+                        credit_limit: 100000
+                        available_credit: 76000
+                        principal_balance: 24000
+                        minimum_payment_amount: 180
+                        next_payment_amount: 180
+                        next_payment_due_date: "2026-07-05"
+                        last_payment_amount: 180
+                        last_payment_date: "2026-06-05"
+                        last_statement_balance: 24000
+                        last_statement_issue_date: "2026-06-01"
+                        past_due_amount: 0
+                        finance_charges: 162.5
+                        draw_period_end_date: "2032-03-10"
+                        aprs:
+                        - apr_percentage: 8.25
+                          apr_type: purchase_apr
+                          balance_subject_to_apr: null
+                          interest_charge_amount: null
                     request_id: dTnnm60WgKGLnKL
         default:
           description: Error response
@@ -12710,7 +12755,9 @@ paths:
             schema:
               $ref: '#/components/schemas/LiabilitiesGetRequest'
       description: |-
-        The `/liabilities/get` endpoint returns various details about an Item with loan or credit accounts. Liabilities data is available primarily for US financial institutions, with some limited coverage of Canadian institutions. Currently supported account types are account type `credit` with account subtype `credit card` or `paypal`, and account type `loan` with account subtype `student` or `mortgage`. To limit accounts listed in Link to types and subtypes supported by Liabilities, you can use the `account_filters` parameter when [creating a Link token](https://plaid.com/docs/api/link/#linktokencreate).
+        The `/liabilities/get` endpoint returns various details about an Item with loan or credit accounts. Liabilities data is available primarily for US financial institutions, with some limited coverage of Canadian institutions. Supported account types are account type `credit` with account subtype `credit card` or `paypal`; and account type `loan` with account subtype `auto`, `commercial`, `commercial line of credit`, `consumer`, `home equity`, `home equity loan`, `line of credit`, `loan`, `mortgage`, or `student`. To limit accounts listed in Link to types and subtypes supported by Liabilities, you can use the `account_filters` parameter when [creating a Link token](https://plaid.com/docs/api/link/#linktokencreate).
+
+        To receive the expanded loan subtype values, use plaid-go 10.1.0 or later, plaid-java 44.0.0 or later, plaid-python 8.3.0 or later, or plaid-ruby 14.4.0 or later. Earlier client library versions may receive `loan` instead of `home equity loan` and `line of credit` instead of `commercial line of credit`.
 
         The types of information returned by Liabilities can include balances and due dates, loan terms, and account details such as original loan amount and guarantor. Data is refreshed approximately once per day; the latest data can be retrieved by calling `/liabilities/get`.
   /payment_initiation/recipient/create:
@@ -33585,15 +33632,13 @@ components:
           items:
             $ref: '#/components/schemas/StudentLoan'
         loan:
-          x-hidden-from-docs: true
-          description: The closed-end loan accounts returned.
+          description: The closed-end loan accounts returned. This field is omitted when using plaid-python earlier than 13.0.0 or plaid-ruby earlier than 50.0.0.
           type: array
           nullable: true
           items:
             $ref: '#/components/schemas/LoanLiability'
         line_of_credit:
-          x-hidden-from-docs: true
-          description: The line of credit accounts returned.
+          description: The line of credit accounts returned. This field is omitted when using plaid-python earlier than 13.0.0 or plaid-ruby earlier than 50.0.0.
           type: array
           nullable: true
           items:
@@ -33603,7 +33648,6 @@ components:
       - mortgage
       - student
     LoanLiability:
-      x-hidden-from-docs: true
       title: LoanLiability
       type: object
       additionalProperties: true
@@ -33701,7 +33745,6 @@ components:
       - ytd_interest_paid
       - compounding_period
     LineOfCreditLiability:
-      x-hidden-from-docs: true
       title: LineOfCreditLiability
       type: object
       additionalProperties: true
@@ -33800,7 +33843,6 @@ components:
       - draw_period_end_date
       - aprs
     LoanInterestRate:
-      x-hidden-from-docs: true
       title: LoanInterestRate
       type: object
       additionalProperties: true
@@ -33818,7 +33860,6 @@ components:
       - percentage
       - type
     LoanInterestRateType:
-      x-hidden-from-docs: true
       title: LoanInterestRateType
       type: string
       nullable: true
@@ -33827,7 +33868,6 @@ components:
       - variable
       description: The type of interest rate.
     LoanPaymentFrequency:
-      x-hidden-from-docs: true
       title: LoanPaymentFrequency
       type: string
       nullable: true
@@ -33841,7 +33881,6 @@ components:
       - annually
       description: The frequency at which payments are scheduled.
     LoanCompoundingPeriod:
-      x-hidden-from-docs: true
       title: LoanCompoundingPeriod
       type: string
       nullable: true
@@ -37248,7 +37287,7 @@ components:
           description: Commercial loan
         commercial line of credit:
           type: string
-          description: Commercial line of credit
+          description: Commercial line of credit. This subtype is normalized to `line of credit` in plaid-go versions earlier than 10.1.0, plaid-java versions earlier than 44.0.0, plaid-python versions earlier than 8.3.0, and plaid-ruby versions earlier than 14.4.0.
         construction:
           type: string
           description: Construction loan
@@ -37260,7 +37299,7 @@ components:
           description: Home Equity Line of Credit (HELOC)
         home equity loan:
           type: string
-          description: Home equity loan
+          description: Home equity loan. This subtype is normalized to `loan` in plaid-go versions earlier than 10.1.0, plaid-java versions earlier than 44.0.0, plaid-python versions earlier than 8.3.0, and plaid-ruby versions earlier than 14.4.0.
         line of credit:
           type: string
           description: Pre-approved line of credit
@@ -45131,7 +45170,7 @@ components:
         days_requested:
           type: integer
           nullable: true
-          description: The number of days of history to include in Plaid Check products. Maximum is 731; minimum is 180. If a value lower than 180 is provided, a minimum of 180 days of history will be requested.
+          description: The number of days of history to include in Plaid Check products. Maximum is 731. If a value lower than 180 is provided, a minimum of 180 days of history will be requested.
           minimum: 0
           maximum: 731
         days_required:
@@ -69137,6 +69176,7 @@ components:
       - version
     CraHomeLendingProduct:
       title: CraHomeLendingProduct
+      x-hidden-from-docs: true
       type: object
       additionalProperties: true
       description: Names the Home Lending product at a given version.
@@ -69167,11 +69207,32 @@ components:
       required:
       - product
       - version
+    CraLendScoreVariant:
+      title: CraLendScoreVariant
+      type: string
+      description: The variant identifier for a LendScore result.
+      enum:
+      - GENERALIST
+      - AUTO
+      - MORTGAGE
+      - SHORT_TERM_LOANS
+      - ARC
+    CraReportGetLendScoreOptions:
+      title: CraReportGetLendScoreOptions
+      type: object
+      nullable: true
+      description: Configures which LendScore variants are retrieved.
+      properties:
+        variants:
+          type: array
+          description: The LendScore variants to retrieve. If omitted or empty, `GENERALIST` is returned. A variant listed more than once is returned once. Only supported for version `V2`.
+          items:
+            $ref: '#/components/schemas/CraLendScoreVariant'
     CraLendScoreProduct:
       title: CraLendScoreProduct
       type: object
       additionalProperties: true
-      description: Names the LendScore product at a given version.
+      description: Names the LendScore product at a given version, with options for selecting variants.
       properties:
         product:
           type: string
@@ -69180,6 +69241,8 @@ components:
           description: The LendScore product discriminator.
         version:
           $ref: '#/components/schemas/CraProductVersion'
+        options:
+          $ref: '#/components/schemas/CraReportGetLendScoreOptions'
       required:
       - product
       - version
@@ -69326,6 +69389,7 @@ components:
       - version
     CraReportCreateHomeLendingProductConfig:
       title: CraReportCreateHomeLendingProductConfig
+      x-hidden-from-docs: true
       type: object
       additionalProperties: true
       description: Requests the given version of the Home Lending product, optionally configuring how it is generated.
@@ -69394,6 +69458,7 @@ components:
       - version
     CraReportCreateQualifyProductConfig:
       title: CraReportCreateQualifyProductConfig
+      x-hidden-from-docs: true
       type: object
       additionalProperties: true
       description: Requests the given version of the Qualify product. Qualify accepts no additional configuration today.
@@ -69463,7 +69528,8 @@ components:
         days_requested:
           type: integer
           nullable: true
-          description: The number of days of history to include in Plaid Check products. Maximum is 731; minimum is 180. If a value lower than 180 is provided, a minimum of 180 days of history will be requested.
+          description: The number of days of history to include in Plaid Check products. Maximum is 731. If a value lower than 180 is provided, a minimum of 180 days of history will be requested.
+          minimum: 0
           maximum: 731
         days_required:
           type: integer
@@ -69537,6 +69603,15 @@ components:
       additionalProperties: true
       description: The CRA report returned by `/cra/report/get`.
       properties:
+        report_id:
+          allOf:
+          - $ref: '#/components/schemas/CraReportId'
+          - description: The identifier of the report that was returned. Pass this value to `/cra/report/get` to retrieve the same report again. `null` if the returned report has no stored identifier.
+          nullable: true
+        client_report_id:
+          type: string
+          nullable: true
+          description: Client-generated identifier, which can be used by lenders to track loan applications.
         retrieved_time:
           type: string
           format: date-time
@@ -69553,6 +69628,8 @@ components:
           items:
             $ref: '#/components/schemas/CraReportGetResponseProduct'
       required:
+      - report_id
+      - client_report_id
       - retrieved_time
       - scope
       - decision_stage
@@ -69594,8 +69671,7 @@ components:
           - cra_lend_score
           - cra_network_insights
         version:
-          type: string
-          description: The version of the product that was generated.
+          $ref: '#/components/schemas/CraProductVersion'
       required:
       - product
       - version
@@ -69850,12 +69926,190 @@ components:
       - $ref: '#/components/schemas/CraReportGetQualifyResponseProduct'
       - $ref: '#/components/schemas/CraReportGetIncomeInsightsResponseProduct'
       - $ref: '#/components/schemas/CraReportGetHomeLendingResponseProduct'
+      - $ref: '#/components/schemas/CraReportGetCashflowInsightsResponseProduct'
+      - $ref: '#/components/schemas/CraReportGetNetworkInsightsResponseProduct'
+      - $ref: '#/components/schemas/CraReportGetLendScoreResponseProduct'
       discriminator:
         propertyName: product
         mapping:
           cra_qualify: '#/components/schemas/CraReportGetQualifyResponseProduct'
           cra_income_insights: '#/components/schemas/CraReportGetIncomeInsightsResponseProduct'
           cra_home_lending: '#/components/schemas/CraReportGetHomeLendingResponseProduct'
+          cra_cashflow_insights: '#/components/schemas/CraReportGetCashflowInsightsResponseProduct'
+          cra_network_insights: '#/components/schemas/CraReportGetNetworkInsightsResponseProduct'
+          cra_lend_score: '#/components/schemas/CraReportGetLendScoreResponseProduct'
+    CraReportGetCashflowInsightsResponseProduct:
+      title: CraReportGetCashflowInsightsResponseProduct
+      type: object
+      additionalProperties: true
+      description: Cashflow Insights data returned by `/cra/report/get`.
+      properties:
+        product:
+          type: string
+          enum:
+          - cra_cashflow_insights
+          description: The Cashflow Insights product.
+        version:
+          $ref: '#/components/schemas/CraProductVersion'
+        metadata:
+          $ref: '#/components/schemas/CraReportGetCashflowInsightsMetadata'
+        attributes:
+          $ref: '#/components/schemas/CraReportGetCashflowInsightsAttributes'
+        errors:
+          type: array
+          description: Product-level errors. Non-empty when this product failed to generate; empty on success.
+          items:
+            $ref: '#/components/schemas/PlaidError'
+      required:
+      - product
+      - version
+      - metadata
+      - attributes
+      - errors
+    CraReportGetNetworkInsightsResponseProduct:
+      title: CraReportGetNetworkInsightsResponseProduct
+      type: object
+      additionalProperties: true
+      description: Network Insights data returned by `/cra/report/get`.
+      properties:
+        product:
+          type: string
+          enum:
+          - cra_network_insights
+          description: The Network Insights product.
+        version:
+          $ref: '#/components/schemas/CraProductVersion'
+        metadata:
+          $ref: '#/components/schemas/CraReportGetNetworkInsightsMetadata'
+        attributes:
+          $ref: '#/components/schemas/CraReportGetNetworkInsightsAttributes'
+        errors:
+          type: array
+          description: Product-level errors. Non-empty when this product failed to generate; empty on success.
+          items:
+            $ref: '#/components/schemas/PlaidError'
+      required:
+      - product
+      - version
+      - metadata
+      - attributes
+      - errors
+    CraReportGetCashflowInsightsAttributes:
+      title: CraReportGetCashflowInsightsAttributes
+      type: object
+      nullable: true
+      additionalProperties: {}
+      description: A map of Cashflow Insights attributes, where the key is a string and the value is a string, float, int, or boolean. The specific list of attributes depends on the version requested. For a full list, contact your account manager. May be `null` if attributes were not available.
+    CraReportGetNetworkInsightsAttributes:
+      title: CraReportGetNetworkInsightsAttributes
+      type: object
+      nullable: true
+      additionalProperties: {}
+      description: A map of Network Insights attributes, where the key is a string and the value is a float, int, or boolean. The specific list of attributes depends on the version requested. For a full list, contact your account manager. May be `null` if attributes were not available.
+    CraReportGetLendScoreResponseProduct:
+      title: CraReportGetLendScoreResponseProduct
+      type: object
+      additionalProperties: true
+      description: LendScore data returned by `/cra/report/get`.
+      properties:
+        product:
+          type: string
+          enum:
+          - cra_lend_score
+          description: The LendScore product.
+        version:
+          $ref: '#/components/schemas/CraProductVersion'
+        metadata:
+          $ref: '#/components/schemas/CraReportGetLendScoreMetadata'
+        scores:
+          type: array
+          description: The results for the requested LendScore variants. If a variant fails due to a client error, its `score` is `null` and its `error_code` is populated.
+          items:
+            $ref: '#/components/schemas/CraReportGetLendScoreVariantScore'
+        errors:
+          type: array
+          description: Product-level errors. Non-empty when this product failed to generate; empty on success.
+          items:
+            $ref: '#/components/schemas/PlaidError'
+      required:
+      - product
+      - version
+      - metadata
+      - scores
+      - errors
+    CraReportGetLendScoreMetadata:
+      title: CraReportGetLendScoreMetadata
+      type: object
+      nullable: true
+      additionalProperties: true
+      description: LendScore report metadata returned by `/cra/report/get`.
+      allOf:
+      - $ref: '#/components/schemas/CraReportGetProductBaseMetadata'
+      - type: object
+        properties:
+          primary_account_count:
+            type: integer
+            description: The number of accounts carrying Plaid's primary account indicator.
+          depository_account_type_count:
+            type: integer
+            description: The number of depository accounts used to generate the report.
+          credit_account_type_count:
+            type: integer
+            description: The number of credit accounts used to generate the report.
+          investment_account_type_count:
+            type: integer
+            description: The number of investment accounts used to generate the report.
+          other_account_type_count:
+            type: integer
+            description: The number of accounts that are neither depository, credit, nor investment.
+          multiple_owner_account_count:
+            type: integer
+            description: The number of accounts with multiple owners.
+          oldest_transaction_date:
+            type: string
+            format: date
+            nullable: true
+            description: The earliest transaction date across the accounts the report was generated from. May be `null` if the producer could not compute a transaction range.
+          most_recent_transaction_date:
+            type: string
+            format: date
+            nullable: true
+            description: The latest transaction date across the accounts the report was generated from. May be `null` if the producer could not compute a transaction range.
+        required:
+        - primary_account_count
+        - depository_account_type_count
+        - credit_account_type_count
+        - investment_account_type_count
+        - other_account_type_count
+        - multiple_owner_account_count
+        - oldest_transaction_date
+        - most_recent_transaction_date
+    CraReportGetLendScoreVariantScore:
+      title: CraReportGetLendScoreVariantScore
+      type: object
+      additionalProperties: true
+      description: An individual LendScore variant result returned by `/cra/report/get`.
+      properties:
+        variant:
+          $ref: '#/components/schemas/CraLendScoreVariant'
+        score:
+          type: integer
+          nullable: true
+          description: The score returned by the LendScore model for this variant.
+        reason_codes:
+          type: array
+          description: The reasons for an individual having risk according to this LendScore variant. For a full list of possible reason codes and a mapping of reason codes to human-readable reasons, contact your Plaid account manager. Empty if the variant could not be computed.
+          items:
+            type: string
+        error_code:
+          type: string
+          nullable: true
+          description: The error code explaining why this LendScore variant could not be computed, such as `INSUFFICIENT_TRANSACTION_DATA` or `NO_ACCOUNTS`. `null` on success. New codes may be added over time, so treat an unrecognized value as a generic failure.
+      required:
+      - variant
+      - score
+      - reason_codes
+      - error_code
     CraReportGetQualifyResponseProduct:
       title: CraReportGetQualifyResponseProduct
       x-hidden-from-docs: true
@@ -69987,6 +70241,100 @@ components:
       - item_count
       - account_count
       - institution_ids
+    CraReportGetCashflowInsightsMetadata:
+      title: CraReportGetCashflowInsightsMetadata
+      type: object
+      nullable: true
+      additionalProperties: true
+      description: Cashflow Insights report metadata returned by `/cra/report/get`.
+      allOf:
+      - $ref: '#/components/schemas/CraReportGetProductBaseMetadata'
+      - type: object
+        properties:
+          primary_account_count:
+            type: integer
+            description: The number of accounts carrying Plaid's primary account indicator.
+          depository_account_type_count:
+            type: integer
+            description: The number of depository accounts used to generate the report.
+          credit_account_type_count:
+            type: integer
+            description: The number of credit accounts used to generate the report.
+          investment_account_type_count:
+            type: integer
+            description: The number of investment accounts used to generate the report.
+          other_account_type_count:
+            type: integer
+            description: The number of accounts that are neither depository, credit, nor investment.
+          multiple_owner_account_count:
+            type: integer
+            description: The number of accounts with multiple owners.
+          oldest_transaction_date:
+            type: string
+            format: date
+            nullable: true
+            description: The earliest transaction date across the accounts the report was generated from. May be `null` if the producer could not compute a transaction range.
+          most_recent_transaction_date:
+            type: string
+            format: date
+            nullable: true
+            description: The latest transaction date across the accounts the report was generated from. May be `null` if the producer could not compute a transaction range.
+        required:
+        - primary_account_count
+        - depository_account_type_count
+        - credit_account_type_count
+        - investment_account_type_count
+        - other_account_type_count
+        - multiple_owner_account_count
+        - oldest_transaction_date
+        - most_recent_transaction_date
+    CraReportGetNetworkInsightsMetadata:
+      title: CraReportGetNetworkInsightsMetadata
+      type: object
+      nullable: true
+      additionalProperties: true
+      description: Network Insights report metadata returned by `/cra/report/get`.
+      allOf:
+      - $ref: '#/components/schemas/CraReportGetProductBaseMetadata'
+      - type: object
+        properties:
+          primary_account_count:
+            type: integer
+            description: The number of accounts carrying Plaid's primary account indicator.
+          depository_account_type_count:
+            type: integer
+            description: The number of depository accounts used to generate the report.
+          credit_account_type_count:
+            type: integer
+            description: The number of credit accounts used to generate the report.
+          investment_account_type_count:
+            type: integer
+            description: The number of investment accounts used to generate the report.
+          other_account_type_count:
+            type: integer
+            description: The number of accounts that are neither depository, credit, nor investment.
+          multiple_owner_account_count:
+            type: integer
+            description: The number of accounts with multiple owners.
+          oldest_transaction_date:
+            type: string
+            format: date
+            nullable: true
+            description: The earliest transaction date across the accounts the report was generated from. May be `null` if the producer could not compute a transaction range.
+          most_recent_transaction_date:
+            type: string
+            format: date
+            nullable: true
+            description: The latest transaction date across the accounts the report was generated from. May be `null` if the producer could not compute a transaction range.
+        required:
+        - primary_account_count
+        - depository_account_type_count
+        - credit_account_type_count
+        - investment_account_type_count
+        - other_account_type_count
+        - multiple_owner_account_count
+        - oldest_transaction_date
+        - most_recent_transaction_date
     CraReportGetIncomeInsightsMetadata:
       title: CraReportGetIncomeInsightsMetadata
       type: object
@@ -70032,6 +70380,7 @@ components:
         - most_recent_transaction_date
     CraReportGetHomeLendingResponseProduct:
       title: CraReportGetHomeLendingResponseProduct
+      x-hidden-from-docs: true
       type: object
       additionalProperties: true
       description: Home Lending data returned by `/cra/report/get`.
@@ -70201,6 +70550,7 @@ components:
           items:
             $ref: '#/components/schemas/CheckReportWarning'
       required:
+      - client_user_id
       - report
       - request_id
       - user_id

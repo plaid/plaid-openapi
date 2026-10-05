@@ -1,3 +1,32 @@
+### 2020-09-14_1.764.2
+
+- Declare `minimum: 0` on `days_requested` for `/cra/report/create`, matching `cra_report_parameter` on `/link/token/create`, so negative values are rejected.
+
+### 2020-09-14_1.764.1
+
+- Document the `loan` and `line_of_credit` liability objects on `/liabilities/get`, including the client library versions required to receive the new fields and expanded loan subtype values. Supported loan subtypes are `auto`, `commercial`, `commercial line of credit`, `consumer`, `home equity`, `home equity loan`, `line of credit`, `loan`, `mortgage`, and `student`.
+- Document that `home equity loan` is normalized to `loan` and `commercial line of credit` is normalized to `line of credit` in plaid-go versions earlier than 10.1.0, plaid-java versions earlier than 44.0.0, plaid-python versions earlier than 8.3.0, and plaid-ruby versions earlier than 14.4.0.
+
+### 2020-09-14_1.764.0
+
+- Add Network Insights (`cra_network_insights`) and Cashflow Insights (`cra_cashflow_insights`) response entries to `/cra/report/get`. Each response entry returns the product's `metadata`, `attributes`, and `errors`.
+
+### 2020-09-14_1.763.2
+
+- Internal changes only.
+
+### 2020-09-14_1.763.1
+
+- Describe `version` on the product entries of the `CRA_REPORT` webhooks as a `CraProductVersion`, matching the `/cra/report/create` and `/cra/report/get` product schemas. The wire type is unchanged.
+
+### 2020-09-14_1.763.0
+
+- Add LendScore V2 variant selection and per-variant report results to the CRA `/cra/report/get` schemas.
+
+### 2020-09-14_1.762.1
+
+- Document `report_id`, `client_report_id`, and `client_user_id` on `/cra/report/get`.
+
 ### 2020-09-14_1.762.0
 
 - Add the `CRA_REPORT_READY` webhook, fired when generation finishes for a CRA report requested via `/cra/report/create` or a Link session configured with `cra_report_parameter`. `successful_products` and `failed_products` list which products were generated, and `error_code`, a `CraReportErrorCode` enum, is populated when every product failed.
