@@ -2,65 +2,9 @@
 
 > **Help shape Plaid’s next-generation SDKs**
 >
-> We’re modernizing Plaid’s SDKs and looking for developers to try early releases and share feedback. [Register your interest](https://docs.google.com/forms/d/e/1FAIpQLScuhIBKCGcxrDQXLZA0nyTdJEW83J-VEr8E08KMKkT0EjmxBQ/viewform) and we’ll follow up when an early release is available for your language. No migration is required today.
+> We’re modernizing Plaid’s SDKs. The new Go library is available now as [plaid-go v49](https://github.com/plaid/plaid-go), with the previous library included at `github.com/plaid/plaid-go/v49/legacy`. For the other languages, [register your interest](https://docs.google.com/forms/d/e/1FAIpQLScuhIBKCGcxrDQXLZA0nyTdJEW83J-VEr8E08KMKkT0EjmxBQ/viewform) and we’ll follow up when an early release is available. No migration is required today.
 
 Plaid uses the `OpenAPI 3.0.0` specification to schematize our [docs](https://plaid.com/docs) and to generate our supported client libraries. This provides for a consistent typing experience across our external interfaces. Below we have listed some examples and issues we have found when iterating on the specification.
-
-## Naming component schemas
-
-Names under `components.schemas` must match `^[A-Za-z_][A-Za-z0-9_]*$` because the internal Go generators use each component name as a source identifier. Use the existing PascalCase convention (for example, `TransactionsGetRequest`); do not use hyphens, periods, spaces, or a leading digit. Internal generation fails capability validation and reports the offending component path when this requirement is violated.
-
-## Internal generation pipeline
-
-The canonical per-product files remain authored as OpenAPI 3.0. Internal Go generation uses this pipeline:
-
-`canonical source → merge → internal 3.1 projection → libopenapi → internal generators`
-
-libopenapi can parse more OpenAPI and JSON Schema constructs than the internal generators implement. The generator-capability validator therefore rejects known generator-visible constructs that are not implemented, with the affected path or component and keyword. It is a guardrail rather than an exhaustive raw-keyword allowlist: parsing successfully is not evidence that a newly introduced construct affects generation. Adopt a new construct by adding focused behavior coverage and removing its capability rejection when one exists.
-
-Public SDK generation, including Fern, is a separate downstream concern and does not sit in this internal generator path.
-
-Kin is no longer part of this pipeline. The repository-level Kin dependency remains for the unrelated Data Partner Dashboard FDX validator under `services/data_partner_dashboard/server/unittestvalidator`.
-
-Internal request validators intentionally preserve Plaid's existing unknown-field policy. Schema-valued `additionalProperties` permits arbitrary nested keys, while boolean `additionalProperties: true` does not change the generated path allowlist; request-schema-level `x-plaid-allow-unknown-fields` controls that behavior. Aligning this with standard JSON Schema semantics is a separate compatibility change because it would alter production request validation.
-
-## Adding a new `x-*` extension tag
-
-If your edit to the OpenAPI spec introduces a new `x-*` extension, add or update its entry on the Slite [Extension Tags](https://plaid.slite.com/app/docs/O4qPiIyok-7HnF) page in the same PR (or link the follow-up doc PR from this PR's description). The Slite [Editing the OpenAPI file](https://plaid.slite.com/app/docs/6fx_S6U4ai4GdT) workflow carries the canonical step-by-step; in short, the Extension Tags entry should record:
-
-- **granularity** — which scope(s) the tag is valid on (schema, object, field, path, operation, `$ref` target);
-- **survives strip?** — whether the tag reaches the published `2020-09-14.yml`. All
-  `x-plaid-*` and `internalUseFields` entries are stripped; generator-only tags must be
-  re-derived in a throwaway input, as `prepare_oneof_openapi.rb` does for exact `oneOf`;
-- **primary consumer** — the file(s) that read the tag, with `file.go:NNN` citations;
-- **enforced vs intent-only** — `x-hidden-from-docs` at path/operation scope is the canonical intent-only example, and is the source of most author confusion.
-
-Pure codegen internals with no author-visible decision may be skipped if you record the reason at the definition site. Background: per the 2026-04-23 inventory, half of the spec's 20 `x-*` extensions had no Extension Tags row before that revision; missing this step is how that gap accumulated.
-
-## Exact-discriminator `oneOf` support across the five SDKs
-
-A named top-level component `oneOf` must use bare local branch references, an explicit
-one-to-one `discriminator.mapping`, and a required singleton discriminator enum on each
-direct object branch. Branches may be open or closed; `additionalProperties` controls model
-evolution independently of discriminator dispatch. Other named top-level `oneOf` shapes fail
-processing. Keep response branches and their nested objects open for additive compatibility;
-server-side request strictness is configured separately.
-
-| Language | Construct emitted | What you hold after decode |
-|---|---|---|
-| Go | `struct` wrapper | the wrapper — inspect its typed branch field or call `GetActualInstance()` |
-| Java | `interface` | the branch — `instanceof` |
-| Python | `class(ModelComposed)` | the branch — `isinstance` |
-| Ruby | `module` | the branch — `is_a?` |
-| Node | type alias | the branch — narrow on the discriminator |
-
-Go, Java, Python, and Ruby dispatch at runtime and reject missing or unknown discriminator
-values. Node provides compile-time narrowing only; axios returns parsed JSON without runtime
-discriminator validation.
-
-Go is the only SDK that returns a wrapper. Its `<Branch>As<Union>(...)` helpers construct
-request wrappers; they are not decode accessors. Python also enforces required fields during
-deserialization while Go leaves missing fields at their zero values.
 
 ## Using the OpenAPI generator
 
@@ -102,7 +46,7 @@ openapi-generator-cli generate -g ruby  \
 -o build/generated-ruby \
 --global-property=apiTests=false,modelTests=false,useAutoload=true  \
 --library=faraday \
--p gemName=plaid,gemRequiredRubyVersion=">= 3.0.0" \
+-p gemName=plaid,gemRequiredRubyVersion=">= 3.2.0" \
 -t local/templates/ruby
 
 ```
@@ -122,18 +66,18 @@ openapi-generator-cli generate -g java \
 ```
 
 #### plaid-go
+The command below generates the previous Go library, which plaid-go v49 includes as the `legacy` package.
+
 OpenAPI Generator version: 5.2
 
 ```bash
-openapi-generator-cli -g go \
+openapi-generator-cli generate -g go \
 -i 2020-09-14.yml \
 -o build/plaid-go \
 --global-property=apiTests=false,modelTests=false,apiDocs=false,modelDocs=false \
 -t templates/go \
--p packageName=plaid,enumClassPrefix=true,
+-p packageName=plaid,enumClassPrefix=true
 ```
-
-All template edits can be found on their corresponding in the `/templates` folder for the associated library.
 
 ### Known issues with openapi-generator
 
