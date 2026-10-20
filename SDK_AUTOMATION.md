@@ -26,7 +26,9 @@ root module; it does not copy the internal monorepo or its Git history.
 Generation preserves handwritten SDK files, release controls and previous release
 history. It compares public API compatibility with the latest published version.
 Breaking changes stop for an explicitly reviewed major transition. The normal
-version proposal is the next minor within the configured major. Generation waits
+version proposal is the next minor within the configured major. README, test and
+fixture changes alone do not count as new generation inputs; runtime helpers,
+templates, dependencies, spec and generator settings still do. Generation waits
 for a merged candidate to be tagged before proposing another version. Edited,
 draft or closed generated PRs are not overwritten or reopened automatically.
 

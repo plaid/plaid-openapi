@@ -97,6 +97,41 @@ class PipelineTests(unittest.TestCase):
         common.save_json(artifact / "plan.json", plan)
         return repo, artifact, manifest, plan
 
+    def test_documentation_and_tests_do_not_change_release_inputs(self):
+        repo = self.root / "config"
+        init(repo)
+        write(repo, "fern/generators.yml", "groups: {}\n")
+        write(repo, "pipeline/generation/generate.py", "# runtime\n")
+        commit(repo)
+        expected = generate.config_digest(repo)
+        for name in ("fern/README.md", "pipeline/generation/README.md",
+                     "pipeline/generation/test_pipeline.py", "pipeline/generation/harden_internal_tests_test.go",
+                     "pipeline/generation/fixtures/sample.go.txt", "pipeline/legacy/testdata/union_test.go",
+                     ".github/workflows/sdk-pipeline-checks.yml"):
+            with self.subTest(path=name):
+                write(repo, name, "test or documentation only\n")
+                commit(repo)
+                self.assertEqual(generate.config_digest(repo), expected)
+
+    def test_generation_inputs_still_change_release_fingerprint(self):
+        repo = self.root / "config"
+        init(repo)
+        write(repo, "fern/generators.yml", "groups: {}\n")
+        commit(repo)
+        before = generate.config_digest(repo)
+        for name in ("2020-09-14.yml", "fern/fern.config.json", "fern/openapi-overlay.yml",
+                     "pipeline/generation/generate.py", "pipeline/generation/settings.json",
+                     "pipeline/generation/harden_internal_tests.go", "pipeline/generation/new_runtime.py",
+                     "pipeline/legacy/generate.py", "pipeline/legacy/provenance.json",
+                     "pipeline/legacy/requirements.txt", "pipeline/legacy/templates/client.mustache",
+                     common.WORKFLOW):
+            with self.subTest(path=name):
+                write(repo, name, "generation input\n")
+                commit(repo)
+                after = generate.config_digest(repo)
+                self.assertNotEqual(after, before)
+                before = after
+
     def test_version_selection(self):
         self.assertEqual(common.propose_version([], 49), "49.0.0")
         tags = ["v48.99.0", "v49.0.0-beta.1", "v49.1.5", "v49.2.0"]

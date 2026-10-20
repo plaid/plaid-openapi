@@ -105,7 +105,16 @@ def verified_spec(repo: Path, config_commit: str, values: dict, sdk: Path | None
 def config_digest(repo: Path) -> str:
     selected = []
     for path, mode, digest in entries(repo, ref="HEAD"):
-        if path == "2020-09-14.yml" or path.startswith(("fern/", "pipeline/")) or path == WORKFLOW:
+        if path == "2020-09-14.yml" or path == WORKFLOW:
+            selected.append([path, mode, digest])
+        elif path.startswith(("fern/", "pipeline/")):
+            name = Path(path).name
+            # Keep runtime changes conservative, including new helper files.
+            # Docs/tests are recorded by the source commit but do not warrant a release.
+            if (name.endswith((".md", ".rst", ".pyc", "_test.go"))
+                    or name.startswith("test_") or name == ".gitignore"
+                    or set(Path(path).parts) & {"tests", "testdata", "fixtures", "__pycache__"}):
+                continue
             selected.append([path, mode, digest])
     return sha256(canonical(selected))
 
