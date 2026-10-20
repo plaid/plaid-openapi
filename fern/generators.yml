@@ -1,0 +1,59 @@
+auth-schemes:
+  plaidSecret:
+    header: PLAID-SECRET
+    name: secret
+    type: string
+    env: PLAID_SECRET
+
+api:
+  auth: plaidSecret
+  headers:
+    PLAID-CLIENT-ID:
+      name: clientId
+      type: optional<string>
+      env: PLAID_CLIENT_ID
+    Plaid-Version:
+      name: version
+      type: optional<string>
+      env: PLAID_VERSION
+      client-default: "2020-09-14"
+  specs:
+    - openapi: ../2020-09-14.yml
+      overlays: ./openapi-overlay.yml
+      settings:
+        title-as-schema-name: false
+        only-include-referenced-schemas: false
+readme:
+  apiName: Plaid
+
+replay:
+  enabled: false
+
+default-group: go-sdk
+
+groups:
+  go-sdk:
+    generators:
+      - name: fernapi/fern-go-sdk
+        version: 1.70.3
+        github:
+          repository: plaid/plaid-go
+          mode: pull-request
+          workflows: false
+          license: MIT
+        config:
+          enableRequestBodyPagination: true
+          enableNestedRequestBodyPagination: true
+          offsetSemantics: item-index
+          union: v1
+          packageName: plaid
+          importPath: github.com/plaid/plaid-go/v49
+          module:
+            path: github.com/plaid/plaid-go/v49
+          inlinePathParameters: true
+          inlineFileProperties: true
+          user-agent: "Plaid Go {version}"
+          omitFernHeaders: false
+          maxRetries: 0
+          includeLegacyClientOptions: false
+        smart-casing: true

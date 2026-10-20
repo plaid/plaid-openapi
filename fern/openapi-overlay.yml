@@ -1,0 +1,3591 @@
+overlay: 1.0.0
+info:
+  title: Plaid — Fern feature overlay
+  version: 1.0.0
+
+actions:
+  - target: $.paths['/accounts/balance/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - accounts
+      x-fern-sdk-method-name: getBalance
+  - target: $.paths['/accounts/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - accounts
+      x-fern-sdk-method-name: get
+  - target: $.paths['/application/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - application
+      x-fern-sdk-method-name: get
+  - target: $.paths['/asset_report/audit_copy/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - asset_report
+      x-fern-sdk-method-name: createAuditCopy
+  - target: $.paths['/asset_report/audit_copy/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - asset_report
+      x-fern-sdk-method-name: getAuditCopy
+  - target: $.paths['/asset_report/audit_copy/pdf/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - asset_report
+      x-fern-sdk-method-name: getAuditCopyPdf
+  - target: $.paths['/asset_report/audit_copy/remove'].post
+    update:
+      x-fern-sdk-group-name:
+        - asset_report
+      x-fern-sdk-method-name: removeAuditCopy
+  - target: $.paths['/asset_report/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - asset_report
+      x-fern-sdk-method-name: create
+  - target: $.paths['/asset_report/filter'].post
+    update:
+      x-fern-sdk-group-name:
+        - asset_report
+      x-fern-sdk-method-name: filter
+  - target: $.paths['/asset_report/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - asset_report
+      x-fern-sdk-method-name: get
+  - target: $.paths['/asset_report/pdf/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - asset_report
+      x-fern-sdk-method-name: getPdf
+  - target: $.paths['/asset_report/refresh'].post
+    update:
+      x-fern-sdk-group-name:
+        - asset_report
+      x-fern-sdk-method-name: refresh
+  - target: $.paths['/asset_report/remove'].post
+    update:
+      x-fern-sdk-group-name:
+        - asset_report
+      x-fern-sdk-method-name: remove
+  - target: $.paths['/auth/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - auth
+      x-fern-sdk-method-name: get
+  - target: $.paths['/auth/verify'].post
+    update:
+      x-fern-sdk-group-name:
+        - auth
+      x-fern-sdk-method-name: verify
+  - target: $.paths['/bank_transfer/balance/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - bank_transfer
+        - balance
+      x-fern-sdk-method-name: get
+  - target: $.paths['/bank_transfer/cancel'].post
+    update:
+      x-fern-sdk-group-name:
+        - bank_transfer
+      x-fern-sdk-method-name: cancel
+  - target: $.paths['/bank_transfer/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - bank_transfer
+      x-fern-sdk-method-name: create
+  - target: $.paths['/bank_transfer/event/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - bank_transfer
+        - event
+      x-fern-sdk-method-name: list
+  - target: $.paths['/bank_transfer/event/sync'].post
+    update:
+      x-fern-sdk-group-name:
+        - bank_transfer
+        - event
+      x-fern-sdk-method-name: sync
+  - target: $.paths['/bank_transfer/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - bank_transfer
+      x-fern-sdk-method-name: get
+  - target: $.paths['/bank_transfer/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - bank_transfer
+      x-fern-sdk-method-name: list
+  - target: $.paths['/bank_transfer/migrate_account'].post
+    update:
+      x-fern-sdk-group-name:
+        - bank_transfer
+      x-fern-sdk-method-name: migrateAccount
+  - target: $.paths['/bank_transfer/sweep/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - bank_transfer
+        - sweep
+      x-fern-sdk-method-name: get
+  - target: $.paths['/bank_transfer/sweep/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - bank_transfer
+        - sweep
+      x-fern-sdk-method-name: list
+  - target: $.paths['/beacon/account_risk/v1/evaluate'].post
+    update:
+      x-fern-sdk-group-name:
+        - beacon_account_risk
+      x-fern-sdk-method-name: evaluate
+  - target: $.paths['/beacon/duplicate/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - beacon_duplicate
+      x-fern-sdk-method-name: get
+  - target: $.paths['/beacon/report/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - beacon_report
+      x-fern-sdk-method-name: create
+  - target: $.paths['/beacon/report/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - beacon_report
+      x-fern-sdk-method-name: get
+  - target: $.paths['/beacon/report/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - beacon_report
+      x-fern-sdk-method-name: list
+  - target: $.paths['/beacon/report_syndication/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - beacon_report
+        - syndication
+      x-fern-sdk-method-name: get
+  - target: $.paths['/beacon/report_syndication/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - beacon_report
+        - syndication
+      x-fern-sdk-method-name: list
+  - target: $.paths['/beacon/user/account_insights/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - beacon_user
+      x-fern-sdk-method-name: getAccountInsights
+  - target: $.paths['/beacon/user/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - beacon_user
+      x-fern-sdk-method-name: create
+  - target: $.paths['/beacon/user/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - beacon_user
+      x-fern-sdk-method-name: get
+  - target: $.paths['/beacon/user/history/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - beacon_user
+      x-fern-sdk-method-name: listHistory
+  - target: $.paths['/beacon/user/review'].post
+    update:
+      x-fern-sdk-group-name:
+        - beacon_user
+      x-fern-sdk-method-name: review
+  - target: $.paths['/beacon/user/update'].post
+    update:
+      x-fern-sdk-group-name:
+        - beacon_user
+      x-fern-sdk-method-name: update
+  - target: $.paths['/beta/cash_advance/income_insights/v1/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - cash_advance
+      x-fern-sdk-method-name: getIncomeInsights
+  - target: $.paths['/beta/credit/v1/bank_employment/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - credit
+      x-fern-sdk-method-name: getBankEmployment
+  - target: $.paths['/beta/ewa_report/v1/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - ewa_report
+      x-fern-sdk-method-name: get
+  - target: $.paths['/beta/issues/v1/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - issues
+      x-fern-sdk-method-name: getV1
+  - target: $.paths['/beta/issues/v1/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - issues
+      x-fern-sdk-method-name: listV1
+  - target: $.paths['/beta/issues/v1/match'].post
+    update:
+      x-fern-sdk-group-name:
+        - issues
+      x-fern-sdk-method-name: matchV1
+  - target: $.paths['/beta/issues/v1/subscribe'].post
+    update:
+      x-fern-sdk-group-name:
+        - issues
+      x-fern-sdk-method-name: subscribeV1
+  - target: $.paths['/beta/issues/v1/unsubscribe'].post
+    update:
+      x-fern-sdk-group-name:
+        - issues
+      x-fern-sdk-method-name: unsubscribeV1
+  - target: $.paths['/beta/partner/customer/v1/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - partner
+      x-fern-sdk-method-name: createCustomerV1
+  - target: $.paths['/beta/partner/customer/v1/enable'].post
+    update:
+      x-fern-sdk-group-name:
+        - partner
+      x-fern-sdk-method-name: enableCustomerV1
+  - target: $.paths['/beta/partner/customer/v1/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - partner
+      x-fern-sdk-method-name: getCustomerV1
+  - target: $.paths['/beta/partner/customer/v1/update'].post
+    update:
+      x-fern-sdk-group-name:
+        - partner
+      x-fern-sdk-method-name: updateCustomerV1
+  - target: $.paths['/beta/transactions/rules/v1/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - transactions
+      x-fern-sdk-method-name: createRule
+  - target: $.paths['/beta/transactions/rules/v1/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - transactions
+      x-fern-sdk-method-name: listRules
+  - target: $.paths['/beta/transactions/rules/v1/remove'].post
+    update:
+      x-fern-sdk-group-name:
+        - transactions
+      x-fern-sdk-method-name: removeRule
+  - target: $.paths['/beta/transactions/user_insights/v1/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - transactions
+      x-fern-sdk-method-name: getUserInsights
+  - target: $.paths['/beta/webhook_events/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - webhook_events
+      x-fern-sdk-method-name: list
+  - target: $.paths['/business_verification/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - business_verification
+      x-fern-sdk-method-name: create
+  - target: $.paths['/business_verification/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - business_verification
+      x-fern-sdk-method-name: get
+  - target: $.paths['/cashflow_report/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - cashflow_report
+      x-fern-sdk-method-name: get
+  - target: $.paths['/cashflow_report/insights/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - cashflow_report
+      x-fern-sdk-method-name: getInsights
+  - target: $.paths['/cashflow_report/refresh'].post
+    update:
+      x-fern-sdk-group-name:
+        - cashflow_report
+      x-fern-sdk-method-name: refresh
+  - target: $.paths['/cashflow_report/transactions/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - cashflow_report
+      x-fern-sdk-method-name: getTransactions
+  - target: $.paths['/categories/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - categories
+      x-fern-sdk-method-name: get
+  - target: $.paths['/consent/events/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - consent
+      x-fern-sdk-method-name: getEvents
+  - target: $.paths['/consumer_report/pdf/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - consumer_report
+      x-fern-sdk-method-name: getPdf
+  - target: $.paths['/cra/check_report/base_report/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - check_report
+      x-fern-sdk-method-name: getBaseReport
+  - target: $.paths['/cra/check_report/cashflow_insights/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - check_report
+      x-fern-sdk-method-name: getCashflowInsights
+  - target: $.paths['/cra/check_report/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - check_report
+      x-fern-sdk-method-name: create
+  - target: $.paths['/cra/check_report/income_insights/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - check_report
+      x-fern-sdk-method-name: getIncomeInsights
+  - target: $.paths['/cra/check_report/lend_score/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - check_report
+      x-fern-sdk-method-name: getLendScore
+  - target: $.paths['/cra/check_report/network_insights/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - check_report
+      x-fern-sdk-method-name: getNetworkInsights
+  - target: $.paths['/cra/check_report/partner_insights/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - check_report
+      x-fern-sdk-method-name: getPartnerInsights
+  - target: $.paths['/cra/check_report/pdf/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - check_report
+      x-fern-sdk-method-name: getPdf
+  - target: $.paths['/cra/check_report/verification/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - check_report
+      x-fern-sdk-method-name: getVerification
+  - target: $.paths['/cra/check_report/verification/pdf/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - check_report
+      x-fern-sdk-method-name: getVerificationPdf
+  - target: $.paths['/cra/credit_profile/report/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - credit
+        - profile
+      x-fern-sdk-method-name: getReport
+  - target: $.paths['/cra/loans/applications/register'].post
+    update:
+      x-fern-sdk-group-name:
+        - loans
+      x-fern-sdk-method-name: registerApplications
+  - target: $.paths['/cra/loans/register'].post
+    update:
+      x-fern-sdk-group-name:
+        - loans
+      x-fern-sdk-method-name: register
+  - target: $.paths['/cra/loans/unregister'].post
+    update:
+      x-fern-sdk-group-name:
+        - loans
+      x-fern-sdk-method-name: unregister
+  - target: $.paths['/cra/loans/update'].post
+    update:
+      x-fern-sdk-group-name:
+        - loans
+      x-fern-sdk-method-name: update
+  - target: $.paths['/cra/monitoring_insights/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - monitoring_insights
+      x-fern-sdk-method-name: get
+  - target: $.paths['/cra/monitoring_insights/subscribe'].post
+    update:
+      x-fern-sdk-group-name:
+        - monitoring_insights
+      x-fern-sdk-method-name: subscribe
+  - target: $.paths['/cra/monitoring_insights/unsubscribe'].post
+    update:
+      x-fern-sdk-group-name:
+        - monitoring_insights
+      x-fern-sdk-method-name: unsubscribe
+  - target: $.paths['/cra/partner_insights/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - partner
+        - insights
+      x-fern-sdk-method-name: get
+  - target: $.paths['/cra/report/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - cra_report
+      x-fern-sdk-method-name: create
+  - target: $.paths['/cra/report/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - cra_report
+      x-fern-sdk-method-name: get
+  - target: $.paths['/cra/servicing/subscription/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - servicing
+        - subscription
+      x-fern-sdk-method-name: create
+  - target: $.paths['/cra/servicing/subscription/delete'].post
+    update:
+      x-fern-sdk-group-name:
+        - servicing
+        - subscription
+      x-fern-sdk-method-name: delete
+  - target: $.paths['/cra/servicing/subscription/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - servicing
+        - subscription
+      x-fern-sdk-method-name: get
+  - target: $.paths['/cra/servicing/subscription/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - servicing
+        - subscription
+      x-fern-sdk-method-name: list
+  - target: $.paths['/cra/servicing/subscription/update'].post
+    update:
+      x-fern-sdk-group-name:
+        - servicing
+        - subscription
+      x-fern-sdk-method-name: update
+  - target: $.paths['/credit/asset_report/freddie_mac/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - credit
+      x-fern-sdk-method-name: getAssetReportFreddieMac
+  - target: $.paths['/credit/audit_copy_token/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - credit
+      x-fern-sdk-method-name: createAuditCopyToken
+  - target: $.paths['/credit/audit_copy_token/remove'].post
+    update:
+      x-fern-sdk-group-name:
+        - credit
+      x-fern-sdk-method-name: removeAuditCopyToken
+  - target: $.paths['/credit/audit_copy_token/update'].post
+    update:
+      x-fern-sdk-group-name:
+        - credit
+      x-fern-sdk-method-name: updateAuditCopyToken
+  - target: $.paths['/credit/bank_income/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - credit
+      x-fern-sdk-method-name: getBankIncome
+  - target: $.paths['/credit/bank_income/pdf/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - credit
+      x-fern-sdk-method-name: getBankIncomePdf
+  - target: $.paths['/credit/bank_income/refresh'].post
+    update:
+      x-fern-sdk-group-name:
+        - credit
+      x-fern-sdk-method-name: refreshBankIncome
+  - target: $.paths['/credit/bank_income/webhook/update'].post
+    update:
+      x-fern-sdk-group-name:
+        - credit
+      x-fern-sdk-method-name: updateBankIncomeWebhook
+  - target: $.paths['/credit/bank_statements/uploads/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - credit
+      x-fern-sdk-method-name: getBankStatementsUploads
+  - target: $.paths['/credit/employment/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - credit
+      x-fern-sdk-method-name: getEmployment
+  - target: $.paths['/credit/freddie_mac/reports/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - credit
+      x-fern-sdk-method-name: getFreddieMacReports
+  - target: $.paths['/credit/payroll_income/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - credit
+      x-fern-sdk-method-name: getPayrollIncome
+  - target: $.paths['/credit/payroll_income/parsing_config/update'].post
+    update:
+      x-fern-sdk-group-name:
+        - credit
+      x-fern-sdk-method-name: updatePayrollIncomeParsingConfig
+  - target: $.paths['/credit/payroll_income/precheck'].post
+    update:
+      x-fern-sdk-group-name:
+        - credit
+      x-fern-sdk-method-name: precheckPayrollIncome
+  - target: $.paths['/credit/payroll_income/refresh'].post
+    update:
+      x-fern-sdk-group-name:
+        - credit
+      x-fern-sdk-method-name: refreshPayrollIncome
+  - target: $.paths['/credit/payroll_income/risk_signals/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - credit
+      x-fern-sdk-method-name: getPayrollIncomeRiskSignals
+  - target: $.paths['/credit/relay/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - credit
+      x-fern-sdk-method-name: createRelay
+  - target: $.paths['/credit/relay/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - credit
+      x-fern-sdk-method-name: getRelay
+  - target: $.paths['/credit/relay/pdf/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - credit
+      x-fern-sdk-method-name: getRelayPdf
+  - target: $.paths['/credit/relay/refresh'].post
+    update:
+      x-fern-sdk-group-name:
+        - credit
+      x-fern-sdk-method-name: refreshRelay
+  - target: $.paths['/credit/relay/remove'].post
+    update:
+      x-fern-sdk-group-name:
+        - credit
+      x-fern-sdk-method-name: removeRelay
+  - target: $.paths['/credit/sessions/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - credit
+      x-fern-sdk-method-name: getSessions
+  - target: $.paths['/dashboard_user/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - dashboard_user
+      x-fern-sdk-method-name: get
+  - target: $.paths['/dashboard_user/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - dashboard_user
+      x-fern-sdk-method-name: list
+  - target: $.paths['/employers/search'].post
+    update:
+      x-fern-sdk-group-name:
+        - employers
+      x-fern-sdk-method-name: search
+  - target: $.paths['/employment/verification/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - employment_verification
+      x-fern-sdk-method-name: get
+  - target: $.paths['/fdx/consents'].get
+    update:
+      x-fern-sdk-group-name:
+        - fdx
+      x-fern-sdk-method-name: getConsents
+  - target: $.paths['/fdx/consents/{consentId}'].get
+    update:
+      x-fern-sdk-group-name:
+        - fdx
+      x-fern-sdk-method-name: getConsent
+  - target: $.paths['/fdx/consents/{consentId}/revocation'].put
+    update:
+      x-fern-sdk-group-name:
+        - fdx
+      x-fern-sdk-method-name: revokeConsent
+  - target: $.paths['/fdx/consents/{consentId}/revocation'].get
+    update:
+      x-fern-sdk-group-name:
+        - fdx
+      x-fern-sdk-method-name: getConsentRevocation
+  - target: $.paths['/fdx/notifications'].post
+    update:
+      x-fern-sdk-group-name:
+        - fdx
+      x-fern-sdk-method-name: notifications
+  - target: $.paths['/fdx/recipient/{recipientId}'].get
+    update:
+      x-fern-sdk-group-name:
+        - fdx
+      x-fern-sdk-method-name: getRecipient
+  - target: $.paths['/fdx/recipients'].get
+    update:
+      x-fern-sdk-group-name:
+        - fdx
+      x-fern-sdk-method-name: getRecipients
+  - target: $.paths['/identity/documents/uploads/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - identity
+      x-fern-sdk-method-name: getDocumentUploads
+  - target: $.paths['/identity/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - identity
+      x-fern-sdk-method-name: get
+  - target: $.paths['/identity/match'].post
+    update:
+      x-fern-sdk-group-name:
+        - identity
+      x-fern-sdk-method-name: match
+  - target: $.paths['/identity/match/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - identity
+      x-fern-sdk-method-name: listMatches
+  - target: $.paths['/identity/refresh'].post
+    update:
+      x-fern-sdk-group-name:
+        - identity
+      x-fern-sdk-method-name: refresh
+  - target: $.paths['/identity_verification/autofill/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - identity
+        - verification
+      x-fern-sdk-method-name: createAutofill
+  - target: $.paths['/identity_verification/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - identity
+        - verification
+      x-fern-sdk-method-name: create
+  - target: $.paths['/identity_verification/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - identity
+        - verification
+      x-fern-sdk-method-name: get
+  - target: $.paths['/identity_verification/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - identity
+        - verification
+      x-fern-sdk-method-name: list
+  - target: $.paths['/identity_verification/retry'].post
+    update:
+      x-fern-sdk-group-name:
+        - identity
+        - verification
+      x-fern-sdk-method-name: retry
+  - target: $.paths['/income/verification/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - income_verification
+      x-fern-sdk-method-name: create
+  - target: $.paths['/income/verification/documents/download'].post
+    update:
+      x-fern-sdk-group-name:
+        - income_verification
+      x-fern-sdk-method-name: downloadDocuments
+  - target: $.paths['/income/verification/paystubs/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - income_verification
+      x-fern-sdk-method-name: getPaystubs
+  - target: $.paths['/income/verification/precheck'].post
+    update:
+      x-fern-sdk-group-name:
+        - income_verification
+      x-fern-sdk-method-name: precheck
+  - target: $.paths['/income/verification/taxforms/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - income_verification
+      x-fern-sdk-method-name: getTaxforms
+  - target: $.paths['/institutions/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - institutions
+      x-fern-sdk-method-name: get
+  - target: $.paths['/institutions/get_by_id'].post
+    update:
+      x-fern-sdk-group-name:
+        - institutions
+      x-fern-sdk-method-name: getById
+  - target: $.paths['/institutions/search'].post
+    update:
+      x-fern-sdk-group-name:
+        - institutions
+      x-fern-sdk-method-name: search
+  - target: $.paths['/investments/auth/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - investments
+      x-fern-sdk-method-name: getAuth
+  - target: $.paths['/investments/holdings/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - investments
+      x-fern-sdk-method-name: getHoldings
+  - target: $.paths['/investments/refresh'].post
+    update:
+      x-fern-sdk-group-name:
+        - investments
+      x-fern-sdk-method-name: refresh
+  - target: $.paths['/investments/transactions/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - investments
+      x-fern-sdk-method-name: getTransactions
+  - target: $.paths['/issues/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - issues
+      x-fern-sdk-method-name: get
+  - target: $.paths['/issues/search'].post
+    update:
+      x-fern-sdk-group-name:
+        - issues
+      x-fern-sdk-method-name: search
+  - target: $.paths['/issues/subscribe'].post
+    update:
+      x-fern-sdk-group-name:
+        - issues
+      x-fern-sdk-method-name: subscribe
+  - target: $.paths['/item/access_token/invalidate'].post
+    update:
+      x-fern-sdk-group-name:
+        - item
+      x-fern-sdk-method-name: invalidateAccessToken
+  - target: $.paths['/item/activity/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - item
+      x-fern-sdk-method-name: listActivity
+  - target: $.paths['/item/application/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - item
+      x-fern-sdk-method-name: listApplications
+  - target: $.paths['/item/application/scopes/update'].post
+    update:
+      x-fern-sdk-group-name:
+        - item
+      x-fern-sdk-method-name: updateApplicationScopes
+  - target: $.paths['/item/application/unlink'].post
+    update:
+      x-fern-sdk-group-name:
+        - item
+      x-fern-sdk-method-name: unlinkApplication
+  - target: $.paths['/item/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - item
+      x-fern-sdk-method-name: get
+  - target: $.paths['/item/import'].post
+    update:
+      x-fern-sdk-group-name:
+        - item
+      x-fern-sdk-method-name: import
+  - target: $.paths['/item/products/terminate'].post
+    update:
+      x-fern-sdk-group-name:
+        - item
+      x-fern-sdk-method-name: terminateProducts
+  - target: $.paths['/item/public_token/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - item
+      x-fern-sdk-method-name: createPublicToken
+  - target: $.paths['/item/public_token/exchange'].post
+    update:
+      x-fern-sdk-group-name:
+        - item
+      x-fern-sdk-method-name: exchangePublicToken
+  - target: $.paths['/item/remove'].post
+    update:
+      x-fern-sdk-group-name:
+        - item
+      x-fern-sdk-method-name: remove
+  - target: $.paths['/item/webhook/update'].post
+    update:
+      x-fern-sdk-group-name:
+        - item
+      x-fern-sdk-method-name: updateWebhook
+  - target: $.paths['/liabilities/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - liabilities
+      x-fern-sdk-method-name: get
+  - target: $.paths['/link/oauth/correlation_id/exchange'].post
+    update:
+      x-fern-sdk-group-name:
+        - link
+      x-fern-sdk-method-name: exchangeOauthCorrelationId
+  - target: $.paths['/link/token/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - link
+      x-fern-sdk-method-name: createToken
+  - target: $.paths['/link/token/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - link
+      x-fern-sdk-method-name: getToken
+  - target: $.paths['/network/status/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - network
+      x-fern-sdk-method-name: getStatus
+  - target: $.paths['/oauth/introspect'].post
+    update:
+      x-fern-sdk-group-name:
+        - o_auth
+      x-fern-sdk-method-name: introspect
+  - target: $.paths['/oauth/revoke'].post
+    update:
+      x-fern-sdk-group-name:
+        - o_auth
+      x-fern-sdk-method-name: revoke
+  - target: $.paths['/oauth/token'].post
+    update:
+      x-fern-sdk-group-name:
+        - o_auth
+      x-fern-sdk-method-name: token
+  - target: $.paths['/partner/customer/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - partner
+      x-fern-sdk-method-name: createCustomer
+  - target: $.paths['/partner/customer/enable'].post
+    update:
+      x-fern-sdk-group-name:
+        - partner
+      x-fern-sdk-method-name: enableCustomer
+  - target: $.paths['/partner/customer/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - partner
+      x-fern-sdk-method-name: getCustomer
+  - target: $.paths['/partner/customer/oauth_institutions/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - partner
+      x-fern-sdk-method-name: getCustomerOauthInstitutions
+  - target: $.paths['/partner/customer/remove'].post
+    update:
+      x-fern-sdk-group-name:
+        - partner
+      x-fern-sdk-method-name: removeCustomer
+  - target: $.paths['/payment_initiation/consent/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - payment_initiation
+      x-fern-sdk-method-name: createConsent
+  - target: $.paths['/payment_initiation/consent/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - payment_initiation
+      x-fern-sdk-method-name: getConsent
+  - target: $.paths['/payment_initiation/consent/payment/execute'].post
+    update:
+      x-fern-sdk-group-name:
+        - payment_initiation
+      x-fern-sdk-method-name: executeConsentPayment
+  - target: $.paths['/payment_initiation/consent/revoke'].post
+    update:
+      x-fern-sdk-group-name:
+        - payment_initiation
+      x-fern-sdk-method-name: revokeConsent
+  - target: $.paths['/payment_initiation/payment/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - payment_initiation
+      x-fern-sdk-method-name: createPayment
+  - target: $.paths['/payment_initiation/payment/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - payment_initiation
+      x-fern-sdk-method-name: getPayment
+  - target: $.paths['/payment_initiation/payment/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - payment_initiation
+      x-fern-sdk-method-name: listPayments
+  - target: $.paths['/payment_initiation/payment/reverse'].post
+    update:
+      x-fern-sdk-group-name:
+        - payment_initiation
+      x-fern-sdk-method-name: reversePayment
+  - target: $.paths['/payment_initiation/payment/token/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - payment_initiation
+      x-fern-sdk-method-name: createPaymentToken
+  - target: $.paths['/payment_initiation/recipient/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - payment_initiation
+      x-fern-sdk-method-name: createRecipient
+  - target: $.paths['/payment_initiation/recipient/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - payment_initiation
+      x-fern-sdk-method-name: getRecipient
+  - target: $.paths['/payment_initiation/recipient/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - payment_initiation
+      x-fern-sdk-method-name: listRecipients
+  - target: $.paths['/payment_profile/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - payment_profile
+      x-fern-sdk-method-name: create
+  - target: $.paths['/payment_profile/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - payment_profile
+      x-fern-sdk-method-name: get
+  - target: $.paths['/payment_profile/remove'].post
+    update:
+      x-fern-sdk-group-name:
+        - payment_profile
+      x-fern-sdk-method-name: remove
+  - target: $.paths['/processor/account/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - processor
+      x-fern-sdk-method-name: getAccount
+  - target: $.paths['/processor/apex/processor_token/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - processor
+      x-fern-sdk-method-name: createApexProcessorToken
+  - target: $.paths['/processor/auth/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - processor
+      x-fern-sdk-method-name: getAuth
+  - target: $.paths['/processor/balance/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - processor
+      x-fern-sdk-method-name: getBalance
+  - target: $.paths['/processor/bank_transfer/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - processor
+      x-fern-sdk-method-name: createBankTransfer
+  - target: $.paths['/processor/identity/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - processor
+      x-fern-sdk-method-name: getIdentity
+  - target: $.paths['/processor/identity/match'].post
+    update:
+      x-fern-sdk-group-name:
+        - processor
+      x-fern-sdk-method-name: matchIdentity
+  - target: $.paths['/processor/investments/auth/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - processor
+      x-fern-sdk-method-name: getInvestmentAuth
+  - target: $.paths['/processor/investments/holdings/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - processor
+      x-fern-sdk-method-name: getInvestmentHoldings
+  - target: $.paths['/processor/investments/transactions/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - processor
+      x-fern-sdk-method-name: getInvestmentTransactions
+  - target: $.paths['/processor/liabilities/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - processor
+      x-fern-sdk-method-name: getLiabilities
+  - target: $.paths['/processor/signal/decision/report'].post
+    update:
+      x-fern-sdk-group-name:
+        - processor
+        - signal
+      x-fern-sdk-method-name: reportDecision
+  - target: $.paths['/processor/signal/evaluate'].post
+    update:
+      x-fern-sdk-group-name:
+        - processor
+        - signal
+      x-fern-sdk-method-name: evaluate
+  - target: $.paths['/processor/signal/prepare'].post
+    update:
+      x-fern-sdk-group-name:
+        - processor
+        - signal
+      x-fern-sdk-method-name: prepare
+  - target: $.paths['/processor/signal/return/report'].post
+    update:
+      x-fern-sdk-group-name:
+        - processor
+        - signal
+      x-fern-sdk-method-name: reportReturn
+  - target: $.paths['/processor/stripe/bank_account_token/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - processor
+      x-fern-sdk-method-name: createStripeBankAccountToken
+  - target: $.paths['/processor/token/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - processor
+      x-fern-sdk-method-name: createToken
+  - target: $.paths['/processor/token/permissions/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - processor
+      x-fern-sdk-method-name: getTokenPermissions
+  - target: $.paths['/processor/token/permissions/set'].post
+    update:
+      x-fern-sdk-group-name:
+        - processor
+      x-fern-sdk-method-name: setTokenPermissions
+  - target: $.paths['/processor/token/webhook/update'].post
+    update:
+      x-fern-sdk-group-name:
+        - processor
+      x-fern-sdk-method-name: updateTokenWebhook
+  - target: $.paths['/processor/transactions/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - processor
+      x-fern-sdk-method-name: getTransactions
+  - target: $.paths['/processor/transactions/recurring/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - processor
+      x-fern-sdk-method-name: getRecurringTransactions
+  - target: $.paths['/processor/transactions/refresh'].post
+    update:
+      x-fern-sdk-group-name:
+        - processor
+      x-fern-sdk-method-name: refreshTransactions
+  - target: $.paths['/processor/transactions/sync'].post
+    update:
+      x-fern-sdk-group-name:
+        - processor
+      x-fern-sdk-method-name: syncTransactions
+  - target: $.paths['/profile/network_status/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - profile
+      x-fern-sdk-method-name: getNetworkStatus
+  - target: $.paths['/protect/cash_advance/decision/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - protect
+      x-fern-sdk-method-name: createCashAdvanceDecision
+  - target: $.paths['/protect/cash_advance/feedback/upload'].post
+    update:
+      x-fern-sdk-group-name:
+        - protect
+      x-fern-sdk-method-name: uploadCashAdvanceFeedback
+  - target: $.paths['/protect/cash_advance/repayment/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - protect
+      x-fern-sdk-method-name: createCashAdvanceRepayment
+  - target: $.paths['/protect/compute'].post
+    update:
+      x-fern-sdk-group-name:
+        - protect
+      x-fern-sdk-method-name: compute
+  - target: $.paths['/protect/event/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - protect
+      x-fern-sdk-method-name: getEvent
+  - target: $.paths['/protect/event/send'].post
+    update:
+      x-fern-sdk-group-name:
+        - protect
+      x-fern-sdk-method-name: sendEvent
+  - target: $.paths['/protect/report/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - protect
+      x-fern-sdk-method-name: createReport
+  - target: $.paths['/protect/user/insights/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - protect
+      x-fern-sdk-method-name: getUserInsights
+  - target: $.paths['/sandbox/bank_income/fire_webhook'].post
+    update:
+      x-fern-sdk-group-name:
+        - sandbox
+      x-fern-sdk-method-name: fireBankIncomeWebhook
+  - target: $.paths['/sandbox/bank_transfer/fire_webhook'].post
+    update:
+      x-fern-sdk-group-name:
+        - sandbox
+      x-fern-sdk-method-name: fireBankTransferWebhook
+  - target: $.paths['/sandbox/bank_transfer/simulate'].post
+    update:
+      x-fern-sdk-group-name:
+        - sandbox
+      x-fern-sdk-method-name: simulateBankTransfer
+  - target: $.paths['/sandbox/cra/cashflow_updates/update'].post
+    update:
+      x-fern-sdk-group-name:
+        - sandbox
+      x-fern-sdk-method-name: updateCraCashflowUpdates
+  - target: $.paths['/sandbox/cra/servicing/simulate'].post
+    update:
+      x-fern-sdk-group-name:
+        - sandbox
+      x-fern-sdk-method-name: simulateCraServicing
+  - target: $.paths['/sandbox/fdx/consent/seed'].post
+    update:
+      x-fern-sdk-group-name:
+        - sandbox
+      x-fern-sdk-method-name: seedFdxConsent
+  - target: $.paths['/sandbox/income/fire_webhook'].post
+    update:
+      x-fern-sdk-group-name:
+        - sandbox
+      x-fern-sdk-method-name: fireIncomeWebhook
+  - target: $.paths['/sandbox/item/application/seed'].post
+    update:
+      x-fern-sdk-group-name:
+        - sandbox
+      x-fern-sdk-method-name: seedItemApplication
+  - target: $.paths['/sandbox/item/fire_webhook'].post
+    update:
+      x-fern-sdk-group-name:
+        - sandbox
+      x-fern-sdk-method-name: fireItemWebhook
+  - target: $.paths['/sandbox/item/reset_login'].post
+    update:
+      x-fern-sdk-group-name:
+        - sandbox
+      x-fern-sdk-method-name: resetItemLogin
+  - target: $.paths['/sandbox/item/set_verification_status'].post
+    update:
+      x-fern-sdk-group-name:
+        - sandbox
+      x-fern-sdk-method-name: setItemVerificationStatus
+  - target: $.paths['/sandbox/oauth/select_accounts'].post
+    update:
+      x-fern-sdk-group-name:
+        - sandbox
+      x-fern-sdk-method-name: selectOauthAccounts
+  - target: $.paths['/sandbox/payment/simulate'].post
+    update:
+      x-fern-sdk-group-name:
+        - sandbox
+      x-fern-sdk-method-name: simulatePayment
+  - target: $.paths['/sandbox/payment_profile/reset_login'].post
+    update:
+      x-fern-sdk-group-name:
+        - sandbox
+      x-fern-sdk-method-name: resetPaymentProfileLogin
+  - target: $.paths['/sandbox/processor_token/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - sandbox
+      x-fern-sdk-method-name: createProcessorToken
+  - target: $.paths['/sandbox/public_token/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - sandbox
+      x-fern-sdk-method-name: createPublicToken
+  - target: $.paths['/sandbox/transactions/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - sandbox
+      x-fern-sdk-method-name: createTransactions
+  - target: $.paths['/sandbox/transfer/fire_webhook'].post
+    update:
+      x-fern-sdk-group-name:
+        - sandbox
+      x-fern-sdk-method-name: fireTransferWebhook
+  - target: $.paths['/sandbox/transfer/ledger/deposit/simulate'].post
+    update:
+      x-fern-sdk-group-name:
+        - sandbox
+      x-fern-sdk-method-name: simulateTransferLedgerDeposit
+  - target: $.paths['/sandbox/transfer/ledger/simulate_available'].post
+    update:
+      x-fern-sdk-group-name:
+        - sandbox
+      x-fern-sdk-method-name: simulateTransferLedgerAvailable
+  - target: $.paths['/sandbox/transfer/ledger/withdraw/simulate'].post
+    update:
+      x-fern-sdk-group-name:
+        - sandbox
+      x-fern-sdk-method-name: simulateTransferLedgerWithdraw
+  - target: $.paths['/sandbox/transfer/refund/simulate'].post
+    update:
+      x-fern-sdk-group-name:
+        - sandbox
+      x-fern-sdk-method-name: simulateTransferRefund
+  - target: $.paths['/sandbox/transfer/simulate'].post
+    update:
+      x-fern-sdk-group-name:
+        - sandbox
+      x-fern-sdk-method-name: simulateTransfer
+  - target: $.paths['/sandbox/transfer/sweep/simulate'].post
+    update:
+      x-fern-sdk-group-name:
+        - sandbox
+      x-fern-sdk-method-name: simulateTransferSweep
+  - target: $.paths['/sandbox/transfer/test_clock/advance'].post
+    update:
+      x-fern-sdk-group-name:
+        - sandbox
+      x-fern-sdk-method-name: advanceTransferTestClock
+  - target: $.paths['/sandbox/transfer/test_clock/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - sandbox
+      x-fern-sdk-method-name: createTransferTestClock
+  - target: $.paths['/sandbox/transfer/test_clock/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - sandbox
+      x-fern-sdk-method-name: getTransferTestClock
+  - target: $.paths['/sandbox/transfer/test_clock/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - sandbox
+      x-fern-sdk-method-name: listTransferTestClocks
+  - target: $.paths['/sandbox/user/fire_webhook'].post
+    update:
+      x-fern-sdk-group-name:
+        - sandbox
+      x-fern-sdk-method-name: fireUserWebhook
+
+  - target: $.paths['/sandbox/user/reset_login'].post
+    update:
+      x-fern-sdk-group-name:
+        - sandbox
+      x-fern-sdk-method-name: resetUserLogin
+  - target: $.paths['/session/token/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - session
+      x-fern-sdk-method-name: createToken
+  - target: $.paths['/signal/decision/report'].post
+    update:
+      x-fern-sdk-group-name:
+        - signal
+      x-fern-sdk-method-name: reportDecision
+  - target: $.paths['/signal/evaluate'].post
+    update:
+      x-fern-sdk-group-name:
+        - signal
+      x-fern-sdk-method-name: evaluate
+  - target: $.paths['/signal/prepare'].post
+    update:
+      x-fern-sdk-group-name:
+        - signal
+      x-fern-sdk-method-name: prepare
+  - target: $.paths['/signal/return/report'].post
+    update:
+      x-fern-sdk-group-name:
+        - signal
+      x-fern-sdk-method-name: reportReturn
+  - target: $.paths['/signal/schedule'].post
+    update:
+      x-fern-sdk-group-name:
+        - signal
+      x-fern-sdk-method-name: schedule
+  - target: $.paths['/statements/download'].post
+    update:
+      x-fern-sdk-group-name:
+        - statements
+      x-fern-sdk-method-name: download
+  - target: $.paths['/statements/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - statements
+      x-fern-sdk-method-name: list
+  - target: $.paths['/statements/refresh'].post
+    update:
+      x-fern-sdk-group-name:
+        - statements
+      x-fern-sdk-method-name: refresh
+  - target: $.paths['/transactions/enrich'].post
+    update:
+      x-fern-sdk-group-name:
+        - transactions
+      x-fern-sdk-method-name: enrich
+  - target: $.paths['/transactions/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - transactions
+      x-fern-sdk-method-name: get
+  - target: $.paths['/transactions/recurring/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - transactions
+      x-fern-sdk-method-name: getRecurring
+  - target: $.paths['/transactions/refresh'].post
+    update:
+      x-fern-sdk-group-name:
+        - transactions
+      x-fern-sdk-method-name: refresh
+  - target: $.paths['/transactions/sync'].post
+    update:
+      x-fern-sdk-group-name:
+        - transactions
+      x-fern-sdk-method-name: sync
+  - target: $.paths['/transfer/authorization/cancel'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - authorization
+      x-fern-sdk-method-name: cancel
+  - target: $.paths['/transfer/authorization/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - authorization
+      x-fern-sdk-method-name: create
+  - target: $.paths['/transfer/balance/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - balance
+      x-fern-sdk-method-name: get
+  - target: $.paths['/transfer/cancel'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+      x-fern-sdk-method-name: cancel
+  - target: $.paths['/transfer/capabilities/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - capabilities
+      x-fern-sdk-method-name: get
+  - target: $.paths['/transfer/configuration/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - configuration
+      x-fern-sdk-method-name: get
+  - target: $.paths['/transfer/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+      x-fern-sdk-method-name: create
+  - target: $.paths['/transfer/diligence/document/upload'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - diligence
+      x-fern-sdk-method-name: uploadDocument
+  - target: $.paths['/transfer/diligence/submit'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - diligence
+      x-fern-sdk-method-name: submit
+  - target: $.paths['/transfer/event/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - event
+      x-fern-sdk-method-name: list
+  - target: $.paths['/transfer/event/sync'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - event
+      x-fern-sdk-method-name: sync
+  - target: $.paths['/transfer/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+      x-fern-sdk-method-name: get
+  - target: $.paths['/transfer/intent/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - intent
+      x-fern-sdk-method-name: create
+  - target: $.paths['/transfer/intent/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - intent
+      x-fern-sdk-method-name: get
+  - target: $.paths['/transfer/ledger/deposit'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - ledger
+      x-fern-sdk-method-name: deposit
+  - target: $.paths['/transfer/ledger/distribute'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - ledger
+      x-fern-sdk-method-name: distribute
+  - target: $.paths['/transfer/ledger/event/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - ledger
+      x-fern-sdk-method-name: listEvents
+  - target: $.paths['/transfer/ledger/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - ledger
+      x-fern-sdk-method-name: get
+  - target: $.paths['/transfer/ledger/withdraw'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - ledger
+      x-fern-sdk-method-name: withdraw
+  - target: $.paths['/transfer/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+      x-fern-sdk-method-name: list
+  - target: $.paths['/transfer/metrics/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - metrics
+      x-fern-sdk-method-name: get
+  - target: $.paths['/transfer/migrate_account'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+      x-fern-sdk-method-name: migrateAccount
+  - target: $.paths['/transfer/originator/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - originator
+      x-fern-sdk-method-name: create
+  - target: $.paths['/transfer/originator/funding_account/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - originator
+      x-fern-sdk-method-name: createFundingAccount
+  - target: $.paths['/transfer/originator/funding_account/update'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - originator
+      x-fern-sdk-method-name: updateFundingAccount
+  - target: $.paths['/transfer/originator/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - originator
+      x-fern-sdk-method-name: get
+  - target: $.paths['/transfer/originator/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - originator
+      x-fern-sdk-method-name: list
+  - target: $.paths['/transfer/platform/originator/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - platform
+      x-fern-sdk-method-name: createOriginator
+  - target: $.paths['/transfer/platform/person/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - platform
+      x-fern-sdk-method-name: createPerson
+  - target: $.paths['/transfer/platform/requirement/submit'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - platform
+      x-fern-sdk-method-name: submitRequirement
+  - target: $.paths['/transfer/questionnaire/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - questionnaire
+      x-fern-sdk-method-name: create
+  - target: $.paths['/transfer/recurring/cancel'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - recurring
+      x-fern-sdk-method-name: cancel
+  - target: $.paths['/transfer/recurring/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - recurring
+      x-fern-sdk-method-name: create
+  - target: $.paths['/transfer/recurring/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - recurring
+      x-fern-sdk-method-name: get
+  - target: $.paths['/transfer/recurring/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - recurring
+      x-fern-sdk-method-name: list
+  - target: $.paths['/transfer/refund/cancel'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - refund
+      x-fern-sdk-method-name: cancel
+  - target: $.paths['/transfer/refund/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - refund
+      x-fern-sdk-method-name: create
+  - target: $.paths['/transfer/refund/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - refund
+      x-fern-sdk-method-name: get
+  - target: $.paths['/transfer/repayment/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - repayment
+      x-fern-sdk-method-name: list
+  - target: $.paths['/transfer/repayment/return/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - repayment
+      x-fern-sdk-method-name: listReturns
+  - target: $.paths['/transfer/return/recover'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+      x-fern-sdk-method-name: recoverReturn
+  - target: $.paths['/transfer/sweep/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - sweep
+      x-fern-sdk-method-name: get
+  - target: $.paths['/transfer/sweep/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - transfer
+        - sweep
+      x-fern-sdk-method-name: list
+  - target: $.paths['/user/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - user
+      x-fern-sdk-method-name: create
+  - target: $.paths['/user/financial_data/refresh'].post
+    update:
+      x-fern-sdk-group-name:
+        - user
+      x-fern-sdk-method-name: refreshFinancialData
+  - target: $.paths['/user/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - user
+      x-fern-sdk-method-name: get
+  - target: $.paths['/user/identity/remove'].post
+    update:
+      x-fern-sdk-group-name:
+        - user
+      x-fern-sdk-method-name: removeIdentity
+  - target: $.paths['/user/items/associate'].post
+    update:
+      x-fern-sdk-group-name:
+        - user
+      x-fern-sdk-method-name: associateItems
+  - target: $.paths['/user/items/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - user
+      x-fern-sdk-method-name: getItems
+  - target: $.paths['/user/items/remove'].post
+    update:
+      x-fern-sdk-group-name:
+        - user
+      x-fern-sdk-method-name: removeItems
+  - target: $.paths['/user/products/terminate'].post
+    update:
+      x-fern-sdk-group-name:
+        - user
+      x-fern-sdk-method-name: terminateProducts
+  - target: $.paths['/user/remove'].post
+    update:
+      x-fern-sdk-group-name:
+        - user
+      x-fern-sdk-method-name: remove
+  - target: $.paths['/user/third_party_token/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - user
+      x-fern-sdk-method-name: createThirdPartyToken
+  - target: $.paths['/user/third_party_token/remove'].post
+    update:
+      x-fern-sdk-group-name:
+        - user
+      x-fern-sdk-method-name: removeThirdPartyToken
+  - target: $.paths['/user/transactions/refresh'].post
+    update:
+      x-fern-sdk-group-name:
+        - user
+      x-fern-sdk-method-name: refreshTransactions
+  - target: $.paths['/user/update'].post
+    update:
+      x-fern-sdk-group-name:
+        - user
+      x-fern-sdk-method-name: update
+  - target: $.paths['/user_account/session/event/send'].post
+    update:
+      x-fern-sdk-group-name:
+        - user
+        - account
+      x-fern-sdk-method-name: sendSessionEvent
+  - target: $.paths['/user_account/session/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - user
+        - account
+      x-fern-sdk-method-name: getSession
+  - target: $.paths['/wallet/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - wallet
+      x-fern-sdk-method-name: create
+  - target: $.paths['/wallet/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - wallet
+      x-fern-sdk-method-name: get
+  - target: $.paths['/wallet/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - wallet
+      x-fern-sdk-method-name: list
+  - target: $.paths['/wallet/transaction/execute'].post
+    update:
+      x-fern-sdk-group-name:
+        - wallet
+      x-fern-sdk-method-name: executeTransaction
+  - target: $.paths['/wallet/transaction/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - wallet
+      x-fern-sdk-method-name: getTransaction
+  - target: $.paths['/wallet/transaction/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - wallet
+      x-fern-sdk-method-name: listTransactions
+  - target: $.paths['/watchlist_screening/entity/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - watchlist_screening_entity
+      x-fern-sdk-method-name: create
+  - target: $.paths['/watchlist_screening/entity/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - watchlist_screening_entity
+      x-fern-sdk-method-name: get
+  - target: $.paths['/watchlist_screening/entity/history/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - watchlist_screening_entity
+      x-fern-sdk-method-name: listHistory
+  - target: $.paths['/watchlist_screening/entity/hit/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - watchlist_screening_entity
+      x-fern-sdk-method-name: listHits
+  - target: $.paths['/watchlist_screening/entity/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - watchlist_screening_entity
+      x-fern-sdk-method-name: list
+  - target: $.paths['/watchlist_screening/entity/program/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - watchlist_screening_entity
+      x-fern-sdk-method-name: getProgram
+  - target: $.paths['/watchlist_screening/entity/program/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - watchlist_screening_entity
+      x-fern-sdk-method-name: listPrograms
+  - target: $.paths['/watchlist_screening/entity/review/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - watchlist_screening_entity
+      x-fern-sdk-method-name: createReview
+  - target: $.paths['/watchlist_screening/entity/review/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - watchlist_screening_entity
+      x-fern-sdk-method-name: listReviews
+  - target: $.paths['/watchlist_screening/entity/update'].post
+    update:
+      x-fern-sdk-group-name:
+        - watchlist_screening_entity
+      x-fern-sdk-method-name: update
+  - target: $.paths['/watchlist_screening/individual/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - watchlist_screening_individual
+      x-fern-sdk-method-name: create
+  - target: $.paths['/watchlist_screening/individual/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - watchlist_screening_individual
+      x-fern-sdk-method-name: get
+  - target: $.paths['/watchlist_screening/individual/history/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - watchlist_screening_individual
+      x-fern-sdk-method-name: listHistory
+  - target: $.paths['/watchlist_screening/individual/hit/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - watchlist_screening_individual
+      x-fern-sdk-method-name: listHits
+  - target: $.paths['/watchlist_screening/individual/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - watchlist_screening_individual
+      x-fern-sdk-method-name: list
+  - target: $.paths['/watchlist_screening/individual/program/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - watchlist_screening_individual
+      x-fern-sdk-method-name: getProgram
+  - target: $.paths['/watchlist_screening/individual/program/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - watchlist_screening_individual
+      x-fern-sdk-method-name: listPrograms
+  - target: $.paths['/watchlist_screening/individual/review/create'].post
+    update:
+      x-fern-sdk-group-name:
+        - watchlist_screening_individual
+      x-fern-sdk-method-name: createReview
+  - target: $.paths['/watchlist_screening/individual/review/list'].post
+    update:
+      x-fern-sdk-group-name:
+        - watchlist_screening_individual
+      x-fern-sdk-method-name: listReviews
+  - target: $.paths['/watchlist_screening/individual/update'].post
+    update:
+      x-fern-sdk-group-name:
+        - watchlist_screening_individual
+      x-fern-sdk-method-name: update
+  - target: $.paths['/webhook_verification_key/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - webhook
+      x-fern-sdk-method-name: getVerificationKey
+  - target: $.paths['/dashboard_user/list'].post
+    update:
+      x-fern-pagination:
+        cursor: $request.cursor
+        next_cursor: $response.next_cursor
+        results: $response.dashboard_users
+  - target: $.paths['/identity_verification/list'].post
+    update:
+      x-fern-pagination:
+        cursor: $request.cursor
+        next_cursor: $response.next_cursor
+        results: $response.identity_verifications
+  - target: $.paths['/watchlist_screening/entity/history/list'].post
+    update:
+      x-fern-pagination:
+        cursor: $request.cursor
+        next_cursor: $response.next_cursor
+        results: $response.entity_watchlist_screenings
+  - target: $.paths['/watchlist_screening/entity/hit/list'].post
+    update:
+      x-fern-pagination:
+        cursor: $request.cursor
+        next_cursor: $response.next_cursor
+        results: $response.entity_watchlist_screening_hits
+  - target: $.paths['/watchlist_screening/entity/list'].post
+    update:
+      x-fern-pagination:
+        cursor: $request.cursor
+        next_cursor: $response.next_cursor
+        results: $response.entity_watchlist_screenings
+  - target: $.paths['/watchlist_screening/entity/program/list'].post
+    update:
+      x-fern-pagination:
+        cursor: $request.cursor
+        next_cursor: $response.next_cursor
+        results: $response.entity_watchlist_programs
+  - target: $.paths['/watchlist_screening/entity/review/list'].post
+    update:
+      x-fern-pagination:
+        cursor: $request.cursor
+        next_cursor: $response.next_cursor
+        results: $response.entity_watchlist_screening_reviews
+  - target: $.paths['/watchlist_screening/individual/history/list'].post
+    update:
+      x-fern-pagination:
+        cursor: $request.cursor
+        next_cursor: $response.next_cursor
+        results: $response.watchlist_screenings
+  - target: $.paths['/watchlist_screening/individual/hit/list'].post
+    update:
+      x-fern-pagination:
+        cursor: $request.cursor
+        next_cursor: $response.next_cursor
+        results: $response.watchlist_screening_hits
+  - target: $.paths['/watchlist_screening/individual/list'].post
+    update:
+      x-fern-pagination:
+        cursor: $request.cursor
+        next_cursor: $response.next_cursor
+        results: $response.watchlist_screenings
+  - target: $.paths['/watchlist_screening/individual/program/list'].post
+    update:
+      x-fern-pagination:
+        cursor: $request.cursor
+        next_cursor: $response.next_cursor
+        results: $response.watchlist_programs
+  - target: $.paths['/watchlist_screening/individual/review/list'].post
+    update:
+      x-fern-pagination:
+        cursor: $request.cursor
+        next_cursor: $response.next_cursor
+        results: $response.watchlist_screening_reviews
+  - target: $.paths['/beacon/report/list'].post
+    update:
+      x-fern-pagination:
+        cursor: $request.cursor
+        next_cursor: $response.next_cursor
+        results: $response.beacon_reports
+  - target: $.paths['/beacon/report_syndication/list'].post
+    update:
+      x-fern-pagination:
+        cursor: $request.cursor
+        next_cursor: $response.next_cursor
+        results: $response.beacon_report_syndications
+  - target: $.paths['/beacon/user/history/list'].post
+    update:
+      x-fern-pagination:
+        cursor: $request.cursor
+        next_cursor: $response.next_cursor
+        results: $response.beacon_users
+  - target: $.paths['/payment_initiation/recipient/list'].post
+    update:
+      x-fern-pagination:
+        cursor: $request.cursor
+        next_cursor: $response.next_cursor
+        results: $response.recipients
+  - target: $.paths['/payment_initiation/payment/list'].post
+    update:
+      x-fern-pagination:
+        cursor: $request.cursor
+        next_cursor: $response.next_cursor
+        results: $response.payments
+  - target: $.paths['/wallet/list'].post
+    update:
+      x-fern-pagination:
+        cursor: $request.cursor
+        next_cursor: $response.next_cursor
+        results: $response.wallets
+  - target: $.paths['/wallet/transaction/list'].post
+    update:
+      x-fern-pagination:
+        cursor: $request.cursor
+        next_cursor: $response.next_cursor
+        results: $response.transactions
+  - target: $.paths['/item/activity/list'].post
+    update:
+      x-fern-pagination:
+        cursor: $request.cursor
+        next_cursor: $response.cursor
+        results: $response.activities
+  - target: $.paths['/identity/match/list'].post
+    update:
+      x-fern-pagination:
+        cursor: $request.cursor
+        next_cursor: $response.next_cursor
+        results: $response.identity_match_attempts
+
+  - target: $.paths['/institutions/get'].post
+    update:
+      x-fern-pagination:
+        offset: $request.offset
+        step: $request.count
+        results: $response.institutions
+  - target: $.paths['/transfer/list'].post
+    update:
+      x-fern-pagination:
+        offset: $request.offset
+        step: $request.count
+        results: $response.transfers
+  - target: $.paths['/transfer/recurring/list'].post
+    update:
+      x-fern-pagination:
+        offset: $request.offset
+        step: $request.count
+        results: $response.recurring_transfers
+  - target: $.paths['/bank_transfer/list'].post
+    update:
+      x-fern-pagination:
+        offset: $request.offset
+        step: $request.count
+        results: $response.bank_transfers
+  - target: $.paths['/transfer/event/list'].post
+    update:
+      x-fern-pagination:
+        offset: $request.offset
+        step: $request.count
+        results: $response.transfer_events
+  - target: $.paths['/transfer/ledger/event/list'].post
+    update:
+      x-fern-pagination:
+        offset: $request.offset
+        step: $request.count
+        results: $response.ledger_events
+  - target: $.paths['/bank_transfer/event/list'].post
+    update:
+      x-fern-pagination:
+        offset: $request.offset
+        step: $request.count
+        results: $response.bank_transfer_events
+  - target: $.paths['/transfer/sweep/list'].post
+    update:
+      x-fern-pagination:
+        offset: $request.offset
+        step: $request.count
+        results: $response.sweeps
+  - target: $.paths['/transfer/repayment/list'].post
+    update:
+      x-fern-pagination:
+        offset: $request.offset
+        step: $request.count
+        results: $response.repayments
+  - target: $.paths['/transfer/repayment/return/list'].post
+    update:
+      x-fern-pagination:
+        offset: $request.offset
+        step: $request.count
+        results: $response.repayment_returns
+  - target: $.paths['/transfer/originator/list'].post
+    update:
+      x-fern-pagination:
+        offset: $request.offset
+        step: $request.count
+        results: $response.originators
+  - target: $.paths['/sandbox/transfer/test_clock/list'].post
+    update:
+      x-fern-pagination:
+        offset: $request.offset
+        step: $request.count
+        results: $response.test_clocks
+  - target: $.paths['/transactions/get'].post
+    update:
+      x-fern-pagination:
+        offset: $request.options.offset
+        step: $request.options.count
+        results: $response.transactions
+  - target: $.paths['/investments/transactions/get'].post
+    update:
+      x-fern-pagination:
+        offset: $request.options.offset
+        step: $request.options.count
+        results: $response.investment_transactions
+  - target: $.paths['/processor/transactions/get'].post
+    update:
+      x-fern-pagination:
+        offset: $request.options.offset
+        step: $request.options.count
+        results: $response.transactions
+  - target: $.paths['/processor/investments/transactions/get'].post
+    update:
+      x-fern-pagination:
+        offset: $request.options.offset
+        step: $request.options.count
+        results: $response.investment_transactions
+  - target: $.paths[*].post.responses
+    update:
+      "400":
+        description: Bad request — see error_type and error_code
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlaidError"
+      "401":
+        description: Unauthorized — invalid API keys
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlaidError"
+      "429":
+        description: Too many requests — rate limit exceeded
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlaidError"
+      "500":
+        description: Internal server error or planned maintenance
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlaidError"
+      "4XX":
+        description: Other client error — see error_type and error_code
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlaidError"
+      "5XX":
+        description: Other server error — see error_type and error_code
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlaidError"
+  - target: $.paths[*].get.responses
+    update:
+      "400":
+        description: Bad request — see error_type and error_code
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlaidError"
+      "401":
+        description: Unauthorized — invalid API keys
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlaidError"
+      "429":
+        description: Too many requests — rate limit exceeded
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlaidError"
+      "500":
+        description: Internal server error or planned maintenance
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlaidError"
+      "4XX":
+        description: Other client error — see error_type and error_code
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlaidError"
+      "5XX":
+        description: Other server error — see error_type and error_code
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlaidError"
+  - target: $.paths[*].put.responses
+    update:
+      "400":
+        description: Bad request — see error_type and error_code
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlaidError"
+      "401":
+        description: Unauthorized — invalid API keys
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlaidError"
+      "429":
+        description: Too many requests — rate limit exceeded
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlaidError"
+      "500":
+        description: Internal server error or planned maintenance
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlaidError"
+      "4XX":
+        description: Other client error — see error_type and error_code
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlaidError"
+      "5XX":
+        description: Other server error — see error_type and error_code
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlaidError"
+  - target: $.components.schemas.AccountsBalanceGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.AccountsBalanceGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.AccountsGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.AccountsGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ApplicationGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ApplicationGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.AssetReportAuditCopyCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.AssetReportAuditCopyCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.AssetReportAuditCopyGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.AssetReportAuditCopyGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.AssetReportAuditCopyPdfGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.AssetReportAuditCopyPdfGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.AssetReportAuditCopyRemoveRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.AssetReportAuditCopyRemoveRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.AssetReportCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.AssetReportCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.AssetReportFilterRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.AssetReportFilterRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.AssetReportFreddieGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.AssetReportFreddieGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.AssetReportGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.AssetReportGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.AssetReportPDFGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.AssetReportPDFGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.AssetReportRefreshRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.AssetReportRefreshRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.AssetReportRemoveRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.AssetReportRemoveRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.AuthGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.AuthGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.AuthVerifyRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.AuthVerifyRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BankTransferBalanceGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BankTransferBalanceGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BankTransferCancelRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BankTransferCancelRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BankTransferCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BankTransferCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BankTransferEventListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BankTransferEventListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BankTransferEventSyncRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BankTransferEventSyncRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BankTransferGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BankTransferGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BankTransferListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BankTransferListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BankTransferMigrateAccountRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BankTransferMigrateAccountRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BankTransferSweepGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BankTransferSweepGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BankTransferSweepListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BankTransferSweepListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BeaconAccountRiskEvaluateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BeaconAccountRiskEvaluateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BeaconDuplicateGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BeaconDuplicateGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BeaconReportCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BeaconReportCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BeaconReportGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BeaconReportGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BeaconReportListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BeaconReportListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BeaconReportSyndicationGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BeaconReportSyndicationGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BeaconReportSyndicationListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BeaconReportSyndicationListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BeaconUserAccountInsightsGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BeaconUserAccountInsightsGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BeaconUserCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BeaconUserCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BeaconUserGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BeaconUserGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BeaconUserHistoryListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BeaconUserHistoryListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BeaconUserReviewRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BeaconUserReviewRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BeaconUserUpdateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BeaconUserUpdateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BetaCashAdvanceIncomeInsightsV1GetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BetaCashAdvanceIncomeInsightsV1GetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BetaEwaReportV1GetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BetaEwaReportV1GetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BetaIssuesV1GetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BetaIssuesV1GetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BetaIssuesV1ListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BetaIssuesV1ListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BetaIssuesV1MatchRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BetaIssuesV1MatchRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BetaIssuesV1SubscribeRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BetaIssuesV1SubscribeRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BetaIssuesV1UnsubscribeRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BetaIssuesV1UnsubscribeRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BetaPartnerCustomerV1CreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BetaPartnerCustomerV1CreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BetaPartnerCustomerV1EnableRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BetaPartnerCustomerV1EnableRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BetaPartnerCustomerV1GetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BetaPartnerCustomerV1GetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BetaPartnerCustomerV1UpdateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BetaPartnerCustomerV1UpdateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BetaWebhookEventsListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BetaWebhookEventsListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BusinessVerificationCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BusinessVerificationCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.BusinessVerificationGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.BusinessVerificationGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CRALoansRegisterRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CRALoansRegisterRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CashflowReportGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CashflowReportGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CashflowReportInsightsGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CashflowReportInsightsGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CashflowReportRefreshRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CashflowReportRefreshRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CashflowReportTransactionsGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CashflowReportTransactionsGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ConsentEventsGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ConsentEventsGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ConsumerReportPDFGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ConsumerReportPDFGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CraCheckReportBaseReportGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CraCheckReportBaseReportGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CraCheckReportCashflowInsightsGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CraCheckReportCashflowInsightsGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CraCheckReportCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CraCheckReportCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CraCheckReportIncomeInsightsGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CraCheckReportIncomeInsightsGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CraCheckReportLendScoreGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CraCheckReportLendScoreGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CraCheckReportNetworkInsightsGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CraCheckReportNetworkInsightsGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CraCheckReportPDFGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CraCheckReportPDFGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CraCheckReportPartnerInsightsGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CraCheckReportPartnerInsightsGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CraCheckReportVerificationGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CraCheckReportVerificationGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CraCheckReportVerificationPdfGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CraCheckReportVerificationPdfGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CraCreditProfileReportGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CraCreditProfileReportGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CraLoansApplicationsRegisterRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CraLoansApplicationsRegisterRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CraLoansUnregisterRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CraLoansUnregisterRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CraLoansUpdateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CraLoansUpdateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CraMonitoringInsightsGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CraMonitoringInsightsGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CraMonitoringInsightsSubscribeRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CraMonitoringInsightsSubscribeRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CraMonitoringInsightsUnsubscribeRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CraMonitoringInsightsUnsubscribeRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CraPartnerInsightsGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CraPartnerInsightsGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CraReportCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CraReportCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CraReportGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CraReportGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CraServicingSubscriptionCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CraServicingSubscriptionCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CraServicingSubscriptionDeleteRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CraServicingSubscriptionDeleteRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CraServicingSubscriptionGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CraServicingSubscriptionGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CraServicingSubscriptionListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CraServicingSubscriptionListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CraServicingSubscriptionUpdateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CraServicingSubscriptionUpdateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CreditAuditCopyTokenCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CreditAuditCopyTokenCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CreditAuditCopyTokenRemoveRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CreditAuditCopyTokenRemoveRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CreditAuditCopyTokenUpdateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CreditAuditCopyTokenUpdateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CreditBankEmploymentGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CreditBankEmploymentGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CreditBankIncomeGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CreditBankIncomeGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CreditBankIncomePDFGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CreditBankIncomePDFGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CreditBankIncomeRefreshRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CreditBankIncomeRefreshRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CreditBankIncomeWebhookUpdateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CreditBankIncomeWebhookUpdateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CreditBankStatementsUploadsGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CreditBankStatementsUploadsGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CreditEmploymentGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CreditEmploymentGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CreditFreddieMacReportsGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CreditFreddieMacReportsGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CreditPayrollIncomeGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CreditPayrollIncomeGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CreditPayrollIncomeParsingConfigUpdateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CreditPayrollIncomeParsingConfigUpdateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CreditPayrollIncomePrecheckRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CreditPayrollIncomePrecheckRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CreditPayrollIncomeRefreshRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CreditPayrollIncomeRefreshRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CreditPayrollIncomeRiskSignalsGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CreditPayrollIncomeRiskSignalsGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CreditRelayCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CreditRelayCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CreditRelayGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CreditRelayGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CreditRelayPDFGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CreditRelayPDFGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CreditRelayRefreshRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CreditRelayRefreshRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CreditRelayRemoveRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CreditRelayRemoveRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.CreditSessionsGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.CreditSessionsGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.DashboardUserGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.DashboardUserGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.DashboardUserListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.DashboardUserListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.EmployersSearchRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.EmployersSearchRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.EmploymentVerificationGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.EmploymentVerificationGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.IdentityDocumentsUploadsGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.IdentityDocumentsUploadsGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.IdentityGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.IdentityGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.IdentityMatchListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.IdentityMatchListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.IdentityMatchRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.IdentityMatchRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.IdentityRefreshRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.IdentityRefreshRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.IdentityVerificationAutofillCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.IdentityVerificationAutofillCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.IdentityVerificationCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.IdentityVerificationCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.IdentityVerificationGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.IdentityVerificationGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.IdentityVerificationListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.IdentityVerificationListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.IdentityVerificationRetryRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.IdentityVerificationRetryRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.IncomeVerificationCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.IncomeVerificationCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.IncomeVerificationDocumentsDownloadRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.IncomeVerificationDocumentsDownloadRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.IncomeVerificationPaystubsGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.IncomeVerificationPaystubsGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.IncomeVerificationPrecheckRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.IncomeVerificationPrecheckRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.IncomeVerificationTaxformsGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.IncomeVerificationTaxformsGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.InstitutionsGetByIdRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.InstitutionsGetByIdRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.InstitutionsGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.InstitutionsGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.InstitutionsSearchRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.InstitutionsSearchRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.InvestmentsAuthGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.InvestmentsAuthGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.InvestmentsHoldingsGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.InvestmentsHoldingsGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.InvestmentsRefreshRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.InvestmentsRefreshRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.InvestmentsTransactionsGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.InvestmentsTransactionsGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.IssuesGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.IssuesGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.IssuesSearchRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.IssuesSearchRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.IssuesSubscribeRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.IssuesSubscribeRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ItemAccessTokenInvalidateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ItemAccessTokenInvalidateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ItemActivityListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ItemActivityListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ItemApplicationListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ItemApplicationListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ItemApplicationScopesUpdateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ItemApplicationScopesUpdateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ItemApplicationUnlinkRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ItemApplicationUnlinkRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ItemGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ItemGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ItemImportRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ItemImportRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ItemProductsTerminateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ItemProductsTerminateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ItemPublicTokenCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ItemPublicTokenCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ItemPublicTokenExchangeRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ItemPublicTokenExchangeRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ItemRemoveRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ItemRemoveRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ItemWebhookUpdateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ItemWebhookUpdateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.LiabilitiesGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.LiabilitiesGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.LinkOAuthCorrelationIdExchangeRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.LinkOAuthCorrelationIdExchangeRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.LinkTokenCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.LinkTokenCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.LinkTokenGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.LinkTokenGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.NetworkStatusGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.NetworkStatusGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.OAuthIntrospectRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.OAuthIntrospectRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.OAuthRevokeRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.OAuthRevokeRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.OAuthTokenRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.OAuthTokenRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.PartnerCustomerCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.PartnerCustomerCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.PartnerCustomerEnableRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.PartnerCustomerEnableRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.PartnerCustomerGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.PartnerCustomerGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.PartnerCustomerOAuthInstitutionsGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.PartnerCustomerOAuthInstitutionsGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.PartnerCustomerRemoveRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.PartnerCustomerRemoveRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.PaymentInitiationConsentCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.PaymentInitiationConsentCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.PaymentInitiationConsentGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.PaymentInitiationConsentGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.PaymentInitiationConsentPaymentExecuteRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.PaymentInitiationConsentPaymentExecuteRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.PaymentInitiationConsentRevokeRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.PaymentInitiationConsentRevokeRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.PaymentInitiationPaymentCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.PaymentInitiationPaymentCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.PaymentInitiationPaymentGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.PaymentInitiationPaymentGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.PaymentInitiationPaymentListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.PaymentInitiationPaymentListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.PaymentInitiationPaymentReverseRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.PaymentInitiationPaymentReverseRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.PaymentInitiationPaymentTokenCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.PaymentInitiationPaymentTokenCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.PaymentInitiationRecipientCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.PaymentInitiationRecipientCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.PaymentInitiationRecipientGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.PaymentInitiationRecipientGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.PaymentInitiationRecipientListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.PaymentInitiationRecipientListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.PaymentProfileCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.PaymentProfileCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.PaymentProfileGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.PaymentProfileGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.PaymentProfileRemoveRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.PaymentProfileRemoveRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ProcessorAccountGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ProcessorAccountGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ProcessorApexProcessorTokenCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ProcessorApexProcessorTokenCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ProcessorAuthGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ProcessorAuthGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ProcessorBalanceGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ProcessorBalanceGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ProcessorBankTransferCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ProcessorBankTransferCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ProcessorIdentityGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ProcessorIdentityGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ProcessorIdentityMatchRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ProcessorIdentityMatchRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ProcessorInvestmentsAuthGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ProcessorInvestmentsAuthGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ProcessorInvestmentsHoldingsGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ProcessorInvestmentsHoldingsGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ProcessorInvestmentsTransactionsGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ProcessorInvestmentsTransactionsGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ProcessorLiabilitiesGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ProcessorLiabilitiesGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ProcessorSignalDecisionReportRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ProcessorSignalDecisionReportRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ProcessorSignalEvaluateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ProcessorSignalEvaluateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ProcessorSignalPrepareRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ProcessorSignalPrepareRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ProcessorSignalReturnReportRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ProcessorSignalReturnReportRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ProcessorStripeBankAccountTokenCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ProcessorStripeBankAccountTokenCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ProcessorTokenCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ProcessorTokenCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ProcessorTokenPermissionsGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ProcessorTokenPermissionsGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ProcessorTokenPermissionsSetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ProcessorTokenPermissionsSetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ProcessorTokenWebhookUpdateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ProcessorTokenWebhookUpdateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ProcessorTransactionsGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ProcessorTransactionsGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ProcessorTransactionsRecurringGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ProcessorTransactionsRecurringGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ProcessorTransactionsRefreshRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ProcessorTransactionsRefreshRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ProcessorTransactionsSyncRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ProcessorTransactionsSyncRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ProfileNetworkStatusGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ProfileNetworkStatusGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ProtectCashAdvanceDecisionCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ProtectCashAdvanceDecisionCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ProtectCashAdvanceRepaymentCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ProtectCashAdvanceRepaymentCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ProtectComputeRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ProtectComputeRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ProtectEventGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ProtectEventGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ProtectEventSendRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ProtectEventSendRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ProtectReportCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ProtectReportCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.ProtectUserInsightsGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.ProtectUserInsightsGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SandboxBankIncomeFireWebhookRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SandboxBankIncomeFireWebhookRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SandboxBankTransferFireWebhookRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SandboxBankTransferFireWebhookRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SandboxBankTransferSimulateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SandboxBankTransferSimulateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SandboxCraCashflowUpdatesUpdateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SandboxCraCashflowUpdatesUpdateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SandboxCraServicingSimulateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SandboxCraServicingSimulateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SandboxFdxConsentSeedRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SandboxFdxConsentSeedRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SandboxIncomeFireWebhookRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SandboxIncomeFireWebhookRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SandboxItemApplicationSeedRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SandboxItemApplicationSeedRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SandboxItemFireWebhookRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SandboxItemFireWebhookRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SandboxItemResetLoginRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SandboxItemResetLoginRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SandboxItemSetVerificationStatusRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SandboxItemSetVerificationStatusRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SandboxPaymentProfileResetLoginRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SandboxPaymentProfileResetLoginRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SandboxPaymentSimulateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SandboxPaymentSimulateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SandboxProcessorTokenCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SandboxProcessorTokenCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SandboxPublicTokenCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SandboxPublicTokenCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SandboxTransactionsCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SandboxTransactionsCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SandboxTransferFireWebhookRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SandboxTransferFireWebhookRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SandboxTransferLedgerDepositSimulateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SandboxTransferLedgerDepositSimulateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SandboxTransferLedgerSimulateAvailableRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SandboxTransferLedgerSimulateAvailableRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SandboxTransferLedgerWithdrawSimulateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SandboxTransferLedgerWithdrawSimulateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SandboxTransferRefundSimulateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SandboxTransferRefundSimulateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SandboxTransferSimulateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SandboxTransferSimulateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SandboxTransferSweepSimulateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SandboxTransferSweepSimulateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SandboxTransferTestClockAdvanceRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SandboxTransferTestClockAdvanceRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SandboxTransferTestClockCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SandboxTransferTestClockCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SandboxTransferTestClockGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SandboxTransferTestClockGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SandboxTransferTestClockListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SandboxTransferTestClockListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SandboxUserFireWebhookRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SandboxUserFireWebhookRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SandboxUserResetLoginRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SandboxUserResetLoginRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SessionTokenCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SessionTokenCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SignalDecisionReportRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SignalDecisionReportRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SignalEvaluateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SignalEvaluateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SignalPrepareRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SignalPrepareRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SignalReturnReportRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SignalReturnReportRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.SignalScheduleRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.SignalScheduleRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.StatementsDownloadRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.StatementsDownloadRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.StatementsListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.StatementsListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.StatementsRefreshRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.StatementsRefreshRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransactionsEnrichRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransactionsEnrichRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransactionsGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransactionsGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransactionsRecurringGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransactionsRecurringGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransactionsRefreshRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransactionsRefreshRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransactionsRulesCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransactionsRulesCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransactionsRulesListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransactionsRulesListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransactionsRulesRemoveRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransactionsRulesRemoveRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransactionsSyncRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransactionsSyncRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransactionsUserInsightsGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransactionsUserInsightsGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferAuthorizationCancelRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferAuthorizationCancelRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferAuthorizationCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferAuthorizationCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferBalanceGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferBalanceGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferCancelRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferCancelRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferCapabilitiesGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferCapabilitiesGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferConfigurationGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferConfigurationGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferDiligenceSubmitRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferDiligenceSubmitRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferEventListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferEventListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferEventSyncRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferEventSyncRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferIntentCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferIntentCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferIntentGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferIntentGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferLedgerDepositRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferLedgerDepositRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferLedgerDistributeRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferLedgerDistributeRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferLedgerEventListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferLedgerEventListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferLedgerGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferLedgerGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferLedgerWithdrawRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferLedgerWithdrawRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferMetricsGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferMetricsGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferMigrateAccountRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferMigrateAccountRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferOriginatorCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferOriginatorCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferOriginatorFundingAccountCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferOriginatorFundingAccountCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferOriginatorFundingAccountUpdateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferOriginatorFundingAccountUpdateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferOriginatorGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferOriginatorGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferOriginatorListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferOriginatorListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferPlatformOriginatorCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferPlatformOriginatorCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferPlatformPersonCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferPlatformPersonCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferPlatformRequirementSubmitRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferPlatformRequirementSubmitRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferQuestionnaireCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferQuestionnaireCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferRecurringCancelRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferRecurringCancelRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferRecurringCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferRecurringCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferRecurringGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferRecurringGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferRecurringListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferRecurringListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferRefundCancelRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferRefundCancelRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferRefundCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferRefundCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferRefundGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferRefundGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferRepaymentListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferRepaymentListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferRepaymentReturnListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferRepaymentReturnListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferReturnRecoverRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferReturnRecoverRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferSweepGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferSweepGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.TransferSweepListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.TransferSweepListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.UserAccountSessionEventSendRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.UserAccountSessionEventSendRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.UserAccountSessionGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.UserAccountSessionGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.UserCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.UserCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.UserFinancialDataRefreshRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.UserFinancialDataRefreshRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.UserGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.UserGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.UserIdentityRemoveRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.UserIdentityRemoveRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.UserItemsAssociateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.UserItemsAssociateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.UserItemsGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.UserItemsGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.UserItemsRemoveRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.UserItemsRemoveRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.UserProductsTerminateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.UserProductsTerminateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.UserRemoveRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.UserRemoveRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.UserThirdPartyTokenCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.UserThirdPartyTokenCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.UserThirdPartyTokenRemoveRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.UserThirdPartyTokenRemoveRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.UserTransactionsRefreshRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.UserTransactionsRefreshRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.UserUpdateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.UserUpdateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.WalletCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.WalletCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.WalletGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.WalletGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.WalletListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.WalletListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.WalletTransactionExecuteRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.WalletTransactionExecuteRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.WalletTransactionGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.WalletTransactionGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.WalletTransactionListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.WalletTransactionListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningEntityCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningEntityCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningEntityGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningEntityGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningEntityHistoryListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningEntityHistoryListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningEntityHitListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningEntityHitListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningEntityListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningEntityListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningEntityProgramGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningEntityProgramGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningEntityProgramListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningEntityProgramListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningEntityReviewCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningEntityReviewCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningEntityReviewListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningEntityReviewListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningEntityUpdateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningEntityUpdateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningIndividualCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningIndividualCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningIndividualGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningIndividualGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningIndividualHistoryListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningIndividualHistoryListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningIndividualHitListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningIndividualHitListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningIndividualListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningIndividualListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningIndividualProgramGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningIndividualProgramGetRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningIndividualProgramListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningIndividualProgramListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningIndividualReviewCreateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningIndividualReviewCreateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningIndividualReviewListRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningIndividualReviewListRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningIndividualUpdateRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.WatchlistScreeningIndividualUpdateRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.WebhookVerificationKeyGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.WebhookVerificationKeyGetRequest.properties.secret
+    remove: true
+  - target: $.paths['/accounts/balance/get'].post.requestBody.content['application/json'].examples['example-1'].value.client_id
+    remove: true
+  - target: $.paths['/accounts/balance/get'].post.requestBody.content['application/json'].examples['example-1'].value.secret
+    remove: true
+  - target: $.paths['/accounts/get'].post.requestBody.content['application/json'].examples['example-1'].value.client_id
+    remove: true
+  - target: $.paths['/accounts/get'].post.requestBody.content['application/json'].examples['example-1'].value.secret
+    remove: true
+  - target: $.paths['/beta/cash_advance/income_insights/v1/get'].post.requestBody.content['application/json'].examples['example-1'].value.client_id
+    remove: true
+  - target: $.paths['/beta/cash_advance/income_insights/v1/get'].post.requestBody.content['application/json'].examples['example-1'].value.secret
+    remove: true
+  - target: $.paths['/beta/partner/customer/v1/create'].post.requestBody.content['application/json'].examples['example-1'].value.client_id
+    remove: true
+  - target: $.paths['/beta/partner/customer/v1/create'].post.requestBody.content['application/json'].examples['example-1'].value.secret
+    remove: true
+  - target: $.paths['/beta/partner/customer/v1/enable'].post.requestBody.content['application/json'].examples['example-1'].value.client_id
+    remove: true
+  - target: $.paths['/beta/partner/customer/v1/enable'].post.requestBody.content['application/json'].examples['example-1'].value.secret
+    remove: true
+  - target: $.paths['/beta/partner/customer/v1/get'].post.requestBody.content['application/json'].examples['example-1'].value.client_id
+    remove: true
+  - target: $.paths['/beta/partner/customer/v1/get'].post.requestBody.content['application/json'].examples['example-1'].value.secret
+    remove: true
+  - target: $.paths['/beta/partner/customer/v1/update'].post.requestBody.content['application/json'].examples['example-1'].value.client_id
+    remove: true
+  - target: $.paths['/beta/partner/customer/v1/update'].post.requestBody.content['application/json'].examples['example-1'].value.secret
+    remove: true
+  - target: $.paths['/beta/transactions/rules/v1/create'].post.requestBody.content['application/json'].examples['example-1'].value.client_id
+    remove: true
+  - target: $.paths['/beta/transactions/rules/v1/create'].post.requestBody.content['application/json'].examples['example-1'].value.secret
+    remove: true
+  - target: $.paths['/beta/transactions/rules/v1/list'].post.requestBody.content['application/json'].examples['example-1'].value.client_id
+    remove: true
+  - target: $.paths['/beta/transactions/rules/v1/list'].post.requestBody.content['application/json'].examples['example-1'].value.secret
+    remove: true
+  - target: $.paths['/beta/transactions/rules/v1/remove'].post.requestBody.content['application/json'].examples['example-1'].value.client_id
+    remove: true
+  - target: $.paths['/beta/transactions/rules/v1/remove'].post.requestBody.content['application/json'].examples['example-1'].value.secret
+    remove: true
+  - target: $.paths['/beta/webhook_events/list'].post.requestBody.content['application/json'].examples['example-1'].value.client_id
+    remove: true
+  - target: $.paths['/beta/webhook_events/list'].post.requestBody.content['application/json'].examples['example-1'].value.secret
+    remove: true
+  - target: $.paths['/beta/webhook_events/list'].post.requestBody.content['application/json'].examples['filtered'].value.client_id
+    remove: true
+  - target: $.paths['/beta/webhook_events/list'].post.requestBody.content['application/json'].examples['filtered'].value.secret
+    remove: true
+  - target: $.paths['/beta/webhook_events/list'].post.requestBody.content['application/json'].examples['cursor-continuation'].value.client_id
+    remove: true
+  - target: $.paths['/beta/webhook_events/list'].post.requestBody.content['application/json'].examples['cursor-continuation'].value.secret
+    remove: true
+  - target: $.paths['/partner/customer/create'].post.requestBody.content['application/json'].examples['example-1'].value.client_id
+    remove: true
+  - target: $.paths['/partner/customer/create'].post.requestBody.content['application/json'].examples['example-1'].value.secret
+    remove: true
+  - target: $.paths['/partner/customer/enable'].post.requestBody.content['application/json'].examples['example-1'].value.client_id
+    remove: true
+  - target: $.paths['/partner/customer/enable'].post.requestBody.content['application/json'].examples['example-1'].value.secret
+    remove: true
+  - target: $.paths['/partner/customer/get'].post.requestBody.content['application/json'].examples['example-1'].value.client_id
+    remove: true
+  - target: $.paths['/partner/customer/get'].post.requestBody.content['application/json'].examples['example-1'].value.secret
+    remove: true
+  - target: $.paths['/partner/customer/oauth_institutions/get'].post.requestBody.content['application/json'].examples['example-1'].value.client_id
+    remove: true
+  - target: $.paths['/partner/customer/oauth_institutions/get'].post.requestBody.content['application/json'].examples['example-1'].value.secret
+    remove: true
+  - target: $.paths['/partner/customer/remove'].post.requestBody.content['application/json'].examples['example-1'].value.client_id
+    remove: true
+  - target: $.paths['/partner/customer/remove'].post.requestBody.content['application/json'].examples['example-1'].value.secret
+    remove: true
+  - target: $.paths['/transfer/diligence/document/upload'].post.requestBody.content
+    update:
+      multipart/form-data:
+        schema:
+          $ref: '#/components/schemas/TransferDiligenceDocumentUploadRequest'
+  - target: $.paths['/transfer/diligence/document/upload'].post.requestBody.content['application/json']
+    remove: true
