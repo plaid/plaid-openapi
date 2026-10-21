@@ -43,6 +43,10 @@ jobs:
       subject: ${{ steps.generate.outputs.subject }}
       rehearsal: ${{ steps.generate.outputs.rehearsal }}
     steps:
+      - name: Require a failure notification owner
+        env:
+          SDK_FAILURE_ASSIGNEE: ${{ vars.SDK_FAILURE_ASSIGNEE }}
+        run: '[[ "$SDK_FAILURE_ASSIGNEE" =~ ^[A-Za-z0-9][A-Za-z0-9-]{0,38}$ ]]'
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           ref: ${{ github.sha }}
@@ -85,6 +89,7 @@ jobs:
             ${{ runner.temp }}/sdk-generation/manifest.json
             ${{ runner.temp }}/sdk-generation/plan.json
             ${{ runner.temp }}/sdk-generation/result.json
+            ${{ runner.temp }}/sdk-generation/api-diff.txt
           retention-days: 14
           if-no-files-found: error
 

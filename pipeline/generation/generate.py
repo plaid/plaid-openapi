@@ -342,7 +342,8 @@ def verify_sdk(sdk: Path, values: dict, work: Path) -> None:
         run(["docker", "rm", "-f", name])
 
 
-def compatibility_gate(old: Path, sdk: Path, module: str, published: bool, values: dict, work: Path) -> None:
+def compatibility_gate(old: Path, sdk: Path, module: str, published: bool, values: dict, work: Path,
+                       *, output: Path | None = None) -> None:
     if not published:
         (work / "api-diff.txt").write_text("Initial configured major has no published stable tag; no within-major compatibility promise yet.\n")
         return
@@ -356,6 +357,10 @@ def compatibility_gate(old: Path, sdk: Path, module: str, published: bool, value
     run([tool, "-m", "-w", str(after), module], sdk, timeout=1200)
     changes = run([tool, "-m", "-incompatible", str(before), str(after)], timeout=1200)
     (work / "api-diff.txt").write_bytes(changes)
+    if changes.strip() and output is not None:
+        # Preserve only the public API report after the temporary checkout is removed.
+        (output / "api-diff.txt").write_bytes(changes)
+        save_json(output / "result.json", {"status": "breaking-change", "report": "api-diff.txt"})
     require(not changes.strip(), "Breaking SDK or legacy API change: review a new configured major instead of publishing a minor/patch")
 
 
@@ -423,6 +428,9 @@ def main() -> None:
             save_json(output / "result.json", {"status": "awaiting-release", "sdk_base": base, "version": waiting})
             return
         source_commit, data = verified_spec(ROOT, config_commit, values, sdk)
+        # Publishing imports this module without the generation-only YAML parser.
+        from overlay_coverage import validate as validate_overlay
+        validate_overlay(data, (ROOT / "fern/openapi-overlay.yml").read_bytes())
         tags = [line.split("refs/tags/", 1)[1] for line in tag_refs.splitlines() if not line.endswith("^{}")]
         version = propose_version(tags, values["major"], override)
         config_hash = config_digest(ROOT)
@@ -449,7 +457,7 @@ def main() -> None:
         legacy = run_legacy(sdk, local_config / "2020-09-14.yml", module, values, work)
         require(protected_state(sdk) == before_legacy, "Legacy generator modified protected release/customization files")
         verify_sdk(sdk, values, work)
-        compatibility_gate(old, sdk, module, baseline_tag is not None, values, work)
+        compatibility_gate(old, sdk, module, baseline_tag is not None, values, work, output=output)
         update_changelog(sdk, version, data, values)
         sanitize_metadata(sdk, version, module, values)
         git(sdk, "add", "-A")

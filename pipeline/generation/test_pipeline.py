@@ -167,6 +167,8 @@ class PipelineTests(unittest.TestCase):
             allowed = {"sdk.tar.gz", "content.json", "manifest.json", "plan.json", "result.json"}
             if index:
                 allowed.add("generation.bundle.json")
+            else:
+                allowed.add("api-diff.txt")
             self.assertEqual({entry.rsplit("/", 1)[-1] for entry in entries}, allowed)
             self.assertTrue(all(entry.startswith("${{ runner.temp }}/") and not entry.endswith("/") and "*" not in entry for entry in entries))
         self.assertEqual(workflow.count("(github.event_name != 'workflow_dispatch' || inputs.rehearsal == false)"), 2)
