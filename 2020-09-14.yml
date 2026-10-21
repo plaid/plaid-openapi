@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.778.0
+  version: 2020-09-14_1.782.2
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -10431,7 +10431,7 @@ paths:
       description: |-
         Use this endpoint to create a Protect report to document fraud incidents, investigation outcomes, or other risk events. This endpoint allows you to report various types of incidents including account takeovers, identity fraud, unauthorized transactions, and other security events. The reported data helps improve fraud detection models and provides valuable feedback to enhance the overall security of the Plaid network.
 
-        Reports can be created for confirmed incidents that have been fully investigated, or for suspected incidents that require further review. You can associate reports with specific users, sessions, or transactions to provide comprehensive context about the incident. Each report must include `user_id`, or an `incident_event` with at least one supported identifier: `link_session_id`, `idv_session_id`, `protect_event_id`, `signal_client_transaction_id`, or `access_token`. Context fields such as `internal_reference`, `time`, `amount`, and `bank_account` do not satisfy this identifier requirement.
+        Reports can be created for confirmed incidents that have been fully investigated, or for suspected incidents that require further review. You can associate reports with specific users, sessions, or transactions to provide comprehensive context about the incident. Each report must include `user_id`, `client_user_id`, or an `incident_event` with at least one supported identifier: `link_session_id`, `idv_session_id`, `protect_event_id`, `signal_client_transaction_id`, or `access_token`. Context fields such as `internal_reference`, `time`, `amount`, and `bank_account` do not satisfy this identifier requirement.
       requestBody:
         required: true
         content:
@@ -13887,6 +13887,8 @@ paths:
         If the user has at least one associated Item and every associated Item contains a Financial Management product, this endpoint also removes the associated Plaid user. The removed `user_id` can no longer be used to access the user.
 
         For Plaid Protect, this endpoint terminates Protect products. For Servicing, it cancels the subscription and preserves CRA Items and historical data for future report requests.
+
+        To learn how terminating products affects billing, see [Billing](https://plaid.com/docs/account/billing/#subscription-fee).
       requestBody:
         required: true
         content:
@@ -15266,7 +15268,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PlaidError'
       operationId: processorTokenCreate
-      description: Used to create a token suitable for sending to one of Plaid's partners to enable integrations. Note that Stripe partnerships use bank account tokens instead; see `/processor/stripe/bank_account_token/create` for creating tokens for use with Stripe integrations. If using multiple processors, multiple different processor tokens can be created for a single access token. Once created, a processor token for a given Item can be modified by calling `/processor/token/permissions/set`. To revoke the processor's access, the entire Item must be deleted by calling `/item/remove`.
+      description: Used to create a token suitable for sending to one of Plaid's partners to enable integrations. To create a Stripe bank account token (`btok_...`), use `/processor/stripe/bank_account_token/create`. If using multiple processors, multiple different processor tokens can be created for a single access token. Once created, a processor token for a given Item can be modified by calling `/processor/token/permissions/set`. To revoke the processor's access, the entire Item must be deleted by calling `/item/remove`.
       requestBody:
         required: true
         content:
@@ -15532,6 +15534,12 @@ paths:
       externalDocs:
         url: /api/link/#linktokenget
       operationId: linkTokenGet
+      security:
+      - clientId: []
+        secret: []
+        plaidVersion: []
+      - oauth2:
+        - link:read
       responses:
         "200":
           description: OK
@@ -15751,6 +15759,8 @@ paths:
         The `/link/token/get` endpoint gets information about a Link session, including all callbacks fired during the session along with their metadata, including the public token. This endpoint is used with Link flows that don't provide a public token via frontend callbacks, such as the [Hosted Link flow](https://plaid.com/docs/link/hosted-link/) and the [Multi-Item Link flow](https://plaid.com/docs/link/multi-item-link/). It also can be useful for debugging purposes.
 
         By default, this endpoint will only return complete event data for Hosted Link sessions. To use `/link/token/get` to retrieve event data for non-Hosted-Link sessions, contact your account manager to request that your account be enabled for Link events. If you do not have an account manager, you can submit this request via a support ticket. Enablement for Link events will also cause you to receive additional webhooks related to Link events, such as the `SESSION_FINISHED` and `EVENTS` webhook.
+
+        When called with a delegated OAuth access token, this endpoint returns a reduced view of the session for the delegate. Only `link_token`, `created_at`, `expiration`, and each session's `link_session_id`, `started_at`, `finished_at`, and `results.item_add_results[].public_token` are populated; `public_token` holds the delegate's own `delegated-public-` token, never the customer's public token. All other fields are withheld and carry no information about the session: arrays such as `metadata.initial_products` and `item_add_results[].accounts` are empty, fields such as `metadata.webhook` and `item_add_results[].institution` are `null`, and `user_id`, `events`, `on_success`, `on_exit`, and `exit` are omitted. A delegated public token can be retrieved for 30 minutes after it is created. Item adds whose delegated public token is no longer available are omitted from `item_add_results`, and if none remain the request fails with `INVALID_LINK_TOKEN`; start a new Link session to continue.
       requestBody:
         required: true
         content:
@@ -23353,6 +23363,7 @@ components:
             cra:read: Read CRA report data.
             user:write: Write user data.
             item:read: Read Item data.
+            link:read: Read Link session results.
             link:write: Create Link tokens.
             item:write: Exchange a public token for an access token.
             auth:read: Read Auth data.
@@ -24398,14 +24409,18 @@ components:
         additionalProperties: true
         properties:
           name:
+            description: The name of the account, either assigned by the user or by the financial institution itself
             type: string
           official_name:
+            description: The official name of the account as given by the financial institution
             type: string
             nullable: true
           mask:
+            description: The last 2-4 alphanumeric characters of either the account's displayed mask or the account's official account number. Note that the mask may be non-unique between an Item's accounts.
             type: string
             nullable: true
           verification_name:
+            description: The account holder name that was used for micro-deposit and/or database verification. Only returned for Auth Items created via micro-deposit or database verification. This name was manually-entered by the user during Link, unless it was otherwise provided via the `user.legal_name` request field in `/link/token/create` for the Link session that created the Item.
             type: string
           owners:
             type: array
@@ -25577,7 +25592,7 @@ components:
         phone_number:
           type: string
           nullable: true
-          description: 'The user''s phone number, in E.164 format: +{countrycode}{number}. For example: "+14157452130". Phone numbers provided in other formats will be parsed on a best-effort basis. Phone number input is validated against valid number ranges; number strings that do not match a real-world phone numbering scheme may cause the request to fail, even in the Sandbox test environment.'
+          description: 'The user''s phone number, in E.164 format: +{countrycode}{number}. For example: "+14157452130". Phone numbers provided in other formats will be parsed on a best-effort basis.'
         email_address:
           type: string
           description: The user's email address.
@@ -28428,7 +28443,7 @@ components:
             $ref: '#/components/schemas/Security'
         total_investment_transactions:
           type: integer
-          description: The total number of transactions available within the date range specified. If `total_investment_transactions` is larger than the size of the `transactions` array, more transactions are available and can be fetched via manipulating the `offset` parameter.
+          description: The total number of transactions available within the date range specified. If `total_investment_transactions` is larger than the size of the `investment_transactions` array, more transactions are available and can be fetched via manipulating the `offset` parameter.
         request_id:
           $ref: '#/components/schemas/RequestID'
         is_investments_fallback_item:
@@ -28513,7 +28528,7 @@ components:
             $ref: '#/components/schemas/InvestmentTransaction'
         total_investment_transactions:
           type: integer
-          description: The total number of transactions available within the date range specified. If `total_investment_transactions` is larger than the size of the `transactions` array, more transactions are available and can be fetched via manipulating the `offset` parameter.
+          description: The total number of transactions available within the date range specified. If `total_investment_transactions` is larger than the size of the `investment_transactions` array, more transactions are available and can be fetched via manipulating the `offset` parameter.
         request_id:
           $ref: '#/components/schemas/RequestID'
         is_investments_fallback_item:
@@ -28567,6 +28582,7 @@ components:
           - galileo
           - modern_treasury
           - ocrolus
+          - stripe
           - vesta
           - drivewealth
           - vopay
@@ -28866,7 +28882,7 @@ components:
 
             If using Identity Verification, `country_codes` should be set to the country where your company is based, not the country where your user is located. For all other products, `country_codes` represents the location of your user's financial institution.
 
-            If Link is launched with multiple country codes, only products that you are enabled for in all countries will be used by Link. While all countries are enabled by default in Sandbox, in Production only the countries you have requested access for are shown. To request access to additional countries, [file a product access Support ticket](https://dashboard.plaid.com/support/new/product-and-development/product-troubleshooting/request-product-access) via the Plaid dashboard.
+            If Link is launched with multiple country codes, every product you specify, in any product array, must be enabled for your account in all of the listed countries; otherwise, the request fails with an `INVALID_PRODUCT` error. While all countries are enabled by default in Sandbox, in Production only the countries you have requested access for are shown. To request access to additional countries, [file a product access Support ticket](https://dashboard.plaid.com/support/new/product-and-development/product-troubleshooting/request-product-access) via the Plaid dashboard.
 
             If using a Link customization, make sure the country codes in the customization match those specified in `country_codes`, or the customization may not be applied.
 
@@ -29129,24 +29145,22 @@ components:
           type: boolean
           description: If `true`, allow users to manually enter Investments account and holdings information. Defaults to `false`.
     LinkTokenInvestmentsAuth:
-      description: Configuration parameters for the Investments Move product
+      description: Configuration parameters for the Investments Move product. Masked Number Match and Stated Account Number default to `true` when omitted. Manual Entry defaults to `false`.
       type: object
       properties:
         manual_entry_enabled:
           nullable: true
           default: false
           type: boolean
-          description: If `true`, show institutions that use the manual entry fallback flow.
+          description: If `true`, show institutions that use the manual entry fallback flow. If omitted, this defaults to `false`.
         masked_number_match_enabled:
           nullable: true
-          default: false
           type: boolean
-          description: If `true`, show institutions that use the masked number match fallback flow.
+          description: If `true`, show institutions that use the masked number match fallback flow. If omitted, this defaults to `true`.
         stated_account_number_enabled:
           nullable: true
-          default: false
           type: boolean
-          description: If `true`, show institutions that use the stated account number fallback flow.
+          description: If `true`, show institutions that use the stated account number fallback flow. If omitted, this defaults to `true`.
         rollover_401k_enabled:
           x-hidden-from-docs: true
           nullable: true
@@ -30466,14 +30480,18 @@ components:
         additionalProperties: true
         properties:
           name:
+            description: The name of the account, either assigned by the user or by the financial institution itself
             type: string
           official_name:
+            description: The official name of the account as given by the financial institution
             type: string
             nullable: true
           mask:
+            description: The last 2-4 alphanumeric characters of either the account's displayed mask or the account's official account number. Note that the mask may be non-unique between an Item's accounts.
             type: string
             nullable: true
           verification_name:
+            description: The account holder name that was used for micro-deposit and/or database verification. Only returned for Auth Items created via micro-deposit or database verification. This name was manually-entered by the user during Link, unless it was otherwise provided via the `user.legal_name` request field in `/link/token/create` for the Link session that created the Item.
             type: string
           balances:
             $ref: '#/components/schemas/InvestmentAccountBalance'
@@ -36320,6 +36338,11 @@ components:
       title: NewUserID
       type: string
       description: A unique user identifier, created by `/user/create`. Integrations that began using `/user/create` after December 10, 2025 use this field to identify a user instead of the `user_token`. For more details, see [New User APIs](https://plaid.com/docs/api/users/user-apis).
+    NewUserIDNullable:
+      title: NewUserIDNullable
+      type: string
+      nullable: true
+      description: A unique user identifier, created by `/user/create`. Integrations that began using `/user/create` after December 10, 2025 use this field to identify a user instead of the `user_token`. For more details, see [New User APIs](https://plaid.com/docs/api/users/user-apis).
     AuthDefaultUpdateWebhook:
       x-examples:
         example-1:
@@ -39681,7 +39704,7 @@ components:
     TransferAuthorizationUserInRequest:
       title: TransferAuthorizationUserInRequest
       type: object
-      description: The legal name and other information for the account holder.  If the account has multiple account holders, provide the information for the account holder on whose behalf the authorization is being requested. The `user.legal_name` field is required. Other fields are not currently used and are present to support planned future functionality.
+      description: The legal name and other information for the account holder.  If the account has multiple account holders, provide the information for the account holder on whose behalf the authorization is being requested. The `user.legal_name` field is required. Other fields are optional (for `rfp` transfers, `address` is required, including `street`, `city`, `region`, `postal_code`, and `country`), but if provided, they must be validly formatted and may be used in Plaid's risk evaluation.
       properties:
         legal_name:
           type: string
@@ -39705,7 +39728,7 @@ components:
         message_to_beneficiary:
           type: string
           nullable: true
-          description: Additional information from the wire originator to the beneficiary. Max 140 characters.
+          description: Additional information from the wire originator to the beneficiary. Max 140 characters; no single word may exceed 35 characters.
         wire_return_fee:
           type: string
           nullable: true
@@ -39866,7 +39889,7 @@ components:
 
         The following codes indicate that the authorization decision was `declined`:
 
-        `NSF` - Transaction has an elevated risk of resulting in a return due to insufficient funds.
+        `NSF` - Transaction has an elevated risk of resulting in a return due to insufficient funds, or, for credit transfers, your available balance (in your Plaid Ledger or prefunded account) is insufficient to cover the transfer.
 
         `RISK` - Transaction is high-risk.
 
@@ -40324,7 +40347,7 @@ components:
       description: |-
         The status of the sweep for the transfer.
 
-        `unswept`: The transfer hasn't been swept yet.
+        `unswept`: The transfer hasn't been swept yet. Transfers that are cancelled, fail, or are returned before being swept remain `unswept`.
 
         `swept`: The transfer was swept to the sweep account.
 
@@ -40332,7 +40355,7 @@ components:
 
         `return_swept`: The transfer was returned, funds were pulled back or pushed back to the sweep account.
 
-        `null`: The transfer will never be swept (e.g. if the transfer is cancelled or returned before being swept)
+        `null`: The transfer will never be swept because it is a credit funded from a prefunded balance.
       enum:
       - null
       - unswept
@@ -40502,6 +40525,12 @@ components:
           $ref: '#/components/schemas/TransferWireDetails'
         user:
           $ref: '#/components/schemas/TransferAuthorizationUserInRequest'
+        user_id:
+          allOf:
+          - $ref: '#/components/schemas/NewUserIDNullable'
+          description: The Plaid-generated user ID returned by `/user/create` for the end user associated with this transfer's Item. This identifier is separate from the account-holder details in `user`. Omit or set to `null` if unavailable; otherwise, provide a non-empty string. During the initial rollout, this field does not affect authorization decisions.
+          x-hidden-from-docs: true
+          example: usr_9nSp2KuZ2x4JDw
         device:
           $ref: '#/components/schemas/TransferAuthorizationDevice'
         origination_account_id:
@@ -41804,7 +41833,7 @@ components:
         transfer_amount:
           title: TransferAmount
           type: string
-          description: The amount of the transfer (decimal string with two digits of precision e.g. "10.00"). This field is omitted for Plaid Ledger Sweep events.
+          description: The amount of the transfer (decimal string with two digits of precision e.g. "10.00"). For refund events and `funds_available` events, this is the amount associated with the event, such as the refund amount, rather than the original transfer amount. This field is omitted for Plaid Ledger Sweep events.
         failure_reason:
           $ref: '#/components/schemas/TransferFailure'
         sweep_id:
@@ -44505,14 +44534,18 @@ components:
         additionalProperties: true
         properties:
           name:
+            description: The name of the account, either assigned by the user or by the financial institution itself
             type: string
           official_name:
+            description: The official name of the account as given by the financial institution
             type: string
             nullable: true
           mask:
+            description: The last 2-4 alphanumeric characters of either the account's displayed mask or the account's official account number. Note that the mask may be non-unique between an Item's accounts.
             type: string
             nullable: true
           verification_name:
+            description: The account holder name that was used for micro-deposit and/or database verification. Only returned for Auth Items created via micro-deposit or database verification. This name was manually-entered by the user during Link, unless it was otherwise provided via the `user.legal_name` request field in `/link/token/create` for the Link session that created the Item.
             type: string
           owners:
             type: array
@@ -44530,14 +44563,18 @@ components:
         additionalProperties: true
         properties:
           name:
+            description: The name of the account, either assigned by the user or by the financial institution itself
             type: string
           official_name:
+            description: The official name of the account as given by the financial institution
             type: string
             nullable: true
           mask:
+            description: The last 2-4 alphanumeric characters of either the account's displayed mask or the account's official account number. Note that the mask may be non-unique between an Item's accounts.
             type: string
             nullable: true
           verification_name:
+            description: The account holder name that was used for micro-deposit and/or database verification. Only returned for Auth Items created via micro-deposit or database verification. This name was manually-entered by the user during Link, unless it was otherwise provided via the `user.legal_name` request field in `/link/token/create` for the Link session that created the Item.
             type: string
           legal_name:
             $ref: '#/components/schemas/NameMatchScore'
@@ -53457,7 +53494,7 @@ components:
     PartnerEndCustomerProductStatuses:
       description: Mapping of product names to their current status.
       type: object
-      additionalProperties: true
+      additionalProperties: {}
     PartnerEndCustomerRequirementsDue:
       description: A list of fields that are still required to be submitted.
       type: array
@@ -63334,6 +63371,22 @@ components:
           nullable: true
           description: Whether the Social Security Administration reported the person as deceased. Null when the status is unavailable.
           example: false
+        name_match:
+          allOf:
+          - $ref: '#/components/schemas/KYCCheckSSAMatchStatus'
+          description: Whether the person's name matches SSA records. `no_data` indicates that this field result is unavailable.
+        date_of_birth_match:
+          allOf:
+          - $ref: '#/components/schemas/KYCCheckSSAMatchStatus'
+          description: Whether the person's date of birth matches SSA records. `no_data` indicates that this field result is unavailable.
+        ssn_match:
+          allOf:
+          - $ref: '#/components/schemas/KYCCheckSSAMatchStatus'
+          description: Whether the person's Social Security number matches SSA records. `no_data` indicates that this field result is unavailable.
+        other_match:
+          allOf:
+          - $ref: '#/components/schemas/KYCCheckSSAMatchStatus'
+          description: The match result when SSA does not disclose individual field results. `no_data` indicates that this field result is unavailable.
       required:
       - match
       - is_deceased
@@ -67828,7 +67881,7 @@ components:
       title: IncomeInsightsVersion
       type: string
       nullable: true
-      description: The version of Income Insights to use. This value is not shared across API calls for the same resource. If it is omitted from a request, the default version is used, even if a version was set in an earlier call such as `/link/token/create` or `/cra/check_report/create`.
+      description: The version of Income Insights to use. Set this to `II2`. The value applies only to the request it is sent with; a version set in an earlier call, such as `/link/token/create` or `/cra/check_report/create`, is not reused.
       enum:
       - II2
     CraCheckReportCashflowInsightsGetResponse:
@@ -75409,7 +75462,7 @@ components:
     SignalUser:
       title: SignalUser
       type: object
-      description: Details about the end user initiating the transaction (i.e., the account holder). These fields are optional, but strongly recommended to increase the accuracy of results when using Signal Transaction Scores. When using a Balance-only ruleset, if the Signal Addendum has been signed, these fields are ignored; if the Addendum has not been signed, using these fields will result in an error.
+      description: Details about the end user initiating the transaction (i.e., the account holder). These fields are optional, but strongly recommended to increase the accuracy of results when using Signal Transaction Scores. When using a Balance-only ruleset, these fields are ignored.
       properties:
         name:
           $ref: '#/components/schemas/SignalPersonName'
@@ -75481,7 +75534,7 @@ components:
     SignalDevice:
       title: SignalEvaluateDevice
       type: object
-      description: Details about the end user's device. These fields are optional, but strongly recommended to increase the accuracy of results when using Signal Transaction Scores. When using a Balance-only Ruleset, these fields are ignored if the Signal Addendum has been signed; if it has not been signed, using these fields will result in an error.
+      description: Details about the end user's device. These fields are optional, but strongly recommended to increase the accuracy of results when using Signal Transaction Scores. When using a Balance-only ruleset, these fields are ignored.
       properties:
         ip_address:
           type: string
@@ -76256,7 +76309,7 @@ components:
       type: object
       description: |-
         Request object for `/protect/report/create`.
-        You must provide either `user_id`, or an `incident_event` with at least one supported identifier: `link_session_id`, `idv_session_id`, `protect_event_id`, `signal_client_transaction_id`, or `access_token`. Context fields such as `internal_reference`, `time`, `amount`, and `bank_account` do not satisfy this identifier requirement.
+        You must provide either `user_id`, `client_user_id`, or an `incident_event` with at least one supported identifier: `link_session_id`, `idv_session_id`, `protect_event_id`, `signal_client_transaction_id`, or `access_token`. Context fields such as `internal_reference`, `time`, `amount`, and `bank_account` do not satisfy this identifier requirement.
       properties:
         client_id:
           $ref: '#/components/schemas/APIClientID'
@@ -76264,7 +76317,13 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_id:
           type: string
-          description: The Plaid User ID associated with the report.
+          nullable: true
+          description: The Plaid User ID associated with the report. This or `client_user_id` can be provided, not both.
+        client_user_id:
+          type: string
+          nullable: true
+          maxLength: 128
+          description: A unique ID representing the end user. Maximum of 128 characters. Typically this will be a user ID number from your application. Personally identifiable information, such as an email address or phone number, should not be used in the `client_user_id`. This or `user_id` can be provided, not both. If a Plaid User does not already exist for this `client_user_id` within your client account, one will be created.
         incident_event:
           $ref: '#/components/schemas/ProtectIncidentEvent'
         report_confidence:
@@ -76704,7 +76763,7 @@ components:
     FraudAttributes:
       type: object
       nullable: true
-      additionalProperties: true
+      additionalProperties: {}
       description: Event fraud attributes as an arbitrary set of key-value pairs. The set of attributes returned varies by model.
     ProtectIncidentEvent:
       nullable: true

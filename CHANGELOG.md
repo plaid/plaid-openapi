@@ -1,3 +1,39 @@
+### 2020-09-14_1.782.2
+
+- Clarify Investments Move fallback defaults. Masked Number Match and Stated Account Number default to `true` when omitted, while Manual Entry defaults to `false`. Earlier Ruby and Java client library releases may serialize omitted Masked Number Match and Stated Account Number fields as `false`; upgrade to the next release generated from this specification or set these fields explicitly to guarantee a specific behavior.
+
+### 2020-09-14_1.782.1
+
+- Allow `/link/token/get` to be called with an OAuth2 access token that carries the new `link:read` scope, including a delegated access token. A delegated caller receives a delegate-specific view of the session that omits the customer's public token, user ID, Link configuration, events, and accounts. The existing `client_id` and `secret` authentication continues to work.
+
+### 2020-09-14_1.782.0
+
+- Add optional, nullable `client_user_id` support to `/protect/report/create`. It is mutually exclusive with a nonempty `user_id`.
+- [Breaking for Go] Mark `/protect/report/create`'s optional `user_id` nullable so null and omission have the same meaning. Use the generated setter instead of assigning the field directly.
+
+### 2020-09-14_1.781.0
+
+- Add optional `user_id` to `/transfer/authorization/create` to identify the Plaid user associated with the transfer's Item. The field is hidden from public documentation until it is generally available.
+
+### 2020-09-14_1.780.0
+
+- [Breaking for Go] Preserve arbitrary JSON value types in the Protect `fraud_attributes` maps, the `/protect/compute` `attributes` map, and the partner end customer `product_statuses` map in generated client libraries.
+
+### 2020-09-14_1.779.0
+
+- Add granular SSA name, date of birth, SSN, and other match results to `kyc_check.id_number.ssa_verification` in Identity Verification responses.
+
+### 2020-09-14_1.778.2
+
+- Add `stripe` to the `processor` enum on `/processor/token/create` for the Stripe processor-token integration. The Stripe bank-account-token endpoint remains available.
+
+### 2020-09-14_1.778.1
+
+- Correct descriptions that disagreed with API behavior: `/link/token/create` returns `INVALID_PRODUCT` when a product isn't enabled in every listed country; `/transfer/authorization/create` requires a complete `user.address` for `rfp` transfers and limits each word of `wire_details.message_to_beneficiary` to 35 characters; the `NSF` decision rationale also covers insufficient Plaid Ledger or prefunded balances; `sweep_status` is `null` only for credits funded from a prefunded balance, and transfers cancelled, failed, or returned before sweeping stay `unswept`; on refund and `funds_available` events, `transfer_amount` is the event amount rather than the original transfer amount; `/identity/match` doesn't fail on invalid phone numbers; Signal no longer returns an Addendum error for `user` and `device` fields; and the `total_investment_transactions` array name.
+- Link `/user/products/terminate` to the subscription fee billing docs for when billing ends.
+- Add the missing descriptions for `name`, `official_name`, `mask`, and `verification_name` on the account objects returned by Identity, Identity Match, and Investments endpoints.
+- Correct the `income_insights_version` description: set it to `II2`; a version set in an earlier call is not reused.
+
 ### 2020-09-14_1.778.0
 
 - [Breaking] Correct Asset Report investment data to match API behavior: remove `cost_basis` from holdings, and move `vested_quantity` and `vested_value` from investment transactions to holdings as nullable fields.
