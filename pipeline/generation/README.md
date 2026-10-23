@@ -2,7 +2,27 @@
 
 An approved merge to `plaid/plaid-openapi` drives the Go release: generate both clients, validate them, attest the exact output, open a ready SDK PR, integrate it after automated checks, then attest and publish its signed version tag. Compatible updates within v49 need no separate human SDK approval or merge.
 
-The spec and Fern configuration live together in this public repository. Each run uses `GITHUB_SHA` for both inputs. Push, scheduled catch-up and manual generation run only from the original public repository's `master`; pull-request, fork and repository-dispatch contexts cannot generate or publish. Manual runs can choose a reviewed version override, but cannot choose another spec commit or URL.
+The spec and Fern configuration live together in this public repository. Each production run uses `GITHUB_SHA` for both inputs. Push, scheduled catch-up and manual production generation run only from the original public repository's `master`; pull-request, fork and repository-dispatch contexts cannot enter that pipeline. Manual runs can choose a reviewed version override, but cannot choose another spec commit or URL.
+
+## Pre-merge hosted rehearsal
+
+`sdk-rehearsal.yml` runs on same-repository PRs changing that workflow or
+`pipeline/rehearsal/`. It checks out the exact PR head and the SDK commit pinned
+in `pipeline/rehearsal/run.py`, so neither automation PR needs to merge first.
+It calls the production generation, legacy, build, mock-test and compatibility
+functions on a standard GitHub runner. Its candidate version is only a local
+test value; no tag is created or reserved.
+
+This separate workflow has only Contents read permission, no secrets, no signing
+job and no publishing steps. Checkout credentials are not persisted. Its public
+artifacts are an unsigned SDK archive, API comparison and rehearsal report with
+phase timings and sampled whole-runner memory availability. It does not emit the
+manifest or signed bundle required by the publishing workflow. Raw logs and
+temporary work directories are not uploaded. Memory sampling can miss short peaks.
+
+This checks generation correctness and runner capacity, not real signing,
+App permissions, protected-branch integration, tag publication or notifications.
+Those remain activation checks after review and access setup.
 
 ## Generation and publication boundaries
 
