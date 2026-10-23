@@ -1,43 +1,62 @@
-name: Check SDK generation controls
+name: Rehearse GitHub attestation without an SDK release
 
 on:
-  pull_request:
-    paths:
-      - pipeline/**
-      - fern/**
-      - 2020-09-14.yml
-      - .github/**
-  push:
-    branches: [master]
-    paths:
-      - pipeline/**
-      - fern/**
-      - 2020-09-14.yml
-      - .github/**
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  policy:
-    if: github.repository == 'plaid/plaid-openapi' && github.event.repository.private == false && github.event.repository.fork == false
+  attest-rehearsal:
+    if: >-
+      github.repository == 'plaid/plaid-openapi' &&
+      github.ref == 'refs/heads/anguyen-sdk-attestation-rehearsal' &&
+      github.event.repository.private == false && github.event.repository.fork == false
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
+          ref: ${{ github.sha }}
           persist-credentials: false
-      - uses: actions/setup-go@7b8cf10d4e4a01d4992d18a89f4d7dc5a3e6d6f4 # v4
+      - name: Prepare a harmless non-SDK subject
+        id: subject
+        run: |
+          mkdir "$RUNNER_TEMP/attestation-rehearsal"
+          printf 'Non-release SDK automation attestation rehearsal.\n' > "$RUNNER_TEMP/attestation-rehearsal/subject.txt"
+          printf '{"rehearsal":true,"sdk_release":false}\n' > "$RUNNER_TEMP/attestation-rehearsal/predicate.json"
+          digest=$(sha256sum "$RUNNER_TEMP/attestation-rehearsal/subject.txt" | cut -d ' ' -f 1)
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
+      - name: Sign only the rehearsal subject
+        id: attest
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6
         with:
-          go-version: '1.26.9'
-          cache: false
-      - name: Install the pinned public legacy spec parser
+          create-storage-record: false
+          subject-name: plaid-sdk-attestation-rehearsal
+          subject-digest: sha256:${{ steps.subject.outputs.digest }}
+          predicate-type: https://plaid.com/attestations/sdk-rehearsal/v1
+          predicate-path: ${{ runner.temp }}/attestation-rehearsal/predicate.json
+      - name: Verify the real signature and reject tampered identities and content
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BUNDLE: ${{ steps.attest.outputs.bundle-path }}
         run: |
-          python3 -m venv "$RUNNER_TEMP/sdk-python"
-          "$RUNNER_TEMP/sdk-python/bin/python" -m pip install --require-hashes -r pipeline/legacy/requirements.txt
-          echo "$RUNNER_TEMP/sdk-python/bin" >> "$GITHUB_PATH"
-      - name: Validate generation policy and public legacy inputs
-        run: |
-          python3 -B -m unittest discover -s pipeline/generation -p 'test_*.py' -v
-          python3 -B -m unittest discover -s pipeline/legacy -p 'test_*.py' -v
-          go test pipeline/generation/harden_internal_tests.go pipeline/generation/harden_internal_tests_test.go
+          cp "$BUNDLE" "$RUNNER_TEMP/attestation-rehearsal/bundle.json"
+          python3 -B pipeline/rehearsal/verify_attestation_probe.py --directory "$RUNNER_TEMP/attestation-rehearsal"
+      - name: Save the public rehearsal evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: sdk-attestation-rehearsal-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/attestation-rehearsal/subject.txt
+            ${{ runner.temp }}/attestation-rehearsal/predicate.json
+            ${{ runner.temp }}/attestation-rehearsal/bundle.json
+            ${{ runner.temp }}/attestation-rehearsal/result.json
+            ${{ runner.temp }}/attestation-rehearsal/verified.json
+          if-no-files-found: error
+          retention-days: 14
