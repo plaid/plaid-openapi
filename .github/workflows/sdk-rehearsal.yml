@@ -1,0 +1,51 @@
+name: Rehearse Go generation without publishing
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/sdk-rehearsal.yml
+      - pipeline/rehearsal/**
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sdk-rehearsal-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  rehearse:
+    if: >-
+      github.repository == 'plaid/plaid-openapi' &&
+      github.event.repository.private == false && github.event.repository.fork == false &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@7b8cf10d4e4a01d4992d18a89f4d7dc5a3e6d6f4 # v4
+        with:
+          go-version: '1.26.9'
+          cache: false
+      - name: Install the pinned public spec parser
+        run: |
+          python3 -m venv "$RUNNER_TEMP/sdk-python"
+          "$RUNNER_TEMP/sdk-python/bin/python" -m pip install --require-hashes -r pipeline/legacy/requirements.txt
+          echo "$RUNNER_TEMP/sdk-python/bin" >> "$GITHUB_PATH"
+      - name: Generate and test without publishing credentials
+        run: python3 -B pipeline/rehearsal/run.py --output "$RUNNER_TEMP/sdk-rehearsal"
+      - name: Save unsigned rehearsal evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: unsigned-go-rehearsal-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/sdk-rehearsal/rehearsal.json
+            ${{ runner.temp }}/sdk-rehearsal/unsigned-sdk.tar.gz
+            ${{ runner.temp }}/sdk-rehearsal/api-diff.txt
+          retention-days: 7
+          if-no-files-found: error

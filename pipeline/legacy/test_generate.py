@@ -126,6 +126,10 @@ class PreparationTests(unittest.TestCase):
             def fake_run(args, cwd=None):
                 if args[0] != 'docker':
                     return
+                # Root-owned bind-mount output cannot be removed by a Linux runner.
+                self.assertIn('--user', args)
+                self.assertEqual(args[args.index('--user') + 1],
+                                 f'{generator.os.getuid()}:{generator.os.getgid()}')
                 mount = next(arg for arg in args if arg.endswith(':/output'))
                 output = Path(mount[:-len(':/output')])
                 for name in ('api_plaid.go', 'client.go', 'configuration.go', 'response.go', 'utils.go', 'model_choice.go'):

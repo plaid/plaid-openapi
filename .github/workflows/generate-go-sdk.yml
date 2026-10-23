@@ -1,0 +1,200 @@
+name: Generate Go SDK from approved inputs
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - fern/**
+      - 2020-09-14.yml
+      - pipeline/**
+      - .github/workflows/**
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Reviewed MAJOR.MINOR.PATCH override; empty proposes next minor
+        type: string
+      rehearsal:
+        description: Generate and test only; no attestation or public PR
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: go-sdk-generation
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    if: >-
+      github.repository == 'plaid/plaid-openapi' &&
+      github.event.repository.private == false && github.event.repository.fork == false &&
+      github.ref == 'refs/heads/master' &&
+      (vars.SDK_PIPELINE_ENABLED == 'true' ||
+       (github.event_name == 'workflow_dispatch' && inputs.rehearsal))
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    outputs:
+      status: ${{ steps.generate.outputs.status }}
+      digest: ${{ steps.generate.outputs.digest }}
+      subject: ${{ steps.generate.outputs.subject }}
+      rehearsal: ${{ steps.generate.outputs.rehearsal }}
+    steps:
+      - name: Require a failure notification owner
+        env:
+          SDK_FAILURE_ASSIGNEE: ${{ vars.SDK_FAILURE_ASSIGNEE }}
+        run: '[[ "$SDK_FAILURE_ASSIGNEE" =~ ^[A-Za-z0-9][A-Za-z0-9-]{0,38}$ ]]'
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@7b8cf10d4e4a01d4992d18a89f4d7dc5a3e6d6f4 # v4
+        with:
+          go-version: '1.26.9'
+          cache: false
+      - name: Install the pinned public legacy spec parser
+        run: |
+          python3 -m venv "$RUNNER_TEMP/sdk-python"
+          "$RUNNER_TEMP/sdk-python/bin/python" -m pip install --require-hashes -r pipeline/legacy/requirements.txt
+          echo "$RUNNER_TEMP/sdk-python/bin" >> "$GITHUB_PATH"
+      - name: Generate both clients and validate the exact content
+        id: generate
+        env:
+          SDK_PIPELINE_ENABLED: ${{ vars.SDK_PIPELINE_ENABLED }}
+          OUTPUT: ${{ runner.temp }}/sdk-generation
+        run: |
+          python3 -B pipeline/generation/generate.py --output "$OUTPUT"
+          python3 -B - <<'PY'
+          import json, os
+          from pathlib import Path
+          value = json.loads((Path(os.environ['OUTPUT']) / 'result.json').read_text())
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('status=' + value['status'] + '\n')
+              output.write('digest=' + value.get('content_sha256', '') + '\n')
+              output.write('subject=' + value.get('subject_name', '') + '\n')
+              output.write('rehearsal=' + str(value.get('rehearsal', False)).lower() + '\n')
+          PY
+      - name: Upload only the public candidate and release records
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: go-generation-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/sdk-generation/sdk.tar.gz
+            ${{ runner.temp }}/sdk-generation/content.json
+            ${{ runner.temp }}/sdk-generation/manifest.json
+            ${{ runner.temp }}/sdk-generation/plan.json
+            ${{ runner.temp }}/sdk-generation/result.json
+            ${{ runner.temp }}/sdk-generation/api-diff.txt
+          retention-days: 14
+          if-no-files-found: error
+
+  attest-generation:
+    needs: generate
+    if: >-
+      needs.generate.outputs.status == 'generated' &&
+      needs.generate.outputs.rehearsal == 'false' &&
+      (github.event_name != 'workflow_dispatch' || inputs.rehearsal == false) &&
+      github.repository == 'plaid/plaid-openapi' &&
+      github.event.repository.private == false && github.event.repository.fork == false &&
+      github.ref == 'refs/heads/master' && vars.SDK_PIPELINE_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: go-generation-${{ github.run_id }}
+          path: ${{ runner.temp }}/generation
+      - name: Check artifact content before signing
+        env:
+          ARTIFACT: ${{ runner.temp }}/generation
+        run: python3 -B pipeline/generation/publish_pr.py --artifact "$ARTIFACT" --unsigned
+      - name: Attest exact SDK content and input manifest
+        id: attest
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          create-storage-record: false
+          subject-name: ${{ needs.generate.outputs.subject }}
+          subject-digest: sha256:${{ needs.generate.outputs.digest }}
+          predicate-type: https://plaid.com/attestations/sdk-generation/v1
+          predicate-path: ${{ runner.temp }}/generation/manifest.json
+      - name: Verify the real signed bundle
+        env:
+          ARTIFACT: ${{ runner.temp }}/generation
+          BUNDLE_PATH: ${{ steps.attest.outputs.bundle-path }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp "$BUNDLE_PATH" "$ARTIFACT/generation.bundle.json"
+          python3 -B pipeline/generation/publish_pr.py --artifact "$ARTIFACT"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: go-generation-signed-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/generation/sdk.tar.gz
+            ${{ runner.temp }}/generation/content.json
+            ${{ runner.temp }}/generation/manifest.json
+            ${{ runner.temp }}/generation/plan.json
+            ${{ runner.temp }}/generation/result.json
+            ${{ runner.temp }}/generation/generation.bundle.json
+          retention-days: 14
+          if-no-files-found: error
+
+  open-sdk-pr:
+    needs: [generate, attest-generation]
+    if: >-
+      needs.generate.outputs.rehearsal == 'false' &&
+      (github.event_name != 'workflow_dispatch' || inputs.rehearsal == false) &&
+      github.repository == 'plaid/plaid-openapi' &&
+      github.event.repository.private == false && github.event.repository.fork == false &&
+      github.ref == 'refs/heads/master' && vars.SDK_PIPELINE_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: sdk-pr-publishing
+    permissions:
+      contents: read
+      actions: read
+      attestations: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: go-generation-signed-${{ github.run_id }}
+          path: ${{ runner.temp }}/generation
+      - name: Reverify before obtaining the publishing credential
+        env:
+          ARTIFACT: ${{ runner.temp }}/generation
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -B pipeline/generation/publish_pr.py --artifact "$ARTIFACT"
+      - name: Obtain repository-scoped PR credential
+        id: app
+        uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2
+        with:
+          app-id: ${{ vars.SDK_PR_APP_ID }}
+          private-key: ${{ secrets.SDK_PR_APP_PRIVATE_KEY }}
+          owner: plaid
+          repositories: plaid-go
+          permission-contents: write
+          permission-pull-requests: write
+      - name: Open the SDK PR for automatic integration
+        env:
+          ARTIFACT: ${{ runner.temp }}/generation
+          SDK_PIPELINE_ENABLED: ${{ vars.SDK_PIPELINE_ENABLED }}
+          SDK_PR_TOKEN: ${{ steps.app.outputs.token }}
+          SDK_PR_APP_BOT_ID: ${{ vars.SDK_PR_APP_BOT_ID }}
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -B pipeline/generation/publish_pr.py --artifact "$ARTIFACT" --publish
