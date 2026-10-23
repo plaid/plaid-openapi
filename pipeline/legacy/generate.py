@@ -200,7 +200,10 @@ def generate(spec_path, sdk, module, manifest):
         output.mkdir()
         (inputs / 'spec.json').write_text(json.dumps(prepared))
         shutil.copytree(HERE / 'templates', inputs / 'templates')
-        run(['docker', 'run', '--rm', '--network=none', '-v', f'{inputs}:/input:ro', '-v', f'{output}:/output', IMAGE,
+        # Linux bind mounts retain container ownership; keep generated files
+        # writable/removable by the runner through installation and cleanup.
+        run(['docker', 'run', '--rm', '--network=none', '--user', f'{os.getuid()}:{os.getgid()}',
+             '-v', f'{inputs}:/input:ro', '-v', f'{output}:/output', IMAGE,
              'generate', '-i', '/input/spec.json', '-g', 'go', '-t', '/input/templates', '-o', '/output',
              '--additional-properties=packageName=plaid,enumClassPrefix=true,packageVersion=' + PACKAGE_VERSION + ',plaidApiVersion=2020-09-14',
              '--global-property=apiTests=false,modelTests=false,apiDocs=false,modelDocs=false'])
