@@ -17,9 +17,13 @@ pins in `pipeline/generation/settings.json`. The public module is
 `v`. Preserve the `Plaid-Version` header and disabled automatic retries when
 updating configuration, unless a behavior change is explicitly reviewed.
 
-When adding an operation to the spec, update its sub-client/method naming and
-pagination where needed. The overlay strips legacy request-body credentials
-because the new client supplies them through client options. Never put real
+When adding an operation to the spec, run
+`python3 pipeline/generation/overlay_coverage.py --fix` from the repository root
+(with `pipeline/legacy/requirements.txt` installed). It adds the credential
+removals and a suggested sub-client/method name; review the suggested name,
+because it becomes a public method, and add pagination where needed. The overlay
+strips legacy request-body credentials because the new client supplies them
+through client options. Never put real
 credentials, private endpoints, or unpublished API definitions in these files.
 
 Configuration changes alone do not authorize a release. Publication stays off
