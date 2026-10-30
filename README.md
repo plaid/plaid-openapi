@@ -6,6 +6,31 @@
 
 Plaid uses the `OpenAPI 3.0.0` specification to schematize our [docs](https://plaid.com/docs) and to generate our supported client libraries. This provides for a consistent typing experience across our external interfaces. Below we have listed some examples and issues we have found when iterating on the specification.
 
+## Exact-discriminator `oneOf` support across the five SDKs
+
+A named top-level component `oneOf` must use bare local branch references, an explicit
+one-to-one `discriminator.mapping`, and a required singleton discriminator enum on each
+direct object branch. Branches may be open or closed; `additionalProperties` controls model
+evolution independently of discriminator dispatch. Other named top-level `oneOf` shapes fail
+processing. Keep response branches and their nested objects open for additive compatibility;
+server-side request strictness is configured separately.
+
+| Language | Construct emitted | What you hold after decode |
+|---|---|---|
+| Go | `struct` wrapper | the wrapper — inspect its typed branch field or call `GetActualInstance()` |
+| Java | `interface` | the branch — `instanceof` |
+| Python | `class(ModelComposed)` | the branch — `isinstance` |
+| Ruby | `module` | the branch — `is_a?` |
+| Node | type alias | the branch — narrow on the discriminator |
+
+Go, Java, Python, and Ruby dispatch at runtime and reject missing or unknown discriminator
+values. Node provides compile-time narrowing only; axios returns parsed JSON without runtime
+discriminator validation.
+
+Go is the only SDK that returns a wrapper. Its `<Branch>As<Union>(...)` helpers construct
+request wrappers; they are not decode accessors. Python also enforces required fields during
+deserialization while Go leaves missing fields at their zero values.
+
 ## Using the OpenAPI generator
 
 You can find examples on the official [OpenApiGenerator docs](https://github.com/OpenAPITools/openapi-generator#3---usage).
