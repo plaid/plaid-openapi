@@ -34,6 +34,20 @@ def fixture(method="post"):
     return spec, overlay
 
 
+def yaml_text(overlay):
+    lines = ["overlay: 1.0.0", "actions:"]
+    for action in overlay["actions"]:
+        lines.append(f"  - target: {action['target']}")
+        if action.get("remove"):
+            lines.append("    remove: true")
+        else:
+            lines.append("    update:")
+            lines.append("      x-fern-sdk-group-name:")
+            lines.extend(f"        - {group}" for group in action["update"]["x-fern-sdk-group-name"])
+            lines.append(f"      x-fern-sdk-method-name: {action['update']['x-fern-sdk-method-name']}")
+    return "\n".join(lines) + "\n"
+
+
 class CoverageTests(unittest.TestCase):
     def test_current_public_spec_and_overlay(self):
         root = Path(__file__).resolve().parents[2]
@@ -98,6 +112,37 @@ class CoverageTests(unittest.TestCase):
         spec, overlay = fixture()
         spec["paths"]["/accounts/get"]["post"]["requestBody"]["$ref"] = "other.yml#/Input"
         with self.assertRaisesRegex(PipelineError, "within the public spec"):
+            coverage.check(spec, overlay)
+
+    def test_fix_adds_suggested_names_and_credential_removals(self):
+        spec, overlay = fixture()
+        spec["paths"]["/accounts/balance/get"] = {"post": {"requestBody": {"content": {"application/json": {
+            "schema": {"$ref": "#/components/schemas/Balance"}}}}}}
+        spec["paths"]["/accounts/inline/get"] = {"post": {"requestBody": {"content": {"application/json": {
+            "schema": {"properties": {"secret": {"type": "string"}, "account_id": {"type": "string"}}}}}}}}
+        spec["components"]["schemas"]["Balance"] = {"properties": {"client_id": {"type": "string"},
+                                                                   "secret": {"type": "string"}}}
+        text, suggested = coverage.fix(json.dumps(spec).encode(), yaml_text(overlay))
+        self.assertEqual(suggested, ["POST /accounts/balance/get: accounts.getBalance",
+                                     "POST /accounts/inline/get: accounts.getInline"])
+        fixed = coverage.load(text.encode())
+        self.assertEqual(coverage.check(spec, fixed), 3)
+        self.assertTrue(text.startswith(yaml_text(overlay).split("  - target:")[0]))
+        self.assertIn("$.paths['/accounts/inline/get'].post.requestBody.content['application/json']"
+                      ".schema.properties.secret", text)
+        self.assertEqual(coverage.fix(json.dumps(spec).encode(), text), (text, []))
+
+    def test_fix_leaves_unfixable_shapes_for_review(self):
+        spec, overlay = fixture()
+        spec["paths"]["/accounts/get"]["post"]["requestBody"] = {"content": {"multipart/form-data": {"schema": {
+            "allOf": [{"properties": {"secret": {"type": "string"}}}]}}}}
+        with self.assertRaisesRegex(PipelineError, "added by hand:\nPOST /accounts/get .*secret"):
+            coverage.fix(json.dumps(spec).encode(), yaml_text(overlay))
+
+    def test_failure_names_the_fix_command(self):
+        spec, overlay = fixture()
+        spec["paths"]["/accounts/new"] = deepcopy(spec["paths"]["/accounts/get"])
+        with self.assertRaisesRegex(PipelineError, "overlay_coverage.py --fix"):
             coverage.check(spec, overlay)
 
     def test_duplicate_yaml_key_rejected(self):
