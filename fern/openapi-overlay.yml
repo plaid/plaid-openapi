@@ -1665,6 +1665,11 @@ actions:
       x-fern-sdk-group-name:
         - user
       x-fern-sdk-method-name: refreshTransactions
+  - target: $.paths['/user/transfer/limits/get'].post
+    update:
+      x-fern-sdk-group-name:
+        - user
+      x-fern-sdk-method-name: getTransferLimits
   - target: $.paths['/user/update'].post
     update:
       x-fern-sdk-group-name:
@@ -3397,6 +3402,10 @@ actions:
   - target: $.components.schemas.UserTransactionsRefreshRequest.properties.client_id
     remove: true
   - target: $.components.schemas.UserTransactionsRefreshRequest.properties.secret
+    remove: true
+  - target: $.components.schemas.UserTransferLimitsGetRequest.properties.client_id
+    remove: true
+  - target: $.components.schemas.UserTransferLimitsGetRequest.properties.secret
     remove: true
   - target: $.components.schemas.UserUpdateRequest.properties.client_id
     remove: true
