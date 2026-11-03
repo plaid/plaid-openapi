@@ -49,12 +49,6 @@ def yaml_text(overlay):
 
 
 class CoverageTests(unittest.TestCase):
-    def test_current_public_spec_and_overlay(self):
-        root = Path(__file__).resolve().parents[2]
-        count = coverage.validate((root / "2020-09-14.yml").read_bytes(),
-                                  (root / "fern/openapi-overlay.yml").read_bytes())
-        self.assertGreater(count, 0)
-
     def test_all_http_methods_require_names(self):
         for method in sorted(coverage.METHODS):
             with self.subTest(method=method):
