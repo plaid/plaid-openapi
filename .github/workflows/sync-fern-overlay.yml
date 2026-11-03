@@ -1,0 +1,54 @@
+name: Sync Fern overlay with the spec
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 2020-09-14.yml
+      - fern/openapi-overlay.yml
+      - pipeline/generation/overlay_coverage.py
+      - pipeline/generation/sync_overlay.py
+      - .github/workflows/sync-fern-overlay.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fern-overlay-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: >-
+      github.repository == 'plaid/plaid-openapi' &&
+      github.event.repository.private == false && github.event.repository.fork == false &&
+      github.ref == 'refs/heads/master' && vars.SDK_PIPELINE_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: sdk-pr-publishing
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Install the pinned public legacy spec parser
+        run: |
+          python3 -m venv "$RUNNER_TEMP/sdk-python"
+          "$RUNNER_TEMP/sdk-python/bin/python" -m pip install --require-hashes -r pipeline/legacy/requirements.txt
+          echo "$RUNNER_TEMP/sdk-python/bin" >> "$GITHUB_PATH"
+      - name: Obtain repository-scoped PR credential
+        id: app
+        uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2
+        with:
+          app-id: ${{ vars.SDK_PR_APP_ID }}
+          private-key: ${{ secrets.SDK_PR_APP_PRIVATE_KEY }}
+          owner: plaid
+          repositories: plaid-openapi
+          permission-contents: write
+          permission-pull-requests: write
+      - name: Open or refresh the overlay sync PR
+        env:
+          OVERLAY_SYNC_TOKEN: ${{ steps.app.outputs.token }}
+          SDK_PR_APP_BOT_ID: ${{ vars.SDK_PR_APP_BOT_ID }}
+        run: python3 -B pipeline/generation/sync_overlay.py
