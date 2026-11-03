@@ -22,7 +22,9 @@ pins in `pipeline/generation/settings.json`. The public module is
 `v`. Preserve the `Plaid-Version` header and disabled automatic retries when
 updating configuration, unless a behavior change is explicitly reviewed.
 
-When adding an operation to the spec, run
+When a spec change reaches master, the `Sync Fern overlay with the spec` workflow
+runs the command below and opens one `fern-overlay-sync` PR with the result. To
+run it yourself, use
 `python3 pipeline/generation/overlay_coverage.py --fix` from the repository root
 (with `pipeline/legacy/requirements.txt` installed). It adds the credential
 removals and a suggested sub-client/method name; review the suggested name,
