@@ -15,7 +15,7 @@ import yaml
 SOURCE_COMMIT = "7c6ddb9f8e1b2bc59f9761b2aa3878a9452779ff"
 GENERATOR_DIGEST = "sha256:74d276d0a094327f3f833d6bc25fa1165cef33ce5204f05496c317314717e892"
 IMAGE = "openapitools/openapi-generator-cli@" + GENERATOR_DIGEST
-# This identifies the preserved legacy client, independently of the v49 root module.
+# This identifies the preserved legacy client, independently of the root module major version.
 PACKAGE_VERSION = "48.0.0"
 HERE = Path(__file__).resolve().parent
 
@@ -177,11 +177,12 @@ def generate(spec_path, sdk, module, manifest):
         raise ValueError('spec file and existing SDK module are required')
     if sdk == manifest or sdk in manifest.parents or not manifest.parent.is_dir() or manifest.exists():
         raise ValueError('manifest must be a new file outside SDK, in an existing directory')
-    if module != 'github.com/plaid/plaid-go/v49':
-        raise ValueError('this migration is scoped to github.com/plaid/plaid-go/v49')
+    match = re.fullmatch(r'github\.com/plaid/plaid-go/v([1-9][0-9]*)', module)
+    if not match or int(match[1]) < 49:
+        raise ValueError('module must be github.com/plaid/plaid-go/vN with major N >= 49')
     check_tree(sdk)
     if not (sdk / 'legacy/tests').is_dir():
-        raise ValueError('SDK must contain the public v49 legacy/tests layout')
+        raise ValueError('SDK must contain the public legacy/tests layout')
     mod = json.loads(subprocess.check_output(['go', 'mod', 'edit', '-json'], cwd=sdk, env=subprocess_env()))
     if mod['Module']['Path'] != module:
         raise ValueError('existing root module does not match --module')

@@ -1,6 +1,6 @@
 # Public legacy Go generation
 
-This adapter regenerates `legacy/` in an existing public v49 SDK checkout. The root Fern client and the existing `legacy/tests` are preserved. It uses only the public sources listed in `provenance.json`; no private generator helper or test adapter is required.
+This adapter regenerates `legacy/` in an existing public SDK checkout (module major v49 or later). The root Fern client and the existing `legacy/tests` are preserved. It uses only the public sources listed in `provenance.json`; no private generator helper or test adapter is required.
 
 Install Python dependencies with `python3 -m pip install --require-hashes -r pipeline/legacy/requirements.txt`. Python 3.10+, Docker, and Go are required. The Docker image must be available locally or pullable; generation runs with container networking disabled. Go may download the checkout's module dependencies during staging. Subprocesses receive only selected local path, Docker, Go toolchain, and cache settings; unrelated credentials are excluded, and `GOENV`/`GOWORK` are disabled.
 
@@ -23,7 +23,7 @@ The public spec has four discriminated `oneOf` schemas. The public v48 `model_on
 
 OpenAPI Generator 5.2.0 also includes Go class names in its `mappedModels`, in addition to explicit wire values. The sole vendored template patch changes the two strict discriminator loops to use `x-plaid-sdk-one-of-mapping`, derived exclusively from the public spec's explicit mapping. This preserves published wire behavior and avoids accepting class names or rejecting valid branches during marshal. The other five templates and the upstream license are unchanged. `provenance.json` records both original and vendored hashes. All Python code and the offline regression fixture are newly authored here.
 
-The legacy client keeps `packageVersion=48.0.0` and `Plaid Go v48.0.0`, matching the public v49 legacy package. Its module path remains `github.com/plaid/plaid-go/v49`. Client identity and module major version are separate.
+The legacy client keeps `packageVersion=48.0.0` and `Plaid Go v48.0.0`, matching the public v49 legacy package. The requested module must be exactly `github.com/plaid/plaid-go/vN` for an integer major version of at least 49 and must match the existing root `go.mod`. For a major upgrade, update the root module and maintained test imports before calling this adapter. Client identity and module major version are separate.
 
 ## Reproduction evidence
 

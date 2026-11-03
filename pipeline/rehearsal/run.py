@@ -87,30 +87,24 @@ def main() -> None:
                 require(git(sdk, "rev-parse", "HEAD") == SDK_COMMIT, "SDK pin mismatch")
                 # Defense in depth: even an accidental push has no configured destination.
                 git(sdk, "remote", "set-url", "--push", "origin", "/dev/null")
-                module = "github.com/" + values["sdk_repository"] + "/v" + str(values["major"])
+                major = generate.current_major(sdk, values)
+                module = "github.com/" + values["sdk_repository"] + "/v" + str(major)
                 generate.assert_sdk_bootstrap(sdk, module)
                 _, data = generate.verified_spec(generate.ROOT, commit, values, sdk)
                 validate_overlay(data, (generate.ROOT / "fern/openapi-overlay.yml").read_bytes())
                 tags = [line.split("refs/tags/", 1)[1] for line in
                         git(sdk, "ls-remote", "--tags", "--refs", "origin", "refs/tags/v*").splitlines()]
-                version = propose_version(tags, values["major"])
+                version = propose_version(tags, major)
                 report.update(spec_sha256=sha256(data), candidate_version=version,
-                              baseline_tag=generate.published_baseline(sdk, tags, values["major"], old))
+                              baseline_tag=generate.published_baseline(sdk, tags, major, old))
                 require(report["baseline_tag"] is not None, "Rehearsal needs a published comparison baseline")
                 require(not (sdk / MANIFEST).exists() and not (sdk / BUNDLE).exists(),
                         "Rehearsal pin must not carry release evidence")
-                generate.render_config(config, sdk, data, version, values)
-            with phase("fern-generation"):
-                generate.generate_new_client(sdk, config, version, values, work)
-            with phase("legacy-generation"):
-                before = protected_state(sdk)
-                report["legacy"] = generate.run_legacy(sdk, config / "2020-09-14.yml", module, values, work)
-                require(protected_state(sdk) == before, "Legacy changed protected SDK files")
-            with phase("build-and-wire-tests"):
-                generate.verify_sdk(sdk, values, work)
-            with phase("compatibility"):
-                generate.compatibility_gate(old, sdk, module, True, values, work, output=output)
-                shutil.copyfile(work / "api-diff.txt", output / "api-diff.txt")
+            with phase("generation-and-validation"):
+                version, report["legacy"] = generate.generate_versioned_candidate(
+                    sdk, old, data, tags, major, "", True, values, work, output)
+                module = "github.com/plaid/plaid-go/v" + str(generate.version_tuple(version)[0])
+                report["candidate_version"] = version
             with phase("unsigned-artifact"):
                 generate.update_changelog(sdk, version, data, values)
                 generate.sanitize_metadata(sdk, version, module, values)
