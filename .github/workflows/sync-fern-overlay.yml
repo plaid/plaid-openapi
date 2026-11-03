@@ -26,7 +26,7 @@ jobs:
       github.ref == 'refs/heads/master' && vars.SDK_PIPELINE_ENABLED == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    environment: sdk-pr-publishing
+    environment: overlay-sync-publishing
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -41,8 +41,8 @@ jobs:
         id: app
         uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2
         with:
-          app-id: ${{ vars.SDK_PR_APP_ID }}
-          private-key: ${{ secrets.SDK_PR_APP_PRIVATE_KEY }}
+          app-id: ${{ vars.OVERLAY_SYNC_APP_ID }}
+          private-key: ${{ secrets.OVERLAY_SYNC_APP_PRIVATE_KEY }}
           owner: plaid
           repositories: plaid-openapi
           permission-contents: write
@@ -50,5 +50,5 @@ jobs:
       - name: Open or refresh the overlay sync PR
         env:
           OVERLAY_SYNC_TOKEN: ${{ steps.app.outputs.token }}
-          SDK_PR_APP_BOT_ID: ${{ vars.SDK_PR_APP_BOT_ID }}
+          OVERLAY_SYNC_APP_BOT_ID: ${{ vars.OVERLAY_SYNC_APP_BOT_ID }}
         run: python3 -B pipeline/generation/sync_overlay.py

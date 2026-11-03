@@ -43,7 +43,7 @@ class SyncOverlayTests(unittest.TestCase):
         event.write_text('{"repository":{"full_name":"plaid/plaid-openapi","private":false,"fork":false}}')
         self.env = {"GITHUB_REPOSITORY": "plaid/plaid-openapi", "GITHUB_REF": "refs/heads/master",
                     "GITHUB_EVENT_NAME": "push", "GITHUB_EVENT_PATH": str(event), "GITHUB_SHA": self.head,
-                    "OVERLAY_SYNC_TOKEN": "fixture-token", "SDK_PR_APP_BOT_ID": str(BOT)}
+                    "OVERLAY_SYNC_TOKEN": "fixture-token", "OVERLAY_SYNC_APP_BOT_ID": str(BOT)}
         self.pushes = []
 
     def add_endpoint(self):
@@ -110,14 +110,14 @@ class SyncOverlayTests(unittest.TestCase):
 
     def test_branch_pr_from_another_author_is_rejected(self):
         self.add_endpoint()
-        with self.assertRaisesRegex(PipelineError, "not opened by the publishing App"):
+        with self.assertRaisesRegex(PipelineError, "not opened by the overlay sync App"):
             self.sync(self.automation_pr("0" * 40, author=999))
         self.assertEqual(self.pushes, [])
 
     def test_untrusted_context_fails_before_github_calls(self):
         for change in ({"GITHUB_EVENT_NAME": "pull_request"}, {"GITHUB_EVENT_NAME": "pull_request_target"},
                        {"GITHUB_REF": "refs/heads/feature"}, {"GITHUB_REPOSITORY": "fork/plaid-openapi"},
-                       {"OVERLAY_SYNC_TOKEN": ""}, {"SDK_PR_APP_BOT_ID": "bot"}, {"GITHUB_SHA": "0" * 40}):
+                       {"OVERLAY_SYNC_TOKEN": ""}, {"OVERLAY_SYNC_APP_BOT_ID": "bot"}, {"GITHUB_SHA": "0" * 40}):
             with self.subTest(change=change):
                 github = FakeGitHub()
                 original = dict(self.env)
@@ -132,6 +132,8 @@ class SyncOverlayTests(unittest.TestCase):
         self.assertIn("permissions:\n  contents: read\n", workflow)
         self.assertIn("repositories: plaid-openapi\n", workflow)
         self.assertNotIn("pull_request", workflow.split("permissions:", 1)[0])
+        self.assertNotIn("SDK_PR_APP", workflow)
+        self.assertIn("environment: overlay-sync-publishing\n", workflow)
 
 
 if __name__ == "__main__":

@@ -43,6 +43,12 @@ draft or closed generated PRs are not overwritten or reopened automatically.
    requests write. It needs no workflow permission, Administration write, branch
    review bypass. Repository tag rules must prevent this identity from creating
    release tags; Contents write alone does not enforce that restriction.
+   Overlay sync PRs use a separate App, installed only on `plaid/plaid-openapi`
+   with Contents write and Pull requests write, no workflow permission and no
+   review bypass. Create `overlay-sync-publishing`, restricted to protected
+   `master`, with `OVERLAY_SYNC_APP_PRIVATE_KEY`, and configure repository variables
+   `OVERLAY_SYNC_APP_ID` and `OVERLAY_SYNC_APP_BOT_ID`. Neither App's key is
+   available to the other's workflow.
 3. Create `sdk-pr-publishing`, restricted to protected `master`, with
    `SDK_PR_APP_PRIVATE_KEY`. Configure repository variables `SDK_PR_APP_ID` and
    `SDK_PR_APP_BOT_ID` (the App's numeric GitHub bot user ID). Normal runs must not

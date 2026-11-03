@@ -41,7 +41,7 @@ def open_sync_pr(repository: str, token: str) -> dict | None:
 
 def automation_only(repository: str, pr: dict, token: str, bot_id: int) -> dict | None:
     """Return the PR's single automation commit, or None when someone else has committed to it."""
-    require((pr.get("user") or {}).get("id") == bot_id, "Overlay sync PR was not opened by the publishing App")
+    require((pr.get("user") or {}).get("id") == bot_id, "Overlay sync PR was not opened by the overlay sync App")
     commits = public_get(f"https://api.github.com/repos/{repository}/pulls/{pr['number']}/commits", token=token)
     require(isinstance(commits, list), "Unexpected overlay sync PR commits response")
     if len(commits) == 1 and commits[0]["commit"]["author"]["email"] == AUTHOR_EMAIL:
@@ -72,8 +72,8 @@ def sync(env: dict[str, str]) -> str:
             metadata.get("fork") is False, "Overlay sync requires the original public OpenAPI repository")
     token = env.get("OVERLAY_SYNC_TOKEN", "")
     require(bool(token), "Repo-scoped PR App token is missing")
-    bot = env.get("SDK_PR_APP_BOT_ID", "")
-    require(re.fullmatch(r"[1-9][0-9]*", bot) is not None, "Publishing App bot ID is missing or invalid")
+    bot = env.get("OVERLAY_SYNC_APP_BOT_ID", "")
+    require(re.fullmatch(r"[1-9][0-9]*", bot) is not None, "Overlay sync App bot ID is missing or invalid")
     commit = env.get("GITHUB_SHA", "")
     require(git(ROOT, "rev-parse", "HEAD") == commit, "Checkout is not the commit that triggered this run")
     require(not git(ROOT, "status", "--porcelain"), "Overlay sync checkout must be clean")
@@ -101,7 +101,7 @@ def sync(env: dict[str, str]) -> str:
                          payload={"title": TITLE, "head": BRANCH, "base": "master",
                                   "body": body(commit, suggested), "draft": False})
     require(isinstance(created, dict) and (created.get("user") or {}).get("id") == int(bot),
-            "Created PR was not opened by the publishing App")
+            "Created PR was not opened by the overlay sync App")
     return f"Opened {created['html_url']}"
 
 
