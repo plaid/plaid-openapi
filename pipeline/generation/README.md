@@ -7,8 +7,11 @@ The spec and Fern configuration live together in this public repository. Each pr
 ## Pre-merge hosted rehearsal
 
 `sdk-rehearsal.yml` runs on same-repository PRs changing that workflow or
-`pipeline/rehearsal/`. It checks out the exact PR head and the SDK commit pinned
-in `pipeline/rehearsal/run.py`, so neither automation PR needs to merge first.
+`pipeline/rehearsal/`. It checks out the exact PR head and captures the current public SDK `master`
+commit, detaches at that SHA, and records it in the report. This follows the
+reviewed SDK baseline across major releases without accepting arbitrary refs.
+An SDK candidate still awaiting publication blocks rehearsal. Prior production
+release evidence is removed locally before generation.
 It calls the production generation, legacy, build, mock-test and compatibility
 functions on a standard GitHub runner. Its candidate version is only a local
 test value; no tag is created or reserved.
