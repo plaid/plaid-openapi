@@ -17,7 +17,7 @@ import urllib.request
 
 from attestation import parse_json, validate_manifest
 from common import (BUNDLE, MANIFEST, WORKFLOW, PipelineError, archive_sdk, canonical,
-                    check_sha, clean_env, content, entries, git, protected_state,
+                    check_sha, clean_env, content, entries, git, protected_state, module_rewrite,
                     propose_version, public_get, require, run, save_json, sha256,
                     spec_version, version_tuple)
 from harden_wire_tests import harden as harden_wire_tests
@@ -343,10 +343,10 @@ def verify_sdk(sdk: Path, values: dict, work: Path) -> None:
 
 
 def compatibility_gate(old: Path, sdk: Path, module: str, published: bool, values: dict, work: Path,
-                       *, output: Path | None = None) -> None:
+                       *, output: Path | None = None, allow_breaking: bool = False) -> bytes:
     if not published:
         (work / "api-diff.txt").write_text("Initial configured major has no published stable tag; no within-major compatibility promise yet.\n")
-        return
+        return b""
     binary = work / "bin"
     binary.mkdir()
     run(["go", "install", "golang.org/x/exp/cmd/apidiff@" + values["apidiff_version"]],
@@ -361,7 +361,86 @@ def compatibility_gate(old: Path, sdk: Path, module: str, published: bool, value
         # Preserve only the public API report after the temporary checkout is removed.
         (output / "api-diff.txt").write_bytes(changes)
         save_json(output / "result.json", {"status": "breaking-change", "report": "api-diff.txt"})
-    require(not changes.strip(), "Breaking SDK or legacy API change: review a new configured major instead of publishing a minor/patch")
+    require(allow_breaking or not changes.strip(), "Breaking SDK or legacy API change: explicit minor/patch overrides cannot publish breaking changes")
+    return changes
+
+
+def current_major(sdk: Path, values: dict) -> int:
+    line = (sdk / "go.mod").read_text().splitlines()[0]
+    match = re.fullmatch(r"module github\.com/plaid/plaid-go/v([1-9][0-9]*)", line)
+    require(match is not None and int(match[1]) >= values["major"], "Unexpected SDK root module or major below configured floor")
+    return int(match[1])
+
+
+def rewrite_module(sdk: Path, previous: int, target: int) -> None:
+    """Rewrite only this SDK's namespace; keep workflow/security policy bytes intact."""
+    old = f"github.com/plaid/plaid-go/v{previous}"
+    new = f"github.com/plaid/plaid-go/v{target}"
+    mod = sdk / "go.mod"
+    require(mod.read_text().splitlines()[0] == "module " + old, "Unexpected module before major rewrite")
+    for name, _, _ in entries(sdk):
+        if not name.startswith((".github/", ".circleci/", "scripts/release/")) and (name.endswith(".go") or name in {"go.mod", "README.md"}):
+            path = sdk / name
+            path.write_bytes(module_rewrite(path.read_bytes(), previous, target))
+    git(sdk, "add", "-A")
+    git(sdk, "-c", "user.name=SDK generator", "-c", "user.email=sdk-generator@localhost",
+        "-c", "commit.gpgsign=false", "commit", "-m", "Update SDK module namespace")
+
+
+def generate_candidate(sdk: Path, data: bytes, version: str, values: dict, work: Path) -> dict:
+    work.mkdir()
+    config = work / "config"
+    module = "github.com/plaid/plaid-go/v" + str(version_tuple(version)[0])
+    render_config(config, sdk, data, version, values)
+    generate_new_client(sdk, config, version, values, work)
+    before = protected_state(sdk)
+    legacy = run_legacy(sdk, config / "2020-09-14.yml", module, values, work)
+    require(protected_state(sdk) == before, "Legacy generator modified protected release/customization files")
+    verify_sdk(sdk, values, work)
+    return legacy
+
+
+def generate_versioned_candidate(sdk: Path, old: Path, data: bytes, tags: list[str],
+                                 major: int, override: str, published: bool, values: dict,
+                                 work: Path, output: Path) -> tuple[str, dict]:
+    """Generate in the current namespace first; only an API break selects a new major."""
+    stable_majors = [version_tuple(tag[1:])[0] for tag in tags
+                     if re.fullmatch(r"v(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)", tag)]
+    supported = [number for number in stable_majors if number >= values["major"]]
+    require(major == (max(supported) if supported else values["major"]),
+            "SDK root major must match the latest published supported major or initial configured floor")
+    version = propose_version(tags, major, override)
+    original = work / "original-sdk"
+    shutil.copytree(sdk, original)
+    legacy = generate_candidate(sdk, data, version, values, work / "candidate")
+    module = f"github.com/plaid/plaid-go/v{major}"
+    comparison = work / "comparison"
+    comparison.mkdir()
+    changes = compatibility_gate(old, sdk, module, published, values, comparison,
+                                 output=output if override else None, allow_breaking=not override)
+    (output / "api-diff.txt").write_bytes(changes)
+    if not changes.strip():
+        return version, legacy
+    version = f"{major + 1}.0.0"
+    require("v" + version not in tags and not any(
+        re.fullmatch(r"v" + str(major + 1) + r"\.[0-9]+\.[0-9]+", tag) for tag in tags),
+        "Next major already has published tags; review the SDK baseline")
+    probe = work / "probe-sdk"
+    shutil.move(str(sdk), probe)
+    shutil.copytree(original, sdk)
+    rewrite_module(sdk, major, major + 1)
+    legacy = generate_candidate(sdk, data, version, values, work / "major-candidate")
+    # apidiff snapshots are binary. Normalize a temporary source checkout, never
+    # serialized snapshots or the actual candidate, before comparing namespaces.
+    normalized = work / "normalized-sdk"
+    shutil.copytree(sdk, normalized)
+    git(normalized, "add", "-A")
+    rewrite_module(normalized, major + 1, major)
+    for label, before, after in (("forward", probe, normalized), ("reverse", normalized, probe)):
+        check = work / ("major-equivalence-" + label)
+        check.mkdir()
+        compatibility_gate(before, after, module, True, values, check)
+    return version, legacy
 
 
 def manifest_for(values: dict, *, version: str, source_commit: str, source_bytes: bytes,
@@ -432,32 +511,27 @@ def main() -> None:
         from overlay_coverage import validate as validate_overlay
         validate_overlay(data, (ROOT / "fern/openapi-overlay.yml").read_bytes())
         tags = [line.split("refs/tags/", 1)[1] for line in tag_refs.splitlines() if not line.endswith("^{}")]
-        version = propose_version(tags, values["major"], override)
+        major = current_major(sdk, values)
         config_hash = config_digest(ROOT)
-        identity = input_identity(version, sha256(data), config_hash)
         # Read-only catch-up: the current manifest proves these exact inputs already reached master.
         prior = json.loads((sdk / MANIFEST).read_text()) if (sdk / MANIFEST).exists() else None
         unchanged = prior and not override and prior["source"]["sha256"] == sha256(data) and prior["config"]["sha256"] == config_hash
         if unchanged:
             save_json(output / "result.json", {"status": "unchanged", "sdk_base": base})
             return
-        module = "github.com/" + values["sdk_repository"] + "/v" + str(values["major"])
+        module = "github.com/" + values["sdk_repository"] + "/v" + str(major)
         assert_sdk_bootstrap(sdk, module)
         old = work / "before"
-        baseline_tag = published_baseline(sdk, tags, values["major"], old)
+        baseline_tag = published_baseline(sdk, tags, major, old)
         # Old provenance must not survive into a newly generated PR.
         run(["git", "rm", "--ignore-unmatch", "--", MANIFEST, BUNDLE], sdk)
         if git(sdk, "diff", "--cached", "--name-only"):
             git(sdk, "-c", "user.name=SDK generator", "-c", "user.email=sdk-generator@localhost",
                 "-c", "commit.gpgsign=false", "commit", "-m", "Replace prior generation evidence")
-        local_config = work / "config"
-        render_config(local_config, sdk, data, version, values)
-        generate_new_client(sdk, local_config, version, values, work)
-        before_legacy = protected_state(sdk)
-        legacy = run_legacy(sdk, local_config / "2020-09-14.yml", module, values, work)
-        require(protected_state(sdk) == before_legacy, "Legacy generator modified protected release/customization files")
-        verify_sdk(sdk, values, work)
-        compatibility_gate(old, sdk, module, baseline_tag is not None, values, work, output=output)
+        version, legacy = generate_versioned_candidate(
+            sdk, old, data, tags, major, override, baseline_tag is not None, values, work, output)
+        module = "github.com/plaid/plaid-go/v" + str(version_tuple(version)[0])
+        identity = input_identity(version, sha256(data), config_hash)
         update_changelog(sdk, version, data, values)
         sanitize_metadata(sdk, version, module, values)
         git(sdk, "add", "-A")
@@ -470,7 +544,7 @@ def main() -> None:
         archive_sdk(sdk, output / "sdk.tar.gz")
         (output / "content.json").write_bytes(index)
         save_json(output / "manifest.json", manifest)
-        save_json(output / "plan.json", {"sdk_base": base, "branch": "sdk-generation/go-v" + str(values["major"]) + "-" + identity,
+        save_json(output / "plan.json", {"sdk_base": base, "branch": "sdk-generation/go-v" + str(version_tuple(version)[0]) + "-" + identity,
                                         "identity": identity, "rehearsal": rehearsal})
         save_json(output / "result.json", {"status": "generated", "content_sha256": digest,
                                            "subject_name": "plaid-go-v" + version + "-source", "rehearsal": rehearsal})

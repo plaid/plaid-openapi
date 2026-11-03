@@ -194,9 +194,10 @@ def publish(directory: Path, artifact: Path, manifest: dict, plan: dict, work: P
     run(["git", "clone", "--filter=blob:none", "--single-branch", "--branch", values["sdk_branch"],
          "https://github.com/" + repository + ".git", str(sdk)])
     require(git(sdk, "rev-parse", "HEAD") == plan["sdk_base"], "SDK master changed during generation; regenerate from the new reviewed base")
-    before = protected_state(sdk)
-    # README/release-history edits are producer-owned, visible SDK PR content. Workflows,
-    # scripts and custom security files remain exactly the reviewed base versions.
+    from common import expected_protected_state
+    before = expected_protected_state(sdk, int(manifest["sdk"]["version"].split(".")[0]))
+    # Protected Go files and README may only receive the exact major namespace rewrite.
+    # Workflows and release policy scripts remain byte-identical to the reviewed base.
     excluded = {"CHANGELOG.md", ".fernignore"}
     old = {path: value for path, value in before.items() if path not in excluded}
     proposed = {path: value for path, value in protected_state(artifact).items() if path not in excluded}
