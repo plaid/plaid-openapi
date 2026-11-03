@@ -1,6 +1,9 @@
 """The pre-merge rehearsal has no production identity or publishing permission."""
 
 import copy
+from contextlib import ExitStack
+import json
+import tarfile
 import importlib.util
 import os
 from pathlib import Path
@@ -9,6 +12,8 @@ import unittest
 from unittest.mock import patch
 
 import yaml
+import common
+import test_pipeline
 from common import PipelineError
 from publish_pr import verify_artifact
 
@@ -57,6 +62,63 @@ class RehearsalTests(unittest.TestCase):
             (path / "rehearsal.json").write_text('{"rehearsal": true}')
             with self.assertRaises(FileNotFoundError):
                 verify_artifact(path, path)
+
+    def run_current_major_fixture(self, pending=None):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            upstream = root / 'upstream'
+            test_pipeline.init(upstream)
+            test_pipeline.write(upstream, 'go.mod', 'module github.com/plaid/plaid-go/v50\n')
+            test_pipeline.write(upstream, common.MANIFEST, '{}')
+            test_pipeline.write(upstream, common.BUNDLE, 'prior signature')
+            base = test_pipeline.commit(upstream)
+            common.git(upstream, '-c', 'tag.gpgsign=false', 'tag', 'v50.0.0')
+            event = root / 'event.json'
+            event.write_text('{}')
+            output = root / 'output'
+            def fetch(repository, branch, sdk):
+                common.run(['git', 'clone', '--shared', str(upstream), str(sdk)])
+                return base
+            def candidate(sdk, old, data, tags, major, override, published, values, work, out):
+                self.assertEqual(major, 50)
+                self.assertEqual(tags, ['v50.0.0'])
+                self.assertFalse((sdk / common.MANIFEST).exists())
+                self.assertFalse((sdk / common.BUNDLE).exists())
+                self.assertEqual(common.git(sdk, 'remote', 'get-url', '--push', 'origin'), '/dev/null')
+                return '50.1.0', {}
+            with ExitStack() as patches:
+                patches.enter_context(patch.dict(os.environ, {'GITHUB_EVENT_PATH': str(event)}))
+                patches.enter_context(patch('sys.argv', ['run.py', '--output', str(output)]))
+                patches.enter_context(patch.object(rehearsal, 'check_context', return_value='a' * 40))
+                patches.enter_context(patch.object(rehearsal, 'sample_memory'))
+                patches.enter_context(patch.object(rehearsal, 'validate_overlay'))
+                patches.enter_context(patch.object(rehearsal.generate, 'fetch_repository', side_effect=fetch))
+                patches.enter_context(patch.object(rehearsal.generate, 'assert_sdk_bootstrap'))
+                patches.enter_context(patch.object(rehearsal.generate, 'verified_spec', return_value=('a' * 40, b'spec')))
+                patches.enter_context(patch.object(rehearsal.generate, 'pending_release', return_value=pending))
+                patches.enter_context(patch.object(rehearsal.generate, 'published_baseline', return_value='v50.0.0'))
+                generation = patches.enter_context(patch.object(rehearsal.generate, 'generate_versioned_candidate', side_effect=candidate))
+                patches.enter_context(patch.object(rehearsal.generate, 'update_changelog'))
+                patches.enter_context(patch.object(rehearsal.generate, 'sanitize_metadata'))
+                if pending:
+                    with self.assertRaisesRegex(PipelineError, 'unpublished candidate'):
+                        rehearsal.main()
+                    generation.assert_not_called()
+                    self.assertFalse((output / 'unsigned-sdk.tar.gz').exists())
+                else:
+                    rehearsal.main()
+                    report = json.loads((output / 'rehearsal.json').read_text())
+                    self.assertEqual(report['sdk_base'], base)
+                    self.assertEqual(report['candidate_version'], '50.1.0')
+                    with tarfile.open(output / 'unsigned-sdk.tar.gz') as archive:
+                        self.assertNotIn(common.MANIFEST, archive.getnames())
+                        self.assertNotIn(common.BUNDLE, archive.getnames())
+
+    def test_current_v50_master_rehearsal_excludes_prior_release_evidence(self):
+        self.run_current_major_fixture()
+
+    def test_pending_release_stops_rehearsal_before_generation(self):
+        self.run_current_major_fixture(pending='50.0.0')
 
     def test_workflow_cannot_sign_or_publish(self):
         text = (ROOT / ".github/workflows/sdk-rehearsal.yml").read_text()
