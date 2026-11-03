@@ -11,6 +11,11 @@ version pins, checks and release workflows. Draft configurations stay in staging
 - `openapi-overlay.yml` supplies sub-client names, pagination, typed errors,
   client-level authentication and the multipart upload correction.
 
+Overlay coverage is checked before Go generation runs. Shared spec-sync PRs
+test the validation logic without requiring the Go overlay to be ready. To
+check readiness manually, run `python3 pipeline/generation/overlay_coverage.py`
+from the repository root.
+
 The workflow checks that the CLI and generator versions match the checksum/image
 pins in `pipeline/generation/settings.json`. The public module is
 `github.com/plaid/plaid-go/v49`; SDK versions passed to Fern include the leading

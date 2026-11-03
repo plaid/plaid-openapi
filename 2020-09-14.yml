@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.778.0
+  version: 2020-09-14_1.792.1
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -10431,7 +10431,7 @@ paths:
       description: |-
         Use this endpoint to create a Protect report to document fraud incidents, investigation outcomes, or other risk events. This endpoint allows you to report various types of incidents including account takeovers, identity fraud, unauthorized transactions, and other security events. The reported data helps improve fraud detection models and provides valuable feedback to enhance the overall security of the Plaid network.
 
-        Reports can be created for confirmed incidents that have been fully investigated, or for suspected incidents that require further review. You can associate reports with specific users, sessions, or transactions to provide comprehensive context about the incident. Each report must include `user_id`, or an `incident_event` with at least one supported identifier: `link_session_id`, `idv_session_id`, `protect_event_id`, `signal_client_transaction_id`, or `access_token`. Context fields such as `internal_reference`, `time`, `amount`, and `bank_account` do not satisfy this identifier requirement.
+        Reports can be created for confirmed incidents that have been fully investigated, or for suspected incidents that require further review. You can associate reports with specific users, sessions, or transactions to provide comprehensive context about the incident. Each report must include `user_id`, `client_user_id`, or an `incident_event` with at least one supported identifier: `link_session_id`, `idv_session_id`, `protect_event_id`, `signal_client_transaction_id`, or `access_token`. Context fields such as `internal_reference`, `time`, `amount`, and `bank_account` do not satisfy this identifier requirement.
       requestBody:
         required: true
         content:
@@ -13887,6 +13887,8 @@ paths:
         If the user has at least one associated Item and every associated Item contains a Financial Management product, this endpoint also removes the associated Plaid user. The removed `user_id` can no longer be used to access the user.
 
         For Plaid Protect, this endpoint terminates Protect products. For Servicing, it cancels the subscription and preserves CRA Items and historical data for future report requests.
+
+        To learn how terminating products affects billing, see [Billing](https://plaid.com/docs/account/billing/#subscription-fee).
       requestBody:
         required: true
         content:
@@ -13904,6 +13906,51 @@ paths:
                   user_id: usr_8c3ZbDBYjaqUXZ
                   reason_code: CONSUMER_LOAN_PAID_OFF
                   reason_note: Consumer loan has been paid in full.
+  /user/transfer/limits/get:
+    x-hidden-from-docs: true
+    post:
+      tags:
+      - plaid
+      x-hidden-from-docs: true
+      summary: Retrieve a user's transfer limits
+      externalDocs:
+        url: /api/users/#usertransferlimitsget
+      description: Retrieve the user's persisted Guaranteed ACH transaction limit and configured daily, weekly, and monthly ceilings. Amounts are returned as decimal strings in dollars with two digits of precision and an ISO currency code. A transaction limit is computed when no active limit exists.
+      operationId: userTransferLimitsGet
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserTransferLimitsGetResponse'
+              examples:
+                example-1:
+                  value:
+                    guarantee_limits:
+                      transaction_limit:
+                        value: "150.25"
+                        iso_currency_code: USD
+                      daily_limit:
+                        value: "5000.00"
+                        iso_currency_code: USD
+                      weekly_limit:
+                        value: "10000.00"
+                        iso_currency_code: USD
+                      monthly_limit: null
+                    request_id: mdqfuVxeoza6mhu
+        default:
+          description: Error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaidError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserTransferLimitsGetRequest'
   /user/items/get:
     post:
       tags:
@@ -14190,6 +14237,7 @@ paths:
                       sort_code: "601613"
                     end_to_end_id: sptch8cde8390bfd363888
                     iban: null
+                    institution_id: null
                     request_id: aEAQmewMzlVa1k6
         default:
           description: Error response
@@ -15266,7 +15314,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PlaidError'
       operationId: processorTokenCreate
-      description: Used to create a token suitable for sending to one of Plaid's partners to enable integrations. Note that Stripe partnerships use bank account tokens instead; see `/processor/stripe/bank_account_token/create` for creating tokens for use with Stripe integrations. If using multiple processors, multiple different processor tokens can be created for a single access token. Once created, a processor token for a given Item can be modified by calling `/processor/token/permissions/set`. To revoke the processor's access, the entire Item must be deleted by calling `/item/remove`.
+      description: Used to create a token suitable for sending to one of Plaid's partners to enable integrations. To create a Stripe bank account token (`btok_...`), use `/processor/stripe/bank_account_token/create`. If using multiple processors, multiple different processor tokens can be created for a single access token. Once created, a processor token for a given Item can be modified by calling `/processor/token/permissions/set`. To revoke the processor's access, the entire Item must be deleted by calling `/item/remove`.
       requestBody:
         required: true
         content:
@@ -15532,6 +15580,12 @@ paths:
       externalDocs:
         url: /api/link/#linktokenget
       operationId: linkTokenGet
+      security:
+      - clientId: []
+        secret: []
+        plaidVersion: []
+      - oauth2:
+        - link:read
       responses:
         "200":
           description: OK
@@ -15728,6 +15782,7 @@ paths:
                         bank_income_results: []
                         payroll_income_results: []
                         document_income_results: null
+                        cra_report_results: null
                       started_at: "2024-07-29T20:22:36.522196741Z"
                     link_token: link-sandbox-e7b6956c-1522-4823-85d2-c4ca74251949
                     metadata:
@@ -15751,6 +15806,8 @@ paths:
         The `/link/token/get` endpoint gets information about a Link session, including all callbacks fired during the session along with their metadata, including the public token. This endpoint is used with Link flows that don't provide a public token via frontend callbacks, such as the [Hosted Link flow](https://plaid.com/docs/link/hosted-link/) and the [Multi-Item Link flow](https://plaid.com/docs/link/multi-item-link/). It also can be useful for debugging purposes.
 
         By default, this endpoint will only return complete event data for Hosted Link sessions. To use `/link/token/get` to retrieve event data for non-Hosted-Link sessions, contact your account manager to request that your account be enabled for Link events. If you do not have an account manager, you can submit this request via a support ticket. Enablement for Link events will also cause you to receive additional webhooks related to Link events, such as the `SESSION_FINISHED` and `EVENTS` webhook.
+
+        When called with a delegated OAuth access token, this endpoint returns a reduced view of the session for the delegate. Only `link_token`, `created_at`, `expiration`, and each session's `link_session_id`, `started_at`, `finished_at`, and `results.item_add_results[].public_token` are populated; `public_token` holds the delegate's own `delegated-public-` token, never the customer's public token. All other fields are withheld and carry no information about the session: arrays such as `metadata.initial_products` and `item_add_results[].accounts` are empty, fields such as `metadata.webhook` and `item_add_results[].institution` are `null`, and `user_id`, `events`, `on_success`, `on_exit`, and `exit` are omitted. A delegated public token can be retrieved for 30 minutes after it is created. Item adds whose delegated public token is no longer available are omitted from `item_add_results`, and if none remain the request fails with `INVALID_LINK_TOKEN`; start a new Link session to continue.
       requestBody:
         required: true
         content:
@@ -23353,6 +23410,7 @@ components:
             cra:read: Read CRA report data.
             user:write: Write user data.
             item:read: Read Item data.
+            link:read: Read Link session results.
             link:write: Create Link tokens.
             item:write: Exchange a public token for an access token.
             auth:read: Read Auth data.
@@ -24398,14 +24456,18 @@ components:
         additionalProperties: true
         properties:
           name:
+            description: The name of the account, either assigned by the user or by the financial institution itself
             type: string
           official_name:
+            description: The official name of the account as given by the financial institution
             type: string
             nullable: true
           mask:
+            description: The last 2-4 alphanumeric characters of either the account's displayed mask or the account's official account number. Note that the mask may be non-unique between an Item's accounts.
             type: string
             nullable: true
           verification_name:
+            description: The account holder name that was used for micro-deposit and/or database verification. Only returned for Auth Items created via micro-deposit or database verification. This name was manually-entered by the user during Link, unless it was otherwise provided via the `user.legal_name` request field in `/link/token/create` for the Link session that created the Item.
             type: string
           owners:
             type: array
@@ -25577,7 +25639,7 @@ components:
         phone_number:
           type: string
           nullable: true
-          description: 'The user''s phone number, in E.164 format: +{countrycode}{number}. For example: "+14157452130". Phone numbers provided in other formats will be parsed on a best-effort basis. Phone number input is validated against valid number ranges; number strings that do not match a real-world phone numbering scheme may cause the request to fail, even in the Sandbox test environment.'
+          description: 'The user''s phone number, in E.164 format: +{countrycode}{number}. For example: "+14157452130". Phone numbers provided in other formats will be parsed on a best-effort basis.'
         email_address:
           type: string
           description: The user's email address.
@@ -27206,6 +27268,78 @@ components:
       required:
       - removed
       - request_id
+    UserTransferLimitsGetRequest:
+      type: object
+      x-hidden-from-docs: true
+      description: UserTransferLimitsGetRequest defines the request schema for `/user/transfer/limits/get`.
+      properties:
+        client_id:
+          $ref: '#/components/schemas/APIClientID'
+        secret:
+          $ref: '#/components/schemas/APISecret'
+        user_id:
+          $ref: '#/components/schemas/NewUserID'
+      required:
+      - user_id
+    UserTransferLimitsGetResponse:
+      type: object
+      additionalProperties: true
+      x-hidden-from-docs: true
+      description: UserTransferLimitsGetResponse defines the response schema for `/user/transfer/limits/get`.
+      properties:
+        guarantee_limits:
+          $ref: '#/components/schemas/UserGuaranteeLimits'
+        request_id:
+          $ref: '#/components/schemas/RequestID'
+      required:
+      - guarantee_limits
+      - request_id
+    UserGuaranteeLimits:
+      type: object
+      additionalProperties: true
+      x-hidden-from-docs: true
+      description: The user's Guaranteed ACH debit limits. Daily, weekly, and monthly limits are configured ceilings, not remaining capacity. Each rolling limit is `null` when no ceiling is enabled for that window.
+      properties:
+        transaction_limit:
+          allOf:
+          - $ref: '#/components/schemas/UserTransferLimitAmount'
+          - description: The user's persisted per-transaction guarantee limit. A zero-dollar limit is returned with a value of `"0.00"`.
+        daily_limit:
+          $ref: '#/components/schemas/UserTransferLimitAmountNullable'
+        weekly_limit:
+          $ref: '#/components/schemas/UserTransferLimitAmountNullable'
+        monthly_limit:
+          $ref: '#/components/schemas/UserTransferLimitAmountNullable'
+      required:
+      - transaction_limit
+      - daily_limit
+      - weekly_limit
+      - monthly_limit
+    UserTransferLimitAmount:
+      type: object
+      additionalProperties: true
+      x-hidden-from-docs: true
+      description: A transfer limit amount and its currency.
+      properties:
+        value:
+          type: string
+          description: The limit in dollars, formatted as a decimal string with two digits of precision (for example, `"150.25"` represents $150.25).
+          example: "150.25"
+        iso_currency_code:
+          type: string
+          description: The ISO-4217 currency code of the limit. Currently always `USD`.
+          example: USD
+      required:
+      - value
+      - iso_currency_code
+    UserTransferLimitAmountNullable:
+      description: A transfer limit amount and its currency, or `null` when the limit is not configured.
+      x-hidden-from-docs: true
+      nullable: true
+      allOf:
+      - $ref: '#/components/schemas/UserTransferLimitAmount'
+      - type: object
+        additionalProperties: true
     UserItemsGetRequest:
       type: object
       description: UserItemsGetRequest defines the request schema for `/user/items/get`
@@ -27749,6 +27883,19 @@ components:
           description: The number of bank statements uploaded by the user.
       required:
       - num_bank_statements_uploaded
+    LinkSessionCraReportResult:
+      type: object
+      nullable: true
+      description: Plaid Check report details for the Link session.
+      additionalProperties: true
+      properties:
+        report_id:
+          allOf:
+          - $ref: '#/components/schemas/CraReportId'
+          - description: The identifier of the report being generated. Use it to retrieve the report with `/cra/report/get` once its products are ready. `null` if no report identifier is available for the session.
+          nullable: true
+      required:
+      - report_id
     CreditSessionBankIncomeStatus:
       type: string
       enum:
@@ -27816,6 +27963,11 @@ components:
       - $ref: '#/components/schemas/PaymentInitiationPayment'
       - type: object
         properties:
+          institution_id:
+            type: string
+            nullable: true
+            description: The Plaid institution ID of the end user's financial institution from which the payment was initiated, such as `ins_61`. `null` if the institution is not known, for example when the end user has not linked an account. A later request may return a value.
+            x-hidden-from-docs: true
           request_id:
             $ref: '#/components/schemas/RequestID'
       required:
@@ -27828,6 +27980,7 @@ components:
       - last_status_update
       - bacs
       - iban
+      - institution_id
     PaymentInitiationPaymentStatus:
       type: string
       enum:
@@ -28428,7 +28581,7 @@ components:
             $ref: '#/components/schemas/Security'
         total_investment_transactions:
           type: integer
-          description: The total number of transactions available within the date range specified. If `total_investment_transactions` is larger than the size of the `transactions` array, more transactions are available and can be fetched via manipulating the `offset` parameter.
+          description: The total number of transactions available within the date range specified. If `total_investment_transactions` is larger than the size of the `investment_transactions` array, more transactions are available and can be fetched via manipulating the `offset` parameter.
         request_id:
           $ref: '#/components/schemas/RequestID'
         is_investments_fallback_item:
@@ -28513,7 +28666,7 @@ components:
             $ref: '#/components/schemas/InvestmentTransaction'
         total_investment_transactions:
           type: integer
-          description: The total number of transactions available within the date range specified. If `total_investment_transactions` is larger than the size of the `transactions` array, more transactions are available and can be fetched via manipulating the `offset` parameter.
+          description: The total number of transactions available within the date range specified. If `total_investment_transactions` is larger than the size of the `investment_transactions` array, more transactions are available and can be fetched via manipulating the `offset` parameter.
         request_id:
           $ref: '#/components/schemas/RequestID'
         is_investments_fallback_item:
@@ -28567,6 +28720,7 @@ components:
           - galileo
           - modern_treasury
           - ocrolus
+          - stripe
           - vesta
           - drivewealth
           - vopay
@@ -28866,7 +29020,7 @@ components:
 
             If using Identity Verification, `country_codes` should be set to the country where your company is based, not the country where your user is located. For all other products, `country_codes` represents the location of your user's financial institution.
 
-            If Link is launched with multiple country codes, only products that you are enabled for in all countries will be used by Link. While all countries are enabled by default in Sandbox, in Production only the countries you have requested access for are shown. To request access to additional countries, [file a product access Support ticket](https://dashboard.plaid.com/support/new/product-and-development/product-troubleshooting/request-product-access) via the Plaid dashboard.
+            If Link is launched with multiple country codes, every product you specify, in any product array, must be enabled for your account in all of the listed countries; otherwise, the request fails with an `INVALID_PRODUCT` error. While all countries are enabled by default in Sandbox, in Production only the countries you have requested access for are shown. To request access to additional countries, [file a product access Support ticket](https://dashboard.plaid.com/support/new/product-and-development/product-troubleshooting/request-product-access) via the Plaid dashboard.
 
             If using a Link customization, make sure the country codes in the customization match those specified in `country_codes`, or the customization may not be applied.
 
@@ -28889,8 +29043,6 @@ components:
             To add products without limiting the institution list or account types, use the [`optional_products`](https://plaid.com/docs/api/link/#link-token-create-request-optional-products) or  [`required_if_supported_products`](https://plaid.com/docs/api/link/#link-token-create-request-required-if-supported-products) fields. Products can also be added to an Item by calling the product endpoint after obtaining an access token; this may require the product to be listed in the [`additional_consented_products`](https://plaid.com/docs/api/link/#link-token-create-request-additional-consented-products) array. For details, see [Choosing when to initialize products](https://plaid.com/docs/link/initializing-products/).
 
             `balance` is *not* a valid value, the Balance product does not require explicit initialization and will automatically be initialized when any other product is initialized.
-
-            If launching Link with CRA products, `cra_base_report` is required and must be included in the `products` array.
 
             Note that, unless you have opted to disable Instant Match support, institutions that support Instant Match will also be shown in Link if `auth` is specified as a product, even though these institutions do not contain `auth` in their product array.
 
@@ -28920,6 +29072,8 @@ components:
           - cra_lend_score
           - cra_partner_insights
           - cra_network_insights
+          - cra_lend_score_complete
+          - cra_income_complete
           - layer
           - protect_linked_bank
           nullable: true
@@ -28968,6 +29122,8 @@ components:
           - cra_lend_score
           - cra_partner_insights
           - cra_network_insights
+          - cra_lend_score_complete
+          - cra_income_complete
           nullable: true
         additional_consented_products:
           type: array
@@ -29128,25 +29284,28 @@ components:
         allow_manual_entry:
           type: boolean
           description: If `true`, allow users to manually enter Investments account and holdings information. Defaults to `false`.
+        async_update:
+          x-hidden-from-docs: true
+          nullable: true
+          type: boolean
+          description: 'If `true`, only a 30-day initial history of investment transactions is pulled synchronously before the Link session completes, with the full history being pulled asynchronously after Link. When the full history is available, an `INVESTMENTS_TRANSACTIONS: HISTORICAL_UPDATE` webhook will be sent. If `false`, Link pulls the full history before the session completes. Only applies when `investments` is initialized in the `products` array. This field is configurable only for clients created before November 30, 2026, and will default to `false` if omitted. For newer clients created on or after that date, this field is ignored and is automatically `true`.'
     LinkTokenInvestmentsAuth:
-      description: Configuration parameters for the Investments Move product
+      description: Configuration parameters for the Investments Move product. Masked Number Match and Stated Account Number default to `true` when omitted. Manual Entry defaults to `false`.
       type: object
       properties:
         manual_entry_enabled:
           nullable: true
           default: false
           type: boolean
-          description: If `true`, show institutions that use the manual entry fallback flow.
+          description: If `true`, show institutions that use the manual entry fallback flow. If omitted, this defaults to `false`.
         masked_number_match_enabled:
           nullable: true
-          default: false
           type: boolean
-          description: If `true`, show institutions that use the masked number match fallback flow.
+          description: If `true`, show institutions that use the masked number match fallback flow. If omitted, this defaults to `true`.
         stated_account_number_enabled:
           nullable: true
-          default: false
           type: boolean
-          description: If `true`, show institutions that use the stated account number fallback flow.
+          description: If `true`, show institutions that use the stated account number fallback flow. If omitted, this defaults to `true`.
         rollover_401k_enabled:
           x-hidden-from-docs: true
           nullable: true
@@ -29752,6 +29911,8 @@ components:
           $ref: '#/components/schemas/CreditSessionDocumentIncomeResult'
         cra_document_upload_results:
           $ref: '#/components/schemas/LinkSessionCraDocumentUploadResult'
+        cra_report_results:
+          $ref: '#/components/schemas/LinkSessionCraReportResult'
       required:
       - item_add_results
       - cra_item_add_results
@@ -29759,6 +29920,7 @@ components:
       - bank_income_results
       - payroll_income_results
       - document_income_results
+      - cra_report_results
     LinkSessionItemAddResult:
       type: object
       description: The details of an Item add in Link.
@@ -30466,14 +30628,18 @@ components:
         additionalProperties: true
         properties:
           name:
+            description: The name of the account, either assigned by the user or by the financial institution itself
             type: string
           official_name:
+            description: The official name of the account as given by the financial institution
             type: string
             nullable: true
           mask:
+            description: The last 2-4 alphanumeric characters of either the account's displayed mask or the account's official account number. Note that the mask may be non-unique between an Item's accounts.
             type: string
             nullable: true
           verification_name:
+            description: The account holder name that was used for micro-deposit and/or database verification. Only returned for Auth Items created via micro-deposit or database verification. This name was manually-entered by the user during Link, unless it was otherwise provided via the `user.legal_name` request field in `/link/token/create` for the Link session that created the Item.
             type: string
           balances:
             $ref: '#/components/schemas/InvestmentAccountBalance'
@@ -32107,6 +32273,8 @@ components:
       - WRITTEN_INSTRUCTION_PREQUALIFICATION
       - WRITTEN_INSTRUCTION_OTHER
       - ELIGIBILITY_FOR_GOVT_BENEFITS
+      - INSURANCE_UNDERWRITING
+      - SECONDARY_INVESTOR
       description: |-
         Describes the reason you are generating a Consumer Report for this user. When calling `/link/token/create`, this field is required when using Plaid Check (CRA) products; invalid if not using Plaid Check (CRA) products.
 
@@ -32125,6 +32293,10 @@ components:
         `WRITTEN_INSTRUCTION_OTHER`: In accordance with the written instructions of the consumer pursuant to FCRA Section 604(a)(2), such as when an individual agrees to act as a guarantor or assumes personal liability for a consumer, business, or commercial loan.
 
         `ELIGIBILITY_FOR_GOVT_BENEFITS`:  In connection with an eligibility determination for a government benefit where the entity is required to consider an applicant's financial status pursuant to FCRA Section 604(a)(3)(D).
+
+        `INSURANCE_UNDERWRITING`: In connection with the underwriting of insurance involving the consumer pursuant to FCRA Section 604(a)(3)(C).
+
+        `SECONDARY_INVESTOR`: As a potential investor or servicer, or current insurer, in connection with a valuation of, or an assessment of the credit or prepayment risks associated with, an existing credit obligation pursuant to FCRA Section 604(a)(3)(E).
     PaymentMeta:
       title: PaymentMeta
       type: object
@@ -35059,6 +35231,8 @@ components:
       - cra_plaid_credit_score
       - cra_qualify
       - cra_home_lending
+      - cra_lend_score_complete
+      - cra_income_complete
       - layer
       - pay_by_bank
       - protect_linked_bank
@@ -36319,6 +36493,11 @@ components:
     NewUserID:
       title: NewUserID
       type: string
+      description: A unique user identifier, created by `/user/create`. Integrations that began using `/user/create` after December 10, 2025 use this field to identify a user instead of the `user_token`. For more details, see [New User APIs](https://plaid.com/docs/api/users/user-apis).
+    NewUserIDNullable:
+      title: NewUserIDNullable
+      type: string
+      nullable: true
       description: A unique user identifier, created by `/user/create`. Integrations that began using `/user/create` after December 10, 2025 use this field to identify a user instead of the `user_token`. For more details, see [New User APIs](https://plaid.com/docs/api/users/user-apis).
     AuthDefaultUpdateWebhook:
       x-examples:
@@ -39681,7 +39860,7 @@ components:
     TransferAuthorizationUserInRequest:
       title: TransferAuthorizationUserInRequest
       type: object
-      description: The legal name and other information for the account holder.  If the account has multiple account holders, provide the information for the account holder on whose behalf the authorization is being requested. The `user.legal_name` field is required. Other fields are not currently used and are present to support planned future functionality.
+      description: The legal name and other information for the account holder.  If the account has multiple account holders, provide the information for the account holder on whose behalf the authorization is being requested. The `user.legal_name` field is required. Other fields are optional (for `rfp` transfers, `address` is required, including `street`, `city`, `region`, `postal_code`, and `country`), but if provided, they must be validly formatted and may be used in Plaid's risk evaluation.
       properties:
         legal_name:
           type: string
@@ -39705,7 +39884,7 @@ components:
         message_to_beneficiary:
           type: string
           nullable: true
-          description: Additional information from the wire originator to the beneficiary. Max 140 characters.
+          description: Additional information from the wire originator to the beneficiary. Max 140 characters; no single word may exceed 35 characters.
         wire_return_fee:
           type: string
           nullable: true
@@ -39866,7 +40045,7 @@ components:
 
         The following codes indicate that the authorization decision was `declined`:
 
-        `NSF` - Transaction has an elevated risk of resulting in a return due to insufficient funds.
+        `NSF` - Transaction has an elevated risk of resulting in a return due to insufficient funds, or, for credit transfers, your available balance (in your Plaid Ledger or prefunded account) is insufficient to cover the transfer.
 
         `RISK` - Transaction is high-risk.
 
@@ -40324,7 +40503,7 @@ components:
       description: |-
         The status of the sweep for the transfer.
 
-        `unswept`: The transfer hasn't been swept yet.
+        `unswept`: The transfer hasn't been swept yet. Transfers that are cancelled, fail, or are returned before being swept remain `unswept`.
 
         `swept`: The transfer was swept to the sweep account.
 
@@ -40332,7 +40511,7 @@ components:
 
         `return_swept`: The transfer was returned, funds were pulled back or pushed back to the sweep account.
 
-        `null`: The transfer will never be swept (e.g. if the transfer is cancelled or returned before being swept)
+        `null`: The transfer will never be swept because it is a credit funded from a prefunded balance.
       enum:
       - null
       - unswept
@@ -40502,6 +40681,12 @@ components:
           $ref: '#/components/schemas/TransferWireDetails'
         user:
           $ref: '#/components/schemas/TransferAuthorizationUserInRequest'
+        user_id:
+          allOf:
+          - $ref: '#/components/schemas/NewUserIDNullable'
+          description: The Plaid-generated user ID returned by `/user/create` for the end user associated with this transfer's Item. This identifier is separate from the account-holder details in `user`. Omit or set to `null` if unavailable; otherwise, provide a non-empty string. During the initial rollout, this field does not affect authorization decisions.
+          x-hidden-from-docs: true
+          example: usr_9nSp2KuZ2x4JDw
         device:
           $ref: '#/components/schemas/TransferAuthorizationDevice'
         origination_account_id:
@@ -41804,7 +41989,7 @@ components:
         transfer_amount:
           title: TransferAmount
           type: string
-          description: The amount of the transfer (decimal string with two digits of precision e.g. "10.00"). This field is omitted for Plaid Ledger Sweep events.
+          description: The amount of the transfer (decimal string with two digits of precision e.g. "10.00"). For refund events and `funds_available` events, this is the amount associated with the event, such as the refund amount, rather than the original transfer amount. This field is omitted for Plaid Ledger Sweep events.
         failure_reason:
           $ref: '#/components/schemas/TransferFailure'
         sweep_id:
@@ -44505,14 +44690,18 @@ components:
         additionalProperties: true
         properties:
           name:
+            description: The name of the account, either assigned by the user or by the financial institution itself
             type: string
           official_name:
+            description: The official name of the account as given by the financial institution
             type: string
             nullable: true
           mask:
+            description: The last 2-4 alphanumeric characters of either the account's displayed mask or the account's official account number. Note that the mask may be non-unique between an Item's accounts.
             type: string
             nullable: true
           verification_name:
+            description: The account holder name that was used for micro-deposit and/or database verification. Only returned for Auth Items created via micro-deposit or database verification. This name was manually-entered by the user during Link, unless it was otherwise provided via the `user.legal_name` request field in `/link/token/create` for the Link session that created the Item.
             type: string
           owners:
             type: array
@@ -44530,14 +44719,18 @@ components:
         additionalProperties: true
         properties:
           name:
+            description: The name of the account, either assigned by the user or by the financial institution itself
             type: string
           official_name:
+            description: The official name of the account as given by the financial institution
             type: string
             nullable: true
           mask:
+            description: The last 2-4 alphanumeric characters of either the account's displayed mask or the account's official account number. Note that the mask may be non-unique between an Item's accounts.
             type: string
             nullable: true
           verification_name:
+            description: The account holder name that was used for micro-deposit and/or database verification. Only returned for Auth Items created via micro-deposit or database verification. This name was manually-entered by the user during Link, unless it was otherwise provided via the `user.legal_name` request field in `/link/token/create` for the Link session that created the Item.
             type: string
           legal_name:
             $ref: '#/components/schemas/NameMatchScore'
@@ -45416,6 +45609,17 @@ components:
           description: Indicates that the report must include identity information. If identity information is not available, the report will fail.
         home_lending_report_options:
           $ref: '#/components/schemas/CraCheckReportHomeLendingReportOptions'
+        exclude_transactions:
+          x-hidden-from-docs: true
+          type: boolean
+          nullable: true
+          default: false
+          description: |-
+            When set to `true`, this option excludes account transaction records from the Base Report before it is stored. In the `/cra/check_report/base_report/get` response, each account's `transactions` field remains present as an empty array. This option does not affect insight calculations.
+
+            Omitting this option or setting it to `null` or `false` preserves existing behavior. These values do not override any client configuration that excludes transactions.
+
+            Requests with `exclude_transactions` set to `true` are rejected with an `INVALID_FIELD` error if they also request GSE or Home Lending reports. A Base Report created with this option set to `true` cannot be used to generate those reports later.
     LinkTokenCreateRequestCraOptionsBaseReportGSEOptions:
       title: LinkTokenCreateRequestCraOptionsBaseReportGSEOptions
       type: object
@@ -45509,6 +45713,7 @@ components:
           - cra_cashflow_insights
           - cra_lend_score
           - cra_network_insights
+          - cra_home_lending
           - cra_lend_score_complete
           - cra_income_complete
       required:
@@ -53457,7 +53662,7 @@ components:
     PartnerEndCustomerProductStatuses:
       description: Mapping of product names to their current status.
       type: object
-      additionalProperties: true
+      additionalProperties: {}
     PartnerEndCustomerRequirementsDue:
       description: A list of fields that are still required to be submitted.
       type: array
@@ -55894,20 +56099,28 @@ components:
       title: CraCheckReportPermissiblePurpose
       enum:
       - ACCOUNT_REVIEW_CREDIT
+      - ACCOUNT_REVIEW_NON_CREDIT
       - WRITTEN_INSTRUCTION_OTHER
+      - SECONDARY_INVESTOR
       description: The permissible purpose under the FCRA for retrieving this consumer report. Restricted to permissible purposes related to loan servicing only. Required when `report_id` is provided.
     MonitoringConsumerReportPermissiblePurpose:
       type: string
       title: MonitoringConsumerReportPermissiblePurpose
       enum:
       - ACCOUNT_REVIEW_CREDIT
+      - ACCOUNT_REVIEW_NON_CREDIT
       - WRITTEN_INSTRUCTION_OTHER
+      - SECONDARY_INVESTOR
       description: |-
         Describes the reason you are generating a Consumer Report for this user.
 
         `ACCOUNT_REVIEW_CREDIT`: In connection with a consumer credit transaction for the review or collection of an account pursuant to FCRA Section 604(a)(3)(A).
 
+        `ACCOUNT_REVIEW_NON_CREDIT`: For a legitimate business need of the information to review a non-credit account provided primarily for personal, family, or household purposes to determine whether the consumer continues to meet the terms of the account pursuant to FCRA Section 604(a)(3)(F)(2).
+
         `WRITTEN_INSTRUCTION_OTHER`: In accordance with the written instructions of the consumer pursuant to FCRA Section 604(a)(2), such as when an individual agrees to act as a guarantor or assumes personal liability for a consumer, business, or commercial loan.
+
+        `SECONDARY_INVESTOR`: As a potential investor or servicer, or current insurer, in connection with a valuation of, or an assessment of the credit or prepayment risks associated with, an existing credit obligation pursuant to FCRA Section 604(a)(3)(E).
     MonitoringInsights:
       title: MonitoringInsights
       type: object
@@ -57900,8 +58113,18 @@ components:
           description: Data returned by the financial institution about the account owner or owners. For business accounts, the name reported may be either the name of the individual or the name of the business, depending on the institution. Multiple owners on a single account will be represented in the same `owner` object, not in multiple owner objects within the array. This array can also be empty if no owners are found.
           items:
             $ref: '#/components/schemas/Owner'
+        holder_category:
+          x-hidden-from-docs: true
+          allOf:
+          - $ref: '#/components/schemas/AccountHolderCategory'
+          - description: This field contains the account holder category extracted from the financial institution. The value is `personal`, `business`, or `unrecognized`. The field is omitted when the extracted category is unavailable.
         ownership_type:
           $ref: '#/components/schemas/OwnershipType'
+        investments:
+          x-hidden-from-docs: true
+          description: This field contains investment data only for investment accounts when `include_investments` in `/cra/check_report/create` or `cra_options.include_investments` in `/link/token/create` is set to `true`. This field may be omitted if recent investment data was unavailable at report generation. The account remains in the report when this field is omitted.
+          allOf:
+          - $ref: '#/components/schemas/BaseReportInvestments'
         historical_balances:
           type: array
           x-hidden-from-docs: true
@@ -58517,7 +58740,7 @@ components:
       type: object
       additionalProperties: true
       nullable: true
-      description: A set of fields describing the investments data on an account.
+      description: A set of fields describing the investments data on an account. Its arrays may be empty.
       properties:
         holdings:
           type: array
@@ -60619,7 +60842,8 @@ components:
           $ref: '#/components/schemas/BusinessVerificationStatus__RiskCheck'
         score:
           type: integer
-          description: A score from 0 to 100 indicating the risk assessment for the business
+          nullable: true
+          description: 'A score from 0 to 100 indicating the risk assessment for the business. `null` if no risk score is available for this verification. Industry classification may still be available when the risk score is `null`. A completed check can have `status: failed` and a `null` score when the risk assessment could not be completed; this does not represent a score of zero or a high-risk assessment. Read `status` separately to determine the check outcome; `null` does not mean the check is still running.'
           example: 92
         industry_prediction:
           $ref: '#/components/schemas/BusinessIndustryPredictionNullable'
@@ -60873,7 +61097,8 @@ components:
           $ref: '#/components/schemas/BusinessVerificationStatus__WebPresenceCheck'
         score:
           type: integer
-          description: A score from 0 to 100 indicating digital presence confidence.
+          nullable: true
+          description: 'A score from 0 to 100 indicating digital presence confidence. `null` if no digital presence score is available for this verification. A completed check can have `status: failed` and a `null` score when website analysis could not produce a score; this does not represent a score of zero. Read `status` separately to determine the check outcome; `null` does not mean the check is still running. When website analysis was not requested, the entire `digital_presence_check` object is `null`.'
           example: 55
         address:
           $ref: '#/components/schemas/BusinessFieldMatchSummary'
@@ -63334,6 +63559,22 @@ components:
           nullable: true
           description: Whether the Social Security Administration reported the person as deceased. Null when the status is unavailable.
           example: false
+        name_match:
+          allOf:
+          - $ref: '#/components/schemas/KYCCheckSSAMatchStatus'
+          description: Whether the person's name matches SSA records. `no_data` indicates that this field result is unavailable.
+        date_of_birth_match:
+          allOf:
+          - $ref: '#/components/schemas/KYCCheckSSAMatchStatus'
+          description: Whether the person's date of birth matches SSA records. `no_data` indicates that this field result is unavailable.
+        ssn_match:
+          allOf:
+          - $ref: '#/components/schemas/KYCCheckSSAMatchStatus'
+          description: Whether the person's Social Security number matches SSA records. `no_data` indicates that this field result is unavailable.
+        other_match:
+          allOf:
+          - $ref: '#/components/schemas/KYCCheckSSAMatchStatus'
+          description: The match result when SSA does not disclose individual field results. `no_data` indicates that this field result is unavailable.
       required:
       - match
       - is_deceased
@@ -67706,6 +67947,17 @@ components:
           description: Indicates that the report must include identity information. If identity information is not available, the report will fail.
         home_lending_report_options:
           $ref: '#/components/schemas/CraCheckReportHomeLendingReportOptions'
+        exclude_transactions:
+          x-hidden-from-docs: true
+          type: boolean
+          nullable: true
+          default: false
+          description: |-
+            When set to `true`, this option excludes account transaction records from the Base Report before it is stored. In the `/cra/check_report/base_report/get` response, each account's `transactions` field remains present as an empty array. This option does not affect insight calculations.
+
+            Omitting this option or setting it to `null` or `false` preserves existing behavior. These values do not override any client configuration that excludes transactions.
+
+            Requests with `exclude_transactions` set to `true` are rejected with an `INVALID_FIELD` error if they also request GSE or Home Lending reports. A Base Report created with this option set to `true` cannot be used to generate those reports later.
     CraCheckReportHomeLendingReportOptions:
       title: CraCheckReportHomeLendingReportOptions
       type: object
@@ -67766,7 +68018,6 @@ components:
       description: The version of the LendScore to use. Required if using LendScore.
       nullable: true
       enum:
-      - v1.0
       - v2.0
       - LS1
       x-override-enum-values-shown:
@@ -67828,7 +68079,7 @@ components:
       title: IncomeInsightsVersion
       type: string
       nullable: true
-      description: The version of Income Insights to use. This value is not shared across API calls for the same resource. If it is omitted from a request, the default version is used, even if a version was set in an earlier call such as `/link/token/create` or `/cra/check_report/create`.
+      description: The version of Income Insights to use. Set this to `II2`. The value applies only to the request it is sent with; a version set in an earlier call, such as `/link/token/create` or `/cra/check_report/create`, is not reused.
       enum:
       - II2
     CraCheckReportCashflowInsightsGetResponse:
@@ -68147,7 +68398,7 @@ components:
     CraCheckReportVerificationPdfGetResponse:
       format: binary
       type: string
-      description: CraCheckReportVerificationPdfGetResponse defines the response schema for `/cra/check_report/verification/pdf/get`
+      description: The verification report in PDF format. Investment account pages may be excluded when recent investment data was unavailable at report generation.
     CraVerificationReport:
       title: CraVerificationReport
       type: object
@@ -68219,7 +68470,7 @@ components:
       properties:
         accounts:
           type: array
-          description: Data about each of the accounts open on the Item.
+          description: Data about each of the accounts open on the Item. Investment accounts are included only when `include_investments` in `/cra/check_report/create` or `cra_options.include_investments` in `/link/token/create` was `true`. They are excluded if recent investment data was unavailable at report generation.
           items:
             $ref: '#/components/schemas/CraVoaReportAccount'
         institution_name:
@@ -69511,7 +69762,6 @@ components:
       - version
     CraHomeLendingProduct:
       title: CraHomeLendingProduct
-      x-hidden-from-docs: true
       type: object
       additionalProperties: true
       description: Names the Home Lending product at a given version.
@@ -69748,7 +69998,6 @@ components:
       - version
     CraReportCreateHomeLendingProductConfig:
       title: CraReportCreateHomeLendingProductConfig
-      x-hidden-from-docs: true
       type: object
       additionalProperties: true
       description: Requests the given version of the Home Lending product. Home Lending accepts no additional configuration today.
@@ -69939,6 +70188,7 @@ components:
           - cra_cashflow_insights
           - cra_lend_score
           - cra_network_insights
+          - cra_home_lending
           - cra_lend_score_complete
           - cra_income_complete
         scope:
@@ -70047,6 +70297,7 @@ components:
           - cra_cashflow_insights
           - cra_lend_score
           - cra_network_insights
+          - cra_home_lending
           - cra_lend_score_complete
           - cra_income_complete
         scope:
@@ -70445,6 +70696,7 @@ components:
 
         - `ELIGIBILITY_FOR_GOVT_BENEFITS`
         - `EXTENSION_OF_CREDIT`
+        - `INSURANCE_UNDERWRITING`
         - `LEGITIMATE_BUSINESS_NEED_OTHER`
         - `LEGITIMATE_BUSINESS_NEED_TENANT_SCREENING`
         - `WRITTEN_INSTRUCTION_OTHER`
@@ -70507,6 +70759,35 @@ components:
       - metadata
       - attributes
       - errors
+      x-examples:
+        example-1:
+          product: cra_cashflow_insights
+          version: V1
+          metadata:
+            generated_time: "2024-01-15T10:30:00Z"
+            item_count: 3
+            account_count: 5
+            institution_ids:
+            - ins_56
+            primary_account_count: 1
+            depository_account_type_count: 3
+            credit_account_type_count: 2
+            investment_account_type_count: 0
+            other_account_type_count: 0
+            multiple_owner_account_count: 0
+            oldest_transaction_date: "2023-01-15"
+            most_recent_transaction_date: "2024-01-14"
+          attributes:
+            accounts_count: 5
+            depository_accounts_count: 3
+            credit_accounts_count: 2
+            depository_latest_balance_user_sum_1d: 4823.56
+            net_income_amt_sum_90d: 13418.75
+            income_sources_count_90d: 1
+            income_is_salaried_90d: 1
+            payment_behavior_nsf_late_fees_count_30d: 0
+            cash_reliance_atm_withdrawal_amt_cv_90d: 0.42
+          errors: []
     CraReportGetNetworkInsightsResponseProduct:
       title: CraReportGetNetworkInsightsResponseProduct
       type: object
@@ -70535,6 +70816,32 @@ components:
       - metadata
       - attributes
       - errors
+      x-examples:
+        example-1:
+          product: cra_network_insights
+          version: V1
+          metadata:
+            generated_time: "2024-01-15T10:30:00Z"
+            item_count: 3
+            account_count: 5
+            institution_ids:
+            - ins_56
+            primary_account_count: 1
+            depository_account_type_count: 3
+            credit_account_type_count: 2
+            investment_account_type_count: 0
+            other_account_type_count: 0
+            multiple_owner_account_count: 0
+            oldest_transaction_date: "2023-01-15"
+            most_recent_transaction_date: "2024-01-14"
+          attributes:
+            plaid_conn_user_days_since_first_conn_all: 412
+            plaid_conn_user_lifetime_lending_count: 3
+            plaid_conn_user_lifetime_personal_lending_flag: 1
+            plaid_conn_user_active_lending_count_90d: 1
+            plaid_conn_user_lifetime_cash_advance_primary_count: 0
+            plaid_conn_user_active_ewa_primary_count_90d: 0
+          errors: []
     CraReportGetCashflowInsightsAttributes:
       title: CraReportGetCashflowInsightsAttributes
       type: object
@@ -70578,6 +70885,32 @@ components:
       - metadata
       - scores
       - errors
+      x-examples:
+        example-1:
+          product: cra_lend_score
+          version: V1
+          metadata:
+            generated_time: "2024-01-15T10:30:00Z"
+            item_count: 3
+            account_count: 5
+            institution_ids:
+            - ins_56
+            primary_account_count: 1
+            depository_account_type_count: 3
+            credit_account_type_count: 2
+            investment_account_type_count: 0
+            other_account_type_count: 0
+            multiple_owner_account_count: 0
+            oldest_transaction_date: "2023-01-15"
+            most_recent_transaction_date: "2024-01-14"
+          scores:
+          - variant: GENERALIST
+            score: 65
+            reason_codes:
+            - PCS0220
+            - PCS0216
+            error_code: null
+          errors: []
     CraReportGetLendScoreMetadata:
       title: CraReportGetLendScoreMetadata
       type: object
@@ -70590,7 +70923,7 @@ components:
         properties:
           primary_account_count:
             type: integer
-            description: The number of accounts carrying Plaid's primary account indicator.
+            description: The number of accounts carrying Plaid's primary account indicator, based on a report-level view of the user's transaction history.
           depository_account_type_count:
             type: integer
             description: The number of depository accounts used to generate the report.
@@ -70645,7 +70978,24 @@ components:
         error_code:
           type: string
           nullable: true
-          description: The error code explaining why this LendScore variant could not be computed, such as `INSUFFICIENT_TRANSACTION_DATA` or `NO_ACCOUNTS`. `null` on success. New codes may be added over time, so treat an unrecognized value as a generic failure.
+          description: |-
+            The error code explaining why this LendScore variant could not be computed. `null` on success. Possible values:
+
+            `INSUFFICIENT_TRANSACTION_HISTORY_30D`: User must have at least 30 days of transaction history
+
+            `INSUFFICIENT_TRANSACTIONS_30D`: User must have at least 1 transaction in the past 30 days
+
+            `INSUFFICIENT_INFLOW_TRANSACTIONS_30D`: User must have at least 1 inflow transaction in the past 30 days
+
+            `INSUFFICIENT_INFLOW_TRANSACTIONS_180D`: User must have at least 2 inflow transactions in the past 180 days
+
+            `INSUFFICIENT_OUTFLOW_TRANSACTIONS_30D`: User must have at least 2 outflow transactions in the past 30 days
+
+            `INSUFFICIENT_OUTFLOW_TRANSACTIONS_180D`: User must have at least 4 outflow transactions in the past 180 days
+
+            `BALANCE_UNAVAILABLE`: Balance unavailable for one or more of the user's accounts
+
+            Other failures return `PRODUCT_GENERATION_FAILED`. New codes may be added over time, so treat an unrecognized value as a generic failure.
       required:
       - variant
       - score
@@ -70686,6 +71036,143 @@ components:
       - metadata
       - items
       - errors
+      x-examples:
+        example-1:
+          product: cra_base_report
+          version: V1
+          metadata:
+            generated_time: "2024-01-15T10:30:00Z"
+            item_count: 1
+            account_count: 1
+            institution_ids:
+            - ins_109508
+            days_requested: 365
+            primary_account_count: 1
+            depository_account_type_count: 1
+            credit_account_type_count: 0
+            investment_account_type_count: 0
+            other_account_type_count: 0
+            multiple_owner_account_count: 0
+            oldest_transaction_date: "2023-01-16"
+            most_recent_transaction_date: "2024-01-12"
+          items:
+          - item_id: eVBnVMp7zdTJLkRNr33Rs6zr7KNJqBFL9DrE6
+            institution_id: ins_109508
+            institution_name: First Platypus Bank
+            date_last_updated: "2024-01-15T10:29:41Z"
+            accounts:
+            - account_id: 1qKRXQjk8xUWDJojNwPXTj8gEmR48piqRNye8
+              name: Plaid Checking
+              official_name: Plaid Gold Standard 0% Interest Checking
+              mask: "0000"
+              type: depository
+              subtype: checking
+              days_available: 361
+              metadata:
+                start_date: "2023-01-16"
+                end_date: "2024-01-12"
+              balances:
+                available: 1203.42
+                current: 1274.93
+                limit: null
+                iso_currency_code: USD
+                unofficial_currency_code: null
+                average_balance: 1180.27
+                most_recent_thirty_day_average_balance: 1251.06
+                average_monthly_balances:
+                - start_date: "2023-12-01"
+                  end_date: "2023-12-31"
+                  average_balance:
+                    amount: 1198.5
+                    iso_currency_code: USD
+                    unofficial_currency_code: null
+              owners:
+              - names:
+                - Alberta Bobbeth Charleson
+                phone_numbers:
+                - data: +1 111-555-3333
+                  primary: true
+                  type: home
+                emails:
+                - data: accountholder0@example.com
+                  primary: true
+                  type: primary
+                addresses:
+                - data:
+                    street: 2992 Cameron Road
+                    city: Malakoff
+                    region: NY
+                    postal_code: "14236"
+                    country: US
+                  primary: true
+              ownership_type: individual
+              consumer_disputes: []
+              transactions:
+              - transaction_id: lPNjeW1nR6CDn5okmGQ6hEpMo4lLNoSrzqDje
+                account_id: 1qKRXQjk8xUWDJojNwPXTj8gEmR48piqRNye8
+                amount: -1500
+                iso_currency_code: USD
+                unofficial_currency_code: null
+                original_description: PLATYPUS PAYROLL PPD ID 1234567890
+                merchant_name: null
+                credit_category:
+                  primary: INCOME
+                  detailed: INCOME_SALARY
+                check_number: null
+                date: "2024-01-12"
+                date_transacted: "2024-01-12"
+                pending: false
+                account_owner: null
+                location:
+                  address: null
+                  city: null
+                  region: null
+                  postal_code: null
+                  country: null
+                  lat: null
+                  lon: null
+                  store_number: null
+              - transaction_id: 4zBRq1Qem4uAPnoyKjJNTRQpQddM4ztlo1PLD
+                account_id: 1qKRXQjk8xUWDJojNwPXTj8gEmR48piqRNye8
+                amount: 72.1
+                iso_currency_code: USD
+                unofficial_currency_code: null
+                original_description: PLATYPUS FRESH MARKET 0233 MALAKOFF NY
+                merchant_name: Platypus Fresh Market
+                credit_category:
+                  primary: FOOD_RETAIL
+                  detailed: FOOD_RETAIL_GROCERIES
+                check_number: null
+                date: "2024-01-10"
+                date_transacted: "2024-01-09"
+                pending: false
+                account_owner: null
+                location:
+                  address: null
+                  city: Malakoff
+                  region: NY
+                  postal_code: "14236"
+                  country: US
+                  lat: null
+                  lon: null
+                  store_number: "0233"
+              attributes:
+                is_primary_account: true
+                primary_account_score: 0.93
+              identity_match:
+                legal_name:
+                  score: 90
+                  is_first_name_or_last_name_match: true
+                  is_nickname_match: false
+                  is_business_name_detected: false
+                phone_number:
+                  score: 100
+                email_address:
+                  score: 100
+                address:
+                  score: 100
+                  is_postal_code_match: true
+          errors: []
     CraReportGetBaseReportMetadata:
       title: CraReportGetBaseReportMetadata
       type: object
@@ -70701,7 +71188,7 @@ components:
             description: The number of days of transaction history requested.
           primary_account_count:
             type: integer
-            description: The number of accounts carrying Plaid's primary account indicator.
+            description: The number of accounts carrying Plaid's primary account indicator, based on a report-level view of the user's transaction history.
           depository_account_type_count:
             type: integer
             description: The number of depository accounts used to generate the report.
@@ -71092,7 +71579,7 @@ components:
         is_primary_account:
           type: boolean
           nullable: true
-          description: Whether the account is predicted to be the user's primary account. At most one account per account type across the user's Items is `true`. `null` if the prediction could not be computed.
+          description: Whether the account is predicted to be the user's primary account, based on an Item-level view of the user's transaction history. At most one account per account type across the user's Items is `true`. `null` if the prediction could not be computed.
         primary_account_score:
           type: number
           format: double
@@ -71292,6 +71779,45 @@ components:
       - metadata
       - attributes
       - errors
+      x-examples:
+        example-1:
+          product: cra_qualify
+          version: V1
+          metadata:
+            account_count: 3
+            credit_account_type_count: 1
+            depository_account_type_count: 2
+            generated_time: "2026-06-29T18:56:05.380377202Z"
+            institution_ids:
+            - ins_116794
+            - ins_3
+            investment_account_type_count: 0
+            item_count: 2
+            most_recent_transaction_date: "2026-03-11"
+            multiple_owner_account_count: 0
+            oldest_transaction_date: "2023-09-01"
+            other_account_type_count: 0
+            primary_account_count: 2
+          attributes:
+            lend_scores:
+            - error_reason: null
+              reason_codes:
+              - PCS0210
+              - PCS0213
+              score: 65
+              variant: GENERAL
+            accounts_count: 3
+            net_income_amt_cv_90d: 0.05
+            income_sources_count_180d: 1
+            income_is_gig_worker_180d: 0
+            payment_behavior_cash_adv_overdraft_amt_sum_90d: 0
+            cash_reliance_atm_withdrawal_amt_cv_90d: 0.25
+            essential_spending_amt_pct_change_180d_90d: 0.01
+            discretionary_spending_dining_amt_sum_180d: 1580
+            loan_payments_amt_cv_90d: 0.08
+            plaid_conn_user_active_auto_loan_count_90d: 0
+            plaid_conn_user_active_bnpl_count_90d: 0
+          errors: []
     CraReportGetIncomeInsightsResponseProduct:
       title: CraReportGetIncomeInsightsResponseProduct
       type: object
@@ -71326,6 +71852,178 @@ components:
       - attributes
       - items
       - errors
+      x-examples:
+        example-1:
+          product: cra_income_insights
+          version: V2
+          metadata:
+            generated_time: "2024-01-15T10:30:00Z"
+            item_count: 1
+            account_count: 1
+            institution_ids:
+            - ins_56
+            primary_account_count: 1
+            depository_account_type_count: 1
+            credit_account_type_count: 0
+            investment_account_type_count: 0
+            other_account_type_count: 0
+            multiple_owner_account_count: 0
+            oldest_transaction_date: "2023-01-15"
+            most_recent_transaction_date: "2024-01-14"
+          attributes:
+            income_streams:
+            - income_stream_id: Xb0o9S88MI9mgWjwZscJ1UQVJycB4UrKg4Pnk
+              start_date: "2023-12-08"
+              end_date: "2024-01-05"
+              description: ACME CORP PAYROLL
+              insights:
+                income_category:
+                  primary: EARNED_INCOME
+                  secondary: SALARY
+                pay_frequency: BIWEEKLY
+                income_provider:
+                  name: Acme Corp
+                  is_normalized: true
+                status: ACTIVE
+                next_payment:
+                  date: "2024-01-19"
+              income_metrics:
+                current:
+                  monthly:
+                    gross_income: 8333.33
+                    net_income: 6250
+                  annual:
+                    gross_income: 100000
+                    net_income: 75000
+                projected:
+                  monthly:
+                    gross_income: 8333.33
+                    net_income: 6250
+                  annual:
+                    gross_income: 100000
+                    net_income: 75000
+                iso_currency_code: USD
+                unofficial_currency_code: null
+              transactions:
+              - transaction_id: NlNM102sFvKPvkEHRM2IoolQGWrItW7DrSXL7
+                item_id: AZMP7JrGXgtPd3AQMeg7hwMKgk5E8qU1V5ME7
+                account_id: 1qKRXQjk8xUWDJojNwPXTj8gEmR48piqRNye8
+                amount: -2884.62
+                date: "2023-12-08"
+                original_description: ACME CORP PAYROLL PPD ID 9876543210
+                iso_currency_code: USD
+                unofficial_currency_code: null
+                outlier:
+                  is_outlier: false
+                  amount: null
+              - transaction_id: 8ckTj04OaC05mKoov6gX8z3XG13BMpNu7jsTN
+                item_id: AZMP7JrGXgtPd3AQMeg7hwMKgk5E8qU1V5ME7
+                account_id: 1qKRXQjk8xUWDJojNwPXTj8gEmR48piqRNye8
+                amount: -2884.62
+                date: "2023-12-22"
+                original_description: ACME CORP PAYROLL PPD ID 9876543210
+                iso_currency_code: USD
+                unofficial_currency_code: null
+                outlier:
+                  is_outlier: false
+                  amount: null
+              - transaction_id: S0CQ0vHeLYC5ULWICjSbcQ4UPledKXXUoW4Sg
+                item_id: AZMP7JrGXgtPd3AQMeg7hwMKgk5E8qU1V5ME7
+                account_id: 1qKRXQjk8xUWDJojNwPXTj8gEmR48piqRNye8
+                amount: -2884.62
+                date: "2024-01-05"
+                original_description: ACME CORP PAYROLL PPD ID 9876543210
+                iso_currency_code: USD
+                unofficial_currency_code: null
+                outlier:
+                  is_outlier: false
+                  amount: null
+            - income_stream_id: wBf06a9Qql7NZljaf1wgV1PCgMGhrmjeSdU0j
+              start_date: "2023-12-15"
+              end_date: "2024-01-12"
+              description: UPWORK ESCROW INC
+              insights:
+                income_category:
+                  primary: EARNED_INCOME
+                  secondary: GIG_ECONOMY
+                pay_frequency: MONTHLY
+                income_provider:
+                  name: Upwork
+                  is_normalized: true
+                status: ACTIVE
+                next_payment:
+                  date: "2024-02-12"
+              income_metrics:
+                current:
+                  monthly:
+                    gross_income: 1050
+                    net_income: 1050
+                  annual:
+                    gross_income: 12600
+                    net_income: 12600
+                projected:
+                  monthly:
+                    gross_income: 1050
+                    net_income: 1050
+                  annual:
+                    gross_income: 12600
+                    net_income: 12600
+                iso_currency_code: USD
+                unofficial_currency_code: null
+              transactions:
+              - transaction_id: fMXSpM1FbBJAn1g5qkzuh5mhwubJYar14mbGj
+                item_id: AZMP7JrGXgtPd3AQMeg7hwMKgk5E8qU1V5ME7
+                account_id: 1qKRXQjk8xUWDJojNwPXTj8gEmR48piqRNye8
+                amount: -1120
+                date: "2023-12-15"
+                original_description: UPWORK ESCROW INC PAYMENT
+                iso_currency_code: USD
+                unofficial_currency_code: null
+                outlier:
+                  is_outlier: false
+                  amount: null
+              - transaction_id: xmioAvxXxN6QaS9ZJnCpkyfIuZHBcYibyQf74
+                item_id: AZMP7JrGXgtPd3AQMeg7hwMKgk5E8qU1V5ME7
+                account_id: 1qKRXQjk8xUWDJojNwPXTj8gEmR48piqRNye8
+                amount: -980
+                date: "2024-01-12"
+                original_description: UPWORK ESCROW INC PAYMENT
+                iso_currency_code: USD
+                unofficial_currency_code: null
+                outlier:
+                  is_outlier: false
+                  amount: null
+            user_summary:
+              income_metrics:
+              - current:
+                  monthly:
+                    gross_income: 9383.33
+                    net_income: 7300
+                  annual:
+                    gross_income: 112600
+                    net_income: 87600
+                projected:
+                  monthly:
+                    gross_income: 9383.33
+                    net_income: 7300
+                  annual:
+                    gross_income: 112600
+                    net_income: 87600
+                iso_currency_code: USD
+                unofficial_currency_code: null
+          items:
+          - institution_id: ins_56
+            institution_name: Chase
+            item_id: AZMP7JrGXgtPd3AQMeg7hwMKgk5E8qU1V5ME7
+            last_updated_time: "2024-01-15T10:28:00Z"
+            accounts:
+            - account_id: 1qKRXQjk8xUWDJojNwPXTj8gEmR48piqRNye8
+              name: Plaid Checking Account
+              official_name: Plaid Checking Account
+              mask: "8888"
+              type: depository
+              subtype: checking
+          errors: []
     CraReportGetIncomeInsightsAttributes:
       title: CraReportGetIncomeInsightsAttributes
       type: object
@@ -71417,6 +72115,181 @@ components:
       - attributes
       - items
       - errors
+      x-examples:
+        example-1:
+          product: cra_lend_score_complete
+          version: V1
+          metadata:
+            generated_time: "2026-06-29T18:56:05.380377202Z"
+            item_count: 2
+            account_count: 3
+            institution_ids:
+            - ins_116794
+            - ins_3
+            primary_account_count: 2
+            depository_account_type_count: 2
+            credit_account_type_count: 1
+            investment_account_type_count: 0
+            other_account_type_count: 0
+            multiple_owner_account_count: 0
+            oldest_transaction_date: "2023-09-01"
+            most_recent_transaction_date: "2026-03-11"
+          attributes:
+            lend_scores:
+            - variant: GENERALIST
+              score: 65
+              reason_codes:
+              - PCS0210
+              - PCS0213
+              error_code: null
+            cashflow_insights:
+              accounts_count: 3
+              net_income_amt_cv_90d: 0.05
+              income_sources_count_180d: 1
+              income_is_gig_worker_180d: 0
+              payment_behavior_cash_adv_overdraft_amt_sum_90d: 0
+              cash_reliance_atm_withdrawal_amt_cv_90d: 0.25
+              essential_spending_amt_pct_change_180d_90d: 0.01
+              discretionary_spending_dining_amt_sum_180d: 1580
+              loan_payments_amt_cv_90d: 0.08
+            network_insights:
+              plaid_conn_user_active_auto_loan_count_90d: 0
+              plaid_conn_user_active_bnpl_count_90d: 0
+          items:
+          - institution_id: ins_116794
+            institution_name: Mercury
+            item_id: d5zOsXJexe8HJWeXfK2RX1hvFXHGy5ezJWKSQ
+            last_updated_time: "2026-06-29T18:55:12Z"
+            accounts:
+            - account_id: 2nQG6pPhDotANwYwX8fy7SKF4ZWBmfD4XPAlh
+              name: Mercury Checking
+              official_name: Mercury Personal Checking
+              mask: "4821"
+              type: depository
+              subtype: checking
+              primary_account:
+                is_primary: true
+                score: 0.93
+              identity_match:
+                legal_name:
+                  score: 90
+                  is_first_name_or_last_name_match: true
+                  is_nickname_match: false
+                  is_business_name_detected: false
+                phone_number:
+                  score: 100
+                email_address:
+                  score: 100
+                address:
+                  score: 100
+                  is_postal_code_match: true
+              owners:
+              - names:
+                - Alberta Bobbeth Charleson
+                phone_numbers:
+                - data: +1 111-555-3333
+                  primary: true
+                  type: home
+                emails:
+                - data: accountholder0@example.com
+                  primary: true
+                  type: primary
+                addresses:
+                - data:
+                    street: 2992 Cameron Road
+                    city: Malakoff
+                    region: NY
+                    postal_code: "14236"
+                    country: US
+                  primary: true
+          - institution_id: ins_3
+            institution_name: Chase
+            item_id: DAgobrKnd1haXKIO7S8wSJfAExPPqq3ErpAAt
+            last_updated_time: "2026-06-29T18:55:20Z"
+            accounts:
+            - account_id: MwSqyi1naT8uZLcuPe1B0DsEa8CG5w3C8CgHi
+              name: Chase Savings
+              official_name: Chase Savings
+              mask: "3307"
+              type: depository
+              subtype: savings
+              primary_account:
+                is_primary: false
+                score: 0.08
+              identity_match:
+                legal_name:
+                  score: 90
+                  is_first_name_or_last_name_match: true
+                  is_nickname_match: false
+                  is_business_name_detected: false
+                phone_number:
+                  score: 100
+                email_address:
+                  score: 100
+                address:
+                  score: 100
+                  is_postal_code_match: true
+              owners:
+              - names:
+                - Alberta Bobbeth Charleson
+                phone_numbers:
+                - data: +1 111-555-3333
+                  primary: true
+                  type: home
+                emails:
+                - data: accountholder0@example.com
+                  primary: true
+                  type: primary
+                addresses:
+                - data:
+                    street: 2992 Cameron Road
+                    city: Malakoff
+                    region: NY
+                    postal_code: "14236"
+                    country: US
+                  primary: true
+            - account_id: DAUOQzH2PCAJb9qJmFB75L7lhP1lSh5h6HfND
+              name: Chase Freedom Unlimited
+              official_name: Chase Freedom Unlimited Visa
+              mask: "1956"
+              type: credit
+              subtype: credit card
+              primary_account:
+                is_primary: true
+                score: 0.88
+              identity_match:
+                legal_name:
+                  score: 90
+                  is_first_name_or_last_name_match: true
+                  is_nickname_match: false
+                  is_business_name_detected: false
+                phone_number:
+                  score: 100
+                email_address:
+                  score: 100
+                address:
+                  score: 100
+                  is_postal_code_match: true
+              owners:
+              - names:
+                - Alberta Bobbeth Charleson
+                phone_numbers:
+                - data: +1 111-555-3333
+                  primary: true
+                  type: home
+                emails:
+                - data: accountholder0@example.com
+                  primary: true
+                  type: primary
+                addresses:
+                - data:
+                    street: 2992 Cameron Road
+                    city: Malakoff
+                    region: NY
+                    postal_code: "14236"
+                    country: US
+                  primary: true
+          errors: []
     CraReportGetLendScoreCompleteAttributes:
       title: CraReportGetLendScoreCompleteAttributes
       type: object
@@ -71449,7 +72322,7 @@ components:
         properties:
           primary_account_count:
             type: integer
-            description: The number of accounts carrying Plaid's primary account indicator.
+            description: The number of accounts carrying Plaid's primary account indicator, based on a report-level view of the user's transaction history.
           depository_account_type_count:
             type: integer
             description: The number of depository accounts used to generate the report.
@@ -71518,6 +72391,214 @@ components:
       - attributes
       - items
       - errors
+      x-examples:
+        example-1:
+          product: cra_income_complete
+          version: V2
+          metadata:
+            generated_time: "2024-01-15T10:30:00Z"
+            item_count: 1
+            account_count: 1
+            institution_ids:
+            - ins_56
+            primary_account_count: 1
+            depository_account_type_count: 1
+            credit_account_type_count: 0
+            investment_account_type_count: 0
+            other_account_type_count: 0
+            multiple_owner_account_count: 0
+            oldest_transaction_date: "2023-01-15"
+            most_recent_transaction_date: "2024-01-14"
+          attributes:
+            income_insights:
+              income_streams:
+              - income_stream_id: Xb0o9S88MI9mgWjwZscJ1UQVJycB4UrKg4Pnk
+                start_date: "2023-12-08"
+                end_date: "2024-01-05"
+                description: ACME CORP PAYROLL
+                insights:
+                  income_category:
+                    primary: EARNED_INCOME
+                    secondary: SALARY
+                  pay_frequency: BIWEEKLY
+                  income_provider:
+                    name: Acme Corp
+                    is_normalized: true
+                  status: ACTIVE
+                  next_payment:
+                    date: "2024-01-19"
+                income_metrics:
+                  current:
+                    monthly:
+                      gross_income: 8333.33
+                      net_income: 6250
+                    annual:
+                      gross_income: 100000
+                      net_income: 75000
+                  projected:
+                    monthly:
+                      gross_income: 8333.33
+                      net_income: 6250
+                    annual:
+                      gross_income: 100000
+                      net_income: 75000
+                  iso_currency_code: USD
+                  unofficial_currency_code: null
+                transactions:
+                - transaction_id: NlNM102sFvKPvkEHRM2IoolQGWrItW7DrSXL7
+                  item_id: AZMP7JrGXgtPd3AQMeg7hwMKgk5E8qU1V5ME7
+                  account_id: 1qKRXQjk8xUWDJojNwPXTj8gEmR48piqRNye8
+                  amount: -2884.62
+                  date: "2023-12-08"
+                  original_description: ACME CORP PAYROLL PPD ID 9876543210
+                  iso_currency_code: USD
+                  unofficial_currency_code: null
+                  outlier:
+                    is_outlier: false
+                    amount: null
+                - transaction_id: 8ckTj04OaC05mKoov6gX8z3XG13BMpNu7jsTN
+                  item_id: AZMP7JrGXgtPd3AQMeg7hwMKgk5E8qU1V5ME7
+                  account_id: 1qKRXQjk8xUWDJojNwPXTj8gEmR48piqRNye8
+                  amount: -2884.62
+                  date: "2023-12-22"
+                  original_description: ACME CORP PAYROLL PPD ID 9876543210
+                  iso_currency_code: USD
+                  unofficial_currency_code: null
+                  outlier:
+                    is_outlier: false
+                    amount: null
+                - transaction_id: S0CQ0vHeLYC5ULWICjSbcQ4UPledKXXUoW4Sg
+                  item_id: AZMP7JrGXgtPd3AQMeg7hwMKgk5E8qU1V5ME7
+                  account_id: 1qKRXQjk8xUWDJojNwPXTj8gEmR48piqRNye8
+                  amount: -2884.62
+                  date: "2024-01-05"
+                  original_description: ACME CORP PAYROLL PPD ID 9876543210
+                  iso_currency_code: USD
+                  unofficial_currency_code: null
+                  outlier:
+                    is_outlier: false
+                    amount: null
+              - income_stream_id: wBf06a9Qql7NZljaf1wgV1PCgMGhrmjeSdU0j
+                start_date: "2023-12-15"
+                end_date: "2024-01-12"
+                description: UPWORK ESCROW INC
+                insights:
+                  income_category:
+                    primary: EARNED_INCOME
+                    secondary: GIG_ECONOMY
+                  pay_frequency: MONTHLY
+                  income_provider:
+                    name: Upwork
+                    is_normalized: true
+                  status: ACTIVE
+                  next_payment:
+                    date: "2024-02-12"
+                income_metrics:
+                  current:
+                    monthly:
+                      gross_income: 1050
+                      net_income: 1050
+                    annual:
+                      gross_income: 12600
+                      net_income: 12600
+                  projected:
+                    monthly:
+                      gross_income: 1050
+                      net_income: 1050
+                    annual:
+                      gross_income: 12600
+                      net_income: 12600
+                  iso_currency_code: USD
+                  unofficial_currency_code: null
+                transactions:
+                - transaction_id: fMXSpM1FbBJAn1g5qkzuh5mhwubJYar14mbGj
+                  item_id: AZMP7JrGXgtPd3AQMeg7hwMKgk5E8qU1V5ME7
+                  account_id: 1qKRXQjk8xUWDJojNwPXTj8gEmR48piqRNye8
+                  amount: -1120
+                  date: "2023-12-15"
+                  original_description: UPWORK ESCROW INC PAYMENT
+                  iso_currency_code: USD
+                  unofficial_currency_code: null
+                  outlier:
+                    is_outlier: false
+                    amount: null
+                - transaction_id: xmioAvxXxN6QaS9ZJnCpkyfIuZHBcYibyQf74
+                  item_id: AZMP7JrGXgtPd3AQMeg7hwMKgk5E8qU1V5ME7
+                  account_id: 1qKRXQjk8xUWDJojNwPXTj8gEmR48piqRNye8
+                  amount: -980
+                  date: "2024-01-12"
+                  original_description: UPWORK ESCROW INC PAYMENT
+                  iso_currency_code: USD
+                  unofficial_currency_code: null
+                  outlier:
+                    is_outlier: false
+                    amount: null
+              user_summary:
+                income_metrics:
+                - current:
+                    monthly:
+                      gross_income: 9383.33
+                      net_income: 7300
+                    annual:
+                      gross_income: 112600
+                      net_income: 87600
+                  projected:
+                    monthly:
+                      gross_income: 9383.33
+                      net_income: 7300
+                    annual:
+                      gross_income: 112600
+                      net_income: 87600
+                  iso_currency_code: USD
+                  unofficial_currency_code: null
+          items:
+          - institution_id: ins_56
+            institution_name: Chase
+            item_id: AZMP7JrGXgtPd3AQMeg7hwMKgk5E8qU1V5ME7
+            last_updated_time: "2024-01-15T10:28:00Z"
+            accounts:
+            - account_id: 1qKRXQjk8xUWDJojNwPXTj8gEmR48piqRNye8
+              name: Plaid Checking Account
+              official_name: Plaid Checking Account
+              mask: "8888"
+              type: depository
+              subtype: checking
+              primary_account:
+                is_primary: true
+                score: 0.97
+              identity_match:
+                legal_name:
+                  score: 90
+                  is_first_name_or_last_name_match: true
+                  is_nickname_match: false
+                  is_business_name_detected: false
+                phone_number:
+                  score: 100
+                email_address:
+                  score: 100
+                address:
+                  score: 100
+                  is_postal_code_match: true
+              owners:
+              - names:
+                - Alberta Bobbeth Charleson
+                phone_numbers:
+                - data: +1 111-555-3333
+                  primary: true
+                  type: home
+                emails:
+                - data: accountholder0@example.com
+                  primary: true
+                  type: primary
+                addresses:
+                - data:
+                    street: 2992 Cameron Road
+                    city: Malakoff
+                    region: NY
+                    postal_code: "14236"
+                    country: US
+                  primary: true
+          errors: []
     CraReportGetIncomeCompleteAttributes:
       title: CraReportGetIncomeCompleteAttributes
       type: object
@@ -71541,7 +72622,7 @@ components:
         properties:
           primary_account_count:
             type: integer
-            description: The number of accounts carrying Plaid's primary account indicator.
+            description: The number of accounts carrying Plaid's primary account indicator, based on a report-level view of the user's transaction history.
           depository_account_type_count:
             type: integer
             description: The number of depository accounts used to generate the report.
@@ -71767,7 +72848,7 @@ components:
         properties:
           primary_account_count:
             type: integer
-            description: The number of accounts carrying Plaid's primary account indicator.
+            description: The number of accounts carrying Plaid's primary account indicator, based on a report-level view of the user's transaction history.
           depository_account_type_count:
             type: integer
             description: The number of depository accounts used to generate the report.
@@ -71814,7 +72895,7 @@ components:
         properties:
           primary_account_count:
             type: integer
-            description: The number of accounts carrying Plaid's primary account indicator.
+            description: The number of accounts carrying Plaid's primary account indicator, based on a report-level view of the user's transaction history.
           depository_account_type_count:
             type: integer
             description: The number of depository accounts used to generate the report.
@@ -71861,7 +72942,7 @@ components:
         properties:
           primary_account_count:
             type: integer
-            description: The number of accounts carrying Plaid's primary account indicator.
+            description: The number of accounts carrying Plaid's primary account indicator, based on a report-level view of the user's transaction history.
           depository_account_type_count:
             type: integer
             description: The number of depository accounts used to generate the report.
@@ -71898,7 +72979,6 @@ components:
         - most_recent_transaction_date
     CraReportGetHomeLendingResponseProduct:
       title: CraReportGetHomeLendingResponseProduct
-      x-hidden-from-docs: true
       type: object
       additionalProperties: true
       description: Home Lending data returned by `/cra/report/get`.
@@ -71931,6 +73011,74 @@ components:
       - attributes
       - items
       - errors
+      x-examples:
+        example-1:
+          product: cra_home_lending
+          version: V1
+          metadata:
+            generated_time: "2026-06-01T12:00:00Z"
+            item_count: 2
+            account_count: 3
+            institution_ids:
+            - ins_56
+            - ins_3
+          attributes:
+            income_metrics:
+            - current:
+                monthly:
+                  gross_income: 7000
+                  net_income: 4900
+                annual:
+                  gross_income: 84000
+                  net_income: 58800
+              iso_currency_code: USD
+              unofficial_currency_code: null
+            income_by_categories:
+            - iso_currency_code: USD
+              unofficial_currency_code: null
+              categories:
+              - income_category:
+                  primary: EARNED_INCOME
+                  secondary: SALARY
+                current:
+                  monthly:
+                    gross_income: 5200
+                    net_income: 3600
+                  annual:
+                    gross_income: 62400
+                    net_income: 43200
+              - income_category:
+                  primary: EARNED_INCOME
+                  secondary: GIG_ECONOMY
+                current:
+                  monthly:
+                    gross_income: 1400
+                    net_income: 900
+                  annual:
+                    gross_income: 16800
+                    net_income: 10800
+              - income_category:
+                  primary: BENEFITS
+                  secondary: CHILD_SUPPORT
+                current:
+                  monthly:
+                    gross_income: 400
+                    net_income: 400
+                  annual:
+                    gross_income: 4800
+                    net_income: 4800
+            income_sources:
+              income_stream_count: 3
+              income_providers:
+              - name: Acme Corp
+                is_normalized: true
+              - name: Lyft
+                is_normalized: true
+            loan_payments_cash_advance_count_90d: 0
+            payment_behavior_nsf_late_fees_flag_90d: 0
+            loan_payments_bnpl_count_90d: 0
+          items: []
+          errors: []
     CraReportGetHomeLendingAttributes:
       title: CraReportGetHomeLendingAttributes
       type: object
@@ -72433,7 +73581,7 @@ components:
       title: AssetDetail
       type: object
       additionalProperties: true
-      description: Details about an asset.
+      description: Details about an asset. In CRA reports, holdings-derived balances, `AssetRetirementIndicator`, and `AssetEmployerSponsoredIndicator` may be omitted when recent investment data was unavailable at report generation. The account's current and available balances remain included.
       properties:
         AssetUniqueIdentifier:
           type: string
@@ -72603,6 +73751,7 @@ components:
       properties:
         ASSET_HOLDING:
           type: array
+          description: The holdings associated with the account. In CRA reports, this array may be empty when recent investment data was unavailable at report generation.
           items:
             $ref: '#/components/schemas/AssetHolding'
       required:
@@ -73165,6 +74314,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CreditFreddieMacAssetTransaction'
+          description: The transactions associated with the account. In CRA reports, investment transactions may be excluded when recent investment data was unavailable at report generation. Other account transactions remain included.
       required:
       - ASSET_TRANSACTION
     CreditFreddieMacAssetTransaction:
@@ -73840,6 +74990,8 @@ components:
           - cra_partner_insights
           - cra_cashflow_insights
           - cra_monitoring
+          - cra_lend_score_complete
+          - cra_income_complete
           - layer
         consent_expiration_time:
           description: The date and time at which the Item's access consent will expire, in [ISO 8601](https://wikipedia.org/wiki/ISO_8601) format. If the Item does not have consent expiration scheduled, this field will be `null`. Currently, only institutions in Europe and a small number of institutions in the US have expiring consent. For a list of US institutions that currently expire consent, see the [OAuth Guide](https://plaid.com/docs/link/oauth/#refreshing-item-consent).
@@ -73858,10 +75010,9 @@ components:
           - background
           - user_present_required
         paired_item_id:
-          description: The `item_id` of the Item that was created alongside this one in a single Link session. Only present for Items created in a hybrid Link flow that produces separate Plaid Inc and Plaid Check items; `null` for every other Item.
+          description: The `item_id` of the Item that was created alongside this one when a single Link session used both Plaid Inc and Plaid Check products (see [Using Plaid Check products alongside Plaid products](https://plaid.com/docs/check/add-to-app/#using-plaid-check-products-alongside-plaid-products)). For a Plaid Inc Item, this is the paired Plaid Check Item, and the reverse for a Plaid Check Item. The field is omitted for Items that have no paired Item. It is also omitted if Plaid cannot look up the paired Item at request time, so do not treat its absence as proof that an Item is unpaired.
           type: string
           nullable: true
-          x-hidden-from-docs: true
       required:
       - item_id
       - webhook
@@ -75409,7 +76560,7 @@ components:
     SignalUser:
       title: SignalUser
       type: object
-      description: Details about the end user initiating the transaction (i.e., the account holder). These fields are optional, but strongly recommended to increase the accuracy of results when using Signal Transaction Scores. When using a Balance-only ruleset, if the Signal Addendum has been signed, these fields are ignored; if the Addendum has not been signed, using these fields will result in an error.
+      description: Details about the end user initiating the transaction (i.e., the account holder). These fields are optional, but strongly recommended to increase the accuracy of results when using Signal Transaction Scores. When using a Balance-only ruleset, these fields are ignored.
       properties:
         name:
           $ref: '#/components/schemas/SignalPersonName'
@@ -75481,7 +76632,7 @@ components:
     SignalDevice:
       title: SignalEvaluateDevice
       type: object
-      description: Details about the end user's device. These fields are optional, but strongly recommended to increase the accuracy of results when using Signal Transaction Scores. When using a Balance-only Ruleset, these fields are ignored if the Signal Addendum has been signed; if it has not been signed, using these fields will result in an error.
+      description: Details about the end user's device. These fields are optional, but strongly recommended to increase the accuracy of results when using Signal Transaction Scores. When using a Balance-only ruleset, these fields are ignored.
       properties:
         ip_address:
           type: string
@@ -76256,7 +77407,7 @@ components:
       type: object
       description: |-
         Request object for `/protect/report/create`.
-        You must provide either `user_id`, or an `incident_event` with at least one supported identifier: `link_session_id`, `idv_session_id`, `protect_event_id`, `signal_client_transaction_id`, or `access_token`. Context fields such as `internal_reference`, `time`, `amount`, and `bank_account` do not satisfy this identifier requirement.
+        You must provide either `user_id`, `client_user_id`, or an `incident_event` with at least one supported identifier: `link_session_id`, `idv_session_id`, `protect_event_id`, `signal_client_transaction_id`, or `access_token`. Context fields such as `internal_reference`, `time`, `amount`, and `bank_account` do not satisfy this identifier requirement.
       properties:
         client_id:
           $ref: '#/components/schemas/APIClientID'
@@ -76264,7 +77415,13 @@ components:
           $ref: '#/components/schemas/APISecret'
         user_id:
           type: string
-          description: The Plaid User ID associated with the report.
+          nullable: true
+          description: The Plaid User ID associated with the report. This or `client_user_id` can be provided, not both.
+        client_user_id:
+          type: string
+          nullable: true
+          maxLength: 128
+          description: A unique ID representing the end user. Maximum of 128 characters. Typically this will be a user ID number from your application. Personally identifiable information, such as an email address or phone number, should not be used in the `client_user_id`. This or `user_id` can be provided, not both. If a Plaid User does not already exist for this `client_user_id` within your client account, one will be created.
         incident_event:
           $ref: '#/components/schemas/ProtectIncidentEvent'
         report_confidence:
@@ -76704,7 +77861,7 @@ components:
     FraudAttributes:
       type: object
       nullable: true
-      additionalProperties: true
+      additionalProperties: {}
       description: Event fraud attributes as an arbitrary set of key-value pairs. The set of attributes returned varies by model.
     ProtectIncidentEvent:
       nullable: true
