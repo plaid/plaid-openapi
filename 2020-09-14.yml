@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.792.1
+  version: 2020-09-14_1.799.0
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -10702,7 +10702,10 @@ paths:
                       website: https://example.com
                       phone_number: "+14025671234"
                       email_address: user@example.com
-                    kyb_check:
+                      tin: "123456789"
+                      officers:
+                      - name: Leslie Knope
+                    business_verification:
                       status: success
                       score: 85
                       name:
@@ -10711,6 +10714,13 @@ paths:
                         summary: match
                       website:
                         summary: match
+                      tin:
+                        summary: match
+                        tin_type: ein
+                      officers:
+                        summary: match
+                      registered_agent:
+                        summary: no_match
                       match_details:
                         names:
                         - is_primary: true
@@ -10809,7 +10819,10 @@ paths:
                       website: https://example.com
                       phone_number: "+14025671234"
                       email_address: user@example.com
-                    kyb_check:
+                      tin: "123456789"
+                      officers:
+                      - name: Leslie Knope
+                    business_verification:
                       status: success
                       score: 85
                       name:
@@ -10818,6 +10831,13 @@ paths:
                         summary: match
                       website:
                         summary: match
+                      tin:
+                        summary: match
+                        tin_type: ein
+                      officers:
+                        summary: match
+                      registered_agent:
+                        summary: no_match
                       match_details:
                         names:
                         - is_primary: true
@@ -13907,15 +13927,13 @@ paths:
                   reason_code: CONSUMER_LOAN_PAID_OFF
                   reason_note: Consumer loan has been paid in full.
   /user/transfer/limits/get:
-    x-hidden-from-docs: true
     post:
       tags:
       - plaid
-      x-hidden-from-docs: true
       summary: Retrieve a user's transfer limits
       externalDocs:
         url: /api/users/#usertransferlimitsget
-      description: Retrieve the user's persisted Guaranteed ACH transaction limit and configured daily, weekly, and monthly ceilings. Amounts are returned as decimal strings in dollars with two digits of precision and an ISO currency code. A transaction limit is computed when no active limit exists.
+      description: Retrieve the user's current Guaranteed ACH per-transaction limit and configured daily, weekly, and monthly ceilings. Amounts are returned as decimal strings in dollars with two decimal places and an ISO currency code. Access to this endpoint must be enabled for your client.
       operationId: userTransferLimitsGet
       responses:
         "200":
@@ -27270,7 +27288,6 @@ components:
       - request_id
     UserTransferLimitsGetRequest:
       type: object
-      x-hidden-from-docs: true
       description: UserTransferLimitsGetRequest defines the request schema for `/user/transfer/limits/get`.
       properties:
         client_id:
@@ -27284,7 +27301,6 @@ components:
     UserTransferLimitsGetResponse:
       type: object
       additionalProperties: true
-      x-hidden-from-docs: true
       description: UserTransferLimitsGetResponse defines the response schema for `/user/transfer/limits/get`.
       properties:
         guarantee_limits:
@@ -27297,13 +27313,12 @@ components:
     UserGuaranteeLimits:
       type: object
       additionalProperties: true
-      x-hidden-from-docs: true
       description: The user's Guaranteed ACH debit limits. Daily, weekly, and monthly limits are configured ceilings, not remaining capacity. Each rolling limit is `null` when no ceiling is enabled for that window.
       properties:
         transaction_limit:
           allOf:
           - $ref: '#/components/schemas/UserTransferLimitAmount'
-          - description: The user's persisted per-transaction guarantee limit. A zero-dollar limit is returned with a value of `"0.00"`.
+          - description: The user's current per-transaction guarantee limit. A zero-dollar limit is returned with a value of `"0.00"`.
         daily_limit:
           $ref: '#/components/schemas/UserTransferLimitAmountNullable'
         weekly_limit:
@@ -27318,7 +27333,6 @@ components:
     UserTransferLimitAmount:
       type: object
       additionalProperties: true
-      x-hidden-from-docs: true
       description: A transfer limit amount and its currency.
       properties:
         value:
@@ -27334,7 +27348,6 @@ components:
       - iso_currency_code
     UserTransferLimitAmountNullable:
       description: A transfer limit amount and its currency, or `null` when the limit is not configured.
-      x-hidden-from-docs: true
       nullable: true
       allOf:
       - $ref: '#/components/schemas/UserTransferLimitAmount'
@@ -30253,9 +30266,13 @@ components:
           nullable: true
           description: The `language` specified in the `/link/token/create` call.
         institution_data:
-          $ref: '#/components/schemas/LinkTokenCreateInstitutionData'
+          allOf:
+          - $ref: '#/components/schemas/LinkTokenCreateInstitutionData'
+          nullable: true
         account_filters:
-          $ref: '#/components/schemas/AccountFiltersResponse'
+          allOf:
+          - $ref: '#/components/schemas/AccountFiltersResponse'
+          nullable: true
         redirect_uri:
           type: string
           description: The `redirect_uri` specified in the `/link/token/create` call.
@@ -32171,6 +32188,8 @@ components:
           description: Details of recent health incidents associated with the institution.
           items:
             $ref: '#/components/schemas/HealthIncident'
+      required:
+      - item_logins
       description: |
         The status of an institution is determined by the health of its Item logins, Transactions updates, Investments updates, Liabilities updates, Auth requests, Balance requests, Identity requests, Investments requests, and Liabilities requests. A login attempt is conducted during the initial Item add in Link. If there is not enough traffic to accurately calculate an institution's status, Plaid will return null rather than potentially inaccurate data.
 
@@ -35346,6 +35365,10 @@ components:
             When `true`, every date in this configuration is shifted at Item creation so that the most recent activity date falls on the day the Item is created, keeping the spacing between dates. Activity dates are transaction and investment transaction dates, pay period end dates and pay days, holding `institution_price_as_of` dates, and a loan's `last_payment_date` or `last_statement_issue_date`. Scheduled loan dates such as `origination_date`, `maturity_date`, and `next_payment_due_date` move by the same amount but are never the anchor. This lets a saved configuration keep producing recent data without being edited.
 
             A `date_posted` later than its `date_transacted` stays later, so the most recent transaction can still be pending. Dates are UTC calendar dates. The shift happens once, when the Item is created; the Item keeps the shifted dates afterwards. Defaults to `false`.
+        has_perpetual_otp:
+          type: boolean
+          default: false
+          description: When `true`, the Item behaves like an Item at an institution that requires a one-time passcode (OTP) or other multi-factor authentication at every login, so it can be updated only while the user is present. `/item/get` returns an `update_type` of `user_present_required`. Endpoints that fetch new data from the institution, such as `/transactions/refresh` and `/accounts/balance/get`, return `ITEM_LOGIN_REQUIRED`. If your integration isn't enabled for this kind of institution, they return [`MFA_NOT_SUPPORTED`](https://plaid.com/docs/errors/item/#mfa_not_supported) instead. Endpoints that return data Plaid already has, such as `/transactions/sync` and `/accounts/get`, still work. Defaults to `false`.
         override_accounts:
           type: array
           description: An array of account overrides to configure the accounts for the Item. By default, if no override is specified, transactions and account data will be randomly generated based on the account type and subtype, and other products will have fixed or empty data.
@@ -35485,7 +35508,7 @@ components:
         apy:
           type: number
           format: double
-          description: The annual percentage yield (APY) to report on the account, expressed as a percentage (e.g. `4.25` means 4.25%). Applies to interest-bearing depository accounts; if omitted, the account reports no APY.
+          description: The annual percentage yield (APY) to report on the account, expressed as a percentage (e.g. `4.25` means 4.25%). Applies to interest-bearing depository accounts. If omitted, savings, money market, CD, cash management, and HSA accounts report a generated APY, and other accounts report none.
     Numbers:
       title: Numbers
       type: object
@@ -35986,12 +36009,12 @@ components:
           format: double
           description: Amount of income per month. This value is required if `type` is `monthly-income`.
         payment_day_of_month:
-          description: Either a whole number between 1 and 28 or the string `last`, meaning the last day of the month. The day of the month on which the income transaction will appear. This field is required if `type` is `monthly-income`, `monthly-balance-payment` or `monthly-interest-only-payment`.
+          description: 'The day of the month on which the income transaction will appear: a whole number between 1 and 28, or the string `last` for the last day of the month. This field is required if `type` is `monthly-income`, `monthly-balance-payment` or `monthly-interest-only-payment`.'
         transaction_name:
           type: string
           description: The name of the income transaction. This field is required if `type` is `monthly-income`, `monthly-balance-payment` or `monthly-interest-only-payment`.
         statement_day_of_month:
-          description: Either a whole number between 1 and 28 or the string `last`, meaning the last day of the month. The day of the month on which the balance is calculated for the next payment. This field is required if `type` is `monthly-balance-payment` or `monthly-interest-only-payment`.
+          description: 'The day of the month on which the balance is calculated for the next payment: a whole number between 1 and 28, or the string `last` for the last day of the month. For compatibility with client libraries generated before 1.776.0, which typed this field as a string, a quoted number such as `"15"` is also accepted. This field is required if `type` is `monthly-balance-payment` or `monthly-interest-only-payment`.'
       required:
       - type
     IncomeOverride:
@@ -39629,6 +39652,7 @@ components:
         origination_account_id:
           type: string
           description: Plaid's unique identifier for the origination account that was used for this transfer.
+          nullable: true
         direction:
           $ref: '#/components/schemas/BankTransferDirection'
       required:
@@ -40648,6 +40672,7 @@ components:
         description:
           type: string
           description: A human-readable description of the reason for the failure or reversal.
+          nullable: true
     TransferAuthorizationCreateRequest:
       title: TransferAuthorizationCreateRequest
       type: object
@@ -40684,8 +40709,7 @@ components:
         user_id:
           allOf:
           - $ref: '#/components/schemas/NewUserIDNullable'
-          description: The Plaid-generated user ID returned by `/user/create` for the end user associated with this transfer's Item. This identifier is separate from the account-holder details in `user`. Omit or set to `null` if unavailable; otherwise, provide a non-empty string. During the initial rollout, this field does not affect authorization decisions.
-          x-hidden-from-docs: true
+          description: The Plaid-generated user ID returned by `/user/create` for the end user associated with this transfer's Item. This identifier is separate from the account-holder details in `user`. Omit or set to `null` if unavailable; otherwise, provide a non-empty string. This field does not currently affect authorization decisions.
           example: usr_9nSp2KuZ2x4JDw
         device:
           $ref: '#/components/schemas/TransferAuthorizationDevice'
@@ -44652,13 +44676,21 @@ components:
       additionalProperties: true
       properties:
         depository:
-          $ref: '#/components/schemas/DepositoryFilter'
+          allOf:
+          - $ref: '#/components/schemas/DepositoryFilter'
+          nullable: true
         credit:
-          $ref: '#/components/schemas/CreditFilter'
+          allOf:
+          - $ref: '#/components/schemas/CreditFilter'
+          nullable: true
         loan:
-          $ref: '#/components/schemas/LoanFilter'
+          allOf:
+          - $ref: '#/components/schemas/LoanFilter'
+          nullable: true
         investment:
-          $ref: '#/components/schemas/InvestmentFilter'
+          allOf:
+          - $ref: '#/components/schemas/InvestmentFilter'
+          nullable: true
     InstitutionsSearchAccountFilter:
       title: InstitutionsSearchAccountFilter
       description: An account filter to apply to institutions search requests
@@ -47053,6 +47085,7 @@ components:
           description: The title of the incident
         incident_updates:
           type: array
+          nullable: true
           description: Updates on the health incident.
           items:
             $ref: '#/components/schemas/IncidentUpdate'
@@ -53911,10 +53944,12 @@ components:
       properties:
         primary:
           type: string
-          description: A high level category that communicates the broad category of the transaction.
+          nullable: true
+          description: A high level category that communicates the broad category of the transaction. Can be `null` when no credit category is available.
         detailed:
           type: string
-          description: A granular category conveying the transaction's intent. This field can also be used as a unique identifier for the category.
+          nullable: true
+          description: A granular category conveying the transaction's intent. This field can also be used as a unique identifier for the category. Can be `null` when no credit category is available.
       required:
       - primary
       - detailed
@@ -58120,11 +58155,6 @@ components:
           - description: This field contains the account holder category extracted from the financial institution. The value is `personal`, `business`, or `unrecognized`. The field is omitted when the extracted category is unavailable.
         ownership_type:
           $ref: '#/components/schemas/OwnershipType'
-        investments:
-          x-hidden-from-docs: true
-          description: This field contains investment data only for investment accounts when `include_investments` in `/cra/check_report/create` or `cra_options.include_investments` in `/link/token/create` is set to `true`. This field may be omitted if recent investment data was unavailable at report generation. The account remains in the report when this field is omitted.
-          allOf:
-          - $ref: '#/components/schemas/BaseReportInvestments'
         historical_balances:
           type: array
           x-hidden-from-docs: true
@@ -60716,21 +60746,27 @@ components:
       required:
       - summary
       additionalProperties: true
-    BusinessKYBCheck:
+    BusinessVerificationCheck:
       type: object
-      description: Results from the KYB (Know Your Business) identity verification check
+      description: Results from the business identity verification check, which matches the submitted business information against data provider records. `officers` is one result for all submitted officers, as reported by the data provider. `registered_agent` compares the submitted officer names against the business's registered agent. Both are `no_input` when no officers were submitted.
       properties:
         status:
-          $ref: '#/components/schemas/BusinessVerificationStatus__KYBCheck'
+          $ref: '#/components/schemas/BusinessVerificationStatus__BusinessVerificationCheck'
         score:
           type: integer
-          description: A score from 0 to 100 indicating the confidence in KYB (Know Your Business) identity assessment for the business
+          description: A score from 0 to 100 indicating the confidence in the identity verification of the business.
           example: 85
         name:
           $ref: '#/components/schemas/BusinessFieldMatchSummary'
         address:
           $ref: '#/components/schemas/BusinessFieldMatchSummary'
         website:
+          $ref: '#/components/schemas/BusinessFieldMatchSummary'
+        tin:
+          $ref: '#/components/schemas/BusinessTINMatch'
+        officers:
+          $ref: '#/components/schemas/BusinessFieldMatchSummary'
+        registered_agent:
           $ref: '#/components/schemas/BusinessFieldMatchSummary'
         match_details:
           $ref: '#/components/schemas/BusinessKYBMatchDetails'
@@ -60740,8 +60776,44 @@ components:
       - name
       - address
       - website
+      - tin
+      - officers
+      - registered_agent
       - match_details
       nullable: true
+      additionalProperties: true
+    BusinessTINMatch:
+      type: object
+      description: How the submitted TIN matched IRS records.
+      properties:
+        summary:
+          $ref: '#/components/schemas/MatchSummaryCode'
+        tin_type:
+          $ref: '#/components/schemas/BusinessTINType'
+      required:
+      - summary
+      - tin_type
+      additionalProperties: true
+    BusinessTINType:
+      type: string
+      nullable: true
+      description: The kind of TIN the IRS reported. `unknown` means the IRS did not say which kind it is. `null` when no TIN was submitted (`summary` is `no_input`) or the IRS did not report a type, as when the check could not run (`summary` is `no_data`). A non-null `tin_type` does not mean the TIN matched; read `summary` for that.
+      enum:
+      - ein
+      - ssn
+      - unknown
+      - null
+      example: ein
+    BusinessOfficer:
+      type: object
+      description: An officer of the business.
+      properties:
+        name:
+          type: string
+          description: The officer's full name. Must have at least one character and a maximum length of 500 characters.
+          example: Leslie Knope
+      required:
+      - name
       additionalProperties: true
     BusinessKYBMatchDetails:
       type: object
@@ -60897,6 +60969,16 @@ components:
           $ref: '#/components/schemas/BusinessVerificationPhoneNumberNullable'
         email_address:
           $ref: '#/components/schemas/EmailAddressNullable'
+        tin:
+          type: string
+          nullable: true
+          description: The TIN that was submitted, as 9 digits without a dash. `null` if no TIN was submitted.
+          example: "123456789"
+        officers:
+          type: array
+          description: The officers that were submitted.
+          items:
+            $ref: '#/components/schemas/BusinessOfficer'
       required:
       - name
       - alternative_names
@@ -60904,6 +60986,8 @@ components:
       - website
       - phone_number
       - email_address
+      - tin
+      - officers
       additionalProperties: true
     BusinessVerificationCreateRequest:
       type: object
@@ -60919,9 +61003,9 @@ components:
           $ref: '#/components/schemas/APISecret'
       required:
       - client_user_id
+      - business
     BusinessVerificationCreateRequestBusiness:
       type: object
-      nullable: true
       description: Business information provided in the verification request
       properties:
         name:
@@ -60936,6 +61020,21 @@ components:
           $ref: '#/components/schemas/BusinessVerificationPhoneNumber'
         email_address:
           $ref: '#/components/schemas/EmailAddress'
+        tin:
+          type: string
+          nullable: true
+          description: The business's Taxpayer Identification Number (TIN), such as an Employer Identification Number (EIN), as 9 digits. An EIN may include a dash after the first two digits, such as `12-3456789`.
+          example: 12-3456789
+        officers:
+          type: array
+          nullable: true
+          maxItems: 10
+          description: Officers of the business, used to check that the people listed match public records. At most 10.
+          items:
+            $ref: '#/components/schemas/BusinessOfficer'
+      required:
+      - name
+      - address
       additionalProperties: true
     BusinessVerificationCreateResponse:
       description: A business verification represents a check of a business's identity and risk profile, including information collected about the business and results from third-party data providers.
@@ -60955,8 +61054,8 @@ components:
           $ref: '#/components/schemas/BusinessVerificationStatus__Overall'
         search_terms:
           $ref: '#/components/schemas/BusinessSearchTerms'
-        kyb_check:
-          $ref: '#/components/schemas/BusinessKYBCheck'
+        business_verification:
+          $ref: '#/components/schemas/BusinessVerificationCheck'
         risk_check:
           $ref: '#/components/schemas/BusinessRiskCheck'
         digital_presence_check:
@@ -60973,7 +61072,7 @@ components:
       - redacted_at
       - status
       - search_terms
-      - kyb_check
+      - business_verification
       - risk_check
       - digital_presence_check
       - request_id
@@ -61009,8 +61108,8 @@ components:
           $ref: '#/components/schemas/BusinessVerificationStatus__Overall'
         search_terms:
           $ref: '#/components/schemas/BusinessSearchTerms'
-        kyb_check:
-          $ref: '#/components/schemas/BusinessKYBCheck'
+        business_verification:
+          $ref: '#/components/schemas/BusinessVerificationCheck'
         risk_check:
           $ref: '#/components/schemas/BusinessRiskCheck'
         digital_presence_check:
@@ -61027,7 +61126,7 @@ components:
       - redacted_at
       - status
       - search_terms
-      - kyb_check
+      - business_verification
       - risk_check
       - digital_presence_check
       - request_id
@@ -61039,7 +61138,7 @@ components:
       example: busver_52xR9LKo77r1Np
       title: BusinessVerificationID
       description: ID of the associated business verification.
-    BusinessVerificationStatus__KYBCheck:
+    BusinessVerificationStatus__BusinessVerificationCheck:
       type: string
       enum:
       - active
@@ -61047,7 +61146,7 @@ components:
       - failed
       example: success
       title: BusinessVerificationStatus
-      description: Status of the KYB (Know Your Business) identity assessment check
+      description: Status of the business identity verification check
     BusinessVerificationStatus__Overall:
       type: string
       enum:
@@ -61144,11 +61243,13 @@ components:
       additionalProperties: true
     BusinessWebsiteBuildStatus:
       type: string
-      description: Build status of the business website.
+      nullable: true
+      description: Build status of the business website. `null` if the build status could not be determined.
       enum:
       - coming_soon
       - active
       - inactive
+      - null
       example: active
     BusinessWhoisRecord:
       type: object
