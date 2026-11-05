@@ -102,6 +102,9 @@ groups:
           # Lets the SDK run where `process` doesn't exist (browsers, Deno, Cloudflare Workers).
           guardProcessEnvAccess: true
           useLegacyExports: false
+          # Match the published Node client: callers opt in to retrying requests.
+          # Transfers and payments may already have succeeded when a request fails.
+          maxRetries: 0
           # Preserve the legacy client's package entries across regeneration.
           # Object entries merge with the generator's own exports and scripts.
           packageJson:
