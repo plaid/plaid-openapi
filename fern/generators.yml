@@ -25,6 +25,34 @@ api:
         only-include-referenced-schemas: false
 readme:
   apiName: Plaid
+  customSections:
+    - title: Legacy SDK
+      language: typescript
+      content: |
+        Plaid's previous client ships in this package as `plaid/legacy`, generated from the
+        same API spec. To keep existing code working, change its import from `plaid` to
+        `plaid/legacy`:
+
+        ```typescript
+        import { Configuration, PlaidApi, PlaidEnvironments } from "plaid/legacy";
+
+        const plaidClient = new PlaidApi(
+            new Configuration({
+                basePath: PlaidEnvironments.sandbox,
+                baseOptions: {
+                    headers: {
+                        "PLAID-CLIENT-ID": process.env.PLAID_CLIENT_ID,
+                        "PLAID-SECRET": process.env.PLAID_SECRET,
+                    },
+                },
+            }),
+        );
+        ```
+
+        The previous client and `PlaidClient` can be used side by side while you migrate.
+        Imports of individual files in the previous package, such as `plaid/dist/api`, no
+        longer resolve; import from `plaid/legacy` instead.
+
 
 replay:
   enabled: false
@@ -74,6 +102,29 @@ groups:
           # Lets the SDK run where `process` doesn't exist (browsers, Deno, Cloudflare Workers).
           guardProcessEnvAccess: true
           useLegacyExports: false
+          # Preserve the legacy client's package entries across regeneration.
+          # Object entries merge with the generator's own exports and scripts.
+          packageJson:
+            dependencies:
+              # The previous client's runtime dependency.
+              axios: ^1.7.4
+            scripts:
+              # The empty dist/legacy/package.json drops this package's "type": "commonjs"
+              # for the legacy declarations, so TypeScript's bundler resolution reads the
+              # same axios types as the caller's code.
+              build:legacy: tsc --project ./legacy/tsconfig.json && node -e "require('fs').writeFileSync('dist/legacy/package.json', '{}\n')"
+              # postbuild rather than an edited build script, which would replace Fern's.
+              postbuild: pnpm build:legacy
+            exports:
+              ./legacy:
+                types: ./dist/legacy/index.d.ts
+                default: ./dist/legacy/index.js
+            # TypeScript's classic "node" resolution, the default for module commonjs,
+            # ignores exports.
+            typesVersions:
+              "*":
+                legacy:
+                  - ./dist/legacy/index.d.ts
 
   python-sdk:
     generators:
