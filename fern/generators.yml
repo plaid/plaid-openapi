@@ -105,6 +105,9 @@ groups:
           # Match the published Node client: callers opt in to retrying requests.
           # Transfers and payments may already have succeeded when a request fails.
           maxRetries: 0
+          # Match the published Node client, which sets no request timeout.
+          # Callers can still set timeoutInSeconds on the client or per request.
+          defaultTimeout: infinity
           # Preserve the legacy client's package entries across regeneration.
           # Object entries merge with the generator's own exports and scripts.
           packageJson:
