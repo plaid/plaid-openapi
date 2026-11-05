@@ -33,7 +33,9 @@ Those remain activation checks after review and access setup.
 - `harden_wire_tests.py` sets explicit dummy credentials and custom mock endpoints in the reviewed generated test shapes. WireMock mappings require those headers; compose binds only to loopback without verbose request logging. The helper rejects unfamiliar generator versions or test shapes. Runtime destination checks stay enabled.
 - Before generation, every operation must have an explicit Fern group and method
   name after applying the overlay, and request bodies must not retain top-level
-  `client_id` or `secret` fields. Shared request schemas are checked too.
+  `client_id` or `secret` fields. Shared request schemas are checked too. `overlay_coverage.py --fix` writes the missing
+  entries into the checked-in overlay for review; generation never infers names
+  or removals on its own.
 - The Go floor build and complete local mock suite run before producing the candidate. Compatibility is checked against the latest published stable tag in the configured major, including `legacy/`. A breaking change stops generation and preserves `api-diff.txt` plus a `breaking-change` result in the run artifacts. The current implementation is v49-only; a new major needs reviewed module/import migration work in both clients. Legacy continues to regenerate from the same spec.
 - If a generation has merged but its tag is absent, the job returns `awaiting-release` before choosing another version. The tag must be annotated and peel to the exact first-parent commit that introduced the manifest. A tag on the generated PR head or another commit is rejected. Later unrelated commits carrying the same published manifest are allowed.
 - A separate job validates the package and uses public Sigstore attestation to bind its content digest to the manifest. The signed source and config repository/commit must match `plaid/plaid-openapi` and the same workflow SHA. Verification requires the exact workflow, `master`, public visibility, run identity, predicate and subject. No generated SDK code executes in this job.
