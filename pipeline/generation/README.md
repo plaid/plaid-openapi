@@ -8,7 +8,9 @@ The spec and Fern configuration live together in this public repository. Each pr
 
 The reviewed `generation_mode` setting selects `fern-hosted`. The production
 switches still control activation; merging the implementation does not enable it.
-The workflow runs these stages:
+The input fingerprint covers the Go group, shared API inputs and Go pipeline
+controls. Edits confined to other SDK groups or the shared CLI default do not
+trigger a Go release. The workflow runs these stages:
 
 1. Pin the public spec/config commit, SDK base and proposed version.
 2. Request Fern generation into a private staging repository. Verify its signature,

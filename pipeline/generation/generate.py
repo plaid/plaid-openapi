@@ -104,8 +104,9 @@ def verified_spec(repo: Path, config_commit: str, values: dict, sdk: Path | None
 
 
 def config_digest(repo: Path) -> str:
+    commit = check_sha(git(repo, "rev-parse", "HEAD"))
     selected = []
-    for path, mode, digest in entries(repo, ref="HEAD"):
+    for path, mode, digest in entries(repo, ref=commit):
         if path == "2020-09-14.yml" or path == WORKFLOW:
             selected.append([path, mode, digest])
         elif path.startswith(("fern/", "pipeline/")):
@@ -116,6 +117,25 @@ def config_digest(repo: Path) -> str:
                     or name.startswith("test_") or name == ".gitignore"
                     or set(Path(path).parts) & {"tests", "testdata", "fixtures", "__pycache__"}):
                 continue
+            if path == "fern/generators.yml":
+                # Match the Go-only document render_config actually consumes;
+                # other SDK groups and the shared default group do not affect it.
+                text = run(["git", "show", commit + ":" + path], repo).decode("utf-8")
+                text = text.replace("\r\n", "\n").replace("\r", "\n")
+                group_start = re.search(r"^groups:[ \t]*(?:#.*)?\n", text, re.MULTILINE)
+                require(group_start is not None, "Expected top-level generator groups")
+                groups = list(re.finditer(r"^  go-sdk:\n(.*?)(?=^  [a-zA-Z0-9_-]+:|\Z)",
+                                         text[group_start.end():], re.MULTILINE | re.DOTALL))
+                require(len(groups) == 1, "Expected one reviewed go-sdk group")
+                header = re.sub(r"^default-group:.*(?:\n|$)", "", text[:group_start.start()], flags=re.MULTILINE)
+                effective = header.rstrip() + "\ndefault-group: go-sdk\ngroups:\n" + groups[0].group(0).rstrip() + "\n"
+                digest = sha256(effective.encode("utf-8"))
+            elif path == "fern/fern.config.json":
+                # Go's independently reviewed settings supply the CLI version.
+                shared = parse_json(run(["git", "show", commit + ":" + path], repo))
+                require(isinstance(shared, dict), "Expected shared Fern configuration object")
+                digest = sha256(json.dumps({key: value for key, value in shared.items() if key != "version"},
+                                          sort_keys=True, separators=(",", ":")).encode("utf-8"))
             selected.append([path, mode, digest])
     return sha256(canonical(selected))
 

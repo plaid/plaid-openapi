@@ -104,7 +104,7 @@ class PipelineTests(unittest.TestCase):
     def test_documentation_and_tests_do_not_change_release_inputs(self):
         repo = self.root / "config"
         init(repo)
-        write(repo, "fern/generators.yml", "groups: {}\n")
+        write(repo, "fern/generators.yml", "default-group: go-sdk\ngroups:\n  go-sdk:\n    generators: []\n")
         write(repo, "pipeline/generation/generate.py", "# runtime\n")
         commit(repo)
         expected = generate.config_digest(repo)
@@ -120,7 +120,7 @@ class PipelineTests(unittest.TestCase):
     def test_generation_inputs_still_change_release_fingerprint(self):
         repo = self.root / "config"
         init(repo)
-        write(repo, "fern/generators.yml", "groups: {}\n")
+        write(repo, "fern/generators.yml", "default-group: go-sdk\ngroups:\n  go-sdk:\n    generators: []\n")
         commit(repo)
         before = generate.config_digest(repo)
         for name in ("2020-09-14.yml", "fern/fern.config.json", "fern/openapi-overlay.yml",
@@ -130,7 +130,8 @@ class PipelineTests(unittest.TestCase):
                      "pipeline/legacy/requirements.txt", "pipeline/legacy/templates/client.mustache",
                      common.WORKFLOW):
             with self.subTest(path=name):
-                write(repo, name, "generation input\n")
+                data = json.dumps({"organization": "plaid", "version": "5.134.0"}) if name == "fern/fern.config.json" else "generation input\n"
+                write(repo, name, data)
                 commit(repo)
                 after = generate.config_digest(repo)
                 self.assertNotEqual(after, before)
