@@ -74,7 +74,7 @@ class PipelineTests(unittest.TestCase):
         write(repo, "go.sum", "")
         write(repo, "legacy/client.go", "package plaid\n")
         write(repo, "client.go", "package plaid\n")
-        common.save_json(repo / ".fern/metadata.json", {"sdkVersion": "v49.0.0", "cliVersion": "5.134.0",
+        common.save_json(repo / ".fern/metadata.json", {"sdkVersion": "v49.0.0", "cliVersion": "5.193.2",
                                                        "generatorName": "fernapi/fern-go-sdk", "generatorVersion": "1.70.3"})
         base = commit(repo)
         data, digest = common.content(repo)
@@ -392,7 +392,7 @@ class PipelineTests(unittest.TestCase):
     def test_sdk_metadata_contains_only_version_identity(self):
         sdk = self.root / "sdk"
         sdk.mkdir()
-        metadata = {"cliVersion": "5.134.0", "generatorName": "fernapi/fern-go-sdk", "generatorVersion": "1.70.3",
+        metadata = {"cliVersion": "5.193.2", "generatorName": "fernapi/fern-go-sdk", "generatorVersion": "1.70.3",
                     "sdkVersion": "v49.0.0", "generatorConfig": {"importPath": "github.com/plaid/plaid-go/v49",
                     "module": {"path": "github.com/plaid/plaid-go/v49"}, "maxRetries": 0, "extra_setting": "must-not-leak"}}
         common.save_json(sdk / ".fern/metadata.json", metadata)
