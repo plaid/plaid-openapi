@@ -57,3 +57,118 @@ groups:
           maxRetries: 0
           includeLegacyClientOptions: false
         smart-casing: true
+
+  ts-sdk:
+    generators:
+      - name: fernapi/fern-typescript-node-sdk
+        version: 3.104.5
+        output:
+          location: local-file-system
+          path: ../generated/ts-sdk
+        config:
+          enableInlineTypes: true
+          inlineFileProperties: true
+          inlinePathParameters: true
+          namespaceExport: Plaid
+          noSerdeLayer: true
+          # Lets the SDK run where `process` doesn't exist (browsers, Deno, Cloudflare Workers).
+          guardProcessEnvAccess: true
+          useLegacyExports: false
+
+  python-sdk:
+    generators:
+      - name: fernapi/fern-python-sdk
+        version: 5.41.1
+        output:
+          location: local-file-system
+          path: ../generated/python-sdk
+        config:
+          # Import package `plaid`, matching Plaid's SDK (`import plaid`). Without
+          # this the module name follows `package-name` and becomes `plaid_python`.
+          package_name: plaid
+          client:
+            class_name: Plaid
+            filename: client.py
+          pydantic_config:
+            # Plaid adds enum values and fields without a version bump; skip
+            # response validation so new values decode instead of raising.
+            skip_validation: true
+          # Nested request objects accept plain dicts (`user={"client_user_id": ...}`)
+          # instead of forcing callers to build model instances.
+          use_typeddict_requests: true
+          # Same for the non-file fields of multipart uploads (only
+          # /transfer/diligence/document/upload, made multipart by the overlay).
+          use_typeddict_requests_for_file_upload: true
+          # Ships the WireMock-backed tests/wire suite; off by default.
+          wire_tests:
+            enabled: true
+
+  java-sdk:
+    generators:
+      - name: fernapi/fern-java-sdk
+        version: 4.32.1
+        output:
+          location: local-file-system
+          path: ../generated/java-sdk
+        config:
+          # Match the live SDK's coordinates and root package (com.plaid.client).
+          # Without this Fern derives com.plaid.api from the org/API names.
+          package-prefix: com.plaid.client
+          # The live SDK's entry point is `PlaidApi`; a different name avoids
+          # implying the call shape is drop-in (it is not).
+          client-class-name: PlaidClient
+          # OSSRH was shut down in 2025; Maven Central Portal is the only target.
+          publish-to: central
+          # Plaid's format: date fields are LocalDate in the live SDK. The
+          # default maps them to String.
+          use-local-date-for-dates: true
+          # collapse-optional-nullable is deliberately left at its default
+          # (false). It compiles as of 4.23.3 (4.23.2 did not), but turning it
+          # on changes many field types to OptionalNullable.
+          # Off, null and absent both decode to Optional.empty() — the same as
+          # live plaid-java, whose Gson setup also drops nulls.
+          # Plaid's `offset` counts records to skip, not pages (same as Go).
+          offset-semantics: item-index
+          # Emits wire tests (OkHttp MockWebServer, no Docker) for every
+          # endpoint; the only generated harness Java has.
+          enable-wire-tests: true
+          # Same reasons as the Go/TS groups.
+          inline-path-parameters: true
+          inline-file-properties: true
+          # Lets callers add OkHttp interceptors, which live plaid-java users
+          # get via ApiClient.getOkBuilder().
+          custom-interceptors: true
+
+  ruby-sdk:
+    generators:
+      # fern-ruby-sdk is the v2 generator (generators/ruby-v2 in fern-api/fern).
+      # fernapi/fern-ruby-sdk-v2 is the same image (identical digest at 1.28.3).
+      - name: fernapi/fern-ruby-sdk
+        version: 1.38.2
+        output:
+          location: local-file-system
+          path: ../generated/ruby-sdk
+        config:
+          # moduleName is deliberately unset: the default (organization
+          # "plaid") already yields `module Plaid` under lib/plaid/. Setting
+          # moduleName: Plaid would also rename the folder to lib/Plaid/.
+          #
+          # Plaid's live gem exposes its client as Plaid::PlaidApi; keep the
+          # same constant so a migrating codebase finds it (default: Client).
+          clientModuleName: PlaidApi
+          # Plaid's `offset` counts records to skip, not pages (same as Go).
+          offsetSemantics: item-index
+          # Emits the WireMock-backed wire tests used for validation.
+          enableWireTests: true
+          # Don't retry 500s. The legacy list retries 500/521/522/524 too, and
+          # most Plaid endpoints are non-idempotent POSTs (/transfer/create,
+          # /payment_initiation/payment/create, ...). Retries 408/429/502/503/504.
+          retryStatusCodes: recommended
+          # Opt-in correctness fixes that are off by default only to protect
+          # existing callers of an already published gem. This gem is new.
+          # A required-but-nullable field arriving as null still matches its
+          # undiscriminated-union member instead of degrading to a Hash.
+          respectNullableUnionFields: true
+          # A response that is a $ref alias to a model is coerced into that
+          # model rather than returned as a raw Hash.
+          coerceAliasResponses: true

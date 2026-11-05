@@ -1,13 +1,16 @@
-# Released SDK configuration
+# SDK generation configuration
 
-This directory contains the production Go SDK configuration for the public spec
-at `../2020-09-14.yml`. Spec and configuration changes are reviewed together; the
-workflow generates from their exact shared commit. Only Go is enabled here.
-Configurations for other languages can be added when ready, with independent
-version pins, checks and release workflows. Draft configurations stay in staging.
+This directory is the source of truth for Fern SDK configuration and the public
+spec at `../2020-09-14.yml`. Update generator pins, client options, and the shared
+overlay here.
+
+The `go-sdk` group targets `plaid/plaid-go` through the existing production
+pipeline. TypeScript, Python, Java, and Ruby default to local output under
+`generated/`. Release automation supplies its destination and package metadata
+separately while using the generator versions and client options defined here.
 
 - `fern.config.json` pins the Fern CLI.
-- `generators.yml` pins the Go generator and client options.
+- `generators.yml` pins each language generator and its client options.
 - `openapi-overlay.yml` supplies sub-client names, pagination, typed errors,
   client-level authentication and the multipart upload correction.
 

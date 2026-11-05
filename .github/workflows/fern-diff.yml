@@ -1,0 +1,90 @@
+name: fern diff (breaking-change gate)
+
+# Fails the PR when the API change is breaking.
+#
+# `fern diff` exits non-zero when the change is MAJOR and prints the reason —
+# removed properties / endpoints / enum values, newly-required properties,
+# required -> optional relaxations, and so on.
+#
+# None of this is automatic in Fern. This job is the opt-in.
+#
+# Design note: we build BOTH IRs using the *current* Fern config and swap only
+# the spec file. Checking out the base branch wholesale would also pick up its
+# generators.yml / fern.config.json, so an unrelated config change on main can
+# break the job — and we'd be diffing config drift, not API drift.
+
+on:
+  pull_request:
+    # labeled/unlabeled re-run the gate when `breaking-change-approved` is added or
+    # removed; otherwise the override only takes effect on the next push.
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+    paths:
+      - "2020-09-14.yml"
+      - "fern/openapi-overlay.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  diff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0 # need the base commit
+          persist-credentials: false
+
+      - name: Install pinned Fern CLI
+        run: |
+          version=$(node -p 'require("./fern/fern.config.json").version')
+          npm install -g "fern-api@$version"
+
+      - name: Build IR for PR head
+        run: fern ir /tmp/head-ir.json
+
+      - name: Build IR for base (same config, base spec)
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          cp 2020-09-14.yml /tmp/head-spec.yaml
+          git show "$BASE_SHA:2020-09-14.yml" > 2020-09-14.yml
+          fern ir /tmp/base-ir.json
+          cp /tmp/head-spec.yaml 2020-09-14.yml
+
+      - name: Diff
+        env:
+          APPROVED: ${{ contains(github.event.pull_request.labels.*.name, 'breaking-change-approved') }}
+        run: |
+          set +e
+          fern diff --from /tmp/base-ir.json --to /tmp/head-ir.json > /tmp/diff.txt 2>&1
+          code=$?
+          set -e
+          cat /tmp/diff.txt
+          # Note: fern diff only emits the {"bump":...,"nextVersion":...} JSON line
+          # when --from-version is supplied. A presubmit has no released version to
+          # pass, so we gate on the exit code instead: non-zero == major == breaking.
+          {
+            echo "## \`fern diff\`"
+            if [ "$code" -eq 0 ]; then
+              echo "✅ No breaking changes."
+            else
+              echo "🚨 **Breaking change detected** — requires a major version bump."
+              echo ""
+              echo '```'
+              head -100 /tmp/diff.txt
+              echo '```'
+              echo ""
+              echo "_Showing first 100 findings. Override with the \`breaking-change-approved\` label._"
+            fi
+            if [ "$code" -ne 0 ] && [ "$APPROVED" = "true" ]; then
+              echo ""
+              echo "☑️ Acknowledged via the \`breaking-change-approved\` label — not failing the job."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+          # The escape hatch has to be evaluated HERE rather than in a later step:
+          # once this step exits non-zero the job is failed, and a subsequent
+          # passing step cannot undo that.
+          if [ "$APPROVED" = "true" ]; then
+            exit 0
+          fi
+          exit $code

@@ -1,0 +1,31 @@
+name: Fern Check
+
+on:
+  pull_request:
+    paths:
+      - fern/**
+      - 2020-09-14.yml
+      - .github/workflows/fern-check.yml
+  push:
+    branches: [master]
+    paths:
+      - fern/**
+      - 2020-09-14.yml
+      - .github/workflows/fern-check.yml
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Install pinned Fern CLI
+        run: |
+          version=$(node -p 'require("./fern/fern.config.json").version')
+          npm install -g "fern-api@$version"
+      - name: Validate shared SDK configuration
+        run: fern check
