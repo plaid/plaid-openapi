@@ -111,6 +111,7 @@ class HostedRequestTests(unittest.TestCase):
     def test_launch_uses_own_job_and_private_pr_not_incoming_receipt(self):
         job = "11111111-1111-4111-8111-111111111111"
         token = "fern_fixture_token"
+        use_stderr = False
         def run(argv, **kwargs):
             env = kwargs["env"]
             self.assertEqual(env["FERN_TOKEN"], token)
@@ -123,10 +124,14 @@ class HostedRequestTests(unittest.TestCase):
             except urllib.error.HTTPError as error:
                 self.assertEqual(error.code, 403)
             log = f"DEBUG now go-pipeline fernapi/fern-go-sdk Job ID: {job}\nINFO now go-pipeline fernapi/fern-go-sdk Created pull request: https://github.com/example/private-sdk/pull/17\n"
+            if use_stderr:
+                return subprocess.CompletedProcess(argv, 0, stdout="", stderr=log.replace("Created pull request:", "Reused existing pull request:"))
             return subprocess.CompletedProcess(argv, 0, stdout=log, stderr="")
         with patch.dict(os.environ, {"SDK_FERN_READ_TOKEN": "never-pass", "GITHUB_TOKEN": "never-pass"}), \
              patch.object(request.subprocess, "run", side_effect=run):
-            self.assertEqual(request.launch(self.root, self.root / "cli.cjs", "50.1.0", token, "example/private-sdk"), (job, 17))
+            for use_stderr in (False, True):
+                with self.subTest(reused_pr_on_stderr=use_stderr):
+                    self.assertEqual(request.launch(self.root, self.root / "cli.cjs", "50.1.0", token, "example/private-sdk"), (job, 17))
 
     def test_launch_rejects_ambiguous_identity_or_unobserved_registry_containment(self):
         result = subprocess.CompletedProcess([], 0, stdout="unexpected result", stderr="private details")

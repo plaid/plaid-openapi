@@ -184,9 +184,11 @@ def launch(config, cli, version, token, repository):
                                 capture_output=True, timeout=2700, text=True)
         require(result.returncode == 0 and server.registration_blocked, "Hosted Fern generation failed or registry isolation was not observed")
         # Parse the CLI's own job identity, never copy it from the incoming receipt.
-        jobs = set(re.findall(r"^DEBUG .* go-pipeline fernapi/fern-go-sdk Job ID: (" + UUID + r")\s*$", result.stdout, re.MULTILINE))
-        pulls = set(re.findall(r"^INFO .* go-pipeline fernapi/fern-go-sdk Created pull request: https://github\.com/" +
-                              re.escape(repository) + r"/pull/([1-9][0-9]*)\s*$", result.stdout, re.MULTILINE))
+        log = (result.stdout or "") + "\n" + (result.stderr or "")
+        jobs = set(re.findall(r"^DEBUG .* go-pipeline fernapi/fern-go-sdk Job ID: (" + UUID + r")\s*$", log, re.MULTILINE))
+        # A retry may reuse a PR; its display wording is not part of the identity.
+        pulls = set(re.findall(r"https://github\.com/" + re.escape(repository) +
+                              r"/pull/([1-9][0-9]*)\b", log))
         require(len(jobs) == 1 and len(pulls) == 1, "Fern did not return exactly one requested job and private PR")
         return jobs.pop(), int(pulls.pop())
     except (OSError, subprocess.TimeoutExpired):
