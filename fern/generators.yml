@@ -156,6 +156,8 @@ groups:
           # Plaid's live gem exposes its client as Plaid::PlaidApi; keep the
           # same constant so a migrating codebase finds it (default: Client).
           clientModuleName: PlaidApi
+          # Plaid uses this name and version to select SDK compatibility behavior.
+          user-agent: "Plaid Ruby v{version}"
           # Plaid's `offset` counts records to skip, not pages (same as Go).
           offsetSemantics: item-index
           # Emits the WireMock-backed wire tests used for validation.
