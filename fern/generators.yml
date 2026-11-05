@@ -25,6 +25,45 @@ api:
         only-include-referenced-schemas: false
 readme:
   apiName: Plaid
+  customSections:
+    # The Java SDK replaces the Retrofit-based com.plaid:plaid-java 46.x, and its
+    # models need the SDK's own ObjectMapper; the generated README covers neither.
+    # The destination SDK must include MIGRATION.md, preserved via .fernignore.
+    - language: java
+      title: Migrating from plaid-java 46.x
+      content: |
+        This SDK replaces the Retrofit-based `com.plaid:plaid-java` 46.x client and is not a drop-in upgrade. Most call sites change:
+
+        ```java
+        // 46.x
+        Response<ItemPublicTokenExchangeResponse> response =
+            plaidApi.itemPublicTokenExchange(new ItemPublicTokenExchangeRequest().publicToken(publicToken)).execute();
+
+        // this SDK: returns the model, or throws a typed exception such as BadRequestError
+        ItemPublicTokenExchangeResponse response = client.item().exchangePublicToken(
+            ItemPublicTokenExchangeRequest.builder().publicToken(publicToken).build());
+        ```
+
+        Requests use builders, optional response fields return `Optional`, enums are classes (switch on `getEnumValue()`), and spec defaults such as `days_requested: 90` are no longer sent unless you set them. See [MIGRATION.md](./MIGRATION.md) for every change with before/after examples.
+    - language: java
+      title: Webhooks
+      content: |
+        Decode webhook bodies with the SDK's `ObjectMappers.JSON_MAPPER`. A plain `new ObjectMapper()` fails on the models' `Optional` and date fields.
+
+        ```java
+        import com.fasterxml.jackson.databind.JsonNode;
+        import com.plaid.client.core.ObjectMappers;
+        import com.plaid.client.types.SyncUpdatesAvailableWebhook;
+
+        JsonNode envelope = ObjectMappers.JSON_MAPPER.readTree(body);
+        if ("TRANSACTIONS".equals(envelope.get("webhook_type").asText())
+                && "SYNC_UPDATES_AVAILABLE".equals(envelope.get("webhook_code").asText())) {
+            SyncUpdatesAvailableWebhook webhook =
+                ObjectMappers.JSON_MAPPER.treeToValue(envelope, SyncUpdatesAvailableWebhook.class);
+        }
+        ```
+
+        Verify the `Plaid-Verification` header before trusting the body; `client.webhook().getVerificationKey(...)` returns the signing key.
 
 replay:
   enabled: false
