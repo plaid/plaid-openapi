@@ -4,6 +4,32 @@ An approved merge to `plaid/plaid-openapi` drives the Go release: generate both 
 
 The spec and Fern configuration live together in this public repository. Each production run uses `GITHUB_SHA` for both inputs. Push, scheduled catch-up and manual production generation run only from the original public repository's `master`; pull-request, fork and repository-dispatch contexts cannot enter that pipeline. Manual runs can choose a reviewed version override, but cannot choose another spec commit or URL.
 
+## Fern-hosted delivery preparation
+
+`fern_delivery.py` and `fern_provenance.py` provide the read and verification
+boundary for a future Fern-hosted generation step. They are not connected to the
+release workflow yet. The existing generation path and activation switches remain
+in effect.
+
+The trusted caller supplies the private output repository, requested job ID,
+version, generator image digest and exact input hashes. Retrieval uses an explicit
+machine credential to read the generated PR, checks its repository and base, and
+rejects a PR that changes during verification. Verification checks Fern's pinned
+signing key, builder, input hashes, generator image, exact Git commit/tree and SDK
+version. It never executes the generated SDK.
+
+Keep the original signed record and raw Git repository in private storage: they
+can identify private repositories and branches. The verifier returns only hashes
+and public generator/version identity. That summary is not itself an attestation;
+a trusted workflow must sign it and bind it to the final assembled SDK before any
+release consumer can rely on it.
+
+Wiring still requires a machine reader for the private PR, Fern authentication,
+and separate jobs for privileged retrieval and credential-free SDK assembly/tests.
+Automatic major-version selection may require a second hosted generation. Keep
+both clients on the same spec and retain the existing path, CI, merge and release
+checks. Do not enable production based on these helpers alone.
+
 ## Pre-merge hosted rehearsal
 
 `sdk-rehearsal.yml` runs on same-repository PRs changing that workflow or
