@@ -4,6 +4,28 @@ An approved merge to `plaid/plaid-openapi` drives the Go release: generate both 
 
 The spec and Fern configuration live together in this public repository. Each production run uses `GITHUB_SHA` for both inputs. Push, scheduled catch-up and manual production generation run only from the original public repository's `master`; pull-request, fork and repository-dispatch contexts cannot enter that pipeline. Manual runs can choose a reviewed version override, but cannot choose another spec commit or URL.
 
+## Fern-hosted delivery preparation
+
+`fern_provenance.py` verifies Fern's hosted download before assembly or SDK
+execution. The trusted caller supplies the requested job ID, SDK and CLI versions,
+generator image digest, and exact input hashes. The verifier checks Fern's pinned
+signing key, builder, complete downloaded tree and metadata against those inputs.
+It rejects links, Git metadata and unexpected signed fields. File modes follow
+Fern's download contract: every file is a regular `100644` blob, empty directories
+are omitted, and only `.fern/provenance.json` is excluded from the signed tree.
+
+The result includes a portable signed receipt. Its payload and signature stay
+unchanged; only the unsigned `keyid` reference is removed. Before returning it,
+the verifier checks that every signed field belongs to the known public format.
+The summary hashes those portable bytes. A downstream workflow must bind this
+evidence to the final assembled SDK before releasing it.
+
+The helper is not connected to the release workflow in this preparation change.
+Wiring still requires Fern authentication and separate jobs for generation,
+assembly, testing and signing. The download route needs no private SDK repository
+or GitHub credential for reading an intermediate PR. Existing activation switches
+remain in effect; do not enable production based on the helper alone.
+
 ## Pre-merge hosted rehearsal
 
 `sdk-rehearsal.yml` runs on same-repository PRs changing that workflow or
