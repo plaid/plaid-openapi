@@ -217,6 +217,9 @@ groups:
           offsetSemantics: item-index
           # Emits the WireMock-backed wire tests used for validation.
           enableWireTests: true
+          # Match the published Ruby client: callers opt in to retrying requests.
+          # Transfers and payments may already have succeeded when a request fails.
+          maxRetries: 0
           # Don't retry 500s. The legacy list retries 500/521/522/524 too, and
           # most Plaid endpoints are non-idempotent POSTs (/transfer/create,
           # /payment_initiation/payment/create, ...). Retries 408/429/502/503/504.
