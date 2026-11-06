@@ -33,6 +33,7 @@ class AssemblySealTests(unittest.TestCase):
         self.record = test_hosted_contract.record_fixture(self.manifest, sdk_base=self.plan["sdk_base"], index=self.fern_index)
         self.manifest.update(schema_version=2, fern=self.record)
         (self.repo / hosted_contract.FERN_INDEX).write_bytes(self.fern_index)
+        (self.repo / hosted_contract.FERN_PROVENANCE).write_bytes(test_hosted_contract.portable_fixture(self.record))
         common.save_json(self.repo / hosted_contract.FERN_BUNDLE, {"fixture_type": hosted_contract.FERN_PREDICATE})
         self.refresh_artifact()
         common.save_json(self.artifact / assembly_seal.ASSEMBLY_BUNDLE, {"fixture_type": assembly_seal.ASSEMBLY_PREDICATE})

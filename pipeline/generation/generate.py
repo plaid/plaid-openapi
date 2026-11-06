@@ -551,7 +551,8 @@ def main() -> None:
         baseline_tag = published_baseline(sdk, tags, major, old)
         # Old provenance must not survive into a newly generated PR.
         run(["git", "rm", "--ignore-unmatch", "--", MANIFEST, BUNDLE,
-             ".sdk-release/fern-content.json", ".sdk-release/fern.bundle.json"], sdk)
+             ".sdk-release/fern-content.json", ".sdk-release/fern.bundle.json",
+             ".sdk-release/fern-provenance.json"], sdk)
         if git(sdk, "diff", "--cached", "--name-only"):
             git(sdk, "-c", "user.name=SDK generator", "-c", "user.email=sdk-generator@localhost",
                 "-c", "commit.gpgsign=false", "commit", "-m", "Replace prior generation evidence")

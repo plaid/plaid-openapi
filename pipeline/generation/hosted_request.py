@@ -6,7 +6,6 @@ import sys
 sys.dont_write_bytecode = True
 
 import argparse
-import base64
 import http.server
 import json
 import os
@@ -16,11 +15,10 @@ import shutil
 import subprocess
 import tempfile
 import threading
-from urllib.parse import quote
 
 import yaml
 
-import fern_delivery
+import fern_provenance
 import generate
 from attestation import parse_json
 from common import (PipelineError, check_sha, clean_env, propose_version,
@@ -37,37 +35,26 @@ CLI_SHA256 = "bf69ff492a3ab6bc5ff890eff0060fd59ef9612eb9d3b30697dfbe6c16fbd059"
 UUID = r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}"
 
 
-def private_command(argv, *, cwd=None, env=None, timeout=300):
+def quiet_command(argv, *, cwd=None, env=None, timeout=300):
     try:
         result = subprocess.run(argv, cwd=cwd, env=env or clean_env(),
                                 capture_output=True, timeout=timeout)
-        require(result.returncode == 0, "Private SDK operation failed")
+        require(result.returncode == 0, "SDK base operation failed")
         return result.stdout
     except (OSError, subprocess.TimeoutExpired):
-        raise PipelineError("Private SDK operation failed") from None
+        raise PipelineError("SDK base operation failed") from None
 
 
-def fetch_objects(destination: Path, repository: str, commits: list[str], token: str | None = None):
-    """Use transient HTTP auth; never put credentials in Git URLs, files or logs."""
-    require(re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository) is not None
-            and all(part not in {".", ".."} for part in repository.split("/")), "Invalid SDK repository setting")
-    require(commits and all(check_sha(commit) for commit in commits), "Expected fixed Git commits")
-    require(not destination.exists(), "Refusing to reuse a private Git directory")
+def fetch_public_base(destination: Path, commit: str):
+    """Fetch the exact public SDK base without any GitHub credential."""
+    check_sha(commit)
+    require(not destination.exists(), "Refusing to reuse a Git directory")
     env = clean_env(GIT_NO_REPLACE_OBJECTS="1", GIT_NO_LAZY_FETCH="1")
-    private_command(["git", "init", "--bare", "--template=", str(destination)], env=env)
-    if token is not None:
-        require(isinstance(token, str) and token and all(32 < ord(char) < 127 for char in token), "Missing SDK reader credential")
-        authorization = base64.b64encode(("x-access-token:" + token).encode()).decode()
-        env.update(GIT_CONFIG_COUNT="1", GIT_CONFIG_KEY_0="http.https://github.com/.extraheader",
-                   GIT_CONFIG_VALUE_0="Authorization: Basic " + authorization)
-    try:
-        private_command(["git", "-c", "credential.helper=", "-c", "http.followRedirects=false",
-                         "-c", "protocol.allow=never", "-c", "protocol.https.allow=always",
-                         "-c", "fetch.fsckObjects=true", "fetch", "--no-tags", "--no-write-fetch-head",
-                         "--depth=2" if token is not None else "--depth=1",
-                         "https://github.com/" + repository + ".git", *commits], cwd=destination, env=env)
-    finally:
-        env.pop("GIT_CONFIG_VALUE_0", None)
+    quiet_command(["git", "init", "--bare", "--template=", str(destination)], env=env)
+    quiet_command(["git", "-c", "credential.helper=", "-c", "http.followRedirects=false",
+                   "-c", "protocol.allow=never", "-c", "protocol.https.allow=always",
+                   "-c", "fetch.fsckObjects=true", "fetch", "--no-tags", "--no-write-fetch-head", "--depth=1",
+                   "https://github.com/plaid/plaid-go.git", commit], cwd=destination, env=env)
 
 
 def validate_plan(plan: dict, settings: dict, major: bool) -> str:
@@ -102,22 +89,9 @@ def validate_plan(plan: dict, settings: dict, major: bool) -> str:
     return plan["version"]
 
 
-def private_target(repository, repository_id, token):
-    require(isinstance(repository, str) and re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository)
-            and all(part not in {".", ".."} for part in repository.split("/")), "Invalid private Fern output setting")
-    require(isinstance(repository_id, str) and re.fullmatch(r"[1-9][0-9]*", repository_id), "Invalid private repository identity")
-    repository_id = int(repository_id)
-    metadata = fern_delivery._get("repos/" + repository, token)
-    fern_delivery._repository(metadata, repository, repository_id)
-    branch = metadata.get("default_branch")
-    require(isinstance(branch, str) and branch and not any(ord(char) < 32 for char in branch), "Invalid private SDK default branch")
-    current = fern_delivery._get("repos/" + repository + "/branches/" + quote(branch, safe=""), token)
-    require(current.get("name") == branch and isinstance(current.get("commit"), dict), "Private SDK branch changed")
-    return repository_id, branch, check_sha(current["commit"].get("sha", ""))
-
-
-def render_request(config: Path, spec: bytes, version: str, settings: dict, repository: str):
-    generate.render_config(config, config.parent / "unused-local-output", spec, version, settings)
+def render_request(config: Path, raw: Path, spec: bytes, version: str, settings: dict):
+    require(raw.is_dir() and not raw.is_symlink() and not any(raw.iterdir()), "Expected an empty download directory")
+    generate.render_config(config, raw, spec, version, settings)
     path = config / "fern/generators.yml"
     document = yaml.safe_load(path.read_text())
     require(set(document["groups"]) == {"go-pipeline"}, "Expected only the reviewed Go generator")
@@ -126,10 +100,19 @@ def render_request(config: Path, spec: bytes, version: str, settings: dict, repo
     entry = entries[0]
     require(entry["name"] == settings["generator_image"] + "@" + settings["generator_digest"]
             and entry["version"] == settings["generator_version"] and
-            entry["output"]["location"] == "local-file-system", "Unexpected rendered generator")
-    del entry["output"]
+            set(entry["output"]) == {"location", "path"} and entry["output"]["location"] == "local-file-system"
+            and (config / "fern" / entry["output"]["path"]).resolve() == raw.resolve(), "Unexpected rendered generator")
     entry["name"] = settings["generator_image"]
-    entry["github"] = {"repository": repository, "mode": "pull-request", "workflows": False, "license": "MIT"}
+    def no_publication(value):
+        if isinstance(value, dict):
+            require(not ({"github", "publish", "publishInfo", "publish-info", "publish-metadata"} & value.keys()),
+                    "Download configuration contains a repository or publishing destination")
+            for nested in value.values():
+                no_publication(nested)
+        elif isinstance(value, list):
+            for nested in value:
+                no_publication(nested)
+    no_publication(document)
     require(document.get("replay", {}).get("enabled") is False, "Hosted replay must remain disabled")
     path.write_text(yaml.safe_dump(document, sort_keys=False, allow_unicode=True))
     inputs = {"fern:" + name: sha256((config / "fern" / name).read_bytes())
@@ -169,7 +152,7 @@ class RegistrySink(http.server.BaseHTTPRequestHandler):
     do_DELETE = reject
 
 
-def launch(config, cli, version, token, repository):
+def launch(config, cli, version, token):
     require(isinstance(token, str) and token and all(32 < ord(char) < 127 for char in token), "Missing Fern credential")
     server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), RegistrySink)
     server.registration_blocked = False
@@ -186,11 +169,10 @@ def launch(config, cli, version, token, repository):
         # Parse the CLI's own job identity, never copy it from the incoming receipt.
         log = (result.stdout or "") + "\n" + (result.stderr or "")
         jobs = set(re.findall(r"^DEBUG .* go-pipeline fernapi/fern-go-sdk Job ID: (" + UUID + r")\s*$", log, re.MULTILINE))
-        # A retry may reuse a PR; its display wording is not part of the identity.
-        pulls = set(re.findall(r"https://github\.com/" + re.escape(repository) +
-                              r"/pull/([1-9][0-9]*)\b", log))
-        require(len(jobs) == 1 and len(pulls) == 1, "Fern did not return exactly one requested job and private PR")
-        return jobs.pop(), int(pulls.pop())
+        require(len(jobs) == 1, "Fern did not return exactly one requested generation job")
+        require(re.search(r"https://github\.com/[^/\s]+/[^/\s]+/pull/[1-9][0-9]*\b", log) is None,
+                "Download generation unexpectedly reported a pull request")
+        return jobs.pop()
     except (OSError, subprocess.TimeoutExpired):
         raise PipelineError("Hosted Fern generation could not complete") from None
     finally:
@@ -203,9 +185,6 @@ def launch(config, cli, version, token, repository):
 def request(prepared: Path, output: Path, *, major=False):
     """Produce only public-safe generated bytes and a predicate for Plaid signing."""
     fern_token = os.environ.pop("FERN_TOKEN", "")
-    reader = os.environ.pop("SDK_FERN_READ_TOKEN", "")
-    repository = os.environ.pop("FERN_OUTPUT_REPOSITORY", "")
-    repository_id = os.environ.pop("FERN_OUTPUT_REPOSITORY_ID", "")
     try:
         require(not any(os.environ.get(name) for name in ("GH_TOKEN", "GITHUB_TOKEN", "SSH_AUTH_SOCK")),
                 "Hosted request received an unexpected credential")
@@ -213,46 +192,41 @@ def request(prepared: Path, output: Path, *, major=False):
         plan = parse_json((prepared / "plan.json").read_bytes())
         settings = generate.settings()
         version = validate_plan(plan, settings, major)
-        # Everything below runs in a disposable directory; none of it is uploaded.
-        with tempfile.TemporaryDirectory(prefix="sdk-private-fern-") as temporary:
+        # Raw output and the original envelope stay disposable; only the filtered
+        # SDK and the verifier's portable public receipt may leave this directory.
+        with tempfile.TemporaryDirectory(prefix="sdk-fern-download-") as temporary:
             work = Path(temporary)
             public = work / "public.git"
-            fetch_objects(public, settings["sdk_repository"], [plan["sdk_base"]])
+            fetch_public_base(public, plan["sdk_base"])
             public_files = git_files(public, plan["sdk_base"])
             require(public_files["go.mod"][1].splitlines()[0] ==
                     f"module github.com/plaid/plaid-go/v{plan['current_major']}".encode(), "Plan differs from the public SDK base module")
-            public_ignore = public_files[".fernignore"][1]
-            repository_id, branch, raw_base = private_target(repository, repository_id, reader)
             spec = (generate.ROOT / settings["spec_path"]).read_bytes()
             config = work / "config"
-            inputs = render_request(config, spec, version, settings, repository)
+            raw = work / "raw"
+            raw.mkdir()
+            inputs = render_request(config, raw, spec, version, settings)
             cli = generate.install_cli(work, settings)
-            job, number = launch(config, cli, version, fern_token, repository)
-            expected = {"repository": "https://github.com/" + repository, "job_id": job, "sdk_version": version,
+            job = launch(config, cli, version, fern_token)
+            expected = {"job_id": job, "sdk_version": version, "cli_version": settings["cli_version"],
                         "generator": {"image": settings["generator_image"], "version": settings["generator_version"],
                                       "sha256": settings["generator_digest"].removeprefix("sha256:")}, "inputs": inputs}
-            snapshot = fern_delivery.fetch_snapshot(repository=repository, repository_id=repository_id, number=number,
-                                                   expected_base=raw_base, machine_token=reader)
-            require(snapshot.base_ref == branch, "Generated PR targets a different private branch")
-            raw = work / "raw.git"
-            fetch_objects(raw, repository, [raw_base, snapshot.head], reader)
-            verified = fern_delivery.fetch_and_verify(repository=repository, repository_id=repository_id, number=number,
-                expected_base=raw_base, expected_head=snapshot.head, machine_token=reader, sdk_repo=raw,
-                public_key=PUBLIC_KEY, expected=expected)
-            require(verified.snapshot == snapshot, "Private Fern candidate changed during retrieval")
+            verified = fern_provenance.verify_download(raw, PUBLIC_KEY, expected)
+            summary, receipt = verified["summary"], verified["receipt"]
+            require(isinstance(receipt, bytes) and sha256(receipt) == summary["receipt_sha256"], "Portable Fern receipt differs from verified evidence")
+            require(fern_token.encode() not in receipt, "Portable Fern receipt contains a credential")
             safe = work / "public-output"
             safe.mkdir()
-            content_hash = export_verified_output(repo=raw, base=raw_base, commit=snapshot.head, public_ignore=public_ignore,
-                public_paths=set(public_files), version=version, settings=settings, output=safe, private_repository=repository,
-                forbidden_values=(fern_token.encode(), reader.encode()))
-            summary = verified.public_summary
-            record = {"schema_version": 1, "sdk_version": version, "source": plan["source"], "config": plan["config"],
+            content_hash = export_verified_output(directory=raw, expected_tree=summary["git_tree"], public_files=public_files,
+                version=version, settings=settings, output=safe, forbidden_values=(fern_token.encode(),))
+            (safe / "fern-provenance.json").write_bytes(receipt)
+            record = {"schema_version": 2, "sdk_version": version, "source": plan["source"], "config": plan["config"],
                       "sdk_base": plan["sdk_base"], "generator": expected["generator"],
                       "cli": {"version": settings["cli_version"], "sha256": settings["cli_sha256"]},
-                      "evidence": {key: summary[key] for key in ("receipt_sha256", "key_sha256", "git_commit", "git_tree", "inputs_sha256", "job_id_sha256")},
+                      "evidence": {key: summary[key] for key in ("receipt_sha256", "key_sha256", "output_mode", "git_tree", "inputs_sha256", "job_id_sha256")},
                       "content_sha256": content_hash, "generation": plan["generation"]}
             save_json(safe / "fern-record.json", record)
-            require(set(path.name for path in safe.iterdir()) == {"fern-output.tar.gz", "fern-content.json", "fern-record.json"},
+            require(set(path.name for path in safe.iterdir()) == {"fern-output.tar.gz", "fern-content.json", "fern-record.json", "fern-provenance.json"},
                     "Unexpected public hosted artifact")
             shutil.copytree(safe, output)
     except Exception:

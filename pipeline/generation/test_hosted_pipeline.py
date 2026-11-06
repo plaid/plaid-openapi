@@ -15,6 +15,7 @@ import hosted_contract
 import hosted_pipeline as hosted
 import publish_pr
 from test_pipeline import commit, init, spec as empty_spec, write
+from test_hosted_contract import bind_portable_fixture
 
 
 def spec():
@@ -117,14 +118,15 @@ class HostedPipelineTests(unittest.TestCase):
         index, digest = common.content(tree)
         common.archive_sdk(tree, output / "fern-output.tar.gz")
         (output / "fern-content.json").write_bytes(index)
-        record = {"schema_version": 1, "sdk_version": version, "sdk_base": plan["sdk_base"],
+        record = {"schema_version": 2, "sdk_version": version, "sdk_base": plan["sdk_base"],
                   **{key: plan[key] for key in ("source", "config", "generation")},
                   "generator": {"image": self.values["generator_image"], "version": self.values["generator_version"],
                                 "sha256": self.values["generator_digest"].removeprefix("sha256:")},
                   "cli": {"version": self.values["cli_version"], "sha256": self.values["cli_sha256"]},
                   "evidence": {"receipt_sha256": "d" * 64, "key_sha256": hosted_contract.FERN_KEY_SHA256,
-                               "git_commit": "e" * 40, "git_tree": "f" * 40,
+                               "output_mode": "downloadFiles", "git_tree": "f" * 40,
                                "inputs_sha256": "a" * 64, "job_id_sha256": "b" * 64}, "content_sha256": digest}
+        (output / "fern-provenance.json").write_bytes(bind_portable_fixture(record))
         common.save_json(output / "fern-record.json", record)
         if not plan["rehearsal"]:
             (output / "fern.bundle.json").write_text('{"fixture":true}')
@@ -188,6 +190,7 @@ class HostedPipelineTests(unittest.TestCase):
         common.extract_sdk(output / "sdk.tar.gz", tree)
         self.assertTrue((tree / hosted_contract.FERN_INDEX).is_file())
         self.assertTrue((tree / hosted_contract.FERN_BUNDLE).is_file())
+        self.assertTrue((tree / hosted_contract.FERN_PROVENANCE).is_file())
         self.assertEqual((tree / "MIGRATION.md").read_text(), "Reviewed migration\n")
         self.assertFalse((tree / "removed.go").exists())
         self.seal(output)
@@ -211,6 +214,18 @@ class HostedPipelineTests(unittest.TestCase):
                 self.signature.side_effect = common.PipelineError("bad signature")
                 with self.assertRaises(common.PipelineError):
                     hosted.assemble(self.prepared, fern, self.root / ("failed-" + failure))
+        self.legacy.assert_not_called()
+        self.tests.assert_not_called()
+
+    def test_missing_or_changed_portable_receipt_blocks_before_assembly(self):
+        plan = self.plan()
+        fern = self.fern(plan)
+        (fern / "fern-provenance.json").unlink()
+        with self.assertRaisesRegex(common.PipelineError, "Portable Fern provenance"):
+            hosted.assemble(self.prepared, fern, self.root / "missing-portable")
+        (fern / "fern-provenance.json").write_text("{}")
+        with self.assertRaisesRegex(common.PipelineError, "receipt differs"):
+            hosted.assemble(self.prepared, fern, self.root / "changed-portable")
         self.legacy.assert_not_called()
         self.tests.assert_not_called()
 
@@ -239,6 +254,7 @@ class HostedPipelineTests(unittest.TestCase):
         tree = self.root / "rehearsal-sdk"
         common.extract_sdk(output / "sdk.tar.gz", tree)
         self.assertTrue((tree / hosted_contract.FERN_INDEX).is_file())
+        self.assertTrue((tree / hosted_contract.FERN_PROVENANCE).is_file())
         self.assertFalse((tree / hosted_contract.FERN_BUNDLE).exists())
         self.assertFalse((tree / common.BUNDLE).exists())
         publish_pr.verify_artifact(output, self.root / "unsigned-check", signed=False)

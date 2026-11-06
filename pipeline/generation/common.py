@@ -14,7 +14,7 @@ import urllib.request
 
 MANIFEST = ".sdk-release/manifest.json"
 BUNDLE = ".sdk-release/generation.bundle.json"
-EVIDENCE_FILES = {MANIFEST, BUNDLE, ".sdk-release/fern-content.json", ".sdk-release/fern.bundle.json"}
+EVIDENCE_FILES = {MANIFEST, BUNDLE, ".sdk-release/fern-content.json", ".sdk-release/fern.bundle.json", ".sdk-release/fern-provenance.json"}
 PREDICATE = "https://plaid.com/attestations/sdk-generation/v1"
 WORKFLOW = ".github/workflows/generate-go-sdk.yml"
 SHA = re.compile(r"[0-9a-f]{40}\Z")

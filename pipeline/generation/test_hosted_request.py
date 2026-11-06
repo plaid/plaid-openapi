@@ -61,54 +61,49 @@ class HostedRequestTests(unittest.TestCase):
         with self.assertRaises(common.PipelineError):
             self.validate(settings=dict(self.settings, generation_mode="local"))
 
-    def test_machine_reader_credential_stays_out_of_git_arguments_and_storage(self):
+    def test_git_fetch_is_public_and_credential_free(self):
         seen = []
         def command(argv, **kwargs):
             seen.append((list(argv), dict(kwargs["env"])))
             return b""
-        token = "ghs_EXPLICIT_READER_TEST_ONLY"
-        with patch.object(request, "private_command", side_effect=command):
-            request.fetch_objects(self.root / "private.git", "example/private-sdk", ["a" * 40, "b" * 40], token)
+        with patch.dict(os.environ, {"FERN_TOKEN": "fixture-secret", "GITHUB_TOKEN": "fixture-gh-secret"}), \
+             patch.object(request, "quiet_command", side_effect=command):
+            request.fetch_public_base(self.root / "public.git", "a" * 40)
         self.assertEqual(len(seen), 2)
-        self.assertTrue(all(token not in " ".join(argv) for argv, _ in seen))
+        self.assertIn("https://github.com/plaid/plaid-go.git", seen[1][0])
         self.assertIn("--no-write-fetch-head", seen[1][0])
         self.assertIn("http.followRedirects=false", seen[1][0])
         self.assertIn("fetch.fsckObjects=true", seen[1][0])
-        self.assertEqual(seen[1][1]["GIT_CONFIG_KEY_0"], "http.https://github.com/.extraheader")
-        self.assertNotIn("GIT_CONFIG_VALUE_0", seen[0][1])
-        self.assertFalse((self.root / "private.git").exists())
+        for _, env in seen:
+            self.assertNotIn("GIT_CONFIG_VALUE_0", env)
+            self.assertNotIn("FERN_TOKEN", env)
+            self.assertNotIn("GITHUB_TOKEN", env)
+        self.assertFalse((self.root / "public.git").exists())
 
-    def test_private_target_records_fixed_identity_and_base_before_launch(self):
-        metadata = {"id": 123, "full_name": "example/private-sdk", "private": True, "fork": False, "default_branch": "main"}
-        branch = {"name": "main", "commit": {"sha": "a" * 40}}
-        with patch.object(request.fern_delivery, "_get", side_effect=[metadata, branch]) as get:
-            self.assertEqual(request.private_target("example/private-sdk", "123", "fixture-token"), (123, "main", "a" * 40))
-        self.assertEqual(get.call_args_list[1].args[0], "repos/example/private-sdk/branches/main")
-        for change in ({"private": False}, {"fork": True}, {"id": 456}):
-            with patch.object(request.fern_delivery, "_get", return_value=dict(metadata, **change)), self.assertRaises(Exception):
-                request.private_target("example/private-sdk", "123", "fixture-token")
-
-    def test_renderer_has_only_private_pr_output_and_digests_exact_written_inputs(self):
+    def test_renderer_has_only_empty_download_output_and_digests_exact_written_inputs(self):
         config = self.root / "config"
-        def render(path, *_args):
+        raw = self.root / "raw"
+        raw.mkdir()
+        def render(path, destination, *_args):
             (path / "fern").mkdir(parents=True)
             (path / "2020-09-14.yml").write_bytes(b"reviewed public spec")
             (path / "fern/openapi-overlay.yml").write_bytes(b"overlay: 1.0.0\n")
             (path / "fern/fern.config.json").write_text(json.dumps({"version": request.CLI_VERSION}))
             document = {"replay": {"enabled": False}, "groups": {"go-pipeline": {"generators": [{
                 "name": "fernapi/fern-go-sdk@" + self.settings["generator_digest"], "version": "1.70.3",
-                "output": {"location": "local-file-system", "path": "../../unused"}, "config": {"maxRetries": 0}}]}}}
+                "output": {"location": "local-file-system", "path": os.path.relpath(destination, path / "fern")}, "config": {"maxRetries": 0}}]}}}
             (path / "fern/generators.yml").write_text(request.yaml.safe_dump(document))
         with patch.object(request.generate, "render_config", side_effect=render):
-            inputs = request.render_request(config, b"reviewed public spec", "50.1.0", self.settings, "example/private-sdk")
+            inputs = request.render_request(config, raw, b"reviewed public spec", "50.1.0", self.settings)
         doc = request.yaml.safe_load((config / "fern/generators.yml").read_text())
         entry = doc["groups"]["go-pipeline"]["generators"][0]
-        self.assertNotIn("output", entry)
-        self.assertEqual(entry["github"], {"repository": "example/private-sdk", "mode": "pull-request", "workflows": False, "license": "MIT"})
+        self.assertNotIn("github", entry)
+        self.assertEqual(entry["output"]["location"], "local-file-system")
+        self.assertEqual((config / "fern" / entry["output"]["path"]).resolve(), raw.resolve())
         self.assertEqual(inputs["fern:generators.yml"], common.sha256((config / "fern/generators.yml").read_bytes()))
         self.assertEqual(inputs["fern:generators.yml#fernapi/fern-go-sdk"], common.sha256(json.dumps(entry, sort_keys=True, separators=(",", ":")).encode()))
 
-    def test_launch_uses_own_job_and_private_pr_not_incoming_receipt(self):
+    def test_launch_uses_own_job_without_a_git_reader_or_private_repository(self):
         job = "11111111-1111-4111-8111-111111111111"
         token = "fern_fixture_token"
         use_stderr = False
@@ -123,34 +118,75 @@ class HostedRequestTests(unittest.TestCase):
                 urllib.request.urlopen(urllib.request.Request(env["FERN_FDR_ORIGIN"] + "/registry/api/register", data=b"{}"), timeout=3)
             except urllib.error.HTTPError as error:
                 self.assertEqual(error.code, 403)
-            log = f"DEBUG now go-pipeline fernapi/fern-go-sdk Job ID: {job}\nINFO now go-pipeline fernapi/fern-go-sdk Created pull request: https://github.com/example/private-sdk/pull/17\n"
+            log = f"DEBUG now go-pipeline fernapi/fern-go-sdk Job ID: {job}\nINFO now go-pipeline fernapi/fern-go-sdk Downloaded files\n"
             if use_stderr:
-                return subprocess.CompletedProcess(argv, 0, stdout="", stderr=log.replace("Created pull request:", "Reused existing pull request:"))
+                return subprocess.CompletedProcess(argv, 0, stdout="", stderr=log)
             return subprocess.CompletedProcess(argv, 0, stdout=log, stderr="")
         with patch.dict(os.environ, {"SDK_FERN_READ_TOKEN": "never-pass", "GITHUB_TOKEN": "never-pass"}), \
              patch.object(request.subprocess, "run", side_effect=run):
             for use_stderr in (False, True):
-                with self.subTest(reused_pr_on_stderr=use_stderr):
-                    self.assertEqual(request.launch(self.root, self.root / "cli.cjs", "50.1.0", token, "example/private-sdk"), (job, 17))
+                with self.subTest(log_on_stderr=use_stderr):
+                    self.assertEqual(request.launch(self.root, self.root / "cli.cjs", "50.1.0", token), job)
 
     def test_launch_rejects_ambiguous_identity_or_unobserved_registry_containment(self):
         result = subprocess.CompletedProcess([], 0, stdout="unexpected result", stderr="private details")
         with patch.object(request.subprocess, "run", return_value=result), self.assertRaises(common.PipelineError) as caught:
-            request.launch(self.root, self.root / "cli.cjs", "50.1.0", "fern_fixture_token", "example/private-sdk")
+            request.launch(self.root, self.root / "cli.cjs", "50.1.0", "fern_fixture_token")
         self.assertNotIn("private", str(caught.exception))
 
     def test_outer_failure_never_leaks_private_details_and_does_not_publish_files(self):
         prepared, output = self.root / "prepared", self.root / "output"
         prepared.mkdir()
         (prepared / "plan.json").write_text(json.dumps(self.plan))
-        secrets = {"FERN_TOKEN": "fern_fixture", "SDK_FERN_READ_TOKEN": "reader_fixture",
-                   "FERN_OUTPUT_REPOSITORY": "example/private-sdk", "FERN_OUTPUT_REPOSITORY_ID": "123"}
-        with patch.dict(os.environ, secrets), patch.object(request.generate, "settings", side_effect=ValueError("reader_fixture example/private-sdk")), \
+        with patch.dict(os.environ, {"FERN_TOKEN": "fern_fixture", "GH_TOKEN": "", "GITHUB_TOKEN": "", "SSH_AUTH_SOCK": ""}), \
+             patch.object(request.generate, "settings", side_effect=ValueError("fern_fixture secret-location")), \
              self.assertRaises(common.PipelineError) as failure:
             request.request(prepared, output)
-        self.assertNotIn("reader_fixture", str(failure.exception))
-        self.assertNotIn("example/private-sdk", str(failure.exception))
+        self.assertNotIn("fern_fixture", str(failure.exception))
+        self.assertNotIn("secret-location", str(failure.exception))
         self.assertFalse(output.exists())
+
+    def test_request_keeps_download_receipt_and_uses_no_private_git_handoff(self):
+        prepared, output = self.root / "prepared", self.root / "output"
+        prepared.mkdir()
+        (prepared / "plan.json").write_text(json.dumps(self.plan))
+        public_files = {"go.mod": ("100644", b"module github.com/plaid/plaid-go/v50\n")}
+        job = "11111111-1111-4111-8111-111111111111"
+        inputs = {"fern:../2020-09-14.yml": "a" * 64}
+        receipt = b'{"payload":"fixture","payloadType":"fixture","signatures":[{"sig":"fixture"}]}'
+        summary = {"receipt_sha256": common.sha256(receipt), "key_sha256": "b" * 64,
+                   "output_mode": "downloadFiles", "git_tree": "c" * 40,
+                   "inputs_sha256": "d" * 64, "job_id_sha256": "e" * 64}
+        def export(**kwargs):
+            self.assertEqual(kwargs["expected_tree"], summary["git_tree"])
+            self.assertEqual(kwargs["forbidden_values"], (b"fern_fixture",))
+            (kwargs["output"] / "fern-output.tar.gz").write_bytes(b"fixture archive")
+            (kwargs["output"] / "fern-content.json").write_bytes(b"[]")
+            return common.sha256(b"[]")
+        with patch.dict(os.environ, {"FERN_TOKEN": "fern_fixture", "GH_TOKEN": "", "GITHUB_TOKEN": "", "SSH_AUTH_SOCK": ""}), \
+             patch.object(request.generate, "ROOT", self.root), \
+             patch.object(request.generate, "settings", return_value=self.settings), \
+             patch.object(request, "validate_plan", return_value="50.1.0"), \
+             patch.object(request, "fetch_public_base") as fetch, \
+             patch.object(request, "git_files", return_value=public_files), \
+             patch.object(request, "render_request", return_value=inputs), \
+             patch.object(request.generate, "install_cli", return_value=self.root / "cli.cjs"), \
+             patch.object(request, "launch", return_value=job) as launch, \
+             patch.object(request.fern_provenance, "verify_download", return_value={"summary": summary, "receipt": receipt}) as verify, \
+             patch.object(request, "export_verified_output", side_effect=export):
+            request.request(prepared, output)
+        fetch.assert_called_once()
+        self.assertEqual(fetch.call_args.args[1], self.plan["sdk_base"])
+        self.assertEqual(launch.call_args.args[-1], "fern_fixture")
+        self.assertEqual(set(verify.call_args.args[2]), {"job_id", "sdk_version", "cli_version", "generator", "inputs"})
+        self.assertEqual(verify.call_args.args[2]["job_id"], job)
+        self.assertEqual(set(path.name for path in output.iterdir()),
+                         {"fern-output.tar.gz", "fern-content.json", "fern-record.json", "fern-provenance.json"})
+        self.assertEqual((output / "fern-provenance.json").read_bytes(), receipt)
+        record = json.loads((output / "fern-record.json").read_text())
+        self.assertEqual(record["schema_version"], 2)
+        self.assertEqual(record["evidence"], summary)
+        self.assertNotIn("git_commit", record["evidence"])
 
 
 if __name__ == "__main__":

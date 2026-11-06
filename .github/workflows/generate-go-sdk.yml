@@ -150,24 +150,11 @@ jobs:
         with:
           name: go-prepared-${{ github.run_id }}
           path: ${{ runner.temp }}/prepared
-      - name: Obtain a read-only token for the private output repository
-        id: reader
-        uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2
-        with:
-          app-id: ${{ vars.SDK_PR_APP_ID }}
-          private-key: ${{ secrets.SDK_PR_APP_PRIVATE_KEY }}
-          owner: ${{ secrets.FERN_OUTPUT_OWNER }}
-          repositories: ${{ secrets.FERN_OUTPUT_REPOSITORY_NAME }}
-          permission-contents: read
-          permission-pull-requests: read
       - name: Request Fern generation and verify its signed output
         id: request
         env:
           SDK_PIPELINE_ENABLED: ${{ vars.SDK_PIPELINE_ENABLED }}
           FERN_TOKEN: ${{ secrets.FERN_TOKEN }}
-          SDK_FERN_READ_TOKEN: ${{ steps.reader.outputs.token }}
-          FERN_OUTPUT_REPOSITORY: ${{ secrets.FERN_OUTPUT_OWNER }}/${{ secrets.FERN_OUTPUT_REPOSITORY_NAME }}
-          FERN_OUTPUT_REPOSITORY_ID: ${{ secrets.FERN_OUTPUT_REPOSITORY_ID }}
           PREPARED: ${{ runner.temp }}/prepared
           OUTPUT: ${{ runner.temp }}/fern
         run: python3 -B pipeline/generation/hosted_request.py --prepared "$PREPARED" --output "$OUTPUT"
@@ -181,8 +168,11 @@ jobs:
           from pathlib import Path
           sys.path.insert(0, 'pipeline/generation')
           from attestation import parse_json
-          from hosted_contract import validate_fern_record
-          record = validate_fern_record(parse_json(Path(os.environ['RECORD']).read_bytes()))
+          from hosted_contract import validate_fern_record, validate_fern_index, validate_fern_provenance
+          path = Path(os.environ['RECORD'])
+          record = validate_fern_record(parse_json(path.read_bytes()))
+          validate_fern_index((path.parent / 'fern-content.json').read_bytes(), record)
+          validate_fern_provenance((path.parent / 'fern-provenance.json').read_bytes(), record)
           with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
               output.write('digest=' + record['content_sha256'] + '\n')
               output.write('subject=plaid-go-v' + record['sdk_version'] + '-fern-source\n')
@@ -222,6 +212,7 @@ jobs:
             ${{ runner.temp }}/fern/fern-output.tar.gz
             ${{ runner.temp }}/fern/fern-content.json
             ${{ runner.temp }}/fern/fern-record.json
+            ${{ runner.temp }}/fern/fern-provenance.json
             ${{ runner.temp }}/fern/fern.bundle.json
           retention-days: 14
           if-no-files-found: error
@@ -284,6 +275,7 @@ jobs:
             ${{ runner.temp }}/candidate/plan.json
             ${{ runner.temp }}/candidate/fern-content.json
             ${{ runner.temp }}/candidate/fern-record.json
+            ${{ runner.temp }}/candidate/fern-provenance.json
             ${{ runner.temp }}/candidate/fern.bundle.json
             ${{ runner.temp }}/candidate/result.json
           retention-days: 14
@@ -431,24 +423,11 @@ jobs:
         with:
           name: go-prepared-${{ github.run_id }}
           path: ${{ runner.temp }}/prepared
-      - name: Obtain a read-only token for the private output repository
-        id: reader
-        uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2
-        with:
-          app-id: ${{ vars.SDK_PR_APP_ID }}
-          private-key: ${{ secrets.SDK_PR_APP_PRIVATE_KEY }}
-          owner: ${{ secrets.FERN_OUTPUT_OWNER }}
-          repositories: ${{ secrets.FERN_OUTPUT_REPOSITORY_NAME }}
-          permission-contents: read
-          permission-pull-requests: read
       - name: Request Fern generation and verify its signed output
         id: request
         env:
           SDK_PIPELINE_ENABLED: ${{ vars.SDK_PIPELINE_ENABLED }}
           FERN_TOKEN: ${{ secrets.FERN_TOKEN }}
-          SDK_FERN_READ_TOKEN: ${{ steps.reader.outputs.token }}
-          FERN_OUTPUT_REPOSITORY: ${{ secrets.FERN_OUTPUT_OWNER }}/${{ secrets.FERN_OUTPUT_REPOSITORY_NAME }}
-          FERN_OUTPUT_REPOSITORY_ID: ${{ secrets.FERN_OUTPUT_REPOSITORY_ID }}
           PREPARED: ${{ runner.temp }}/prepared
           OUTPUT: ${{ runner.temp }}/fern
         run: python3 -B pipeline/generation/hosted_request.py --prepared "$PREPARED" --output "$OUTPUT" --major
@@ -462,8 +441,11 @@ jobs:
           from pathlib import Path
           sys.path.insert(0, 'pipeline/generation')
           from attestation import parse_json
-          from hosted_contract import validate_fern_record
-          record = validate_fern_record(parse_json(Path(os.environ['RECORD']).read_bytes()))
+          from hosted_contract import validate_fern_record, validate_fern_index, validate_fern_provenance
+          path = Path(os.environ['RECORD'])
+          record = validate_fern_record(parse_json(path.read_bytes()))
+          validate_fern_index((path.parent / 'fern-content.json').read_bytes(), record)
+          validate_fern_provenance((path.parent / 'fern-provenance.json').read_bytes(), record)
           with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
               output.write('digest=' + record['content_sha256'] + '\n')
               output.write('subject=plaid-go-v' + record['sdk_version'] + '-fern-source\n')
@@ -503,6 +485,7 @@ jobs:
             ${{ runner.temp }}/fern/fern-output.tar.gz
             ${{ runner.temp }}/fern/fern-content.json
             ${{ runner.temp }}/fern/fern-record.json
+            ${{ runner.temp }}/fern/fern-provenance.json
             ${{ runner.temp }}/fern/fern.bundle.json
           retention-days: 14
           if-no-files-found: error
@@ -565,6 +548,7 @@ jobs:
             ${{ runner.temp }}/candidate/plan.json
             ${{ runner.temp }}/candidate/fern-content.json
             ${{ runner.temp }}/candidate/fern-record.json
+            ${{ runner.temp }}/candidate/fern-provenance.json
             ${{ runner.temp }}/candidate/fern.bundle.json
             ${{ runner.temp }}/candidate/result.json
           retention-days: 14

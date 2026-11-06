@@ -15,7 +15,7 @@ from common import (BUNDLE, MANIFEST, WORKFLOW, archive_sdk, approved_generated_
                     canonical, check_sha, content, entries, extract_sdk, git, protected,
                     protected_state, propose_version, require, run, save_json, sha256, version_tuple)
 
-PROOFS = (MANIFEST, BUNDLE, hosted_contract.FERN_INDEX, hosted_contract.FERN_BUNDLE)
+PROOFS = (MANIFEST, BUNDLE, hosted_contract.FERN_INDEX, hosted_contract.FERN_BUNDLE, hosted_contract.FERN_PROVENANCE)
 PLAN_KEYS = {"schema_version", "source", "config", "generation", "sdk_base", "baseline", "tags",
              "current_major", "version", "override", "rehearsal"}
 
@@ -128,6 +128,9 @@ def verify_delivery(directory, plan, values, version):
             "Fern evidence differs from the prepared inputs")
     index, bundle = directory / "fern-content.json", directory / "fern.bundle.json"
     hosted_contract.validate_fern_index(index.read_bytes(), record)
+    provenance = directory / "fern-provenance.json"
+    require(provenance.is_file() and not provenance.is_symlink(), "Portable Fern provenance is missing or unsafe")
+    hosted_contract.validate_fern_provenance(provenance.read_bytes(), record)
     if plan["rehearsal"]:
         require(not bundle.exists(), "Unsigned rehearsal must not carry production signing evidence")
     else:
@@ -220,10 +223,10 @@ def assemble(prepared, fern, output, major=False):
         generate.update_changelog(sdk, version, data, values)
         git(sdk, "add", "-A")
         approved_generated_changes(sdk, sdk, version_tuple(version)[0], base_ref=base)
-        for name in ("fern-content.json", "fern-record.json", "fern.bundle.json"):
+        for name in ("fern-content.json", "fern-record.json", "fern.bundle.json", "fern-provenance.json"):
             if (fern / name).is_file():
                 shutil.copy2(fern / name, output / name)
-        proof_files = [("fern-content.json", hosted_contract.FERN_INDEX)]
+        proof_files = [("fern-content.json", hosted_contract.FERN_INDEX), ("fern-provenance.json", hosted_contract.FERN_PROVENANCE)]
         if not plan["rehearsal"]:
             proof_files.append(("fern.bundle.json", hosted_contract.FERN_BUNDLE))
         for source, destination in proof_files:

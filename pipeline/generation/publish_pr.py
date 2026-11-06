@@ -52,14 +52,18 @@ def open_pr(repository: str, branch: str, base: str, manifest: dict, token: str,
 
 
 def verify_hosted_sdk(sdk: Path, manifest: dict, *, unsigned_rehearsal: bool = False) -> None:
-    from hosted_contract import FERN_BUNDLE, FERN_INDEX, validate_fern_index, verify_fern_evidence
+    from hosted_contract import (FERN_BUNDLE, FERN_INDEX, FERN_PROVENANCE, validate_fern_index,
+                                 validate_fern_provenance, verify_fern_evidence)
     if manifest["schema_version"] == 1:
-        require(not (sdk / FERN_INDEX).exists() and not (sdk / FERN_BUNDLE).exists(),
+        require(not any((sdk / name).exists() for name in (FERN_INDEX, FERN_BUNDLE, FERN_PROVENANCE)),
                 "Local generation must not carry hosted generation evidence")
         return
     index, bundle = sdk / FERN_INDEX, sdk / FERN_BUNDLE
     require(index.is_file(), "Hosted generation index is missing")
     validate_fern_index(index.read_bytes(), manifest["fern"])
+    provenance = sdk / FERN_PROVENANCE
+    require(provenance.is_file(), "Fern signed provenance record is missing")
+    validate_fern_provenance(provenance.read_bytes(), manifest["fern"])
     if unsigned_rehearsal:
         require(not bundle.exists(), "Unsigned rehearsal must not carry a production Fern verification bundle")
     else:

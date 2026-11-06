@@ -1,4 +1,5 @@
 """Public Fern handoff linkage; only the gh verification process is mocked."""
+import base64
 import copy
 import json
 from pathlib import Path
@@ -11,17 +12,60 @@ import common
 import hosted_contract as hosted
 
 
+FIXTURE_JOB = "11111111-1111-4111-8111-111111111111"
+FIXTURE_TASK = "22222222-2222-4222-8222-222222222222"
+
+
+def input_fixture(record):
+    return {"fern:../2020-09-14.yml": record["source"]["sha256"], "fern:openapi-overlay.yml": "6" * 64,
+            "fern:generators.yml": "7" * 64, "fern:generators.yml#" + record["generator"]["image"]: "8" * 64}
+
+
+def portable_fixture(record, statement=None):
+    """Synthetic DSSE bytes: only Plaid's gh boundary is mocked by these consumers.
+
+    This is not a valid Fern signature. Producer tests separately exercise real
+    OpenSSL verification; consumers bind these bytes to the verified Plaid record.
+    """
+    generator = record["generator"]
+    if statement is None:
+        statement = {"_type": "https://in-toto.io/Statement/v1", "predicateType": "https://slsa.dev/provenance/v1",
+            "subject": [{"name": "fern:generated-files", "digest": {"gitTree": record["evidence"]["git_tree"]}}],
+            "predicate": {"buildDefinition": {"buildType": "https://buildwithfern.com/provenance/sdk-generation/v1",
+                "externalParameters": {"organization": "plaid", "api": "api",
+                    "generator": {key: generator[key] for key in ("image", "version")}, "output": {"mode": "downloadFiles"}},
+                "internalParameters": {"jobId": FIXTURE_JOB, "taskId": FIXTURE_TASK},
+                "resolvedDependencies": [{"uri": "docker://docker.io/" + generator["image"] + ":" + generator["version"],
+                    "digest": {"sha256": generator["sha256"]}}, {"name": "fern:ir.json", "digest": {"sha256": "9" * 64}},
+                    *[{"name": name, "digest": {"sha256": digest}} for name, digest in input_fixture(record).items()]]},
+                "runDetails": {"builder": {"id": "https://buildwithfern.com/fiddle"}, "metadata": {
+                    "invocationId": FIXTURE_JOB + "/" + FIXTURE_TASK, "finishedOn": "2026-01-01T00:00:00Z"}}}}
+    envelope = {"payloadType": "application/vnd.in-toto+json", "payload": base64.b64encode(common.canonical(statement)).decode(),
+                "signatures": [{"sig": base64.b64encode(b"FIXTURE-NOT-A-REAL-FERN-SIGNATURE").decode()}]}
+    return json.dumps(envelope, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode()
+
+
+def bind_portable_fixture(record):
+    record["schema_version"] = 2
+    record["evidence"].pop("git_commit", None)
+    record["evidence"].update(output_mode="downloadFiles", job_id_sha256=common.sha256(FIXTURE_JOB.encode()),
+        inputs_sha256=common.sha256(common.canonical(dict(sorted(input_fixture(record).items())))))
+    receipt = portable_fixture(record)
+    record["evidence"]["receipt_sha256"] = common.sha256(receipt)
+    return receipt
+
+
 def record_fixture(manifest=None, *, sdk_base="b" * 40, index=None):
     """Build a public-safe synthetic record; callers may supply their manifest/index."""
     index = index if index is not None else common.canonical([
         [".fern/metadata.json", "100644", "1" * 64], ["client/client.go", "100644", "2" * 64]])
-    record = {"schema_version": 1, "sdk_version": "50.0.0",
+    record = {"schema_version": 2, "sdk_version": "50.0.0",
         "source": {"repository": attestation.SPEC_REPO, "commit": "a" * 40, "path": "2020-09-14.yml", "sha256": "c" * 64},
         "config": {"repository": attestation.CONFIG_REPO, "commit": "a" * 40, "sha256": "d" * 64},
         "sdk_base": sdk_base, "generator": {"image": "fernapi/fern-go-sdk", "version": "1.70.3", "sha256": "e" * 64},
         "cli": {"version": "5.193.2", "sha256": "f" * 64},
         "evidence": {"receipt_sha256": "1" * 64, "key_sha256": hosted.FERN_KEY_SHA256,
-                     "git_commit": "2" * 40, "git_tree": "3" * 40, "inputs_sha256": "4" * 64, "job_id_sha256": "5" * 64},
+                     "output_mode": "downloadFiles", "git_tree": "3" * 40, "inputs_sha256": "4" * 64, "job_id_sha256": "5" * 64},
         "content_sha256": common.sha256(index),
         "generation": {"repository": attestation.CONFIG_REPO, "workflow": attestation.GEN_WORKFLOW, "run_id": "123"}}
     if manifest is not None:
@@ -29,6 +73,7 @@ def record_fixture(manifest=None, *, sdk_base="b" * 40, index=None):
                       **{name: copy.deepcopy(manifest[name]) for name in ("source", "config", "generation")})
         record["cli"] = {"version": manifest["generator"]["cli_version"], "sha256": manifest["generator"]["cli_sha256"]}
         record["generator"]["sha256"] = manifest["generator"]["image_digest"].removeprefix("sha256:")
+    bind_portable_fixture(record)
     return record
 
 
@@ -157,6 +202,53 @@ class HostedContractTests(unittest.TestCase):
         self.bundle.unlink()
         with self.assertRaisesRegex(common.PipelineError, "signature"):
             hosted.verify_fern_evidence(self.index_path, self.bundle, self.record)
+
+    def test_portable_vendor_receipt_is_bound_to_the_record(self):
+        receipt = portable_fixture(self.record)
+        hosted.validate_fern_provenance(receipt, self.record)
+        with self.assertRaisesRegex(common.PipelineError, "differs from signed record"):
+            hosted.validate_fern_provenance(receipt + b"\n", self.record)
+
+    def test_portable_receipt_rejects_key_identifiers_extras_and_noncanonical_envelopes(self):
+        original = json.loads(portable_fixture(self.record))
+        for mutate in (lambda e: e.update(private_field="not-public"),
+                       lambda e: e["signatures"][0].update(keyid="arn:fixture:private"),
+                       lambda e: e.update(signatures=e["signatures"] * 2),
+                       lambda e: e.update(payloadType="text/plain")):
+            envelope = copy.deepcopy(original)
+            mutate(envelope)
+            data = json.dumps(envelope, sort_keys=True, separators=(",", ":")).encode()
+            record = copy.deepcopy(self.record)
+            record["evidence"]["receipt_sha256"] = common.sha256(data)
+            with self.subTest(envelope=envelope), self.assertRaises(common.PipelineError):
+                hosted.validate_fern_provenance(data, record)
+        data = json.dumps(original, indent=2).encode()
+        record = copy.deepcopy(self.record)
+        record["evidence"]["receipt_sha256"] = common.sha256(data)
+        with self.assertRaisesRegex(common.PipelineError, "canonical"):
+            hosted.validate_fern_provenance(data, record)
+
+    def test_portable_receipt_checks_signed_context_and_known_fields(self):
+        original = json.loads(base64.b64decode(json.loads(portable_fixture(self.record))["payload"]))
+        changes = [lambda s: s["subject"][0]["digest"].update(gitTree="0" * 40),
+                   lambda s: s["subject"][0]["digest"].update(gitCommit="0" * 40),
+                   lambda s: s["predicate"]["buildDefinition"]["externalParameters"]["output"].update(mode="github"),
+                   lambda s: s["predicate"]["buildDefinition"]["externalParameters"].update(private_url="not-public"),
+                   lambda s: s["predicate"]["buildDefinition"]["externalParameters"]["generator"].update(version="9.0.0"),
+                   lambda s: s["predicate"]["buildDefinition"]["internalParameters"].update(jobId=FIXTURE_TASK),
+                   lambda s: s["predicate"]["runDetails"]["metadata"].update(invocationId="different"),
+                   lambda s: s["predicate"]["buildDefinition"]["resolvedDependencies"][0]["digest"].update(sha256="0" * 64),
+                   lambda s: s["predicate"]["buildDefinition"]["resolvedDependencies"].pop(),
+                   lambda s: s["predicate"]["buildDefinition"]["resolvedDependencies"].append(
+                       copy.deepcopy(s["predicate"]["buildDefinition"]["resolvedDependencies"][-1]))]
+        for mutate in changes:
+            statement = copy.deepcopy(original)
+            mutate(statement)
+            data = portable_fixture(self.record, statement)
+            record = copy.deepcopy(self.record)
+            record["evidence"]["receipt_sha256"] = common.sha256(data)
+            with self.subTest(statement=statement), self.assertRaises(common.PipelineError):
+                hosted.validate_fern_provenance(data, record)
 
 
 if __name__ == "__main__":

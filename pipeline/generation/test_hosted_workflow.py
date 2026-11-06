@@ -42,6 +42,16 @@ class HostedWorkflowTests(unittest.TestCase):
         cls.workflow = yaml.safe_load((ROOT / ".github/workflows/generate-go-sdk.yml").read_text())
         cls.jobs = cls.workflow["jobs"]
 
+    def test_direct_generation_uses_no_private_repository_reader(self):
+        for name in ("request-minor", "request-major"):
+            job = self.jobs[name]
+            self.assertFalse(steps_using(job, "actions/create-github-app-token"))
+            self.assertNotIn("FERN_OUTPUT_", str(job))
+            self.assertNotIn("SDK_FERN_READ_TOKEN", str(job))
+            secrets = re.findall(r"secrets\.([A-Z_]+)", str(job))
+            self.assertEqual(set(secrets), {"FERN_TOKEN"})
+            self.assertIn("fern-provenance.json", steps_using(job, "actions/upload-artifact")[0]["with"]["path"])
+
     def test_hosted_sdk_execution_occurs_only_after_sealing_on_read_only_jobs(self):
         for lane in ("minor", "major"):
             assemble, seal, validate = (self.jobs[prefix + lane] for prefix in ("assemble-", "seal-", "validate-"))

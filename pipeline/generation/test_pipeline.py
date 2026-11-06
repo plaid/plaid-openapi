@@ -168,7 +168,7 @@ class PipelineTests(unittest.TestCase):
         jobs = yaml.safe_load(workflow)["jobs"]
         allowed = {"sdk.tar.gz", "content.json", "manifest.json", "plan.json", "result.json",
                    "api-diff.txt", "generation.bundle.json", "assembly.bundle.json",
-                   "fern-output.tar.gz", "fern-content.json", "fern-record.json", "fern.bundle.json"}
+                   "fern-output.tar.gz", "fern-content.json", "fern-record.json", "fern-provenance.json", "fern.bundle.json"}
         uploads = [step for job in jobs.values() for step in job["steps"]
                    if step.get("uses", "").startswith("actions/upload-artifact@")]
         self.assertTrue(uploads)

@@ -13,8 +13,8 @@ controls. Edits confined to other SDK groups or the shared CLI default do not
 trigger a Go release. The workflow runs these stages:
 
 1. Pin the public spec/config commit, SDK base and proposed version.
-2. Request Fern generation into a private staging repository. Verify its signature,
-   requested job, input hashes, generator image and exact Git output. Export only
+2. Request Fern-hosted generation into a fresh local output directory. Verify its
+   signature, requested job, input hashes, generator image and complete file tree. Export only
    allowed generated files and sign a public-safe record of that verification.
 3. Add legacy from the same spec and apply the reviewed customizations. Seal the
    assembled candidate before any SDK tests execute.
@@ -30,19 +30,24 @@ Fern verification to Plaid's final assembly; the SDK consumer verifies both
 records and the generation mode at the exact public config commit. Removing the
 Fern proof or substituting a local-generation manifest stops publication.
 
-The request job uses an explicit App token restricted to Contents read
-and Pull requests read. It never executes generated SDK code. Assembly and test
-jobs receive no Fern or publishing credentials. Private repository identities,
-original Fern receipts, CLI debug logs and raw Git objects are never uploaded to
-public artifacts. The original receipt remains on the private staging PR; retain
-those PRs and their signed commits for audit, and arrange durable private retention
-before adopting any staging cleanup or branch-reuse policy.
+The request job needs only `FERN_TOKEN`; it does not open a staging PR or read a
+private GitHub repository. Assembly and test jobs receive no Fern or publishing
+credentials. Only reviewed generated paths are exported, with metadata reduced
+to version identity. The fresh generated caller is compared against the maintained
+public caller with its reviewed security hook removed.
+
+The original signed provenance is carried in `.sdk-release/fern-provenance.json`.
+Its signed payload and signature are unchanged. Only the unsigned signing-key
+identifier is omitted, since it can contain provider infrastructure details.
+Unexpected payload fields stop generation before publication. The signed tree
+covers all downloaded files except that provenance file; modes are normalized to
+`100644` according to Fern's directory-proof format.
 
 Go pins CLI 5.193.2 in `settings.json` and overrides only its disposable Go
-config; the shared CLI default used by other SDK languages is unchanged. Its optional registry writes are rejected locally through its FDR-origin
-override. Hosted generation produces a PR only: no package publication, automatic
-merge or generated GitHub workflows. The private staging repo must not publish
-SDK versions from these PRs. Its normal CI is not the release acceptance test.
+config; the shared CLI default used by other SDK languages is unchanged. Optional
+registry writes are rejected locally through the FDR-origin override. Remote
+`local-file-system` output means Fern runs the generator and downloads its files;
+this is distinct from running the generator with `--local`.
 
 `local` remains an explicit reviewed fallback using the previous generator path;
 changing provider requires a config review. Secret-free PR rehearsals exercise
@@ -77,7 +82,7 @@ Those remain activation checks after review and access setup.
 
 - The source is the tracked `2020-09-14.yml` at the exact workflow commit. Fern config refers to `../2020-09-14.yml`. Rendering makes a disposable copy of those exact bytes beside the temporary Fern config; it never adds a second repository spec. Previous SDK source commits must remain ancestors and spec versions cannot move backward.
 - The request job checks the CLI archive checksum and verifies Fern's signed generator image digest. Assembly runs the public-only legacy generator on exactly the same spec bytes. The local fallback still executes Fern by immutable image digest.
-- Maintained customizations, license, release history and release/integration automation survive generation. The hosted path retains the reviewed caller and rejects changes to maintained staging files. Generator upgrades require reconciling that caller with the new runtime; the local fallback additionally compares the raw generated caller with the maintained security hook.
+- Maintained customizations, license, release history and release/integration automation survive generation. Both hosted downloads and the local fallback compare the fresh generated caller with the maintained security hook removed. An incompatible runtime change stops generation until the caller is reconciled.
 - Fern Go 1.70.3 regenerates the transfer diligence upload's `purpose` field as JSON, adding quotes. A narrow post-generation correction restores the [published v49 text-field behavior](https://github.com/plaid/plaid-go/blob/0d83b050ea325adda35c6d88bdf24b46fe2f7044/transfer/diligence/raw_client.go#L103). It checks the exact generator version, method, endpoint and serialization shape, recognizes already-correct output, and stops on unknown shapes. The public upload regression test is preserved; the generated file is otherwise refreshed normally.
 - `harden_wire_tests.py` sets explicit dummy credentials and custom mock endpoints in the reviewed generated test shapes. WireMock mappings require those headers; compose binds only to loopback without verbose request logging. The helper rejects unfamiliar generator versions or test shapes. Runtime destination checks stay enabled.
 - Before generation, every operation must have an explicit Fern group and method
@@ -89,14 +94,14 @@ Those remain activation checks after review and access setup.
 - A separate job validates the package and uses public Sigstore attestation to bind its content digest to the manifest. The signed source and config repository/commit must match `plaid/plaid-openapi` and the same workflow SHA. Verification requires the exact workflow, `master`, public visibility, run identity, predicate and subject. No generated SDK code executes in this job.
 - The PR job verifies the signature before obtaining its narrowly scoped App token. `SDK_PR_APP_BOT_ID` pins the numeric bot user ID; the public SDK integration and release workflows use the same identity. Same-input retries recheck the existing ready PR, base, one-parent generation commit, content and signature. They never rebase or overwrite existing branches, change drafts, or recreate closed PRs.
 
-Public artifact uploads use explicit file allowlists: prepared plans, filtered `fern-output.tar.gz`, `fern-content.json`, `fern-record.json`, `fern.bundle.json`, assembled `sdk.tar.gz`, `content.json`, `manifest.json`, `plan.json`, `result.json`, the separate `assembly.bundle.json`, final `generation.bundle.json`, and public API comparisons. The final SDK carries only the final manifest, generation signature and Fern verification index/signature. Environment dumps, raw CLI debug output, test logs and temporary work directories are not uploaded. The CLI debug file used to check the raw generated caller stays in disposable local storage; failed logged subprocess output is withheld from public job logs. SDK `.fern/metadata.json` contains only version identity.
+Public artifact uploads use explicit file allowlists: prepared plans, filtered `fern-output.tar.gz`, `fern-content.json`, `fern-record.json`, `fern-provenance.json`, `fern.bundle.json`, assembled `sdk.tar.gz`, `content.json`, `manifest.json`, `plan.json`, `result.json`, the separate `assembly.bundle.json`, final `generation.bundle.json`, and public API comparisons. The final SDK carries the final manifest, generation signature, Fern verification index/signature and original portable Fern provenance. Environment dumps, raw CLI debug output, test logs and temporary work directories are not uploaded. The CLI debug file used to check the raw generated caller stays in disposable local storage; failed logged subprocess output is withheld from public job logs. SDK `.fern/metadata.json` contains only version identity.
 
 ## Activation
 
 1. Verify CODEOWNERS resolves to maintainers with write access and enable required code-owner review for public spec, `fern/`, `pipeline/` and workflow changes. Land the public SDK's maintained customizations, integration/release automation and ownership rules. For the first automatic release after a manual release, install its reviewed predecessor pins.
 2. Set `SDK_FAILURE_ASSIGNEE` to a repository maintainer and verify assigned failure issues reach them. Leave `SDK_PIPELINE_ENABLED`, `SDK_AUTOMERGE_ENABLED` and `SDK_RELEASE_ENABLED` off while preparing. `rehearsal: true` only generates and tests; trusted workflow input guards prevent signing or PR publication even if artifact outputs change.
 3. Land the SDK schema-2 consumer before enabling hosted generation. In this repo, configure `SDK_PR_APP_ID`, `SDK_PR_APP_PRIVATE_KEY` and `SDK_PR_APP_BOT_ID` for the protected `sdk-pr-publishing` environment. Restrict it to `master` without a per-run reviewer gate. The PR App needs Contents and Pull requests write only on `plaid-go`, with no workflow permission or review bypass. Configure the separate integration and release identities in the SDK repo.
-4. Create a `fern-generation` environment restricted to `master`. Configure `SDK_PR_APP_ID`, its `SDK_PR_APP_PRIVATE_KEY`, `FERN_TOKEN`, and secrets `FERN_OUTPUT_OWNER`, `FERN_OUTPUT_REPOSITORY_NAME`, `FERN_OUTPUT_REPOSITORY_ID`. The existing creator App must be installed on exactly that private output repo; the workflow mints a separate read-only token. Installation still grants the App's registered code/PR write permissions. Fern's own App must also have access there. Keep the original receipts private and restrict staging CI to the access it needs.
+4. Create a `fern-generation` environment restricted to `master` and configure `FERN_TOKEN`. Generation needs no private staging repository or reader App. The separate creator, integration and release Apps retain their public SDK roles.
 5. After approving deployment, enable generation and run a real signed candidate while automatic integration and release remain disabled. Validate the public integration workflow's no-write mode, then enable automatic integration with tag publication still disabled. Run the public release's no-tag attestation rehearsal and verify the exact control/signing identities and repository protections.
 6. Enable publication only after the hosted rehearsal passes. Dispatch the first already-merged candidate explicitly; enabling a flag does not replay an old push event. Thereafter approved input changes should generate, integrate and publish automatically.
 
