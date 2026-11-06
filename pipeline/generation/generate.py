@@ -17,7 +17,7 @@ import urllib.request
 
 from attestation import parse_json, validate_manifest
 from common import (BUNDLE, MANIFEST, WORKFLOW, PipelineError, archive_sdk, canonical,
-                    check_sha, clean_env, content, entries, git, protected_state, module_rewrite,
+                    check_sha, clean_env, content, entries, git, protected_state, module_rewrite, approved_generated_changes,
                     propose_version, public_get, require, run, save_json, sha256,
                     spec_version, version_tuple)
 from harden_wire_tests import harden as harden_wire_tests
@@ -535,6 +535,7 @@ def main() -> None:
         update_changelog(sdk, version, data, values)
         sanitize_metadata(sdk, version, module, values)
         git(sdk, "add", "-A")
+        approved_generated_changes(sdk, sdk, version_tuple(version)[0], base_ref=base)
         index, digest = content(sdk)
         manifest = manifest_for(values, version=version, source_commit=source_commit, source_bytes=data,
                                 config_repo=config_repo, config_commit=config_commit, config_hash=config_hash,

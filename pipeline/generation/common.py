@@ -192,6 +192,41 @@ def expected_protected_state(repo: Path, target_major: int) -> dict[str, tuple[s
     return state
 
 
+GENERATED_GO_PATH = re.compile(r"(?:[a-z][a-z0-9_]*/)*[a-z][a-z0-9_]*\.go")
+GENERATED_DATA_FILES = {"go.mod", "go.sum", ".fern/metadata.json", "reference.md", "wiremock/wiremock-mappings.json"}
+
+
+def approved_generated_changes(base: Path, candidate: Path, target_major: int, *, base_ref: str | None = None) -> None:
+    """Bound attested output to reviewed generated paths, using the original SDK base."""
+    old = {name: (mode, digest) for name, mode, digest in entries(base, ref=base_ref)}
+    new = {name: (mode, digest) for name, mode, digest in entries(candidate)}
+    def original(name):
+        return run(["git", "show", (base_ref or "") + ":" + name], base)
+    require("go.mod" in old, "Generated path policy requires an existing SDK base")
+    matches = re.findall(rb"^module\s+github\.com/plaid/plaid-go/v([1-9][0-9]*)\s*$", original("go.mod"), re.MULTILINE)
+    require(len(matches) == 1 and int(matches[0]) >= 49, "Unexpected SDK base module")
+    previous = int(matches[0])
+    require(target_major in {previous, previous + 1}, "SDK major must stay current or advance by one")
+    for name in old.keys() | new.keys():
+        before, after = old.get(name), new.get(name)
+        if before == after:
+            continue
+        if name == "CHANGELOG.md":
+            # Generation prepends its deterministic entry; integration checks its exact bytes.
+            continue
+        if protected(name) or name.startswith((".circleci/", "legacy/tests/")):
+            rewritable = name.endswith(".go") or name == "README.md"
+            rewritable = rewritable and not name.startswith(PRESERVED_PREFIXES + (".circleci/",))
+            require(previous != target_major and before is not None and after is not None and rewritable and
+                    after == (before[0], sha256(module_rewrite(original(name), previous, target_major))),
+                    "Generated PR changed maintained content: " + name)
+            continue
+        require(name in GENERATED_DATA_FILES or (not name.startswith("scripts/") and GENERATED_GO_PATH.fullmatch(name)),
+                "Generated PR changed an unapproved path: " + name)
+        require(all(value is None or value[0] == "100644" for value in (before, after)),
+                "Generated paths must be regular non-executable files: " + name)
+
+
 def public_get(url: str, *, token: str | None = None, payload: object | None = None,
                method: str | None = None) -> object:
     headers = {"Accept": "application/vnd.github+json", "User-Agent": "plaid-sdk-generation"}

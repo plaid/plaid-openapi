@@ -194,7 +194,8 @@ def publish(directory: Path, artifact: Path, manifest: dict, plan: dict, work: P
     run(["git", "clone", "--filter=blob:none", "--single-branch", "--branch", values["sdk_branch"],
          "https://github.com/" + repository + ".git", str(sdk)])
     require(git(sdk, "rev-parse", "HEAD") == plan["sdk_base"], "SDK master changed during generation; regenerate from the new reviewed base")
-    from common import expected_protected_state
+    from common import expected_protected_state, approved_generated_changes
+    approved_generated_changes(sdk, artifact, int(manifest["sdk"]["version"].split(".")[0]))
     before = expected_protected_state(sdk, int(manifest["sdk"]["version"].split(".")[0]))
     # Protected Go files and README may only receive the exact major namespace rewrite.
     # Workflows and release policy scripts remain byte-identical to the reviewed base.
