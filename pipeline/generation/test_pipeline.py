@@ -146,6 +146,36 @@ class PipelineTests(unittest.TestCase):
             with self.subTest(value=value), self.assertRaises(common.PipelineError):
                 common.propose_version(tags, 49, value)
 
+    def test_legacy_adapter_only_defers_tests_when_requested(self):
+        sdk, _artifact, manifest, _plan = self.fixture()
+        source = self.root / 'spec.yml'
+        source.write_bytes(spec())
+        for deferred in (False, True):
+            with self.subTest(deferred=deferred):
+                work = self.root / str(deferred)
+                work.mkdir()
+                def legacy_command(*_args, **_kwargs):
+                    common.save_json(work / 'legacy-manifest.json', manifest['legacy'])
+                with patch.object(generate, 'run', side_effect=legacy_command) as command:
+                    options = {'defer_tests': True} if deferred else {}
+                    generate.run_legacy(sdk, source, 'github.com/plaid/plaid-go/v49', self.values, work, **options)
+                self.assertEqual('--defer-tests' in command.call_args.args[0], deferred)
+
+    def test_sdk_validation_runs_full_suite_and_legacy_integration_compile(self):
+        sdk, _artifact, _manifest, _plan = self.fixture()
+        write(sdk, 'wiremock/wiremock-mappings.json', '{}')
+        work = self.root / 'validation'
+        work.mkdir()
+        def fake_run(args, *_args, **_kwargs):
+            return b'127.0.0.1:12345\n' if args[:2] == ['docker', 'port'] else b''
+        with patch.object(generate, 'run', side_effect=fake_run) as command, patch.object(generate.urllib.request, 'urlopen'):
+            generate.verify_sdk(sdk, self.values, work)
+        tests = [call.args[0] for call in command.call_args_list if call.args[0][:2] == ['go', 'test']]
+        self.assertEqual(tests, [
+            ['go', 'test', '-count=1', '-timeout=180s', './...'],
+            ['go', 'test', '-tags=plaid_integration', '-run=^$', './legacy/...'],
+        ])
+
     def test_sdk_subprocesses_do_not_receive_publishing_credentials(self):
         sensitive = {"GH_TOKEN": "secret", "GITHUB_TOKEN": "secret", "SDK_PR_TOKEN": "secret",
                      "FERN_TOKEN": "secret", "PLAID_SECRET": "secret", "GIT_CONFIG_COUNT": "9",

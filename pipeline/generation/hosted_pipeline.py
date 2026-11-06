@@ -214,7 +214,7 @@ def assemble(prepared, fern, output, major=False):
                              "generatorVersion": values["generator_version"], "sdkVersion": "v" + version},
                 "Fern metadata differs from the requested SDK")
         module = f"github.com/plaid/plaid-go/v{version_tuple(version)[0]}"
-        legacy = generate.run_legacy(sdk, generate.ROOT / values["spec_path"], module, values, work)
+        legacy = generate.run_legacy(sdk, generate.ROOT / values["spec_path"], module, values, work, defer_tests=True)
         require(legacy["spec_sha256"] == plan["source"]["sha256"] and protected_state(sdk) == before,
                 "Legacy input or maintained files changed")
         # Resolves dependencies without running generated SDK code. Execution
