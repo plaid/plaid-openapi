@@ -51,6 +51,26 @@ def open_pr(repository: str, branch: str, base: str, manifest: dict, token: str,
     return result["html_url"]
 
 
+def verify_hosted_sdk(sdk: Path, manifest: dict, *, unsigned_rehearsal: bool = False) -> None:
+    from hosted_contract import (FERN_BUNDLE, FERN_INDEX, FERN_PROVENANCE, validate_fern_index,
+                                 validate_fern_provenance, verify_fern_evidence)
+    if manifest["schema_version"] == 1:
+        require(not any((sdk / name).exists() for name in (FERN_INDEX, FERN_BUNDLE, FERN_PROVENANCE)),
+                "Local generation must not carry hosted generation evidence")
+        return
+    index, bundle = sdk / FERN_INDEX, sdk / FERN_BUNDLE
+    require(index.is_file(), "Hosted generation index is missing")
+    validate_fern_index(index.read_bytes(), manifest["fern"])
+    provenance = sdk / FERN_PROVENANCE
+    require(provenance.is_file(), "Fern signed provenance record is missing")
+    validate_fern_provenance(provenance.read_bytes(), manifest["fern"])
+    if unsigned_rehearsal:
+        require(not bundle.exists(), "Unsigned rehearsal must not carry a production Fern verification bundle")
+    else:
+        require(bundle.is_file(), "Hosted generation verification bundle is missing")
+        verify_fern_evidence(index, bundle, manifest["fern"])
+
+
 def recover_pushed_branch(repository: str, branch: str, manifest: dict, plan: dict, work: Path,
                           expected_head: str) -> None:
     """Verify an existing generation branch; never modify its ref or PR."""
@@ -61,7 +81,8 @@ def recover_pushed_branch(repository: str, branch: str, manifest: dict, plan: di
     require(len(parents) == 2 and parents[0] == check_sha(expected_head) and parents[1] == plan["sdk_base"],
             "Existing branch changed or has additional commits; refusing automatic changes")
     old = validate_manifest(parse_json((previous / MANIFEST).read_bytes()))
-    require(input_identity(old["sdk"]["version"], old["source"]["sha256"], old["config"]["sha256"]) == plan["identity"],
+    verify_hosted_sdk(previous, old)
+    require(input_identity(old["sdk"]["version"], old["source"]["sha256"], old["config"]["sha256"], plan["sdk_base"]) == plan["identity"],
             "Existing branch was generated from different inputs")
     data, digest = content(previous)
     require(digest == old["content_sha256"] == manifest["content_sha256"], "Existing branch was edited; refusing automatic changes")
@@ -97,7 +118,10 @@ def verify_artifact(directory: Path, sdk: Path, *, signed: bool = True) -> tuple
     require(set(plan) == {"sdk_base", "branch", "identity", "rehearsal"}, "Unexpected PR plan fields")
     check_sha(plan["sdk_base"])
     require(type(plan["rehearsal"]) is bool, "Invalid rehearsal flag")
-    identity = input_identity(manifest["sdk"]["version"], manifest["source"]["sha256"], manifest["config"]["sha256"])
+    if manifest["schema_version"] == 2:
+        require(manifest["fern"]["sdk_base"] == plan["sdk_base"], "Hosted generation used a different SDK base")
+    verify_hosted_sdk(sdk, manifest, unsigned_rehearsal=not signed and plan["rehearsal"])
+    identity = input_identity(manifest["sdk"]["version"], manifest["source"]["sha256"], manifest["config"]["sha256"], plan["sdk_base"])
     branch = "sdk-generation/go-v" + manifest["sdk"]["version"].split(".")[0] + "-" + identity
     require(plan["identity"] == identity and plan["branch"] == branch, "PR branch/input identity mismatch")
     if signed:
@@ -152,6 +176,8 @@ def require_no_closed_pr(repository: str, branch: str, base: str, token: str) ->
 
 def publish(directory: Path, artifact: Path, manifest: dict, plan: dict, work: Path) -> str:
     values = settings()
+    expected_schema = 2 if values.get("generation_mode", "local") == "fern-hosted" else 1
+    require(manifest["schema_version"] == expected_schema, "Generation provider differs from reviewed configuration")
     require(os.environ.get("GITHUB_REPOSITORY") == values["config_repository"] and
             os.environ.get("GITHUB_REF") == "refs/heads/master" and
             os.environ.get("SDK_PIPELINE_ENABLED") == "true", "Production PR publishing is disabled outside trusted public master")

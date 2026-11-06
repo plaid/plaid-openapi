@@ -64,7 +64,11 @@ class PipelineTests(unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
-        self.values = generate.settings()
+        self.values = dict(generate.settings(), generation_mode="local")
+        for module in (generate, publish_pr):
+            configured = patch.object(module, "settings", return_value=self.values)
+            configured.start()
+            self.addCleanup(configured.stop)
 
     def fixture(self):
         repo, artifact = self.root / "sdk", self.root / "artifact"
@@ -74,7 +78,7 @@ class PipelineTests(unittest.TestCase):
         write(repo, "go.sum", "")
         write(repo, "legacy/client.go", "package plaid\n")
         write(repo, "client.go", "package plaid\n")
-        common.save_json(repo / ".fern/metadata.json", {"sdkVersion": "v49.0.0", "cliVersion": "5.134.0",
+        common.save_json(repo / ".fern/metadata.json", {"sdkVersion": "v49.0.0", "cliVersion": self.values["cli_version"],
                                                        "generatorName": "fernapi/fern-go-sdk", "generatorVersion": "1.70.3"})
         base = commit(repo)
         data, digest = common.content(repo)
@@ -91,7 +95,7 @@ class PipelineTests(unittest.TestCase):
         (artifact / "content.json").write_bytes(data)
         common.save_json(artifact / "manifest.json", manifest)
         (artifact / "generation.bundle.json").write_text('{"fixture_only": true}')
-        identity = generate.input_identity("49.0.0", manifest["source"]["sha256"], manifest["config"]["sha256"])
+        identity = generate.input_identity("49.0.0", manifest["source"]["sha256"], manifest["config"]["sha256"], base)
         plan = {"sdk_base": base, "branch": "sdk-generation/go-v49-" + identity,
                 "identity": identity, "rehearsal": False}
         common.save_json(artifact / "plan.json", plan)
@@ -100,7 +104,7 @@ class PipelineTests(unittest.TestCase):
     def test_documentation_and_tests_do_not_change_release_inputs(self):
         repo = self.root / "config"
         init(repo)
-        write(repo, "fern/generators.yml", "groups: {}\n")
+        write(repo, "fern/generators.yml", "default-group: go-sdk\ngroups:\n  go-sdk:\n    generators: []\n")
         write(repo, "pipeline/generation/generate.py", "# runtime\n")
         commit(repo)
         expected = generate.config_digest(repo)
@@ -116,7 +120,7 @@ class PipelineTests(unittest.TestCase):
     def test_generation_inputs_still_change_release_fingerprint(self):
         repo = self.root / "config"
         init(repo)
-        write(repo, "fern/generators.yml", "groups: {}\n")
+        write(repo, "fern/generators.yml", "default-group: go-sdk\ngroups:\n  go-sdk:\n    generators: []\n")
         commit(repo)
         before = generate.config_digest(repo)
         for name in ("2020-09-14.yml", "fern/fern.config.json", "fern/openapi-overlay.yml",
@@ -126,7 +130,8 @@ class PipelineTests(unittest.TestCase):
                      "pipeline/legacy/requirements.txt", "pipeline/legacy/templates/client.mustache",
                      common.WORKFLOW):
             with self.subTest(path=name):
-                write(repo, name, "generation input\n")
+                data = json.dumps({"organization": "plaid", "version": "5.134.0"}) if name == "fern/fern.config.json" else "generation input\n"
+                write(repo, name, data)
                 commit(repo)
                 after = generate.config_digest(repo)
                 self.assertNotEqual(after, before)
@@ -159,18 +164,19 @@ class PipelineTests(unittest.TestCase):
 
     def test_public_uploads_are_exact_candidate_file_allowlists(self):
         workflow = (generate.ROOT / ".github/workflows/generate-go-sdk.yml").read_text()
-        blocks = workflow.split("uses: actions/upload-artifact@")[1:]
-        self.assertEqual(len(blocks), 2)
-        for index, block in enumerate(blocks):
-            paths = block.split("          path: |\n", 1)[1].split("          retention-days:", 1)[0]
-            entries = [line.strip() for line in paths.splitlines()]
-            allowed = {"sdk.tar.gz", "content.json", "manifest.json", "plan.json", "result.json"}
-            if index:
-                allowed.add("generation.bundle.json")
-            else:
-                allowed.add("api-diff.txt")
-            self.assertEqual({entry.rsplit("/", 1)[-1] for entry in entries}, allowed)
-            self.assertTrue(all(entry.startswith("${{ runner.temp }}/") and not entry.endswith("/") and "*" not in entry for entry in entries))
+        import yaml
+        jobs = yaml.safe_load(workflow)["jobs"]
+        allowed = {"sdk.tar.gz", "content.json", "manifest.json", "plan.json", "result.json",
+                   "api-diff.txt", "generation.bundle.json", "assembly.bundle.json",
+                   "fern-output.tar.gz", "fern-content.json", "fern-record.json", "fern-provenance.json", "fern.bundle.json"}
+        uploads = [step for job in jobs.values() for step in job["steps"]
+                   if step.get("uses", "").startswith("actions/upload-artifact@")]
+        self.assertTrue(uploads)
+        for step in uploads:
+            entries = step["with"]["path"].strip().splitlines()
+            self.assertTrue({entry.rsplit("/", 1)[-1] for entry in entries} <= allowed)
+            self.assertTrue(all(entry.startswith("${{ runner.temp }}/") and not entry.endswith("/")
+                                and "*" not in entry and ".." not in entry for entry in entries))
         self.assertEqual(workflow.count("(github.event_name != 'workflow_dispatch' || inputs.rehearsal == false)"), 2)
 
     def test_only_push_schedule_and_manual_inputs_are_accepted(self):
@@ -381,7 +387,10 @@ class PipelineTests(unittest.TestCase):
 
     def test_local_config_pins_actual_image_and_has_no_publishing_settings(self):
         config = self.root / "config"
+        shared_cli = (generate.ROOT / "fern/fern.config.json").read_bytes()
         generate.render_config(config, self.root / "sdk", spec(), "49.0.0", self.values)
+        self.assertEqual((generate.ROOT / "fern/fern.config.json").read_bytes(), shared_cli)
+        self.assertEqual(json.loads((config / "fern/fern.config.json").read_text())["version"], self.values["cli_version"])
         text = (config / "fern/generators.yml").read_text()
         self.assertIn("name: fernapi/fern-go-sdk@" + self.values["generator_digest"], text)
         self.assertIn("location: local-file-system", text)
@@ -392,7 +401,7 @@ class PipelineTests(unittest.TestCase):
     def test_sdk_metadata_contains_only_version_identity(self):
         sdk = self.root / "sdk"
         sdk.mkdir()
-        metadata = {"cliVersion": "5.134.0", "generatorName": "fernapi/fern-go-sdk", "generatorVersion": "1.70.3",
+        metadata = {"cliVersion": self.values["cli_version"], "generatorName": "fernapi/fern-go-sdk", "generatorVersion": "1.70.3",
                     "sdkVersion": "v49.0.0", "generatorConfig": {"importPath": "github.com/plaid/plaid-go/v49",
                     "module": {"path": "github.com/plaid/plaid-go/v49"}, "maxRetries": 0, "extra_setting": "must-not-leak"}}
         common.save_json(sdk / ".fern/metadata.json", metadata)

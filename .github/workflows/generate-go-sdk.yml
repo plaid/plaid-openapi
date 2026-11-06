@@ -28,13 +28,54 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  generate:
+  prepare:
     if: >-
       github.repository == 'plaid/plaid-openapi' &&
       github.event.repository.private == false && github.event.repository.fork == false &&
       github.ref == 'refs/heads/master' &&
       (vars.SDK_PIPELINE_ENABLED == 'true' ||
        (github.event_name == 'workflow_dispatch' && inputs.rehearsal))
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      status: ${{ steps.prepare.outputs.status }}
+      mode: ${{ steps.prepare.outputs.mode }}
+      rehearsal: ${{ steps.prepare.outputs.rehearsal }}
+    steps:
+      - name: Require a failure notification owner
+        env:
+          SDK_FAILURE_ASSIGNEE: ${{ vars.SDK_FAILURE_ASSIGNEE }}
+        run: '[[ "$SDK_FAILURE_ASSIGNEE" =~ ^[A-Za-z0-9][A-Za-z0-9-]{0,38}$ ]]'
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Install the pinned public spec parser
+        run: |
+          python3 -m venv "$RUNNER_TEMP/sdk-python"
+          "$RUNNER_TEMP/sdk-python/bin/python" -m pip install --require-hashes -r pipeline/legacy/requirements.txt
+          echo "$RUNNER_TEMP/sdk-python/bin" >> "$GITHUB_PATH"
+      - name: Pin reviewed inputs, SDK base and proposed version
+        id: prepare
+        env:
+          SDK_PIPELINE_ENABLED: ${{ vars.SDK_PIPELINE_ENABLED }}
+          OUTPUT: ${{ runner.temp }}/prepared
+        run: |
+          python3 -B pipeline/generation/hosted_pipeline.py prepare --output "$OUTPUT"
+          python3 -B pipeline/generation/workflow_outputs.py --result "$OUTPUT/result.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: go-prepared-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/prepared/plan.json
+            ${{ runner.temp }}/prepared/result.json
+          retention-days: 14
+          if-no-files-found: error
+
+  generate-local:
+    needs: prepare
+    if: needs.prepare.outputs.mode == 'local' && needs.prepare.outputs.status == 'ready'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     outputs:
@@ -68,21 +109,12 @@ jobs:
           OUTPUT: ${{ runner.temp }}/sdk-generation
         run: |
           python3 -B pipeline/generation/generate.py --output "$OUTPUT"
-          python3 -B - <<'PY'
-          import json, os
-          from pathlib import Path
-          value = json.loads((Path(os.environ['OUTPUT']) / 'result.json').read_text())
-          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
-              output.write('status=' + value['status'] + '\n')
-              output.write('digest=' + value.get('content_sha256', '') + '\n')
-              output.write('subject=' + value.get('subject_name', '') + '\n')
-              output.write('rehearsal=' + str(value.get('rehearsal', False)).lower() + '\n')
-          PY
+          python3 -B pipeline/generation/workflow_outputs.py --result "$OUTPUT/result.json"
       - name: Upload only the public candidate and release records
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: go-generation-${{ github.run_id }}
+          name: go-local-${{ github.run_id }}
           path: |
             ${{ runner.temp }}/sdk-generation/sdk.tar.gz
             ${{ runner.temp }}/sdk-generation/content.json
@@ -93,8 +125,629 @@ jobs:
           retention-days: 14
           if-no-files-found: error
 
+  request-minor:
+    needs: prepare
+    if: needs.prepare.outputs.mode == 'fern-hosted' && needs.prepare.outputs.status == 'ready'
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    environment: fern-generation
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Install the pinned public spec parser
+        run: |
+          python3 -m venv "$RUNNER_TEMP/sdk-python"
+          "$RUNNER_TEMP/sdk-python/bin/python" -m pip install --require-hashes -r pipeline/legacy/requirements.txt
+          echo "$RUNNER_TEMP/sdk-python/bin" >> "$GITHUB_PATH"
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: go-prepared-${{ github.run_id }}
+          path: ${{ runner.temp }}/prepared
+      - name: Request Fern generation and verify its signed output
+        id: request
+        env:
+          SDK_PIPELINE_ENABLED: ${{ vars.SDK_PIPELINE_ENABLED }}
+          FERN_TOKEN: ${{ secrets.FERN_TOKEN }}
+          PREPARED: ${{ runner.temp }}/prepared
+          OUTPUT: ${{ runner.temp }}/fern
+        run: python3 -B pipeline/generation/hosted_request.py --prepared "$PREPARED" --output "$OUTPUT"
+      - name: Read the verified public subject
+        id: subject
+        env:
+          RECORD: ${{ runner.temp }}/fern/fern-record.json
+        run: |
+          python3 -B - <<'PY'
+          import os, sys
+          from pathlib import Path
+          sys.path.insert(0, 'pipeline/generation')
+          from attestation import parse_json
+          from hosted_contract import validate_fern_record, validate_fern_index, validate_fern_provenance
+          path = Path(os.environ['RECORD'])
+          record = validate_fern_record(parse_json(path.read_bytes()))
+          validate_fern_index((path.parent / 'fern-content.json').read_bytes(), record)
+          validate_fern_provenance((path.parent / 'fern-provenance.json').read_bytes(), record)
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('digest=' + record['content_sha256'] + '\n')
+              output.write('subject=plaid-go-v' + record['sdk_version'] + '-fern-source\n')
+          PY
+      - name: Sign the verified Fern handoff before any SDK code runs
+        if: needs.prepare.outputs.rehearsal == 'false'
+        id: attest
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          create-storage-record: false
+          subject-name: ${{ steps.subject.outputs.subject }}
+          subject-digest: sha256:${{ steps.subject.outputs.digest }}
+          predicate-type: https://plaid.com/attestations/fern-generation/v1
+          predicate-path: ${{ runner.temp }}/fern/fern-record.json
+      - name: Verify the intermediate signature
+        if: needs.prepare.outputs.rehearsal == 'false'
+        env:
+          BUNDLE: ${{ steps.attest.outputs.bundle-path }}
+          OUTPUT: ${{ runner.temp }}/fern
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp "$BUNDLE" "$OUTPUT/fern.bundle.json"
+          python3 -B - <<'PY'
+          import os, sys
+          from pathlib import Path
+          sys.path.insert(0, 'pipeline/generation')
+          from attestation import parse_json
+          from hosted_contract import verify_fern_evidence
+          root = Path(os.environ['OUTPUT'])
+          verify_fern_evidence(root / 'fern-content.json', root / 'fern.bundle.json', parse_json((root / 'fern-record.json').read_bytes()))
+          PY
+      - name: Upload only verified public-safe generated files and evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: go-fern-minor-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/fern/fern-output.tar.gz
+            ${{ runner.temp }}/fern/fern-content.json
+            ${{ runner.temp }}/fern/fern-record.json
+            ${{ runner.temp }}/fern/fern-provenance.json
+            ${{ runner.temp }}/fern/fern.bundle.json
+          retention-days: 14
+          if-no-files-found: error
+
+  assemble-minor:
+    needs: [prepare, request-minor]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      attestations: read
+    outputs:
+      status: ${{ steps.result.outputs.status }}
+      digest: ${{ steps.result.outputs.digest }}
+      subject: ${{ steps.result.outputs.subject }}
+      rehearsal: ${{ steps.result.outputs.rehearsal }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@7b8cf10d4e4a01d4992d18a89f4d7dc5a3e6d6f4 # v4
+        with:
+          go-version: '1.26.9'
+          cache: false
+      - name: Install the pinned public spec parser
+        run: |
+          python3 -m venv "$RUNNER_TEMP/sdk-python"
+          "$RUNNER_TEMP/sdk-python/bin/python" -m pip install --require-hashes -r pipeline/legacy/requirements.txt
+          echo "$RUNNER_TEMP/sdk-python/bin" >> "$GITHUB_PATH"
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: go-prepared-${{ github.run_id }}
+          path: ${{ runner.temp }}/prepared
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: go-fern-minor-${{ github.run_id }}
+          path: ${{ runner.temp }}/fern
+      - name: Assemble both clients without executing SDK code
+        env:
+          SDK_PIPELINE_ENABLED: ${{ vars.SDK_PIPELINE_ENABLED }}
+          PREPARED: ${{ runner.temp }}/prepared
+          FERN: ${{ runner.temp }}/fern
+          OUTPUT: ${{ runner.temp }}/candidate
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -B pipeline/generation/hosted_pipeline.py assemble --prepared "$PREPARED" --fern "$FERN" --output "$OUTPUT"
+      - name: Read bounded candidate results
+        id: result
+        env:
+          OUTPUT: ${{ runner.temp }}/candidate
+        run: python3 -B pipeline/generation/workflow_outputs.py --result "$OUTPUT/result.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: go-candidate-minor-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/candidate/sdk.tar.gz
+            ${{ runner.temp }}/candidate/content.json
+            ${{ runner.temp }}/candidate/manifest.json
+            ${{ runner.temp }}/candidate/plan.json
+            ${{ runner.temp }}/candidate/fern-content.json
+            ${{ runner.temp }}/candidate/fern-record.json
+            ${{ runner.temp }}/candidate/fern-provenance.json
+            ${{ runner.temp }}/candidate/fern.bundle.json
+            ${{ runner.temp }}/candidate/result.json
+          retention-days: 14
+          if-no-files-found: error
+
+  seal-minor:
+    needs: [prepare, assemble-minor]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: go-candidate-minor-${{ github.run_id }}
+          path: ${{ runner.temp }}/candidate
+      - name: Validate assembled content and the signed Fern handoff
+        env:
+          ARTIFACT: ${{ runner.temp }}/candidate
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -B pipeline/generation/publish_pr.py --artifact "$ARTIFACT" --unsigned
+      - name: Read the assembled subject
+        id: candidate
+        env:
+          ARTIFACT: ${{ runner.temp }}/candidate
+        run: python3 -B pipeline/generation/workflow_outputs.py --result "$ARTIFACT/result.json"
+      - name: Seal the candidate before SDK tests run
+        if: needs.prepare.outputs.rehearsal == 'false'
+        id: seal
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          create-storage-record: false
+          subject-name: plaid-go-v${{ steps.candidate.outputs.version }}-assembly
+          subject-digest: sha256:${{ steps.candidate.outputs.digest }}
+          predicate-type: https://plaid.com/attestations/sdk-assembly/v1
+          predicate-path: ${{ runner.temp }}/candidate/manifest.json
+      - name: Preserve the assembly seal
+        if: needs.prepare.outputs.rehearsal == 'false'
+        env:
+          BUNDLE: ${{ steps.seal.outputs.bundle-path }}
+          ARTIFACT: ${{ runner.temp }}/candidate
+        run: cp "$BUNDLE" "$ARTIFACT/assembly.bundle.json"
+      - name: Verify the original candidate seal
+        env:
+          ARTIFACT: ${{ runner.temp }}/candidate
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -B pipeline/generation/assembly_seal.py --artifact "$ARTIFACT"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: go-sealed-minor-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/candidate/sdk.tar.gz
+            ${{ runner.temp }}/candidate/content.json
+            ${{ runner.temp }}/candidate/manifest.json
+            ${{ runner.temp }}/candidate/plan.json
+            ${{ runner.temp }}/candidate/result.json
+            ${{ runner.temp }}/candidate/assembly.bundle.json
+          retention-days: 14
+          if-no-files-found: error
+
+  validate-minor:
+    needs: [prepare, seal-minor]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      attestations: read
+    outputs:
+      status: ${{ steps.result.outputs.status }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@7b8cf10d4e4a01d4992d18a89f4d7dc5a3e6d6f4 # v4
+        with:
+          go-version: '1.26.9'
+          cache: false
+      - name: Install the pinned public spec parser
+        run: |
+          python3 -m venv "$RUNNER_TEMP/sdk-python"
+          "$RUNNER_TEMP/sdk-python/bin/python" -m pip install --require-hashes -r pipeline/legacy/requirements.txt
+          echo "$RUNNER_TEMP/sdk-python/bin" >> "$GITHUB_PATH"
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: go-prepared-${{ github.run_id }}
+          path: ${{ runner.temp }}/prepared
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: go-sealed-minor-${{ github.run_id }}
+          path: ${{ runner.temp }}/candidate
+      - name: Test the sealed SDK and classify the API change
+        env:
+          SDK_PIPELINE_ENABLED: ${{ vars.SDK_PIPELINE_ENABLED }}
+          PREPARED: ${{ runner.temp }}/prepared
+          CANDIDATE: ${{ runner.temp }}/candidate
+          PROBE: ${{ runner.temp }}/probe
+          OUTPUT: ${{ runner.temp }}/validation
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -B pipeline/generation/hosted_pipeline.py validate --prepared "$PREPARED" --candidate "$CANDIDATE" --output "$OUTPUT"
+      - id: result
+        env:
+          OUTPUT: ${{ runner.temp }}/validation
+        run: python3 -B pipeline/generation/workflow_outputs.py --result "$OUTPUT/result.json"
+      - name: Upload test results only, never the SDK files tests could modify
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: go-validation-minor-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/validation/result.json
+            ${{ runner.temp }}/validation/api-diff.txt
+          retention-days: 14
+          if-no-files-found: error
+
+  request-major:
+    needs: [prepare, validate-minor]
+    if: needs.validate-minor.outputs.status == 'needs-major'
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    environment: fern-generation
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Install the pinned public spec parser
+        run: |
+          python3 -m venv "$RUNNER_TEMP/sdk-python"
+          "$RUNNER_TEMP/sdk-python/bin/python" -m pip install --require-hashes -r pipeline/legacy/requirements.txt
+          echo "$RUNNER_TEMP/sdk-python/bin" >> "$GITHUB_PATH"
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: go-prepared-${{ github.run_id }}
+          path: ${{ runner.temp }}/prepared
+      - name: Request Fern generation and verify its signed output
+        id: request
+        env:
+          SDK_PIPELINE_ENABLED: ${{ vars.SDK_PIPELINE_ENABLED }}
+          FERN_TOKEN: ${{ secrets.FERN_TOKEN }}
+          PREPARED: ${{ runner.temp }}/prepared
+          OUTPUT: ${{ runner.temp }}/fern
+        run: python3 -B pipeline/generation/hosted_request.py --prepared "$PREPARED" --output "$OUTPUT" --major
+      - name: Read the verified public subject
+        id: subject
+        env:
+          RECORD: ${{ runner.temp }}/fern/fern-record.json
+        run: |
+          python3 -B - <<'PY'
+          import os, sys
+          from pathlib import Path
+          sys.path.insert(0, 'pipeline/generation')
+          from attestation import parse_json
+          from hosted_contract import validate_fern_record, validate_fern_index, validate_fern_provenance
+          path = Path(os.environ['RECORD'])
+          record = validate_fern_record(parse_json(path.read_bytes()))
+          validate_fern_index((path.parent / 'fern-content.json').read_bytes(), record)
+          validate_fern_provenance((path.parent / 'fern-provenance.json').read_bytes(), record)
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('digest=' + record['content_sha256'] + '\n')
+              output.write('subject=plaid-go-v' + record['sdk_version'] + '-fern-source\n')
+          PY
+      - name: Sign the verified Fern handoff before any SDK code runs
+        if: needs.prepare.outputs.rehearsal == 'false'
+        id: attest
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          create-storage-record: false
+          subject-name: ${{ steps.subject.outputs.subject }}
+          subject-digest: sha256:${{ steps.subject.outputs.digest }}
+          predicate-type: https://plaid.com/attestations/fern-generation/v1
+          predicate-path: ${{ runner.temp }}/fern/fern-record.json
+      - name: Verify the intermediate signature
+        if: needs.prepare.outputs.rehearsal == 'false'
+        env:
+          BUNDLE: ${{ steps.attest.outputs.bundle-path }}
+          OUTPUT: ${{ runner.temp }}/fern
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp "$BUNDLE" "$OUTPUT/fern.bundle.json"
+          python3 -B - <<'PY'
+          import os, sys
+          from pathlib import Path
+          sys.path.insert(0, 'pipeline/generation')
+          from attestation import parse_json
+          from hosted_contract import verify_fern_evidence
+          root = Path(os.environ['OUTPUT'])
+          verify_fern_evidence(root / 'fern-content.json', root / 'fern.bundle.json', parse_json((root / 'fern-record.json').read_bytes()))
+          PY
+      - name: Upload only verified public-safe generated files and evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: go-fern-major-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/fern/fern-output.tar.gz
+            ${{ runner.temp }}/fern/fern-content.json
+            ${{ runner.temp }}/fern/fern-record.json
+            ${{ runner.temp }}/fern/fern-provenance.json
+            ${{ runner.temp }}/fern/fern.bundle.json
+          retention-days: 14
+          if-no-files-found: error
+
+  assemble-major:
+    needs: [prepare, request-major]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      attestations: read
+    outputs:
+      status: ${{ steps.result.outputs.status }}
+      digest: ${{ steps.result.outputs.digest }}
+      subject: ${{ steps.result.outputs.subject }}
+      rehearsal: ${{ steps.result.outputs.rehearsal }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@7b8cf10d4e4a01d4992d18a89f4d7dc5a3e6d6f4 # v4
+        with:
+          go-version: '1.26.9'
+          cache: false
+      - name: Install the pinned public spec parser
+        run: |
+          python3 -m venv "$RUNNER_TEMP/sdk-python"
+          "$RUNNER_TEMP/sdk-python/bin/python" -m pip install --require-hashes -r pipeline/legacy/requirements.txt
+          echo "$RUNNER_TEMP/sdk-python/bin" >> "$GITHUB_PATH"
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: go-prepared-${{ github.run_id }}
+          path: ${{ runner.temp }}/prepared
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: go-fern-major-${{ github.run_id }}
+          path: ${{ runner.temp }}/fern
+      - name: Assemble both clients without executing SDK code
+        env:
+          SDK_PIPELINE_ENABLED: ${{ vars.SDK_PIPELINE_ENABLED }}
+          PREPARED: ${{ runner.temp }}/prepared
+          FERN: ${{ runner.temp }}/fern
+          OUTPUT: ${{ runner.temp }}/candidate
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -B pipeline/generation/hosted_pipeline.py assemble --prepared "$PREPARED" --fern "$FERN" --output "$OUTPUT" --major
+      - name: Read bounded candidate results
+        id: result
+        env:
+          OUTPUT: ${{ runner.temp }}/candidate
+        run: python3 -B pipeline/generation/workflow_outputs.py --result "$OUTPUT/result.json"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: go-candidate-major-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/candidate/sdk.tar.gz
+            ${{ runner.temp }}/candidate/content.json
+            ${{ runner.temp }}/candidate/manifest.json
+            ${{ runner.temp }}/candidate/plan.json
+            ${{ runner.temp }}/candidate/fern-content.json
+            ${{ runner.temp }}/candidate/fern-record.json
+            ${{ runner.temp }}/candidate/fern-provenance.json
+            ${{ runner.temp }}/candidate/fern.bundle.json
+            ${{ runner.temp }}/candidate/result.json
+          retention-days: 14
+          if-no-files-found: error
+
+  seal-major:
+    needs: [prepare, assemble-major]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: go-candidate-major-${{ github.run_id }}
+          path: ${{ runner.temp }}/candidate
+      - name: Validate assembled content and the signed Fern handoff
+        env:
+          ARTIFACT: ${{ runner.temp }}/candidate
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -B pipeline/generation/publish_pr.py --artifact "$ARTIFACT" --unsigned
+      - name: Read the assembled subject
+        id: candidate
+        env:
+          ARTIFACT: ${{ runner.temp }}/candidate
+        run: python3 -B pipeline/generation/workflow_outputs.py --result "$ARTIFACT/result.json"
+      - name: Seal the candidate before SDK tests run
+        if: needs.prepare.outputs.rehearsal == 'false'
+        id: seal
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          create-storage-record: false
+          subject-name: plaid-go-v${{ steps.candidate.outputs.version }}-assembly
+          subject-digest: sha256:${{ steps.candidate.outputs.digest }}
+          predicate-type: https://plaid.com/attestations/sdk-assembly/v1
+          predicate-path: ${{ runner.temp }}/candidate/manifest.json
+      - name: Preserve the assembly seal
+        if: needs.prepare.outputs.rehearsal == 'false'
+        env:
+          BUNDLE: ${{ steps.seal.outputs.bundle-path }}
+          ARTIFACT: ${{ runner.temp }}/candidate
+        run: cp "$BUNDLE" "$ARTIFACT/assembly.bundle.json"
+      - name: Verify the original candidate seal
+        env:
+          ARTIFACT: ${{ runner.temp }}/candidate
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -B pipeline/generation/assembly_seal.py --artifact "$ARTIFACT"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: go-sealed-major-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/candidate/sdk.tar.gz
+            ${{ runner.temp }}/candidate/content.json
+            ${{ runner.temp }}/candidate/manifest.json
+            ${{ runner.temp }}/candidate/plan.json
+            ${{ runner.temp }}/candidate/result.json
+            ${{ runner.temp }}/candidate/assembly.bundle.json
+          retention-days: 14
+          if-no-files-found: error
+
+  validate-major:
+    needs: [prepare, seal-major, seal-minor, validate-minor]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      attestations: read
+    outputs:
+      status: ${{ steps.result.outputs.status }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-go@7b8cf10d4e4a01d4992d18a89f4d7dc5a3e6d6f4 # v4
+        with:
+          go-version: '1.26.9'
+          cache: false
+      - name: Install the pinned public spec parser
+        run: |
+          python3 -m venv "$RUNNER_TEMP/sdk-python"
+          "$RUNNER_TEMP/sdk-python/bin/python" -m pip install --require-hashes -r pipeline/legacy/requirements.txt
+          echo "$RUNNER_TEMP/sdk-python/bin" >> "$GITHUB_PATH"
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: go-prepared-${{ github.run_id }}
+          path: ${{ runner.temp }}/prepared
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: go-sealed-major-${{ github.run_id }}
+          path: ${{ runner.temp }}/candidate
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: go-sealed-minor-${{ github.run_id }}
+          path: ${{ runner.temp }}/probe
+      - name: Test the sealed SDK and classify the API change
+        env:
+          SDK_PIPELINE_ENABLED: ${{ vars.SDK_PIPELINE_ENABLED }}
+          PREPARED: ${{ runner.temp }}/prepared
+          CANDIDATE: ${{ runner.temp }}/candidate
+          PROBE: ${{ runner.temp }}/probe
+          OUTPUT: ${{ runner.temp }}/validation
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -B pipeline/generation/hosted_pipeline.py validate --prepared "$PREPARED" --candidate "$CANDIDATE" --output "$OUTPUT" --probe "$PROBE"
+      - id: result
+        env:
+          OUTPUT: ${{ runner.temp }}/validation
+        run: python3 -B pipeline/generation/workflow_outputs.py --result "$OUTPUT/result.json"
+      - name: Upload test results only, never the SDK files tests could modify
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: go-validation-major-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/validation/result.json
+            ${{ runner.temp }}/validation/api-diff.txt
+          retention-days: 14
+          if-no-files-found: error
+
+  generate:
+    needs: [prepare, generate-local, validate-minor, validate-major]
+    if: >-
+      always() && !cancelled() && needs.prepare.result == 'success' &&
+      (needs.prepare.outputs.status != 'ready' ||
+       needs.generate-local.result == 'success' ||
+       (needs.validate-minor.result == 'success' && needs.validate-minor.outputs.status == 'generated') ||
+       (needs.validate-major.result == 'success' && needs.validate-major.outputs.status == 'generated'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      status: ${{ steps.result.outputs.status }}
+      digest: ${{ steps.result.outputs.digest }}
+      subject: ${{ steps.result.outputs.subject }}
+      rehearsal: ${{ steps.result.outputs.rehearsal }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: ${{ needs.prepare.outputs.status != 'ready' && format('go-prepared-{0}', github.run_id) || needs.prepare.outputs.mode == 'local' && format('go-local-{0}', github.run_id) || needs.validate-major.outputs.status == 'generated' && format('go-sealed-major-{0}', github.run_id) || format('go-sealed-minor-{0}', github.run_id) }}
+          path: ${{ runner.temp }}/generation
+      - name: Mark only the original validated candidate as ready
+        env:
+          ARTIFACT: ${{ runner.temp }}/generation
+          MODE: ${{ needs.prepare.outputs.mode }}
+          VALIDATED: ${{ needs.validate-major.outputs.status == 'generated' || needs.validate-minor.outputs.status == 'generated' }}
+        run: |
+          python3 -B - <<'PY'
+          import json, os
+          from pathlib import Path
+          path = Path(os.environ['ARTIFACT']) / 'result.json'
+          result = json.loads(path.read_text())
+          if os.environ['MODE'] == 'fern-hosted' and result['status'] == 'assembled':
+              assert os.environ['VALIDATED'] == 'true', 'Candidate validation is missing'
+              result['status'] = 'generated'
+              path.write_text(json.dumps(result) + chr(10))
+          PY
+      - id: result
+        env:
+          ARTIFACT: ${{ runner.temp }}/generation
+        run: python3 -B pipeline/generation/workflow_outputs.py --result "$ARTIFACT/result.json"
+      - name: Revalidate the original bytes after test jobs finish
+        if: steps.result.outputs.status == 'generated'
+        env:
+          ARTIFACT: ${{ runner.temp }}/generation
+          MODE: ${{ needs.prepare.outputs.mode }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "$MODE" = fern-hosted ]; then
+            python3 -B pipeline/generation/assembly_seal.py --artifact "$ARTIFACT"
+          else
+            python3 -B pipeline/generation/publish_pr.py --artifact "$ARTIFACT" --unsigned
+          fi
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: go-generation-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/generation/sdk.tar.gz
+            ${{ runner.temp }}/generation/content.json
+            ${{ runner.temp }}/generation/manifest.json
+            ${{ runner.temp }}/generation/plan.json
+            ${{ runner.temp }}/generation/result.json
+            ${{ runner.temp }}/generation/api-diff.txt
+            ${{ runner.temp }}/generation/assembly.bundle.json
+          retention-days: 14
+          if-no-files-found: error
+
   attest-generation:
-    needs: generate
+    needs: [prepare, generate]
     if: >-
       needs.generate.outputs.status == 'generated' &&
       needs.generate.outputs.rehearsal == 'false' &&
@@ -117,10 +770,17 @@ jobs:
         with:
           name: go-generation-${{ github.run_id }}
           path: ${{ runner.temp }}/generation
-      - name: Check artifact content before signing
+      - name: Reverify assembled bytes before marking generation complete
         env:
           ARTIFACT: ${{ runner.temp }}/generation
-        run: python3 -B pipeline/generation/publish_pr.py --artifact "$ARTIFACT" --unsigned
+          MODE: ${{ needs.prepare.outputs.mode }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "$MODE" = fern-hosted ]; then
+            python3 -B pipeline/generation/assembly_seal.py --artifact "$ARTIFACT"
+          else
+            python3 -B pipeline/generation/publish_pr.py --artifact "$ARTIFACT" --unsigned
+          fi
       - name: Attest exact SDK content and input manifest
         id: attest
         uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2

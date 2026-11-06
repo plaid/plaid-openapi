@@ -38,6 +38,7 @@ def settings() -> dict:
             re.fullmatch(r"[0-9a-f]{64}", value["cli_sha256"]) is not None, "Invalid CLI pin")
     require(value["generator_image"] == "fernapi/fern-go-sdk" and
             re.fullmatch(r"sha256:[0-9a-f]{64}", value["generator_digest"]) is not None, "Invalid generator image pin")
+    require(value.get("generation_mode", "local") in {"local", "fern-hosted"}, "Unknown generation mode")
     return value
 
 
@@ -103,8 +104,9 @@ def verified_spec(repo: Path, config_commit: str, values: dict, sdk: Path | None
 
 
 def config_digest(repo: Path) -> str:
+    commit = check_sha(git(repo, "rev-parse", "HEAD"))
     selected = []
-    for path, mode, digest in entries(repo, ref="HEAD"):
+    for path, mode, digest in entries(repo, ref=commit):
         if path == "2020-09-14.yml" or path == WORKFLOW:
             selected.append([path, mode, digest])
         elif path.startswith(("fern/", "pipeline/")):
@@ -115,12 +117,31 @@ def config_digest(repo: Path) -> str:
                     or name.startswith("test_") or name == ".gitignore"
                     or set(Path(path).parts) & {"tests", "testdata", "fixtures", "__pycache__"}):
                 continue
+            if path == "fern/generators.yml":
+                # Match the Go-only document render_config actually consumes;
+                # other SDK groups and the shared default group do not affect it.
+                text = run(["git", "show", commit + ":" + path], repo).decode("utf-8")
+                text = text.replace("\r\n", "\n").replace("\r", "\n")
+                group_start = re.search(r"^groups:[ \t]*(?:#.*)?\n", text, re.MULTILINE)
+                require(group_start is not None, "Expected top-level generator groups")
+                groups = list(re.finditer(r"^  go-sdk:\n(.*?)(?=^  [a-zA-Z0-9_-]+:|\Z)",
+                                         text[group_start.end():], re.MULTILINE | re.DOTALL))
+                require(len(groups) == 1, "Expected one reviewed go-sdk group")
+                header = re.sub(r"^default-group:.*(?:\n|$)", "", text[:group_start.start()], flags=re.MULTILINE)
+                effective = header.rstrip() + "\ndefault-group: go-sdk\ngroups:\n" + groups[0].group(0).rstrip() + "\n"
+                digest = sha256(effective.encode("utf-8"))
+            elif path == "fern/fern.config.json":
+                # Go's independently reviewed settings supply the CLI version.
+                shared = parse_json(run(["git", "show", commit + ":" + path], repo))
+                require(isinstance(shared, dict), "Expected shared Fern configuration object")
+                digest = sha256(json.dumps({key: value for key, value in shared.items() if key != "version"},
+                                          sort_keys=True, separators=(",", ":")).encode("utf-8"))
             selected.append([path, mode, digest])
     return sha256(canonical(selected))
 
 
-def input_identity(version: str, source_hash: str, config_hash: str) -> str:
-    return sha256(canonical([version, source_hash, config_hash]))[:20]
+def input_identity(version: str, source_hash: str, config_hash: str, sdk_base: str) -> str:
+    return sha256(canonical([version, source_hash, config_hash, check_sha(sdk_base)]))[:20]
 
 
 def published_baseline(sdk: Path, tags: list[str], major: int, destination: Path) -> str | None:
@@ -208,7 +229,11 @@ def render_config(destination: Path, sdk: Path, data: bytes, version: str, value
     header = re.sub(r"^default-group:.*$", "default-group: go-pipeline", header, flags=re.MULTILINE)
     (destination / "fern/generators.yml").write_text(header + "groups:\n" + block)
     cli_config = json.loads((destination / "fern/fern.config.json").read_text())
-    require(cli_config["version"] == values["cli_version"], "CLI config and checksum pin disagree")
+    require(cli_config.get("organization") == "plaid", "Unexpected shared Fern organization")
+    # The public config is shared by SDK languages. Go owns its independently
+    # reviewed CLI pin; change only the disposable Go config used for this run.
+    cli_config["version"] = values["cli_version"]
+    (destination / "fern/fern.config.json").write_text(json.dumps(cli_config, sort_keys=True, indent=2) + "\n")
 
 
 def install_cli(work: Path, values: dict) -> Path:
@@ -491,6 +516,7 @@ def main() -> None:
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
     values = settings()
+    require(values.get("generation_mode", "local") == "local", "Hosted generation requires the isolated request/assembly workflow")
     event = json.loads(Path(os.environ["GITHUB_EVENT_PATH"]).read_text())
     override, rehearsal = event_request(os.environ["GITHUB_EVENT_NAME"], event, values)
     config_repo, config_commit, run_id = check_context(event, values, rehearsal)
@@ -504,7 +530,7 @@ def main() -> None:
         tag_refs = git(sdk, "ls-remote", "--tags", "origin", "refs/tags/v*")
         waiting = pending_release(sdk, tag_refs)
         if waiting:
-            save_json(output / "result.json", {"status": "awaiting-release", "sdk_base": base, "version": waiting})
+            save_json(output / "result.json", {"status": "awaiting-release", "sdk_base": base, "version": waiting, "rehearsal": rehearsal})
             return
         source_commit, data = verified_spec(ROOT, config_commit, values, sdk)
         # Publishing imports this module without the generation-only YAML parser.
@@ -517,21 +543,23 @@ def main() -> None:
         prior = json.loads((sdk / MANIFEST).read_text()) if (sdk / MANIFEST).exists() else None
         unchanged = prior and not override and prior["source"]["sha256"] == sha256(data) and prior["config"]["sha256"] == config_hash
         if unchanged:
-            save_json(output / "result.json", {"status": "unchanged", "sdk_base": base})
+            save_json(output / "result.json", {"status": "unchanged", "sdk_base": base, "rehearsal": rehearsal})
             return
         module = "github.com/" + values["sdk_repository"] + "/v" + str(major)
         assert_sdk_bootstrap(sdk, module)
         old = work / "before"
         baseline_tag = published_baseline(sdk, tags, major, old)
         # Old provenance must not survive into a newly generated PR.
-        run(["git", "rm", "--ignore-unmatch", "--", MANIFEST, BUNDLE], sdk)
+        run(["git", "rm", "--ignore-unmatch", "--", MANIFEST, BUNDLE,
+             ".sdk-release/fern-content.json", ".sdk-release/fern.bundle.json",
+             ".sdk-release/fern-provenance.json"], sdk)
         if git(sdk, "diff", "--cached", "--name-only"):
             git(sdk, "-c", "user.name=SDK generator", "-c", "user.email=sdk-generator@localhost",
                 "-c", "commit.gpgsign=false", "commit", "-m", "Replace prior generation evidence")
         version, legacy = generate_versioned_candidate(
             sdk, old, data, tags, major, override, baseline_tag is not None, values, work, output)
         module = "github.com/plaid/plaid-go/v" + str(version_tuple(version)[0])
-        identity = input_identity(version, sha256(data), config_hash)
+        identity = input_identity(version, sha256(data), config_hash, base)
         update_changelog(sdk, version, data, values)
         sanitize_metadata(sdk, version, module, values)
         git(sdk, "add", "-A")

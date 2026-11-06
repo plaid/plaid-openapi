@@ -14,6 +14,7 @@ import urllib.request
 
 MANIFEST = ".sdk-release/manifest.json"
 BUNDLE = ".sdk-release/generation.bundle.json"
+EVIDENCE_FILES = {MANIFEST, BUNDLE, ".sdk-release/fern-content.json", ".sdk-release/fern.bundle.json", ".sdk-release/fern-provenance.json"}
 PREDICATE = "https://plaid.com/attestations/sdk-generation/v1"
 WORKFLOW = ".github/workflows/generate-go-sdk.yml"
 SHA = re.compile(r"[0-9a-f]{40}\Z")
@@ -153,7 +154,7 @@ def entries(repo: Path, *, ref: str | None = None) -> list[list[str]]:
             require(fields[2] == "0", "SDK index has unresolved merge entries")
         name = safe_path(path.decode("utf-8"))
         if name.startswith(".sdk-release/"):
-            require(name in {MANIFEST, BUNDLE}, "Unexpected .sdk-release file")
+            require(name in EVIDENCE_FILES and mode == "100644", "Unexpected .sdk-release file or mode")
             continue
         selected.append((name, mode, oid))
     values = blobs(repo, [oid for _, _, oid in selected])

@@ -19,7 +19,10 @@ class PublisherTests(unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
-        self.values = generate.settings()
+        self.values = dict(generate.settings(), generation_mode="local")
+        configured = patch.object(publish_pr, "settings", return_value=self.values)
+        configured.start()
+        self.addCleanup(configured.stop)
         self.repo, self.artifact, self.manifest, self.plan = test_pipeline.PipelineTests.fixture(self)
         event = self.root / "event.json"
         event.write_text('{"repository":{"full_name":"plaid/plaid-openapi","private":false,"fork":false}}')
@@ -36,6 +39,13 @@ class PublisherTests(unittest.TestCase):
 
     def publish(self):
         return publish_pr.publish(self.artifact, self.repo, self.manifest, self.plan, self.root)
+
+    def test_hosted_configuration_rejects_local_evidence_before_github_access(self):
+        self.values["generation_mode"] = "fern-hosted"
+        with patch.dict(os.environ, self.env), patch.object(publish_pr, "pending_pr") as pending, \
+             self.assertRaisesRegex(common.PipelineError, "Generation provider"):
+            self.publish()
+        pending.assert_not_called()
 
     def test_new_pr_is_ready_for_the_pinned_bot_and_exact_head(self):
         with patch.object(publish_pr, "public_get", return_value=self.ready) as api:

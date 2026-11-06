@@ -56,8 +56,10 @@ def keys(value, expected, label):
     require(isinstance(value, dict) and set(value) == set(expected.split()), f"Invalid {label} fields")
 
 def validate_manifest(value):
-    keys(value, "schema_version sdk source config generator legacy content_sha256 generation", "manifest")
-    require(type(value["schema_version"]) is int and value["schema_version"] == 1, "Unsupported manifest schema")
+    require(isinstance(value, dict) and type(value.get("schema_version")) is int and
+            value["schema_version"] in (1, 2), "Unsupported manifest schema")
+    fields = "schema_version sdk source config generator legacy content_sha256 generation"
+    keys(value, fields + (" fern" if value["schema_version"] == 2 else ""), "manifest")
     keys(value["sdk"], "repository version module", "sdk")
     sdk = value["sdk"]
     require(sdk["repository"] == SDK_REPO, "Untrusted SDK repository")
@@ -86,6 +88,9 @@ def validate_manifest(value):
     keys(value["generation"], "repository workflow run_id", "generation")
     require(value["generation"]["repository"] == CONFIG_REPO and value["generation"]["workflow"] == GEN_WORKFLOW, "Untrusted generation workflow")
     decimal(value["generation"]["run_id"], "generation run ID")
+    if value["schema_version"] == 2:
+        from hosted_contract import validate_fern_record
+        validate_fern_record(value["fern"], value)
     return value
 
 def verified_attestation(artifact, bundle, *, repository, workflow, ref, commit, predicate_type, predicate, subjects, run_id):
