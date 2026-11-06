@@ -109,14 +109,17 @@ Scheduled catch-up runs every 15 minutes, subject to GitHub scheduling delays. A
 
 ## Recovering a stale generated PR
 
-The current pipeline stops if SDK master advances while a generated PR is open.
-It does not automatically rebase or change signed candidate content. After checking
-that the candidate is obsolete, close its PR and dispatch generation again with an
-appropriate unused version above the latest published tag. The new run uses the
-current reviewed source and SDK base, creates fresh evidence and opens another PR.
-For example, an abandoned unpublished 49.1.0 proposal may be replaced by 49.2.0.
-Never move or reuse a published tag. Closing a PR alone does not permit recreating
-the same inputs/version; changing a retry's version changes its branch identity.
+The pipeline stops if SDK master advances while a generated PR is open. After
+checking that the candidate is obsolete, close its PR and dispatch generation
+again without a version override. The branch identity includes the reviewed SDK
+base, so the new base gets a fresh branch and evidence, including when a breaking
+change still selects the next major's `.0.0`. An open generated PR still blocks
+its replacement; the pipeline never rebases or overwrites its signed content.
+
+Retries on the same base, inputs and version remain idempotent. Closing a PR alone
+does not permit recreating that same proposal. A compatible abandoned proposal
+on an unchanged base can use an unused version override; a breaking proposal
+requires a reviewed input or SDK base change. Never move or reuse a published tag.
 
 The failure-reporting workflow creates or updates an assigned issue for a failed
 trusted generation run. It does not guarantee email or Slack delivery; validate

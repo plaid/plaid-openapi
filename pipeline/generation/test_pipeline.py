@@ -95,7 +95,7 @@ class PipelineTests(unittest.TestCase):
         (artifact / "content.json").write_bytes(data)
         common.save_json(artifact / "manifest.json", manifest)
         (artifact / "generation.bundle.json").write_text('{"fixture_only": true}')
-        identity = generate.input_identity("49.0.0", manifest["source"]["sha256"], manifest["config"]["sha256"])
+        identity = generate.input_identity("49.0.0", manifest["source"]["sha256"], manifest["config"]["sha256"], base)
         plan = {"sdk_base": base, "branch": "sdk-generation/go-v49-" + identity,
                 "identity": identity, "rehearsal": False}
         common.save_json(artifact / "plan.json", plan)

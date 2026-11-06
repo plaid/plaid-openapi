@@ -82,7 +82,7 @@ def recover_pushed_branch(repository: str, branch: str, manifest: dict, plan: di
             "Existing branch changed or has additional commits; refusing automatic changes")
     old = validate_manifest(parse_json((previous / MANIFEST).read_bytes()))
     verify_hosted_sdk(previous, old)
-    require(input_identity(old["sdk"]["version"], old["source"]["sha256"], old["config"]["sha256"]) == plan["identity"],
+    require(input_identity(old["sdk"]["version"], old["source"]["sha256"], old["config"]["sha256"], plan["sdk_base"]) == plan["identity"],
             "Existing branch was generated from different inputs")
     data, digest = content(previous)
     require(digest == old["content_sha256"] == manifest["content_sha256"], "Existing branch was edited; refusing automatic changes")
@@ -121,7 +121,7 @@ def verify_artifact(directory: Path, sdk: Path, *, signed: bool = True) -> tuple
     if manifest["schema_version"] == 2:
         require(manifest["fern"]["sdk_base"] == plan["sdk_base"], "Hosted generation used a different SDK base")
     verify_hosted_sdk(sdk, manifest, unsigned_rehearsal=not signed and plan["rehearsal"])
-    identity = input_identity(manifest["sdk"]["version"], manifest["source"]["sha256"], manifest["config"]["sha256"])
+    identity = input_identity(manifest["sdk"]["version"], manifest["source"]["sha256"], manifest["config"]["sha256"], plan["sdk_base"])
     branch = "sdk-generation/go-v" + manifest["sdk"]["version"].split(".")[0] + "-" + identity
     require(plan["identity"] == identity and plan["branch"] == branch, "PR branch/input identity mismatch")
     if signed:

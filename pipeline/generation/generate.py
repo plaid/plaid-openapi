@@ -140,8 +140,8 @@ def config_digest(repo: Path) -> str:
     return sha256(canonical(selected))
 
 
-def input_identity(version: str, source_hash: str, config_hash: str) -> str:
-    return sha256(canonical([version, source_hash, config_hash]))[:20]
+def input_identity(version: str, source_hash: str, config_hash: str, sdk_base: str) -> str:
+    return sha256(canonical([version, source_hash, config_hash, check_sha(sdk_base)]))[:20]
 
 
 def published_baseline(sdk: Path, tags: list[str], major: int, destination: Path) -> str | None:
@@ -559,7 +559,7 @@ def main() -> None:
         version, legacy = generate_versioned_candidate(
             sdk, old, data, tags, major, override, baseline_tag is not None, values, work, output)
         module = "github.com/plaid/plaid-go/v" + str(version_tuple(version)[0])
-        identity = input_identity(version, sha256(data), config_hash)
+        identity = input_identity(version, sha256(data), config_hash, base)
         update_changelog(sdk, version, data, values)
         sanitize_metadata(sdk, version, module, values)
         git(sdk, "add", "-A")

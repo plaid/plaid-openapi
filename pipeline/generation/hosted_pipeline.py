@@ -246,7 +246,7 @@ def assemble(prepared, fern, output, major=False):
         git(sdk, "add", MANIFEST)
         archive_sdk(sdk, output / "sdk.tar.gz")
         (output / "content.json").write_bytes(index)
-        identity = generate.input_identity(version, plan["source"]["sha256"], plan["config"]["sha256"])
+        identity = generate.input_identity(version, plan["source"]["sha256"], plan["config"]["sha256"], base)
         save_json(output / "plan.json", {"sdk_base": base, "branch": f"sdk-generation/go-v{version_tuple(version)[0]}-" + identity,
                                         "identity": identity, "rehearsal": plan["rehearsal"]})
         result = {"status": "assembled", "content_sha256": digest, "subject_name": "plaid-go-v" + version + "-source",

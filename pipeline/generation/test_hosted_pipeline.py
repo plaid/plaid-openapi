@@ -309,6 +309,33 @@ class HostedPipelineTests(unittest.TestCase):
             hosted.assemble(self.prepared, fern, self.root / "stale")
         self.legacy.assert_not_called()
 
+    def test_stale_major_gets_new_branch_only_when_sdk_base_changes(self):
+        plan = self.plan()
+        version = hosted.major_version(plan)
+        original = self.root / "original-major"
+        hosted.assemble(self.prepared, self.fern(plan, version, "original-fern"), original, major=True)
+        original_plan = json.loads((original / "plan.json").read_text())
+
+        write(self.sdk, "README.md", "Updated reviewed docs for github.com/plaid/plaid-go/v50\n")
+        commit(self.sdk, "Update reviewed SDK docs")
+        self.prepared = self.root / "new-prepared"
+        next_plan = self.plan()
+        self.assertEqual(hosted.major_version(next_plan), version)
+        self.assertEqual(next_plan["source"], plan["source"])
+        self.assertEqual(next_plan["config"], plan["config"])
+        self.assertNotEqual(next_plan["sdk_base"], plan["sdk_base"])
+
+        replacement = self.root / "replacement-major"
+        fern = self.fern(next_plan, version, "replacement-fern")
+        hosted.assemble(self.prepared, fern, replacement, major=True)
+        replacement_plan = json.loads((replacement / "plan.json").read_text())
+        self.assertNotEqual(replacement_plan["branch"], original_plan["branch"])
+        publish_pr.verify_artifact(replacement, self.root / "replacement-check", signed=False)
+
+        retry = self.root / "replacement-retry"
+        hosted.assemble(self.prepared, fern, retry, major=True)
+        self.assertEqual(json.loads((retry / "plan.json").read_text()), replacement_plan)
+
     def test_explicit_override_cannot_turn_a_break_into_major(self):
         self.event["inputs"]["version"] = "50.0.1"
         common.save_json(Path(self.env["GITHUB_EVENT_PATH"]), self.event)
