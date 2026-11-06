@@ -159,6 +159,15 @@ groups:
           # Ships the WireMock-backed tests/wire suite; off by default.
           wire_tests:
             enabled: true
+          # The destination SDK must include MIGRATION.md, preserved via .fernignore.
+          custom_readme_sections:
+            - title: Migration Guide
+              content: |
+                Coming from Plaid's previous `plaid-python` SDK (44.0.0 and earlier)? Most call sites
+                change: endpoints move to resource groups, responses are read-only, list endpoints
+                return pagers and errors carry a typed body. The
+                [migration guide](./MIGRATION.md)
+                covers every change with before/after examples and full rename tables.
 
   java-sdk:
     generators:
