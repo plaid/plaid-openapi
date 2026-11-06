@@ -94,7 +94,7 @@ def propose_version(tags: list[str], major: int, override: str = "") -> str:
             versions.append(tuple(map(int, match.groups())))
     if override:
         proposed = version_tuple(override)
-        require(proposed[0] == major, "Major overrides require a reviewed change to the configured major")
+        require(proposed[0] == major, "Explicit version overrides must stay within the current SDK module major")
         require(not versions or proposed > max(versions), "SDK version must exceed the latest published version")
         return override
     return f"{major}.{max(versions)[1] + 1}.0" if versions else f"{major}.0.0"
@@ -171,6 +171,25 @@ def protected(name: str) -> bool:
 
 def protected_state(repo: Path) -> dict[str, tuple[str, str]]:
     return {path: (mode, digest) for path, mode, digest in entries(repo) if protected(path)}
+
+
+def module_rewrite(data: bytes, previous: int, target: int) -> bytes:
+    return re.sub(rb"github\.com/plaid/plaid-go/v" + str(previous).encode() + rb"(?![0-9A-Za-z_.-])",
+                  f"github.com/plaid/plaid-go/v{target}".encode(), data)
+
+
+def expected_protected_state(repo: Path, target_major: int) -> dict[str, tuple[str, str]]:
+    state = protected_state(repo)
+    line = (repo / "go.mod").read_text().splitlines()[0]
+    match = re.fullmatch(r"module github\.com/plaid/plaid-go/v([1-9][0-9]*)", line)
+    require(match is not None and int(match[1]) >= 49, "Unexpected SDK base module")
+    previous = int(match[1])
+    require(target_major in {previous, previous + 1}, "SDK major must stay current or advance by one")
+    if target_major != previous:
+        for name, (mode, _) in state.items():
+            if not name.startswith(PRESERVED_PREFIXES + (".circleci/",)) and (name.endswith(".go") or name == "README.md"):
+                state[name] = (mode, sha256(module_rewrite((repo / name).read_bytes(), previous, target_major)))
+    return state
 
 
 def public_get(url: str, *, token: str | None = None, payload: object | None = None,

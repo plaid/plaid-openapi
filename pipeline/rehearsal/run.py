@@ -17,11 +17,8 @@ import time
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "generation"))
 import generate
 from common import (BUNDLE, MANIFEST, archive_sdk, check_sha, content, git,
-                    protected_state, propose_version, require, save_json, sha256)
+                    propose_version, require, run, save_json, sha256)
 from overlay_coverage import validate as validate_overlay
-
-# Reviewed release controls from plaid/plaid-go#359, not a moving PR branch.
-SDK_COMMIT = "257aa2c6382f737407986369cce22c87307ef2de"
 
 
 def check_context(event: dict) -> str:
@@ -59,7 +56,7 @@ def main() -> None:
     output.mkdir(parents=True)
     values = generate.settings()
     report = {"rehearsal": True, "status": "running", "source_commit": commit,
-              "sdk_base": SDK_COMMIT, "phases_seconds": {}, "cpu_count": os.cpu_count(),
+              "phases_seconds": {}, "cpu_count": os.cpu_count(),
               "disk_free_start_bytes": shutil.disk_usage(output).free}
     stop = threading.Event()
     sampler = threading.Thread(target=sample_memory, args=(report, stop), daemon=True)
@@ -79,38 +76,38 @@ def main() -> None:
     try:
         with tempfile.TemporaryDirectory(prefix="sdk-rehearsal-") as temporary:
             work = Path(temporary).resolve()
-            sdk, old, config = work / "sdk", work / "before", work / "config"
+            sdk, old = work / "sdk", work / "before"
             with phase("fetch-public-inputs"):
-                generate.fetch_repository(values["sdk_repository"], values["sdk_branch"], sdk)
-                git(sdk, "fetch", "origin", SDK_COMMIT)
-                git(sdk, "checkout", "--detach", SDK_COMMIT)
-                require(git(sdk, "rev-parse", "HEAD") == SDK_COMMIT, "SDK pin mismatch")
+                base = generate.fetch_repository(values["sdk_repository"], values["sdk_branch"], sdk)
+                report["sdk_base"] = base
+                git(sdk, "checkout", "--detach", base)
+                require(git(sdk, "rev-parse", "HEAD") == base, "SDK pin mismatch")
                 # Defense in depth: even an accidental push has no configured destination.
                 git(sdk, "remote", "set-url", "--push", "origin", "/dev/null")
-                module = "github.com/" + values["sdk_repository"] + "/v" + str(values["major"])
+                major = generate.current_major(sdk, values)
+                module = "github.com/" + values["sdk_repository"] + "/v" + str(major)
                 generate.assert_sdk_bootstrap(sdk, module)
                 _, data = generate.verified_spec(generate.ROOT, commit, values, sdk)
                 validate_overlay(data, (generate.ROOT / "fern/openapi-overlay.yml").read_bytes())
-                tags = [line.split("refs/tags/", 1)[1] for line in
-                        git(sdk, "ls-remote", "--tags", "--refs", "origin", "refs/tags/v*").splitlines()]
-                version = propose_version(tags, values["major"])
+                tag_refs = git(sdk, "ls-remote", "--tags", "origin", "refs/tags/v*")
+                require(generate.pending_release(sdk, tag_refs) is None,
+                        "SDK master has an unpublished candidate; wait for its release before rehearsal")
+                tags = [line.split("refs/tags/", 1)[1] for line in tag_refs.splitlines() if not line.endswith("^{}")]
+                version = propose_version(tags, major)
                 report.update(spec_sha256=sha256(data), candidate_version=version,
-                              baseline_tag=generate.published_baseline(sdk, tags, values["major"], old))
+                              baseline_tag=generate.published_baseline(sdk, tags, major, old))
                 require(report["baseline_tag"] is not None, "Rehearsal needs a published comparison baseline")
-                require(not (sdk / MANIFEST).exists() and not (sdk / BUNDLE).exists(),
-                        "Rehearsal pin must not carry release evidence")
-                generate.render_config(config, sdk, data, version, values)
-            with phase("fern-generation"):
-                generate.generate_new_client(sdk, config, version, values, work)
-            with phase("legacy-generation"):
-                before = protected_state(sdk)
-                report["legacy"] = generate.run_legacy(sdk, config / "2020-09-14.yml", module, values, work)
-                require(protected_state(sdk) == before, "Legacy changed protected SDK files")
-            with phase("build-and-wire-tests"):
-                generate.verify_sdk(sdk, values, work)
-            with phase("compatibility"):
-                generate.compatibility_gate(old, sdk, module, True, values, work, output=output)
-                shutil.copyfile(work / "api-diff.txt", output / "api-diff.txt")
+                # Preserve source ancestry validation above, but never repackage
+                # an earlier production manifest or signature as rehearsal output.
+                run(["git", "rm", "--ignore-unmatch", "--", MANIFEST, BUNDLE], sdk)
+                if git(sdk, "diff", "--cached", "--name-only"):
+                    git(sdk, "-c", "user.name=SDK rehearsal", "-c", "user.email=sdk-rehearsal@localhost",
+                        "-c", "commit.gpgsign=false", "commit", "-m", "Remove prior release evidence from rehearsal")
+            with phase("generation-and-validation"):
+                version, report["legacy"] = generate.generate_versioned_candidate(
+                    sdk, old, data, tags, major, "", True, values, work, output)
+                module = "github.com/plaid/plaid-go/v" + str(generate.version_tuple(version)[0])
+                report["candidate_version"] = version
             with phase("unsigned-artifact"):
                 generate.update_changelog(sdk, version, data, values)
                 generate.sanitize_metadata(sdk, version, module, values)

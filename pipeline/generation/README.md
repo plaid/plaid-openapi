@@ -1,14 +1,17 @@
 # Generate and publish the Go SDK
 
-An approved merge to `plaid/plaid-openapi` drives the Go release: generate both clients, validate them, attest the exact output, open a ready SDK PR, integrate it after automated checks, then attest and publish its signed version tag. Compatible updates within v49 need no separate human SDK approval or merge.
+An approved merge to `plaid/plaid-openapi` drives the Go release: generate both clients, validate them, attest the exact output, open a ready SDK PR, integrate it after automated checks, then attest and publish its signed version tag. Updates need no separate human SDK approval or merge: compatible API changes stay within the current module major, while detected breaking API changes generate the next major.
 
 The spec and Fern configuration live together in this public repository. Each production run uses `GITHUB_SHA` for both inputs. Push, scheduled catch-up and manual production generation run only from the original public repository's `master`; pull-request, fork and repository-dispatch contexts cannot enter that pipeline. Manual runs can choose a reviewed version override, but cannot choose another spec commit or URL.
 
 ## Pre-merge hosted rehearsal
 
 `sdk-rehearsal.yml` runs on same-repository PRs changing that workflow or
-`pipeline/rehearsal/`. It checks out the exact PR head and the SDK commit pinned
-in `pipeline/rehearsal/run.py`, so neither automation PR needs to merge first.
+`pipeline/rehearsal/`. It checks out the exact PR head and captures the current public SDK `master`
+commit, detaches at that SHA, and records it in the report. This follows the
+reviewed SDK baseline across major releases without accepting arbitrary refs.
+An SDK candidate still awaiting publication blocks rehearsal. Prior production
+release evidence is removed locally before generation.
 It calls the production generation, legacy, build, mock-test and compatibility
 functions on a standard GitHub runner. Its candidate version is only a local
 test value; no tag is created or reserved.
@@ -34,12 +37,12 @@ Those remain activation checks after review and access setup.
 - Before generation, every operation must have an explicit Fern group and method
   name after applying the overlay, and request bodies must not retain top-level
   `client_id` or `secret` fields. Shared request schemas are checked too.
-- The Go floor build and complete local mock suite run before producing the candidate. Compatibility is checked against the latest published stable tag in the configured major, including `legacy/`. A breaking change stops generation and preserves `api-diff.txt` plus a `breaking-change` result in the run artifacts. The current implementation is v49-only; a new major needs reviewed module/import migration work in both clients. Legacy continues to regenerate from the same spec.
+- The Go floor build and complete local mock suite run before producing the candidate. Compatibility is checked against the latest published stable tag in the current root module major, including `legacy/`. The `major` setting is a minimum supported major, not a release pin. The first candidate uses the next minor version; detected API breaks trigger fresh generation of both clients at the next major’s `N.0.0`, with the root module, self imports, maintained Go files and README updated to that namespace. A temporary source copy normalizes the final candidate back to the probe namespace for API comparisons in both directions; unexpected final API drift stops generation. Explicit version overrides remain within the current major and stop on breaking changes. Comparison/tool failures never trigger a major release. Legacy continues to use the same spec and preserves its v48 client identity.
 - If a generation has merged but its tag is absent, the job returns `awaiting-release` before choosing another version. The tag must be annotated and peel to the exact first-parent commit that introduced the manifest. A tag on the generated PR head or another commit is rejected. Later unrelated commits carrying the same published manifest are allowed.
 - A separate job validates the package and uses public Sigstore attestation to bind its content digest to the manifest. The signed source and config repository/commit must match `plaid/plaid-openapi` and the same workflow SHA. Verification requires the exact workflow, `master`, public visibility, run identity, predicate and subject. No generated SDK code executes in this job.
 - The PR job verifies the signature before obtaining its narrowly scoped App token. `SDK_PR_APP_BOT_ID` pins the numeric bot user ID; the public SDK integration and release workflows use the same identity. Same-input retries recheck the existing ready PR, base, one-parent generation commit, content and signature. They never rebase or overwrite existing branches, change drafts, or recreate closed PRs.
 
-Public artifact uploads are explicitly limited to `sdk.tar.gz`, `content.json`, `manifest.json`, `plan.json`, `result.json`, the public `api-diff.txt` comparison when generation stops on a breaking change, and the signed `generation.bundle.json`. Environment dumps, raw CLI debug output, test logs and temporary work directories are not uploaded. The CLI debug file used to check the raw generated caller stays in disposable local storage; failed logged subprocess output is withheld from public job logs. SDK `.fern/metadata.json` contains only version identity.
+Public artifact uploads are explicitly limited to `sdk.tar.gz`, `content.json`, `manifest.json`, `plan.json`, `result.json`, the public `api-diff.txt` comparison used for version selection, and the signed `generation.bundle.json`. Environment dumps, raw CLI debug output, test logs and temporary work directories are not uploaded. The CLI debug file used to check the raw generated caller stays in disposable local storage; failed logged subprocess output is withheld from public job logs. SDK `.fern/metadata.json` contains only version identity.
 
 ## Activation
 
