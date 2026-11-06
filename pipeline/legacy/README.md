@@ -17,6 +17,8 @@ Use physical absolute paths, without symlink components. The manifest must not e
 
 The only dependency additions are missing `oauth2` and `testify` requirements from the public SDK; existing selected versions are retained before `go mod tidy`. Only `legacy/`, `go.mod`, and `go.sum` may change. Root source files are copied for staged compilation and never installed back.
 
+Hosted assembly passes `--defer-tests` so no SDK code executes before the assembly seal. Its separate validation job runs the full suite, including legacy, and the `plaid_integration` compile check against the sealed candidate. Standalone invocation keeps both checks before installation by default.
+
 ## Union preparation
 
 The public spec has four discriminated `oneOf` schemas. The public v48 `model_oneof.mustache` expects `x-plaid-sdk-one-of-interface`, which the public spec does not contain. The adapter validates that every branch has exactly one explicit mapping and a required, single-value string discriminator, then adds the marker to a temporary generation input.

@@ -322,12 +322,15 @@ def generate_new_client(sdk: Path, config: Path, version: str, values: dict, wor
     save_json(work / "wire-test-hardening.json", harden_wire_tests(sdk))
 
 
-def run_legacy(sdk: Path, spec: Path, module: str, values: dict, work: Path) -> dict:
+def run_legacy(sdk: Path, spec: Path, module: str, values: dict, work: Path, *, defer_tests: bool = False) -> dict:
     adapter = ROOT / "pipeline/legacy/generate.py"
     require(adapter.is_file(), "Portable same-spec legacy generator has not been installed")
     output = work / "legacy-manifest.json"
-    run([sys.executable, str(adapter), "--spec", str(spec), "--sdk", str(sdk),
-         "--module", module, "--manifest", str(output)], ROOT, timeout=1800, log=work / "legacy.log")
+    arguments = [sys.executable, str(adapter), "--spec", str(spec), "--sdk", str(sdk),
+                 "--module", module, "--manifest", str(output)]
+    if defer_tests:
+        arguments.append("--defer-tests")
+    run(arguments, ROOT, timeout=1800, log=work / "legacy.log")
     legacy = json.loads(output.read_text())
     require(set(legacy) == {"source_commit", "spec_sha256", "tree_sha256", "generator_digest"}, "Unexpected legacy manifest schema")
     check_sha(legacy["source_commit"])
@@ -363,6 +366,8 @@ def verify_sdk(sdk: Path, values: dict, work: Path) -> None:
                 time.sleep(1)
         run(["go", "test", "-count=1", "-timeout=180s", "./..."], sdk,
             env=clean_env(WIREMOCK_URL=url), timeout=1200, log=work / "sdk-tests.log")
+        run(["go", "test", "-tags=plaid_integration", "-run=^$", "./legacy/..."], sdk,
+            env=clean_env(), timeout=1200, log=work / "legacy-integration-compile.log")
     finally:
         run(["docker", "rm", "-f", name])
 

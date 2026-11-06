@@ -171,7 +171,7 @@ def validate_output(output):
     return files
 
 
-def generate(spec_path, sdk, module, manifest):
+def generate(spec_path, sdk, module, manifest, *, defer_tests=False):
     spec_path, sdk, manifest = map(checked_path, (spec_path, sdk, manifest))
     if not spec_path.is_file() or not sdk.is_dir() or not (sdk / 'go.mod').is_file():
         raise ValueError('spec file and existing SDK module are required')
@@ -224,9 +224,10 @@ def generate(spec_path, sdk, module, manifest):
             if dependency.split('@')[0] not in requirements:
                 run(['go', 'mod', 'edit', '-require=' + dependency], staged)
         run(['go', 'mod', 'tidy'], staged)
-        run(['go', 'test', './legacy/...'], staged)
-        # The tag enables imports and signatures, but no Sandbox test runs.
-        run(['go', 'test', '-tags=plaid_integration', '-run=^$', './legacy/...'], staged)
+        if not defer_tests:
+            run(['go', 'test', './legacy/...'], staged)
+            # The tag enables imports and signatures, but no Sandbox test runs.
+            run(['go', 'test', '-tags=plaid_integration', '-run=^$', './legacy/...'], staged)
         result = {'source_commit': SOURCE_COMMIT, 'spec_sha256': sha(raw),
                   'tree_sha256': tree_sha256(legacy), 'generator_digest': GENERATOR_DIGEST}
         backup = work / 'original-legacy'
@@ -264,9 +265,11 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('spec', 'sdk', 'module', 'manifest'):
         parser.add_argument('--' + name, required=True)
+    parser.add_argument('--defer-tests', action='store_true',
+                        help='Defer SDK execution to isolated validation after the hosted assembly seal')
     args = parser.parse_args()
     try:
-        generate(Path(args.spec), Path(args.sdk), args.module, Path(args.manifest))
+        generate(Path(args.spec), Path(args.sdk), args.module, Path(args.manifest), defer_tests=args.defer_tests)
     except (ValueError, OSError, subprocess.CalledProcessError, yaml.YAMLError) as error:
         parser.exit(1, f'legacy generation failed: {error}\n')
 

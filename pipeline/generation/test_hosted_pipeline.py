@@ -81,7 +81,8 @@ class HostedPipelineTests(unittest.TestCase):
         common.run(["git", "clone", "--quiet", str(self.sdk), str(destination)])
         return common.git(destination, "rev-parse", "HEAD")
 
-    def legacy_generation(self, sdk, source, module, values, work):
+    def legacy_generation(self, sdk, source, module, values, work, *, defer_tests=False):
+        self.assertTrue(defer_tests, 'Hosted assembly must not execute SDK tests before sealing')
         self.assertEqual(common.sha256(source.read_bytes()), common.sha256(spec()))
         self.assertEqual(module, (sdk / "go.mod").read_text().splitlines()[0].removeprefix("module "))
         write(sdk, "legacy/client.go", "package plaid\n// regenerated " + module + "\n")
@@ -183,6 +184,7 @@ class HostedPipelineTests(unittest.TestCase):
         self.tests.assert_not_called()
         self.compatibility.assert_not_called()
         self.legacy.assert_called_once()
+        self.assertTrue(self.legacy.call_args.kwargs['defer_tests'])
         manifest = json.loads((output / "manifest.json").read_text())
         self.assertEqual(manifest["schema_version"], 2)
         self.assertEqual(manifest["fern"]["sdk_base"], self.sdk_commit)
