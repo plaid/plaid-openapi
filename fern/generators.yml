@@ -201,7 +201,7 @@ groups:
       # fern-ruby-sdk is the v2 generator (generators/ruby-v2 in fern-api/fern).
       # fernapi/fern-ruby-sdk-v2 is the same image (identical digest at 1.28.3).
       - name: fernapi/fern-ruby-sdk
-        version: 1.38.2
+        version: 1.41.0
         output:
           location: local-file-system
           path: ../generated/ruby-sdk
@@ -236,3 +236,6 @@ groups:
           coerceAliasResponses: true
           # Keep malformed JSON responses in the SDK error hierarchy.
           wrapInvalidJsonResponses: true
+          isolateModelCopies: true
+          protectModelMethods: true
+          preserveIntegerInputs: true
