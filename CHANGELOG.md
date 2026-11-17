@@ -1,3 +1,15 @@
+### 2020-09-14_1.822.2
+
+- Give `network` in `/transfer/ledger/withdraw` its own description: withdrawals accept `ach` or `same-day-ach`, with limits of $10,000,000 per Standard ACH withdrawal and $1,000,000 per Same Day ACH withdrawal, and `same-day-ach` withdrawals submitted after the Same Day ACH cutoff may be downgraded to Standard ACH.
+
+### 2020-09-14_1.822.1
+
+- (pre-release) Align Business Verification response examples with the fictional ACME Widgets Sandbox business, including an initial active verification and completed optional checks.
+
+### 2020-09-14_1.822.0
+
+- [Breaking for Go] Return `[]` instead of `null` for `monthly_summaries`, `top_categories`, `category_details`, `top_providers` and `top_merchants` in Asset Report account insights when there's no data, and mark them required.
+
 ### 2020-09-14_1.821.0
 
 - [Breaking for Go] Match the Auth number types to API behavior. API responses don't change.

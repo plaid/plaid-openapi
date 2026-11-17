@@ -6,7 +6,7 @@ servers:
   url: https://sandbox.plaid.com
 info:
   title: The Plaid API
-  version: 2020-09-14_1.821.0
+  version: 2020-09-14_1.822.2
   description: The Plaid REST API. Please see https://plaid.com/docs/api for more details.
   contact:
     name: Plaid Developer Team
@@ -10757,34 +10757,34 @@ paths:
                 example-1:
                   value:
                     id: busver_52xR9LKo77r1Np
-                    client_user_id: your-db-id-3b24110
-                    created_at: "2020-07-24T03:26:02Z"
-                    completed_at: "2020-07-24T03:26:02Z"
-                    redacted_at: "2020-07-24T03:26:02Z"
+                    client_user_id: acme-widgets-sandbox-enriched-001
+                    created_at: "2026-01-15T15:00:00Z"
+                    completed_at: "2026-01-15T15:00:10Z"
+                    redacted_at: null
                     status: success
                     requested_checks:
                       include_website_analysis: true
                       include_industry_classification: true
                     search_terms:
-                      name: Acme Corporation
-                      alternative_names:
-                      - Acme Widgets
+                      name: ACME WIDGETS, LLC
+                      alternative_names: []
                       address:
-                        street: 123 Main St.
-                        street2: Unit 42
-                        city: Pawnee
-                        region: IN
-                        postal_code: "46001"
+                        street: 123 Main St
+                        street2: null
+                        city: Anytown
+                        region: CA
+                        postal_code: "90210"
                         country: US
-                      website: https://example.com
-                      phone_number: "+14025671234"
-                      email_address: user@example.com
+                      website: https://acme.example.com
+                      phone_number: null
+                      email_address: null
                       tin: "123456789"
                       officers:
-                      - name: Leslie Knope
+                      - name: John Smith
+                      - name: Jane Doe
                     business_verification:
                       status: success
-                      score: 85
+                      score: 95
                       name:
                         summary: match
                       address:
@@ -10794,43 +10794,43 @@ paths:
                           standardized_address:
                             street: 123 Main St
                             street2: null
-                            city: Pawnee
-                            region: IN
-                            postal_code: "46001"
+                            city: Anytown
+                            region: CA
+                            postal_code: "90210"
                             country: US
-                            lat: 40.65
-                            lon: -86.25
+                            lat: 34.09031
+                            lon: -118.40606
                           deliverability:
                             is_deliverable: true
                             is_cmra: false
                             residential_indicator: commercial
                             delivery_type: street
                       website:
-                        summary: match
+                        summary: no_data
                       tin:
                         summary: match
                         tin_type: ein
                       officers:
                         summary: match
                       registered_agent:
-                        summary: no_match
+                        summary: no_data
                       business_details:
-                        name: Acme Corporation
+                        name: ACME WIDGETS, LLC
                         alternative_names:
-                        - Acme Widgets
+                        - ACME WIDGETS, INC
                         entity_type: llc
-                        incorporation_date: "1990-05-29"
-                        incorporation_jurisdiction: IN
+                        incorporation_date: "2010-01-01"
+                        incorporation_jurisdiction: CA
                         addresses:
-                        - is_primary: true
-                          street: 123 Main St
+                        - is_primary: false
+                          street: 456 Oak Ave
                           street2: null
-                          city: Pawnee
-                          region: IN
-                          postal_code: "46001"
+                          city: Anytown
+                          region: CA
+                          postal_code: "90211"
                           country: US
-                          lat: 40.65
-                          lon: -86.25
+                          lat: 34.08031
+                          lon: -118.41606
                           deliverability:
                             is_deliverable: true
                             is_cmra: false
@@ -10838,81 +10838,134 @@ paths:
                             delivery_type: street
                           sources:
                           - secretary_of_state
+                        - is_primary: true
+                          street: 123 Main St
+                          street2: null
+                          city: Anytown
+                          region: CA
+                          postal_code: "90210"
+                          country: US
+                          lat: 34.07031
+                          lon: -118.42606
+                          deliverability:
+                            is_deliverable: true
+                            is_cmra: false
+                            residential_indicator: commercial
+                            delivery_type: street
+                          sources:
+                          - secretary_of_state
+                        - is_primary: false
+                          street: 789 Pine St
+                          street2: null
+                          city: Anytown
+                          region: CA
+                          postal_code: "90210"
+                          country: US
+                          lat: 34.10031
+                          lon: -118.39606
+                          deliverability:
+                            is_deliverable: false
+                            is_cmra: false
+                            residential_indicator: residential
+                            delivery_type: street
+                          sources:
+                          - secretary_of_state
                         phone_numbers:
-                        - number: "+12345678909"
+                        - number: "+13105550123"
                         email_addresses:
-                        - email_address: business@example.com
+                        - email_address: contact@acme.example.com
                         websites:
-                        - url: https://example.com
+                        - url: https://acme.example.com/
                         officers:
-                        - name: Leslie Knope
+                        - name: John Smith
                           titles:
-                          - President
+                          - MANAGER
                           jurisdictions:
-                          - IN
+                          - CA
+                          sources:
+                          - secretary_of_state
+                        - name: Jane Doe
+                          titles:
+                          - MANAGER
+                          jurisdictions:
+                          - CA
                           sources:
                           - secretary_of_state
                         registrations:
-                        - name: Acme Corporation
-                          file_number: "199005290001"
-                          jurisdiction: IN
+                        - name: ACME WIDGETS, LLC
+                          file_number: "12345678"
+                          jurisdiction: CA
                           type: domestic
                           status: active
-                          standing: In Good Standing
-                          issue_date: "1990-05-29"
+                          standing: Good
+                          issue_date: "2010-01-01"
                           inactive_date: null
                           dissolution_date: null
                           address:
                             street: 123 Main St
                             street2: null
-                            city: Pawnee
-                            region: IN
-                            postal_code: "46001"
+                            city: Anytown
+                            region: CA
+                            postal_code: "90210"
                             country: US
-                            lat: 40.65
-                            lon: -86.25
+                            lat: 34.09031
+                            lon: -118.40606
                             deliverability:
                               is_deliverable: true
                               is_cmra: false
                               residential_indicator: commercial
                               delivery_type: street
                           registered_agent:
-                            name: Ron Swanson
-                            address: null
+                            name: REGISTERED AGENT SERVICES, INC
+                            address:
+                              street: 456 Oak Ave
+                              street2: null
+                              city: Anytown
+                              region: CA
+                              postal_code: "90211"
+                              country: US
+                              lat: 34.08031
+                              lon: -118.41606
+                              deliverability:
+                                is_deliverable: true
+                                is_cmra: false
+                                residential_indicator: commercial
+                                delivery_type: street
                           officers:
-                          - name: Leslie Knope
+                          - name: JOHN SMITH
                             titles:
-                            - President
+                            - MANAGER
+                          - name: JANE DOE
+                            titles:
+                            - MANAGER
                         industry:
                           classification:
-                            code: "423840"
-                            description: Industrial Supplies Merchant Wholesalers
+                            code: "332119"
+                            description: Metal Manufacturing
                             confidence: high
                             mcc_codes:
-                            - code: "5085"
-                              description: Industrial Supplies, Not Elsewhere Classified
+                            - code: "5251"
+                              description: Hardware Stores
+                            - code: "5072"
+                              description: Hardware Equipment and Supplies
                             sic_codes:
-                            - code: "5085"
-                              description: Industrial Supplies
-                        sec_registrations:
-                        - cik: "1234567"
-                          tickers:
-                          - ACME
-                          exchanges:
-                          - NYSE
-                          edgar_url: https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001234567
+                            - code: "3469"
+                              description: Metal Stampings, Nec
+                            - code: "5072"
+                              description: Hardware
+                        sec_registrations: []
                     risk_check:
                       status: success
-                      score: 92
+                      score: 84
                     digital_presence_check:
                       status: success
-                      score: 55
+                      score: 85
                       address:
                         summary: match
                       phone_number:
-                        summary: match
+                        summary: no_input
                       email_address:
-                        summary: match
+                        summary: no_input
                       website:
                         summary: match
                       website_analysis:
@@ -10920,13 +10973,13 @@ paths:
                         email_is_deliverable: "yes"
                         website_build_status: active
                         whois_record:
-                          domain_created_at: "1995-08-16T00:00:00Z"
-                          domain_updated_at: "2025-07-11T00:00:00Z"
-                          domain_expires_at: "2026-08-15T00:00:00Z"
-                          registrar: GANDI SAS
+                          domain_created_at: "2000-01-15T00:00:00Z"
+                          domain_updated_at: "2025-06-10T00:00:00Z"
+                          domain_expires_at: "2026-06-15T00:00:00Z"
+                          registrar: Example Registrar Inc
                         ssl:
                           is_valid: "yes"
-                    shareable_url: https://verify.plaid.com/busver_4FrXJvfQU3zGUR?key=e004115db797f7cc3083bff3167cba30644ef630fb46f5b086cde6cc3b86a36f
+                    shareable_url: https://verify.plaid.com/verify/busver_52xR9LKo77r1Np?key=e004115db797f7cc3083bff3167cba30644ef630fb46f5b086cde6cc3b86a36f
                     request_id: saKrIBuEB9qJZng
       description: Retrieve the current state of a specific business verification.
       requestBody:
@@ -10955,177 +11008,36 @@ paths:
                 example-1:
                   value:
                     id: busver_52xR9LKo77r1Np
-                    client_user_id: your-db-id-3b24110
-                    created_at: "2020-07-24T03:26:02Z"
-                    completed_at: "2020-07-24T03:26:02Z"
-                    redacted_at: "2020-07-24T03:26:02Z"
-                    status: success
+                    client_user_id: acme-widgets-sandbox-enriched-001
+                    created_at: "2026-01-15T15:00:00Z"
+                    completed_at: null
+                    redacted_at: null
+                    status: active
                     requested_checks:
                       include_website_analysis: true
                       include_industry_classification: true
                     search_terms:
-                      name: Acme Corporation
-                      alternative_names:
-                      - Acme Widgets
+                      name: ACME WIDGETS, LLC
+                      alternative_names: []
                       address:
-                        street: 123 Main St.
-                        street2: Unit 42
-                        city: Pawnee
-                        region: IN
-                        postal_code: "46001"
+                        street: 123 Main St
+                        street2: null
+                        city: Anytown
+                        region: CA
+                        postal_code: "90210"
                         country: US
-                      website: https://example.com
-                      phone_number: "+14025671234"
-                      email_address: user@example.com
+                      website: https://acme.example.com
+                      phone_number: null
+                      email_address: null
                       tin: "123456789"
                       officers:
-                      - name: Leslie Knope
-                    business_verification:
-                      status: success
-                      score: 85
-                      name:
-                        summary: match
-                      address:
-                        summary: match
-                        validation:
-                          level: full
-                          standardized_address:
-                            street: 123 Main St
-                            street2: null
-                            city: Pawnee
-                            region: IN
-                            postal_code: "46001"
-                            country: US
-                            lat: 40.65
-                            lon: -86.25
-                          deliverability:
-                            is_deliverable: true
-                            is_cmra: false
-                            residential_indicator: commercial
-                            delivery_type: street
-                      website:
-                        summary: match
-                      tin:
-                        summary: match
-                        tin_type: ein
-                      officers:
-                        summary: match
-                      registered_agent:
-                        summary: no_match
-                      business_details:
-                        name: Acme Corporation
-                        alternative_names:
-                        - Acme Widgets
-                        entity_type: llc
-                        incorporation_date: "1990-05-29"
-                        incorporation_jurisdiction: IN
-                        addresses:
-                        - is_primary: true
-                          street: 123 Main St
-                          street2: null
-                          city: Pawnee
-                          region: IN
-                          postal_code: "46001"
-                          country: US
-                          lat: 40.65
-                          lon: -86.25
-                          deliverability:
-                            is_deliverable: true
-                            is_cmra: false
-                            residential_indicator: commercial
-                            delivery_type: street
-                          sources:
-                          - secretary_of_state
-                        phone_numbers:
-                        - number: "+12345678909"
-                        email_addresses:
-                        - email_address: business@example.com
-                        websites:
-                        - url: https://example.com
-                        officers:
-                        - name: Leslie Knope
-                          titles:
-                          - President
-                          jurisdictions:
-                          - IN
-                          sources:
-                          - secretary_of_state
-                        registrations:
-                        - name: Acme Corporation
-                          file_number: "199005290001"
-                          jurisdiction: IN
-                          type: domestic
-                          status: active
-                          standing: In Good Standing
-                          issue_date: "1990-05-29"
-                          inactive_date: null
-                          dissolution_date: null
-                          address:
-                            street: 123 Main St
-                            street2: null
-                            city: Pawnee
-                            region: IN
-                            postal_code: "46001"
-                            country: US
-                            lat: 40.65
-                            lon: -86.25
-                            deliverability:
-                              is_deliverable: true
-                              is_cmra: false
-                              residential_indicator: commercial
-                              delivery_type: street
-                          registered_agent:
-                            name: Ron Swanson
-                            address: null
-                          officers:
-                          - name: Leslie Knope
-                            titles:
-                            - President
-                        industry:
-                          classification:
-                            code: "423840"
-                            description: Industrial Supplies Merchant Wholesalers
-                            confidence: high
-                            mcc_codes:
-                            - code: "5085"
-                              description: Industrial Supplies, Not Elsewhere Classified
-                            sic_codes:
-                            - code: "5085"
-                              description: Industrial Supplies
-                        sec_registrations:
-                        - cik: "1234567"
-                          tickers:
-                          - ACME
-                          exchanges:
-                          - NYSE
-                          edgar_url: https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001234567
-                    risk_check:
-                      status: success
-                      score: 92
-                    digital_presence_check:
-                      status: success
-                      score: 55
-                      address:
-                        summary: match
-                      phone_number:
-                        summary: match
-                      email_address:
-                        summary: match
-                      website:
-                        summary: match
-                      website_analysis:
-                        is_parked: "no"
-                        email_is_deliverable: "yes"
-                        website_build_status: active
-                        whois_record:
-                          domain_created_at: "1995-08-16T00:00:00Z"
-                          domain_updated_at: "2025-07-11T00:00:00Z"
-                          domain_expires_at: "2026-08-15T00:00:00Z"
-                          registrar: GANDI SAS
-                        ssl:
-                          is_valid: "yes"
-                    shareable_url: https://verify.plaid.com/busver_4FrXJvfQU3zGUR?key=e004115db797f7cc3083bff3167cba30644ef630fb46f5b086cde6cc3b86a36f
-                    request_id: saKrIBuEB9qJZng
+                      - name: John Smith
+                      - name: Jane Doe
+                    business_verification: null
+                    risk_check: null
+                    digital_presence_check: null
+                    shareable_url: https://verify.plaid.com/verify/busver_52xR9LKo77r1Np?key=e004115db797f7cc3083bff3167cba30644ef630fb46f5b086cde6cc3b86a36f
+                    request_id: IhYw3R9KsL2f8Pq
       requestBody:
         content:
           application/json:
@@ -43259,7 +43171,15 @@ components:
         idempotency_key:
           $ref: '#/components/schemas/LedgerWithdrawIdempotencyKey'
         network:
-          $ref: '#/components/schemas/TransferNetwork'
+          description: |-
+            The network or rails used for the withdrawal: `ach` for Standard ACH or `same-day-ach` for Same Day ACH. The limit for a single Standard ACH withdrawal is $10,000,000, and the limit for a single Same Day ACH withdrawal is $1,000,000; withdrawals above the limit for their network will fail.
+
+            The Same Day ACH cutoff is 3:00 PM Eastern Time and the Standard ACH cutoff is 8:30 PM Eastern Time. If a `same-day-ach` withdrawal is submitted on a banking day after the Same Day ACH cutoff and before the Standard ACH cutoff, it may be downgraded to Standard ACH. Withdrawals submitted after the Standard ACH cutoff, or on a weekend or bank holiday, stay Same Day ACH and are submitted in the first Same Day ACH window of the next banking day. See [ACH processing windows](https://plaid.com/docs/transfer/creating-transfers/#ach-processing-windows).
+          x-override-enum-values-shown:
+          - ach
+          - same-day-ach
+          allOf:
+          - $ref: '#/components/schemas/TransferNetwork'
       required:
       - amount
       - idempotency_key
@@ -56255,11 +56175,11 @@ components:
         include_insights:
           type: boolean
           default: false
-          description: '`true` if you would like to retrieve the Asset Report with Insights, `false` otherwise. This field defaults to `false` if omitted.'
+          description: If `true`, retrieves the Asset Report with Insights.
         fast_report:
           type: boolean
           default: false
-          description: '`true` to fetch "fast" version of asset report. Defaults to false if omitted. Can only be used if `/asset_report/create` was called with `options.add_ons` set to `["fast_assets"]`.'
+          description: If `true`, retrieves the Fast Asset Report. If `false`, retrieves the Full Asset Report. To set this field to `true`, you must call `/asset_report/create` with `options.add_ons` set to `["fast_assets"]`.
         options:
           $ref: '#/components/schemas/AssetReportGetRequestOptions'
     AssetReportGetRequestOptions:
@@ -57820,6 +57740,9 @@ components:
       type: object
       nullable: true
       additionalProperties: true
+      required:
+      - category_details
+      - monthly_summaries
       properties:
         amount:
           type: number
@@ -57870,6 +57793,9 @@ components:
       type: object
       nullable: true
       additionalProperties: true
+      required:
+      - top_merchants
+      - monthly_summaries
       properties:
         amount:
           type: number
@@ -57923,6 +57849,10 @@ components:
       type: object
       nullable: true
       additionalProperties: true
+      required:
+      - category_details
+      - top_providers
+      - monthly_summaries
       properties:
         amount:
           type: number
@@ -57981,6 +57911,10 @@ components:
       type: object
       nullable: true
       additionalProperties: true
+      required:
+      - category_details
+      - top_providers
+      - monthly_summaries
       properties:
         amount:
           type: number
@@ -58091,6 +58025,8 @@ components:
       type: object
       nullable: true
       additionalProperties: true
+      required:
+      - top_categories
       properties:
         transactions_count:
           type: integer
@@ -58180,6 +58116,9 @@ components:
       type: object
       nullable: true
       additionalProperties: true
+      required:
+      - top_categories
+      - monthly_summaries
       properties:
         amount:
           type: number
@@ -62240,7 +62179,7 @@ components:
       description: Status of the digital presence check
     BusinessVerificationShareableURL:
       type: string
-      example: https://verify.plaid.com/busver_4FrXJvfQU3zGUR?key=e004115db797f7cc3083bff3167cba30644ef630fb46f5b086cde6cc3b86a36f
+      example: https://verify.plaid.com/verify/busver_52xR9LKo77r1Np?key=e004115db797f7cc3083bff3167cba30644ef630fb46f5b086cde6cc3b86a36f
       description: A shareable URL that can be sent directly to the user to complete verification
       nullable: true
     BusinessCheckBooleanStatus:
