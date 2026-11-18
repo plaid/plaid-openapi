@@ -52,6 +52,27 @@ readme:
         The previous client and `PlaidClient` can be used side by side while you migrate.
         Imports of individual files in the previous package, such as `plaid/dist/api`, no
         longer resolve; import from `plaid/legacy` instead.
+    - title: Legacy SDK
+      language: ruby
+      content: |
+        Plaid's previous client ships in this gem as `Plaid::Legacy`, generated from the
+        same API spec. To keep existing code working, change `require "plaid"` to
+        `require "plaid/legacy"` and prefix its constants with `Plaid::Legacy`:
+
+        ```ruby
+        require "plaid/legacy"
+
+        configuration = Plaid::Legacy::Configuration.new
+        configuration.server_index = Plaid::Legacy::Configuration::Environment["sandbox"]
+        configuration.api_key["PLAID-CLIENT-ID"] = ENV["PLAID_CLIENT_ID"]
+        configuration.api_key["PLAID-SECRET"] = ENV["PLAID_SECRET"]
+
+        client = Plaid::Legacy::PlaidApi.new(Plaid::Legacy::ApiClient.new(configuration))
+        ```
+
+        The previous client and `Plaid::PlaidApi` can be used side by side while you migrate.
+        `require "plaid/legacy"` doesn't load the new client, so require both where one
+        process uses both.
 
 
 replay:
@@ -201,7 +222,7 @@ groups:
       # fern-ruby-sdk is the v2 generator (generators/ruby-v2 in fern-api/fern).
       # fernapi/fern-ruby-sdk-v2 is the same image (identical digest at 1.28.3).
       - name: fernapi/fern-ruby-sdk
-        version: 1.41.0
+        version: 1.45.3
         output:
           location: local-file-system
           path: ../generated/ruby-sdk
