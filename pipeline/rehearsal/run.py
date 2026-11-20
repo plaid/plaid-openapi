@@ -129,3 +129,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+# Triggers this read-only workflow to build the Go SDK release candidate from OpenAPI 1.822.2; the PR is closed unmerged.
