@@ -185,6 +185,14 @@ groups:
     generators:
       - name: fernapi/fern-java-sdk
         version: 4.32.1
+        # Published POM metadata, matching the previous artifact. Without it Fern
+        # writes placeholder values.
+        metadata:
+          package-description: "Bindings for the Plaid (plaid.com) API."
+          reference-url: "https://github.com/plaid/plaid-java"
+          author: "Plaid Engineering"
+          email: "support@plaid.com"
+          license: "MIT"
         output:
           location: local-file-system
           path: ../generated/java-sdk
