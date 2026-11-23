@@ -221,9 +221,9 @@ groups:
           # Match the published Java client: callers opt in to retrying requests.
           # Transfers and payments may already have succeeded when a request fails.
           maxRetries: 0
-          # The previous client ships inside this artifact as com.plaid.client.legacy
-          # (megabin openapi generate-legacy -g java in plaid/go). These are its pom.xml
-          # dependencies; OkHttp comes from Fern, so the logging interceptor matches it.
+          # The previous client ships inside this artifact as com.plaid.client.legacy.
+          # These are its pom.xml dependencies; OkHttp comes from Fern, so the logging
+          # interceptor matches Fern's OkHttp version.
           custom-dependencies:
             - "api com.squareup.retrofit2:retrofit:2.11.0"
             - "api com.squareup.retrofit2:converter-gson:2.11.0"
