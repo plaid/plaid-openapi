@@ -185,6 +185,14 @@ groups:
     generators:
       - name: fernapi/fern-java-sdk
         version: 4.32.1
+        # Published POM metadata, matching the previous artifact. Without it Fern
+        # writes placeholder values.
+        metadata:
+          package-description: "Bindings for the Plaid (plaid.com) API."
+          reference-url: "https://github.com/plaid/plaid-java"
+          author: "Plaid Engineering"
+          email: "support@plaid.com"
+          license: "MIT"
         output:
           location: local-file-system
           path: ../generated/java-sdk
@@ -216,6 +224,26 @@ groups:
           # Lets callers add OkHttp interceptors, which live plaid-java users
           # get via ApiClient.getOkBuilder().
           custom-interceptors: true
+          # Plaid uses this name and version to select SDK compatibility behavior.
+          user-agent: "Plaid Java v{version}"
+          # Match the published Java client: callers opt in to retrying requests.
+          # Transfers and payments may already have succeeded when a request fails.
+          maxRetries: 0
+          # The previous client ships inside this artifact as com.plaid.client.legacy.
+          # These are its pom.xml dependencies; OkHttp comes from Fern, so the logging
+          # interceptor matches Fern's OkHttp version.
+          custom-dependencies:
+            - "api com.squareup.retrofit2:retrofit:2.11.0"
+            - "api com.squareup.retrofit2:converter-gson:2.11.0"
+            - "api com.squareup.okhttp3:logging-interceptor:5.2.1"
+            - "api com.squareup.retrofit2:converter-scalars:2.11.0"
+            - "api io.swagger:swagger-annotations:1.5.22"
+            - "api org.apache.oltu.oauth2:org.apache.oltu.oauth2.client:1.0.1"
+            - "api io.gsonfire:gson-fire:1.9.0"
+            - "compileOnly javax.annotation:javax.annotation-api:1.3.2"
+            - "api com.google.code.findbugs:jsr305:3.0.2"
+            - "testImplementation junit:junit:4.13.1"
+            - "testImplementation net.jcip:jcip-annotations:1.0"
 
   ruby-sdk:
     generators:
