@@ -180,6 +180,17 @@ groups:
           # Ships the WireMock-backed tests/wire suite; off by default.
           wire_tests:
             enabled: true
+          # Runtime dependencies of the previous client, which ships in this package as
+          # plaid.legacy. The urllib3 and python-dateutil floors are the published
+          # client's; it doesn't pin nulltype, so this takes its current release.
+          extra_dependencies:
+            urllib3: ">=1.25.3"
+            python-dateutil: ">=2.5.3"
+            nulltype: ">=2.3.1"
+          # The previous client and its tests are untyped generated code.
+          mypy_exclude:
+            - "^src/plaid/legacy/"
+            - "^tests/legacy/"
 
   java-sdk:
     generators:
