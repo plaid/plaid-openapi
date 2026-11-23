@@ -216,6 +216,11 @@ groups:
           # Lets callers add OkHttp interceptors, which live plaid-java users
           # get via ApiClient.getOkBuilder().
           custom-interceptors: true
+          # Plaid uses this name and version to select SDK compatibility behavior.
+          user-agent: "Plaid Java v{version}"
+          # Match the published Java client: callers opt in to retrying requests.
+          # Transfers and payments may already have succeeded when a request fails.
+          maxRetries: 0
 
   ruby-sdk:
     generators:
