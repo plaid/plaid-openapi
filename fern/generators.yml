@@ -180,6 +180,14 @@ groups:
           # Ships the WireMock-backed tests/wire suite; off by default.
           wire_tests:
             enabled: true
+          # Match the published Python client: one attempt per request.
+          # Transfers and payments may already have succeeded when a request fails.
+          default_max_retries: 0
+          # Match the published Python client, which sets no request timeout.
+          # Callers can still pass timeout on the client or per request.
+          timeout: infinity
+          # Plaid uses this name and version to select SDK compatibility behavior.
+          user-agent: "Plaid Python v{version}"
 
   java-sdk:
     generators:
